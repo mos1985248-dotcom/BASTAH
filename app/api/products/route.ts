@@ -61,7 +61,12 @@ export async function GET(req: NextRequest) {
   };
   if (storeId) where.storeId = storeId;
   if (category) where.category = { slug: category };
-  if (city) where.store = { ...where.store, city: { equals: city, mode: "insensitive" } };
+  if (city) {
+    where.store = {
+      ...where.store,
+      city: { contains: city, mode: "insensitive" },
+    };
+  }
   if (search) {
     where.OR = [
       { nameAr: { contains: search, mode: "insensitive" } },
