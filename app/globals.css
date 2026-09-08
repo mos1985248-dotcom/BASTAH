@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* القيم هنا مطابقة حرفياً لـ theme/ (colors.ts, motion.ts, shadows.ts) —
+   ملفات CSS خام ما تقدر تستورد TypeScript، فهذا هو الاستثناء التقني
+   الوحيد الموثّق. أي تغيير بـtheme/ لازم يُعكَس هنا يدوياً. */
+:root {
+  --color-bg: #FBF8F2;
+  --color-text: #1A1A1A;
+  --color-primary-600: #2A6B57;
+  --shadow-md: 0 6px 16px rgba(27, 77, 62, 0.10);
+  --shadow-sm: 0 2px 6px rgba(27, 77, 62, 0.08);
+  --motion-base: 200ms;
+  --motion-fast: 150ms;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-plex-arabic), "IBM Plex Sans Arabic", system-ui, sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* حلقة تركيز موحّدة لكل عنصر تفاعلي (لوحة المفاتيح) — تستبدل outline
+   المتصفح الافتراضي القبيح بحلقة بلون العلامة التجارية. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* بطاقة تفاعلية عامة (متجر، منتج، مقال، عرض) — hover lift + ظل + انتقال خفيف.
+   مصدر وحيد بدل تكرار نفس الـ transition بكل مكوّن بطاقة على حدة. */
+.basita-card-interactive {
+  transition: transform var(--motion-base) var(--motion-ease),
+              box-shadow var(--motion-base) var(--motion-ease),
+              border-color var(--motion-base) var(--motion-ease);
+}
+.basita-card-interactive:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-600);
+}
+.basita-card-interactive:active {
+  transform: translateY(-1px);
+}
+
+/* زر تفاعلي عام — ضغطة خفيفة عند :active، بدون تغيير الحجم المفاجئ. */
+.basita-btn-interactive {
+  transition: transform var(--motion-fast) var(--motion-ease),
+              box-shadow var(--motion-base) var(--motion-ease),
+              opacity var(--motion-fast) var(--motion-ease),
+              background var(--motion-base) var(--motion-ease);
+}
+.basita-btn-interactive:hover {
+  box-shadow: var(--shadow-sm);
+}
+.basita-btn-interactive:active {
+  transform: scale(0.97);
+}
+.basita-btn-interactive:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+@keyframes basita-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* احترام تفضيل المستخدم بتقليل الحركة — تعطيل الانتقالات/الأنيميشن. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

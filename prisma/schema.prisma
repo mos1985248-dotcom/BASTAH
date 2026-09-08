@@ -1,0 +1,1590 @@
+// ======================================================
+// بسطة - Basita Marketplace Platform
+// Complete Prisma Schema
+// ======================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // ⚠️ لازم لـ Supabase: DATABASE_URL (بورت 6543) يمرّ عبر PgBouncer
+  // (pooling) — مناسب للتطبيق وقت التشغيل لكن لا يدعم DDL بشكل موثوق.
+  // Prisma Migrate يحتاج اتصال مباشر (بورت 5432) عبر directUrl، وإلا
+  // P1001 (Can't reach database server) أو أخطاء migration غامضة.
+  directUrl = env("DIRECT_URL")
+}
+
+// ======================================================
+// ENUMS
+// ======================================================
+
+enum UserRole {
+  BUYER
+  SELLER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum StoreStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_REVIEW
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  OUT_OF_STOCK
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  MADA
+  APPLE_PAY
+  STCPAY
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+}
+
+enum FulfillmentMethod {
+  SHIPPING // الافتراضي — عبر ShippingService الحالي
+  PICKUP   // استلام شخصي من موقع التاجر — لا شحن، لا تكلفة شحن
+}
+
+enum SubscriptionPlan {
+  // مجاني — ٠ ريال، ٣ منتجات، منيرة غير مفعّلة
+  FREE
+
+  // ٤٩ ريال، ٢٠ منتج، منيرة غير مفعّلة
+  STARTER
+
+  // ٩٩ ريال، ٥٠ منتج، منيرة مفعّلة
+  GROWTH
+
+  // ١٩٩ ريال، منتجات غير محدودة، منيرة مفعّلة
+  PRO
+}
+
+enum SubscriptionStatus {
+  TRIAL          // فترة تجريبية
+  ACTIVE         // نشط ومدفوع
+  GRACE_PERIOD   // فشل الدفع — فترة سماح (٧ أيام) قبل التعليق
+  SUSPENDED      // معلّق — انتهت فترة السماح، المتجر غير ظاهر للعامة
+  CANCELLED      // ألغاه التاجر بنفسه
+  EXPIRED        // انتهى ولم يُجدَّد
+}
+
+enum WebhookSource {
+  MOYASAR
+  MOYASAR_MERCHANT  // webhook من حساب Moyasar الخاص بالتاجر نفسه
+}
+
+enum AuditAction {
+  STORE_SUSPENDED
+  STORE_REACTIVATED
+  STORE_VERIFIED
+  STORE_REJECTED
+  SUBSCRIPTION_CHANGED
+  INVOICE_MARKED_PAID
+  REFUND_ISSUED
+  USER_ROLE_CHANGED
+  PRODUCT_REMOVED
+  PAYOUT_PROCESSED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ChatMessageRole {
+  USER
+  ASSISTANT
+}
+
+enum NotificationType {
+  ORDER
+  PAYMENT
+  STORE
+  PRODUCT
+  REVIEW
+  SYSTEM
+  SUPPORT
+}
+
+enum ShippingStatus {
+  PENDING
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RETURNED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ======================================================
+// USER & AUTH
+// ======================================================
+
+model User {
+  id            String    @id @default(cuid())
+  supabaseId    String?   @unique // Supabase Auth UUID
+  email         String    @unique
+  phone         String?   @unique
+  name          String
+  nameEn        String?
+  avatar        String?
+  gender        Gender?
+  birthDate     DateTime?
+  role          UserRole  @default(BUYER)
+  isVerified    Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  lastLoginAt   DateTime?
+  preferredLang String    @default("ar") // ar, en
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  store           Store?
+  buyerOrders     Order[]           @relation("BuyerOrders")
+  addresses       Address[]
+  paymentMethods  PaymentMethod_[]
+  reviews         Review[]
+  wishlist        WishlistItem[]
+  cartItems       CartItem[]
+  chatSessions    ChatSession[]
+  notifications   Notification[]
+  supportTickets  SupportTicket[]
+  ticketMessages  TicketMessage[]
+  auditLogsActor  AuditLog[]        @relation("AuditActor")
+  followedStores  StoreFollower[]
+  blogPosts       BlogPost[]        @relation("BlogAuthor")
+
+  @@index([role])
+  @@map("users")
+}
+
+// ======================================================
+// STORE / SELLER
+// ======================================================
+
+model Store {
+  id              String      @id @default(cuid())
+  userId          String      @unique
+  user            User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  // Basic Info
+  nameAr          String
+  nameEn          String?
+  slug            String      @unique // basita.sa/متجر/slug
+  customDomain    String?     @unique // custom.com
+  description     String?
+  shortDesc       String?
+  logo            String?
+  coverImage      String?
+  bannerImages    String[]    @default([])
+
+  // Contact
+  whatsapp        String?
+  instagram       String?
+  twitter         String?
+  website         String?
+
+  // Location
+  city            String?
+  region          String?
+  country         String      @default("SA")
+  // ⚠️ Geolocation (مرحلة Backend الأولى) — اختيارية، تُملأ لاحقاً من
+  // الفرونت (خريطة/إدخال يدوي). لا تُعرض خاماً بأي API عام — راجع
+  // /api/stores/nearby (يرجع distance_km فقط، مو الإحداثيات الخام).
+  latitude        Float?
+  longitude       Float?
+  // ⚠️ استلام من موقع التاجر — يتطلب latitude/longitude مضبوطة (يُتحقَّق
+  // منه بـPATCH /api/stores/[slug])، فلا فائدة من تفعيله بدون موقع فعلي
+  // معروض للمشتري. مربوط حالياً بطريقة دفع BANK_TRANSFER فقط بالـcheckout
+  // (راجع app/api/checkout/route.ts) — توسعته لطرق دفع أخرى قرار لاحق.
+  pickupEnabled   Boolean   @default(false)
+
+  // Settings
+  status          StoreStatus @default(ACTIVE)
+  isVerified      Boolean     @default(false)
+  isFeatured      Boolean     @default(false)
+  allowReviews    Boolean     @default(true)
+  autoAcceptOrders Boolean    @default(false)
+
+  // التحقق من المتجر — رفع رخصة ← مراجعة الإدارة ← شارة (راجع MerchantBilling.jsx)
+  verificationStatus   VerificationStatus @default(NOT_SUBMITTED)
+  licenseDocUrl        String?
+  licenseSubmittedAt   DateTime?
+  verifiedAt           DateTime?
+  verifiedByAdminId    String?  // intentionally not a FK — admin user may be deleted; string audit trail only
+  rejectionReason      String?
+
+  // SEO
+  metaTitle       String?
+  metaDesc        String?
+  keywords        String[]    @default([])
+
+  // Stats (denormalized for perf)
+  totalProducts   Int         @default(0)
+  totalOrders     Int         @default(0)
+  totalSales      Float       @default(0)
+  avgRating       Float       @default(0)
+  totalReviews    Int         @default(0)
+  totalFollowers  Int         @default(0)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  subscription    StoreSubscription?
+  products        Product[]
+  orders          Order[]           @relation("StoreOrders")
+  reviews         Review[]
+  followers       StoreFollower[]
+  shippingZones   ShippingZone[]
+  categories      StoreCategory[]
+  coupons         Coupon[]
+  bankAccounts    BankAccount[]
+  payouts         Payout[]
+  analytics       StoreAnalytics[]
+  aiSessions      ChatSession[]     @relation("StoreSessions")
+  publicInfo      StorePublicInfo?
+  daftariEntries  DaftariEntry[]
+  // ⚠️ لوحة التسويق (القسم ٣) — بنية فقط، بدون أي Provider حقيقي بعد
+  marketingContent MarketingContent[]
+  adCampaigns      AdCampaign[]
+  daftariSummaries DaftariMonthlySummary[]
+  artisanStories  ArtisanStory[]
+  webhookEvents   WebhookEvent[]
+  storeShipping   StoreShipping[]
+  shippingRates   ShippingRate[]
+  daftariProductCosts DaftariProductCost[]
+
+  @@index([status])
+  @@index([verificationStatus])
+  @@index([city])
+  @@map("stores")
+}
+
+enum VerificationStatus {
+  NOT_SUBMITTED
+  PENDING_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+model StoreFollower {
+  id        String   @id @default(cuid())
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([storeId, userId])
+  @@index([userId])
+  @@map("store_followers")
+}
+
+// ======================================================
+// SUBSCRIPTION
+// ======================================================
+
+// ─── إعدادات الباقات (seed data) ───────────────────────
+// ┌─────────────────────┬──────────┬────────────┬────────────────┬───────────────┐
+// │ الباقة              │ السعر/شهر│ المنتجات   │ دومين مخصص    │ بوابة دفع     │
+// ├─────────────────────┼──────────┼────────────┼────────────────┼───────────────┤
+// │ بسطة الأصل          │ مجاني    │ ٣ منتجات   │ ✗              │ ✗             │
+// │ نماء الابتداء       │ ٤٩ ريال  │ ٢٠ منتج    │ ✗              │ ✗             │
+// │ نماء المتقدمة       │ ٩٩ ريال  │ ٥٠ منتج    │ ✓              │ ✓             │
+// │ نماء الاحترافية     │ ١٩٩ ريال │ غير محدود  │ ✓              │ ✓             │
+// └─────────────────────┴──────────┴────────────┴────────────────┴───────────────┘
+
+model SubscriptionPlanConfig {
+  id                 String           @id @default(cuid())
+  plan               SubscriptionPlan @unique
+
+  // الاسم والوصف
+  nameAr             String           // بسطة الأصل / بسطة نماء / بسطة برو / بسطة أعمال
+  nameEn             String?
+  taglineAr          String?          // مناسبة للتجربة والبداية / للمتاجر الصغيرة...
+  badgeAr            String?          // الأكثر شعبية / الأفضل قيمة
+
+  // التسعير
+  priceMonthly       Float            // السعر شهرياً
+  priceYearly        Float            // السعر سنوياً (خصم ~20%)
+  currency           String           @default("SAR")
+
+  // ⚠️ لا توجد عمولة على المبيعات إطلاقاً — نموذج الإيراد الآن: رسوم
+  // الاشتراك فقط (+ رسوم الشحن التي تذهب لشركة الشحن/التاجر، ليست عمولة
+  // منصة). أي حقل عمولة كان موجوداً سابقاً (commissionRate, hasCommission)
+  // أُزيل من المخطط عمداً — وليس فقط ضبطه على صفر — حتى لا يبقى مساراً
+  // كودياً يمكن تفعيله بالخطأ مستقبلاً.
+
+  // الحدود
+  maxProducts        Int?             // null = غير محدود (∞)
+  maxOrders          Int?             // null = غير محدود
+  storageGB          Float            @default(0.5)
+
+  // الميزات الأساسية
+  hasDaftari         Boolean          @default(false) // دفاتري مفعّل
+  hasCustomDomain    Boolean          @default(false) // دومين مخصص .com
+  hasPaymentGateway  Boolean          @default(false) // بوابة دفع Moyasar
+  hasRemoveBranding  Boolean          @default(false) // إزالة شعار "مدعوم من بسطة"
+  hasDiscountCodes   Boolean          @default(false) // أكواد خصم مخصصة
+  hasFeaturedListing Boolean          @default(false) // ظهور مميّز في بسطة
+  hasVerifiedBadge   Boolean          @default(false) // توثيق المتجر Verified
+  hasPrioritySearch  Boolean          @default(false) // أولوية في نتائج البحث
+
+  // التقارير — مستويات
+  // NONE: لا يوجد | BASIC: إجمالي مبيعات + أرباح فقط
+  // MONTHLY: شهري + تفاصيل منتجات | ADVANCED: + مصروفات + مقارنة
+  // FULL: كامل + تصدير Excel + تحليل AI
+  reportsLevel       String           @default("NONE") // NONE|BASIC|MONTHLY|ADVANCED|FULL
+
+  // الدعم
+  hasChatSupport     Boolean          @default(false) // دعم عبر الدردشة
+  hasPrioritySupport Boolean          @default(false) // أولوية الدعم
+  hasAIFeatures      Boolean          @default(true)  // الوصول لمنيرة AI — false في FREE/STARTER، true في GROWTH/PRO
+
+  // قائمة المميزات للعرض
+  featuresAr         String[]         @default([])
+
+  isActive           Boolean          @default(true)
+  sortOrder          Int              @default(0)
+  updatedAt          DateTime         @updatedAt
+
+  @@map("subscription_plan_configs")
+}
+
+model StoreSubscription {
+  id              String             @id @default(cuid())
+  storeId         String             @unique
+  store           Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  plan            SubscriptionPlan   @default(FREE)
+  status          SubscriptionStatus @default(ACTIVE)
+  billingCycle    String             @default("monthly") // monthly | yearly
+
+  // التواريخ
+  startDate       DateTime           @default(now())
+  endDate         DateTime?
+  trialEndsAt     DateTime?
+
+  // محرك دورة حياة الاشتراك (active → grace_period → suspended → cancelled/expired)
+  lastPaymentFailedAt DateTime?      // أول فشل دفع — يبدأ منه عدّاد فترة السماح
+  gracePeriodEndsAt   DateTime?      // ينتهي بعد 7 أيام من lastPaymentFailedAt
+  suspendedAt         DateTime?
+  reactivatedAt       DateTime?
+  cancelledAt         DateTime?
+  cancelReason        String?
+
+  // الدفع
+  autoRenew       Boolean            @default(false)
+  pricePerMonth   Float              @default(0)
+  currency        String             @default("SAR")
+  moyasarSubId    String?            // Moyasar subscription ID (اشتراك الباقة نفسها)
+
+  // حساب الدفع الخاص بالتاجر (موضّح في MerchantBilling.jsx — كل تاجر يربط مفتاحه الخاص)
+  merchantMoyasarPublishableKey String?
+  merchantMoyasarSecretKeyEnc   String?   // مشفّر بـ AES — لا يُخزَّن نصاً صريحاً أبداً
+  merchantGatewayConnectedAt    DateTime?
+  merchantGatewayWebhookSecret  String?   // لتوثيق الـ webhooks الواردة من حساب التاجر
+
+  // ⚠️ تحويل بنكي — طريقة بديلة يفعّلها التاجر بنفسه من لوحته لاستقبال
+  // دفعات المشترين مباشرة بحسابه البنكي الشخصي/التجاري، بدل انتظار ربط
+  // Moyasar (يفيد بالذات تاجر الباقة المجانية اللي لسه ما ربط بوابة دفع
+  // — "دخول سهل، يبدأ يبيع فوراً"). لا تشفير هنا (بعكس مفتاح Moyasar):
+  // الآيبان بيانات يُفترض عرضها للمشتري وقت الدفع، مو سراً كمفتاح API.
+  bankTransferEnabled        Boolean   @default(false)
+  bankTransferIban           String?
+  bankTransferAccountHolder  String?
+  bankTransferBankName       String?
+
+  // الضريبة (اختياري للتاجر — موضّح في MerchantBilling.jsx)
+  hasTaxNumber    Boolean            @default(false)
+  taxNumber       String?
+
+  // حدود مخصصة (يمكن تجاوز الباقة يدوياً من الأدمن)
+  customMaxProducts   Int?
+  customMaxOrders     Int?
+  customHasDomain     Boolean?
+  customHasPayment    Boolean?
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  invoices        SubscriptionInvoice[]
+
+  @@index([status])
+  @@index([gracePeriodEndsAt])
+  @@map("store_subscriptions")
+}
+
+// ─── قيود الباقة (للتحقق قبل كل عملية) ─────────────────
+// يُستخدم في API middleware للتحقق من حدود الباقة
+// مثال: قبل إضافة منتج → تحقق من maxProducts
+// مثال: قبل ربط دومين → تحقق من hasCustomDomain
+// مثال: قبل فتح بوابة دفع → تحقق من hasPaymentGateway
+
+// فاتورة واحدة تخدم نوعين: رسوم الباقة الشهرية + عمولة المبيعات الشهرية
+// (دُمجا بنفس الموديل بدل إنشاء نظام فواتير مكرر — راجع MerchantBilling.jsx)
+// ⚠️ بعد إزالة العمولة بالكامل، كل فاتورة هي رسوم اشتراك فقط — لا حاجة
+// لحقل "نوع" بعد الآن (كان يفرّق سابقاً بين SUBSCRIPTION_FEE و COMMISSION).
+model SubscriptionInvoice {
+  id             String            @id @default(cuid())
+  subscriptionId String
+  subscription   StoreSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  status         PaymentStatus     @default(PENDING)
+
+  // ⚠️ حقلان أُضيفا لسدّ فجوة حقيقية: السكيما الأصلية لم تكن تُسجّل *لأي
+  // باقة* هذه الفاتورة تحديداً (ضرورية لتفريق فاتورة ترقية GROWTH عن PRO
+  // مثلاً) — بلا هذا الحقل يستحيل لمنطق الدفع معرفة الباقة المستهدفة بعد
+  // عودة Moyasar. billingCycle مثل حقله المطابق بـStoreSubscription تماماً.
+  plan           SubscriptionPlan @default(FREE)
+  billingCycle   String            @default("monthly") // monthly | yearly
+
+  // فترة الفاتورة
+  periodYear     Int
+  periodMonth    Int
+
+  // رسوم الاشتراك المستحقة لهذا الشهر/السنة
+  amount         Float
+  vatRate        Float?          // 15% إن كان للتاجر رقم ضريبي مسجَّل
+  vatAmount      Float?
+
+  dueDate        DateTime
+  paidAt         DateTime?
+  moyasarTxnId   String?
+  remindersSent  Int               @default(0)
+  lastReminderAt DateTime?
+
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@unique([subscriptionId, periodYear, periodMonth])
+  @@index([status, dueDate])
+  @@map("subscription_invoices")
+}
+
+// ─── سجل العمليات الإدارية (Audit Log) ─────────────────
+// كل عملية حساسة من لوحة الإدارة تُسجَّل هنا — لا يمكن حذفها أو تعديلها
+model AuditLog {
+  id           String      @id @default(cuid())
+  actorId      String      // المستخدم (أدمن) الذي قام بالعملية
+  actor        User        @relation("AuditActor", fields: [actorId], references: [id])
+  action       AuditAction
+  targetType   String      // "Store" | "User" | "Order" | "Invoice" ...
+  targetId     String      // polymorphic — intentionally not a typed FK (points to different tables)
+  metadata     Json?       // أي بيانات إضافية (السبب، القيمة القديمة/الجديدة...)
+  ipAddress    String?
+  createdAt    DateTime    @default(now())
+
+  @@index([targetType, targetId])
+  @@index([actorId, createdAt])
+  @@map("audit_logs")
+}
+
+// ─── سجل أحداث الـ Webhooks (لمنع التكرار وإعادة التشغيل) ──
+// كل webhook وارد (من Moyasar المنصة أو حساب تاجر) يُسجَّل بمعرّفه الفريد
+// قبل المعالجة — لو وُجد مسبقاً نتجاهله (idempotency + replay protection)
+model WebhookEvent {
+  id            String         @id @default(cuid())
+  source        WebhookSource
+  externalId    String         // معرّف الحدث القادم من Moyasar (event id)
+  storeId       String?        // null لو كان webhook على مستوى المنصة
+  store         Store?         @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  payloadHash   String         // SHA-256 للـ payload — كشف أي تكرار حتى لو تغيّر externalId
+  processedAt   DateTime?
+  status        String         @default("received") // received | processed | failed | duplicate
+  errorMessage  String?
+  receivedAt    DateTime       @default(now())
+
+  @@unique([source, externalId])
+  @@index([storeId])
+  @@index([receivedAt])
+  @@map("webhook_events")
+}
+
+// ======================================================
+// CATEGORIES
+// ======================================================
+
+model Category {
+  id          String   @id @default(cuid())
+  nameAr      String
+  nameEn      String?
+  slug        String   @unique
+  icon        String?
+  image       String?
+  parentId    String?
+  parent      Category? @relation("SubCategories", fields: [parentId], references: [id])
+  children    Category[] @relation("SubCategories")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  products    Product[]
+  storeCats   StoreCategory[]
+
+  @@map("categories")
+}
+
+model StoreCategory {
+  id         String   @id @default(cuid())
+  storeId    String
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([storeId, categoryId])
+  @@map("store_categories")
+}
+
+// ======================================================
+// PRODUCTS
+// ======================================================
+
+model Product {
+  id              String        @id @default(cuid())
+  storeId         String
+  store           Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  categoryId      String?
+  category        Category?     @relation(fields: [categoryId], references: [id])
+
+  // Names
+  nameAr          String
+  nameEn          String?
+  slug            String
+
+  // Descriptions
+  shortDescAr     String?
+  shortDescEn     String?
+  descAr          String?
+  descEn          String?
+
+  // Pricing
+  price           Float
+  comparePrice    Float?        // سعر قبل الخصم
+  costPrice       Float?        // سعر التكلفة
+
+  // Inventory
+  sku             String?
+  barcode         String?
+  quantity        Int           @default(0)
+  trackInventory  Boolean       @default(true)
+  allowBackorder  Boolean       @default(false)
+  lowStockAlert   Int           @default(5)
+  minOrderQty     Int           @default(1)
+  maxOrderQty     Int?
+
+  // Media
+  // ملاحظة معمارية: images[] و mainImage أدناه أصبحا "كاش" محسوبَين تلقائياً
+  // من جدول ProductImage (المصدر الحقيقي الوحيد للصور الآن). أبقيناهما بدل
+  // حذفهما لأن صفحات حقيقية مربوطة بالفعل (marketplace, store, product
+  // detail) تقرأ منهما مباشرة — حذفهما يكسرها بلا فائدة. كل عملية رفع/حذف/
+  // ترتيب صورة تُعيد حساب هذين الحقلين تلقائياً (lib/product-images.ts).
+  images          String[]      @default([])
+  mainImage       String?
+  videoUrl        String?
+
+  // Physical
+  weight          Float?
+  weightUnit      String?       @default("kg")
+  width           Float?
+  height          Float?
+  depth           Float?
+
+  // AI
+  aiGeneratedDesc Boolean       @default(false)
+  aiGeneratedImg  Boolean       @default(false)
+  voiceTranscript String?       // النص المحول من الصوت
+
+  // SEO
+  metaTitle       String?
+  metaDesc        String?
+  tags            String[]      @default([])
+
+  // Status
+  status          ProductStatus @default(DRAFT)
+  isFeatured      Boolean       @default(false)
+  isHandmade      Boolean       @default(true)
+  requiresShipping Boolean      @default(true)
+
+  // Stats
+  avgRating       Float         @default(0)
+  totalReviews    Int           @default(0)
+  totalSold       Int           @default(0)
+  viewCount       Int           @default(0)
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  variants        ProductVariant[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  wishlistItems   WishlistItem[]
+  cartItems       CartItem[]
+  daftariCost     DaftariProductCost?
+  productImages   ProductImage[]
+
+  @@unique([storeId, slug])
+  @@index([storeId, status])
+  @@index([categoryId])
+  @@map("products")
+}
+
+// ─── صور المنتج — المصدر الحقيقي الوحيد (راجع التعليق أعلى Product.images) ──
+model ProductImage {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  storagePath  String   // مسار الصورة الرئيسية داخل Supabase Storage
+  thumbnailPath String  // مسار النسخة المصغّرة — منفصل صريح، لا نستنتجه من storagePath
+  url          String   // الرابط العام للصورة الرئيسية (بعد التحويل لـ WebP)
+  thumbnailUrl String   // رابط النسخة المصغّرة
+  width        Int
+  height       Int
+  position     Int      @default(0) // ترتيب العرض — 0 = الأول
+  isCover      Boolean  @default(false) // صورة الغلاف المعروضة في القوائم
+
+  createdAt    DateTime @default(now())
+
+  @@index([productId, position])
+  @@map("product_images")
+}
+
+model ProductVariant {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  nameAr     String
+  nameEn     String?
+  options    Json     // [{ name: "اللون", value: "أحمر" }]
+  price      Float?
+  quantity   Int      @default(0)
+  sku        String?
+  image      String?
+  createdAt  DateTime @default(now())
+
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+  @@index([productId])
+
+  @@map("product_variants")
+}
+
+// ======================================================
+// ORDERS
+// ======================================================
+
+model Order {
+  id              String        @id @default(cuid())
+  orderNumber     String        @unique // BS-10001
+  buyerId         String
+  buyer           User          @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Restrict)
+  storeId         String
+  store           Store         @relation("StoreOrders", fields: [storeId], references: [id], onDelete: Restrict)
+
+  // Status
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod   PaymentMethod @default(CREDIT_CARD)
+  // ⚠️ استلام من موقع التاجر — بديل عن الشحن، متاح حالياً فقط مع
+  // BANK_TRANSFER (راجع تعليق Store.pickupEnabled). PICKUP يعني shippingCost=0
+  // ولا يُستدعى ShippingService إطلاقاً لهذا الطلب.
+  fulfillmentMethod FulfillmentMethod @default(SHIPPING)
+  moyasarTxnId    String?       @unique // معرّف Moyasar Invoice (Invoices API) — يُستخدم لمطابقة data.invoice_id بالـwebhook ومنع معالجة نفس الطلب مرتين
+
+  // ⚠️ تحويل بنكي — المشتري يرفع رقم مرجعي + إثبات (صورة) بعد التحويل
+  // لحساب التاجر البنكي مباشرة. لا يُفعَّل الطلب تلقائياً — التاجر (أو
+  // الإدارة إشرافياً، لها نفس صلاحية البائع على هذا الطلب — راجع
+  // isOwnerSeller بـgetOrderWithAccessCheck) يراجع الإثبات ويؤكّد الطلب
+  // (PATCH status=CONFIRMED) فتنقلب paymentStatus تلقائياً PAID، بنفس
+  // نمط COD اللي يتحول PAID عند DELIVERED.
+  bankTransferReference    String?
+  bankTransferProofUrl     String?
+  bankTransferSubmittedAt  DateTime?
+
+  // Pricing
+  subtotal        Float
+  discountAmount  Float         @default(0)
+  couponCode      String?
+  shippingCost    Float         @default(0)
+  codFee          Float         @default(0) // ⚠️ إضافي — رسوم الدفع عند الاستلام، منفصلة تماماً عن shippingCost، صفر لأي طريقة دفع غير COD
+  taxAmount       Float         @default(0)
+  total           Float
+
+  // Shipping Address (snapshot)
+  shippingName    String
+  shippingPhone   String
+  shippingCity    String
+  shippingRegion  String?
+  shippingAddress String
+  shippingZip     String?
+
+  // Notes
+  buyerNotes      String?
+  sellerNotes     String?
+  adminNotes      String?
+
+  // Dates
+  confirmedAt     DateTime?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  items           OrderItem[]
+  shipments       Shipment[]
+  statusHistory   OrderStatusHistory[]
+  review          Review?
+  daftariEntries  DaftariEntry[]
+  shippingRates   ShippingRate[]
+
+  @@index([storeId, status])
+  @@index([buyerId, createdAt])
+  @@index([status, paymentStatus])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String          @id @default(cuid())
+  orderId     String
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variantId   String?
+  variant     ProductVariant? @relation(fields: [variantId], references: [id])
+
+  // Snapshot
+  nameAr      String
+  nameEn      String?
+  image       String?
+  price       Float
+  quantity    Int
+  total       Float
+  @@index([orderId])
+  @@index([productId])
+
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  note      String?
+  createdBy String?     // userId as string audit field (intentionally denormalized - user may be deleted later)
+  createdAt DateTime    @default(now())
+  @@index([orderId])
+
+  @@map("order_status_history")
+}
+
+// ======================================================
+// SHIPPING
+// ======================================================
+
+model ShippingZone {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  nameAr      String
+  regions     String[] // المناطق المشمولة
+  price       Float
+  minDays     Int      @default(2)
+  maxDays     Int      @default(5)
+  isFree      Boolean  @default(false)
+  minOrderAmt Float?   // للشحن المجاني
+  isActive    Boolean  @default(true) // ⚠️ إضافي — دعم تعطيل منطقة مؤقتاً بدون حذفها
+  createdAt   DateTime @default(now())
+  @@index([storeId])
+
+  @@map("shipping_zones")
+}
+
+// ⚠️ موسَّع (مرحلة Shipping Backend الأولى): carrier يبقى نصاً حراً كما هو
+// تماماً (يدعم إدخال يدوي حر من التاجر — لا نكسره)، والحقول الجديدة كلها
+// اختيارية وتُملأ فقط عند إنشاء الشحنة عبر ShippingService (تكامل حقيقي
+// مستقبلي) — لا تعديل على مسار PATCH order status=SHIPPED اليدوي الحالي.
+model Shipment {
+  id                 String          @id @default(cuid())
+  orderId            String
+  order              Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  carrier            String?         // شركة الشحن (نص حر — يدوي أو معبَّأ من carrierCode)
+  carrierCode        ShippingCarrier? // ⚠️ إضافي — محدَّد فقط لشحنات أُنشئت عبر ShippingService
+  externalShipmentId String?         // ⚠️ إضافي — معرّف الشحنة عند شركة الشحن نفسها
+  trackingNumber     String?
+  trackingUrl        String?
+  labelUrl           String?         // ⚠️ إضافي — رابط ملصق الشحن عند توفره
+  status             ShippingStatus  @default(PENDING)
+  estimatedDate      DateTime?
+  pickedUpAt         DateTime?       // ⚠️ إضافي
+  deliveredAt        DateTime?
+  lastSyncedAt       DateTime?       // ⚠️ إضافي — آخر مزامنة حالة مع شركة الشحن
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  events             ShipmentEvent[]
+  @@index([orderId])
+  @@index([externalShipmentId])
+
+  @@map("shipments")
+}
+
+// ⚠️ جديد — سجل تاريخ حالات الشحنة، بنفس مبدأ OrderStatusHistory/WebhookEvent
+// الموجودين مسبقاً بالمشروع (نفس النمط المعماري، لا نظام مواز).
+model ShipmentEvent {
+  id         String         @id @default(cuid())
+  shipmentId String
+  shipment   Shipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  status     ShippingStatus
+  note       String?
+  raw        Json?          // الحمولة الخام من شركة الشحن إن وُجدت (تشخيص لاحق)
+  createdAt  DateTime       @default(now())
+  @@index([shipmentId])
+
+  @@map("shipment_events")
+}
+
+// ======================================================
+// SHIPPING PARTNERS ENGINE (Phase 4B)
+// ======================================================
+// تكامل حقيقي مع شركات شحن خارجية (عكس ShippingZone أعلاه، الذي هو سعر
+// ثابت يدخله التاجر بنفسه). كل شركة شحن جديدة مستقبلاً = قيمة enum واحدة
+// + ملف provider واحد (lib/shipping/providers/*.ts) — بدون لمس الـ schema
+// أو الـ route مرة أخرى، هذا هو معنى "قابل للتوسعة".
+
+enum ShippingCarrier {
+  ARAMEX
+  SPL // البريد السعودي (Saudi Post)
+}
+
+// بيانات اتصال التاجر بشركة شحن — صف واحد لكل (متجر، شركة)، لذا يمكن
+// لمتجر واحد ربط أكثر من شركة شحن في نفس الوقت.
+model StoreShipping {
+  id             String          @id @default(cuid())
+  storeId        String
+  store          Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  carrier        ShippingCarrier
+
+  // JSON مشفّر بـ AES-256-GCM (lib/crypto.ts — نفس آلية مفاتيح Moyasar في
+  // Phase 2، لا تكرار لنظام تشفير جديد). شكل الحقول داخل الـ JSON يختلف
+  // حسب الشركة (Aramex يحتاج accountNumber/accountPin/.. وSPL غير ذلك) —
+  // ولهذا اختيار JSON مشفّر واحد بدل أعمدة منفصلة لكل شركة، فإضافة شركة
+  // بحقول اعتماد مختلفة كلياً لا تحتاج أي تعديل على هذا الموديل.
+  credentialsEnc String
+
+  isActive       Boolean         @default(true)
+  connectedAt    DateTime        @default(now())
+  lastTestedAt   DateTime?
+  lastTestOk     Boolean?
+
+  @@unique([storeId, carrier])
+  @@index([storeId, isActive])
+  @@map("store_shipping")
+}
+
+// سجل كل عرض سعر شحن طُلب فعلياً من شركة شحن — للتدقيق، ولتتبّع إيراد
+// رسوم بسطة التشغيلية الثابتة (لا يُستخدم كمصدر تسعير وهمي بأي حال).
+model ShippingRate {
+  id            String          @id @default(cuid())
+  storeId       String
+  store         Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  carrier       ShippingCarrier
+
+  destCity      String
+  weightKg      Float
+
+  carrierRate   Float           // السعر الفعلي القادم من شركة الشحن (بدون أي تعديل)
+  basitaFee     Float           // رسوم بسطة التشغيلية الثابتة — 3 ر.س حالياً (lib/shipping/constants.ts)
+  totalRate     Float           // carrierRate + basitaFee — هذا فقط ما يُعرض للمشتري
+  currency      String          @default("SAR")
+  estimatedDays Int?
+
+  orderId       String?
+  order         Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime        @default(now())
+
+  @@index([storeId, createdAt])
+  @@index([orderId])
+  @@map("shipping_rates")
+}
+
+// ======================================================
+// ADDRESSES
+// ======================================================
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String   @default("المنزل")
+  name       String
+  phone      String
+  city       String
+  region     String
+  address    String
+  zipCode    String?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  @@index([userId])
+
+  @@map("addresses")
+}
+
+// ======================================================
+// PAYMENT METHODS
+// ======================================================
+
+model PaymentMethod_ {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        PaymentMethod
+  last4       String?
+  brand       String?       // Visa, Mada, etc
+  expiryMonth Int?
+  expiryYear  Int?
+  tokenId     String?       // Moyasar token
+  isDefault   Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  @@index([userId])
+
+  @@map("payment_methods")
+}
+
+// ======================================================
+// BANK ACCOUNTS (for payouts)
+// ======================================================
+
+model BankAccount {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  bankName    String
+  iban        String
+  accountName String
+  isVerified  Boolean  @default(false)
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  payouts     Payout[]
+  @@index([storeId])
+
+  @@map("bank_accounts")
+}
+
+model Payout {
+  id            String        @id @default(cuid())
+  storeId       String
+  store         Store         @relation(fields: [storeId], references: [id], onDelete: Restrict)
+  bankAccountId String
+  bankAccount   BankAccount   @relation(fields: [bankAccountId], references: [id])
+  amount        Float
+  currency      String        @default("SAR")
+  status        PaymentStatus @default(PENDING)
+  reference     String?
+  processedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  @@index([storeId, status])
+
+  @@map("payouts")
+}
+
+// ======================================================
+// COUPONS
+// ======================================================
+
+model Coupon {
+  id            String   @id @default(cuid())
+  storeId       String
+  store         Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  code          String
+  discountType  String   // percentage | fixed
+  discountValue Float
+  minOrderAmt   Float?
+  maxUses       Int?
+  usedCount     Int      @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@unique([storeId, code])
+  @@map("coupons")
+}
+
+// ======================================================
+// REVIEWS
+// ======================================================
+
+model Review {
+  id         String       @id @default(cuid())
+  userId     String
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storeId    String
+  store      Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    Product?     @relation(fields: [productId], references: [id], onDelete: SetNull)
+  orderId    String?      @unique
+  order      Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  rating     Int          // 1-5
+  comment    String?
+  images     String[]     @default([])
+  status     ReviewStatus @default(PENDING)
+  sellerReply String?
+  createdAt  DateTime     @default(now())
+  @@index([storeId, status])
+  @@index([productId])
+
+  @@map("reviews")
+}
+
+// ======================================================
+// WISHLIST
+// ======================================================
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([productId])
+  @@map("wishlist_items")
+}
+
+// سلة التسوق — منتج واحد لكل صف لكل مستخدم (upsert بزيادة الكمية).
+// لا Order يُنشأ حتى إتمام /api/checkout؛ هذا فقط تخزين مؤقت قبل الدفع.
+// ⚠️ variantId إضافي (migration مبرَّرة): بدونه، اختيار المشتري لمتغيّر
+// (حجم/لون) بصفحة المنتج يضيع بالسلة، ومنتجان بمتغيّرين مختلفين كانا
+// سيندمجان خطأً بنفس الصف بسبب @@unique([userId, productId]) القديم.
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId, variantId])
+  @@index([productId])
+  @@map("cart_items")
+}
+
+// ======================================================
+// MUNIRA - AI ASSISTANT
+// ======================================================
+
+model ChatSession {
+  id          String    @id @default(cuid())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  storeId     String?
+  store       Store?    @relation("StoreSessions", fields: [storeId], references: [id])
+  sessionType String    @default("general") // general | store_setup | product | analysis
+  title       String?
+  language    String    @default("ar")
+  isGuest     Boolean   @default(false)
+  guestToken  String?   // للزوار بدون تسجيل
+  isArchived  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  messages    ChatMessage[]
+  @@index([userId])
+  @@index([storeId])
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id          String          @id @default(cuid())
+  sessionId   String
+  session     ChatSession     @relation(fields: [sessionId], references: [id])
+  role        ChatMessageRole
+  content     String          @db.Text
+  audioUrl    String?         // إذا جاءت الرسالة بالصوت
+  metadata    Json?           // بيانات إضافية (tokens, model, etc)
+  createdAt   DateTime        @default(now())
+
+  @@map("chat_messages")
+}
+
+// ─── تتبّع استخدام الذكاء الاصطناعي ─────────────────────
+// مستقل عن المزوّد — يعمل مع Claude أو OpenAI أو Gemini أو أي مزوّد مستقبلي.
+// لا افتراض لمزوّد واحد: provider + model كحقلين منفصلين صريحين.
+model AIUsage {
+  id          String   @id @default(cuid())
+  // AIUsage fields are intentionally NOT FK relations — usage records must survive
+  // deletion of users, stores, or sessions for cost analytics and abuse detection.
+  userId      String?  // null = زائر
+  storeId     String?  // null = مشتري أو زائر
+
+  // تعريف المزوّد والنموذج — صريح وغير مضمّن، يسمح بالتحليل المستقبلي
+  provider    String   // "anthropic" | "openai" | "google" | ...
+  model       String   // "claude-sonnet-4-20250514" | "whisper-1" | ...
+  feature     String   // "chat" | "voice" | "translate"
+  route       String   // "/api/ai/chat" | "/api/ai/voice" | "/api/ai/translate"
+
+  inputTokens  Int     @default(0)
+  outputTokens Int     @default(0)
+  totalTokens  Int     @default(0)
+
+  // تكلفة تقديرية بالدولار (تُحسب من usage metadata الفعلية لو أعادها المزوّد)
+  estimatedCostUsd Float @default(0)
+
+  sessionId   String?  // string ref only — ChatSession may be deleted; usage record persists
+  durationMs  Int?     // وقت استجابة المزوّد (milliseconds)
+  success     Boolean  @default(true)
+  errorMessage String? // رسالة الخطأ لو success=false
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([storeId, feature])
+  @@index([createdAt])
+  @@map("ai_usage")
+}
+
+// ======================================================
+// SUPPORT TICKETS
+// ======================================================
+
+model SupportTicket {
+  id          String          @id @default(cuid())
+  ticketNumber String         @unique // TKT-1001
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject     String
+  category    String          // technical | billing | order | other
+  status      TicketStatus    @default(OPEN)
+  priority    TicketPriority  @default(MEDIUM)
+  assignedTo  String?
+  resolvedAt  DateTime?
+  closedAt    DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  messages    TicketMessage[]
+  @@index([userId, status])
+
+  @@map("support_tickets")
+}
+
+model TicketMessage {
+  id          String        @id @default(cuid())
+  ticketId    String
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String        @db.Text
+  attachments String[]      @default([])
+  isInternal  Boolean       @default(false) // ملاحظات داخلية للدعم
+  createdAt   DateTime      @default(now())
+  @@index([ticketId])
+
+  @@map("ticket_messages")
+}
+
+// ======================================================
+// NOTIFICATIONS
+// ======================================================
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  titleAr   String
+  titleEn   String?
+  bodyAr    String
+  bodyEn    String?
+  data      Json?            // payload (orderId, etc)
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  @@index([userId, isRead])
+
+  @@map("notifications")
+}
+
+// ======================================================
+// BLOG
+// ======================================================
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  titleAr     String
+  titleEn     String?
+  slug        String   @unique
+  excerptAr   String?
+  excerptEn   String?
+  contentAr   String   @db.Text
+  contentEn   String?  @db.Text
+  coverImage  String?
+  category    String   // platform-news | success-stories | store-management | crafts
+  tags        String[] @default([])
+  authorId    String?
+  author      User?    @relation("BlogAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  authorName  String?
+  authorAvatar String?
+  isPublished Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  viewCount   Int      @default(0)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([authorId])
+  @@index([isPublished, publishedAt])
+
+  @@map("blog_posts")
+}
+
+// ======================================================
+// OUR STORY / ARTISANS
+// ======================================================
+
+model ArtisanStory {
+  id          String   @id @default(cuid())
+  nameAr      String
+  nameEn      String?
+  city        String
+  region      String?
+  craft       String   // الحرفة
+  storyAr     String   @db.Text
+  storyEn     String?  @db.Text
+  images      String[] @default([])
+  videoUrl    String?
+  storeId     String?
+  store       Store?   @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@map("artisan_stories")
+}
+
+// ======================================================
+// ANALYTICS
+// ======================================================
+
+model StoreAnalytics {
+  id           String   @id @default(cuid())
+  storeId      String
+  store        Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  date         DateTime @db.Date
+  visits       Int      @default(0)
+  uniqueVisits Int      @default(0)
+  orders       Int      @default(0)
+  revenue      Float    @default(0)
+  newCustomers Int      @default(0)
+
+  @@unique([storeId, date])
+  @@index([storeId, date])
+  @@map("store_analytics")
+}
+
+// ======================================================
+// STORE PUBLIC PAGE — بيانات إضافية لصفحة المتجر العامة
+// ======================================================
+// ملاحظة: معظم بيانات الصفحة العامة موجودة في model Store
+// هذا النموذج للبيانات التشغيلية التي تظهر في البطاقات
+
+model StorePublicInfo {
+  id                 String   @id @default(cuid())
+  storeId            String   @unique
+  store              Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  // بطاقات المعلومات (Image 2, 4)
+  licenseNumber      String?  // رقم الترخيص
+  workingHours       String?  // ساعات العمل — "السبت-الخميس 9ص-9م"
+  responseTimeHours  Float    @default(1)    // وقت الرد بالساعات
+  returnPolicyDays   Int      @default(7)    // سياسة الإرجاع بالأيام
+  shippingCoverage   String   @default("كل المملكة")
+  deliveryPartner    String?  // شريك التوصيل — Aramex, SMSA...
+  paymentMethods     String[] @default([])   // ["مدى","Visa","Apple Pay"]
+
+  // قصة الأسرة المنتجة (Image 1)
+  storyAr            String?  @db.Text
+  storyEn            String?  @db.Text
+  storyTags          String[] @default([])   // ["صناعة يدوية","أسرة منتجة"]
+  videoUrl           String?  // فيديو تعريفي بالمتجر — يظهر بصفحة المتجر العامة إن وُجد
+
+  // السياسات والضمان (Image 4)
+  returnPolicyText   String?  @db.Text
+  shippingPolicyText String?  @db.Text
+  warrantyText       String?  @db.Text
+
+  // إحصائيات الصفحة العامة (محسوبة — تُحدَّث دورياً)
+  satisfactionRate   Float    @default(0)    // 98%
+  completedOrders    Int      @default(0)    // 250+
+  prepTimeDays       String   @default("1-3 أيام")
+  responseSpeed      String   @default("<1س")
+  yearsActive        Int      @default(0)
+
+  updatedAt          DateTime @updatedAt
+
+  @@map("store_public_info")
+}
+
+// ======================================================
+// دفاتري — محاسبة بسيطة مدمجة
+// ======================================================
+// المبدأ: لكل منتج تكلفة → من كل طلب تُحسب الأرباح تلقائياً
+// التقارير تتوفر حسب الباقة (FREE: شهري فقط، PAID: تفصيلي)
+
+enum DaftariEntryType {
+  SALE          // بيع — من طلب مكتمل
+  EXPENSE       // مصروف — شراء خامات، شحن، غيره
+  REFUND        // استرداد
+  WITHDRAWAL    // سحب أرباح
+  ADJUSTMENT    // تعديل يدوي
+}
+
+enum DaftariExpenseCategory {
+  RAW_MATERIALS  // خامات ومواد
+  SHIPPING       // تكاليف شحن
+  PACKAGING      // تغليف
+  MARKETING      // تسويق
+  PLATFORM_FEE   // رسوم المنصة
+  OTHER          // أخرى
+}
+
+model DaftariEntry {
+  id           String               @id @default(cuid())
+  storeId      String
+  store        Store                @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  type         DaftariEntryType
+  amount       Float                // المبلغ
+  currency     String               @default("SAR")
+
+  // للمبيعات
+  orderId      String?
+  order        Order?               @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  // للمصروفات
+  expenseCategory DaftariExpenseCategory?
+  description  String?
+
+  // للتعديلات اليدوية
+  isManual     Boolean              @default(false)
+  note         String?
+
+  entryDate    DateTime             @default(now())
+  createdAt    DateTime             @default(now())
+  @@index([storeId, type])
+  @@index([orderId])
+
+  @@map("daftari_entries")
+}
+
+// تكلفة المنتج — أساس حساب الأرباح
+model DaftariProductCost {
+  id              String   @id @default(cuid())
+  productId       String   @unique
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  storeId         String
+  store           Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  // التكاليف المفصّلة
+  materialsCost   Float    @default(0)  // تكلفة الخامات
+  laborCost       Float    @default(0)  // تكلفة العمالة/الوقت
+  packagingCost   Float    @default(0)  // تكلفة التغليف
+  shippingCost    Float    @default(0)  // تكلفة الشحن للمتجر
+  otherCosts      Float    @default(0)  // تكاليف أخرى
+
+  // محسوبة
+  totalCost       Float    @default(0)  // مجموع التكاليف
+  sellingPrice    Float    @default(0)  // سعر البيع (من Product)
+  profitAmount    Float    @default(0)  // الربح = سعر البيع - التكلفة
+  profitMargin    Float    @default(0)  // هامش الربح %
+
+  notes           String?
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  @@index([storeId])
+
+  @@map("daftari_product_costs")
+}
+
+// ملخص شهري محسوب مسبقاً للأداء
+model DaftariMonthlySummary {
+  id              String   @id @default(cuid())
+  storeId         String
+  store           Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  year            Int
+  month           Int      // 1-12
+
+  // الإيرادات
+  totalRevenue    Float    @default(0)  // إجمالي المبيعات
+  totalRefunds    Float    @default(0)  // إجمالي الاسترداد
+  netRevenue      Float    @default(0)  // صافي الإيرادات
+
+  // التكاليف والمصروفات
+  totalCOGS       Float    @default(0)  // تكلفة البضائع المباعة
+  totalExpenses   Float    @default(0)  // إجمالي المصروفات
+  platformFees    Float    @default(0)  // رسوم المنصة
+
+  // الأرباح
+  grossProfit     Float    @default(0)  // الربح الإجمالي
+  netProfit       Float    @default(0)  // صافي الربح
+  profitMargin    Float    @default(0)  // هامش الربح %
+
+  // الطلبات
+  totalOrders     Int      @default(0)
+  completedOrders Int      @default(0)
+  cancelledOrders Int      @default(0)
+  avgOrderValue   Float    @default(0)
+
+  // حسب الباقة: FREE = ملخص فقط، PAID = تفاصيل كاملة
+  detailsJson     Json?    // تفاصيل إضافية للباقات المدفوعة
+
+  computedAt      DateTime @default(now())
+
+  @@unique([storeId, year, month])
+  @@map("daftari_monthly_summaries")
+}
+
+// تقارير دفاتري حسب الباقة
+// ┌──────────────────────┬──────────────┬───────────────────────────────────┐
+// │ الباقة               │ نوع التقرير  │ المحتوى                           │
+// ├──────────────────────┼──────────────┼───────────────────────────────────┤
+// │ بسطة الأصل           │ شهري فقط     │ إجمالي مبيعات + أرباح فقط        │
+// │ نماء الابتداء        │ شهري + أسبوعي│ + تفاصيل المنتجات                 │
+// │ نماء المتقدمة        │ كامل         │ + مصروفات + هامش ربح + مقارنة     │
+// │ نماء الاحترافية      │ كامل + تصدير │ + تصدير Excel + تحليل AI          │
+// └──────────────────────┴──────────────┴───────────────────────────────────┘
+
+// ======================================================
+// PLATFORM SETTINGS
+// ======================================================
+
+model PlatformSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  type      String   @default("string") // string | number | boolean | json
+  updatedAt DateTime @updatedAt
+
+  @@map("platform_settings")
+}
+
+// ======================================================
+// MARKETING (القسم ٣ — بنية فقط، بدون أي Provider حقيقي)
+// ======================================================
+// ⚠️ لا يوجد أي تكامل فعلي مع إنستقرام/لينز/أي منصة فيديو بهذه المرحلة.
+// راجع lib/marketing/provider.interface.ts — عقد عام جاهز للربط لاحقاً،
+// بدون أي كود يتصل فعلياً بأي مزود. كل الحقول الرقمية تبدأ من صفر حقيقي.
+
+enum MarketingContentStatus {
+  DRAFT               // الافتراضي دائماً بهذه المرحلة — لا نُنشئ أي حالة أخرى
+  PENDING_CONNECTION  // جاهز للنشر لكن لا يوجد Provider مربوط بعد
+  PUBLISHED           // بعد ربط Provider حقيقي مستقبلاً
+  FAILED
+}
+
+model MarketingContent {
+  id            String                 @id @default(cuid())
+  storeId       String
+  store         Store                  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  providerName  String?                // null = "غير محدد" حتى يُربط Provider فعلي
+  status        MarketingContentStatus @default(DRAFT)
+  videoUrl      String?
+  title         String
+  createdAt     DateTime               @default(now())
+
+  metric        ConversionMetric?
+
+  @@index([storeId])
+  @@map("marketing_content")
+}
+
+model ConversionMetric {
+  id                  String            @id @default(cuid())
+  contentId           String            @unique
+  content             MarketingContent  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  // ⚠️ صفر حقيقي دائماً حتى يوجد مصدر بيانات فعلي يُزامَن منه — لا قيم
+  // عشوائية للعرض التجريبي، مهما بدت الواجهة فاضية
+  views               Int               @default(0)
+  clicksToProduct     Int               @default(0)
+  purchasesAttributed Int               @default(0)
+  lastSyncedAt        DateTime?
+
+  @@map("conversion_metrics")
+}
+
+enum AdCampaignStatus {
+  DRAFT // القيمة الوحيدة بهذه المرحلة — لا تفعيل حقيقي، لا معالج دفع مربوط
+}
+
+model AdCampaign {
+  id        String           @id @default(cuid())
+  storeId   String
+  store     Store            @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name      String
+  budget    Float
+  status    AdCampaignStatus @default(DRAFT)
+  createdAt DateTime         @default(now())
+
+  @@index([storeId])
+  @@map("ad_campaigns")
+}
