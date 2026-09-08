@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
     where.store = {
       ...where.store,
       city: city,
-    };
+    } as any;
   }
   if (search) {
     where.OR = [
@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
       products,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
-  }  catch (err) {
+  } catch (err) {
     console.error("[GET /api/products]", err);
     return NextResponse.json({ error: "حدث خطأ في جلب المنتجات" }, { status: 500 });
   }
