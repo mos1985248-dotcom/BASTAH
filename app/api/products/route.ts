@@ -49,21 +49,21 @@ export async function GET(req: NextRequest) {
   }
   const { page, limit, storeId, category, city, search, minPrice, maxPrice, sort } = parsed.data;
 
+  const storeFilter: any = {
+    status: "ACTIVE",
+    subscription: { status: { in: GOOD_STANDING_STATUSES } },
+  };
+  if (city) {
+    storeFilter.city = city;
+  }
+
   const where: Prisma.ProductWhereInput = {
     status: "ACTIVE",
-    store: {
-      status: "ACTIVE",
-      subscription: { status: { in: GOOD_STANDING_STATUSES } },
-    },
+    store: storeFilter,
   };
   if (storeId) where.storeId = storeId;
   if (category) where.category = { slug: category };
-  if (city) {
-    where.store = {
-      ...where.store,
-      city: city,
-    } as any;
-  }
+
   if (search) {
     where.OR = [
       { nameAr: { contains: search, mode: "insensitive" } },
