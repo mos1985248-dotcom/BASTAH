@@ -15,6 +15,9 @@ const SORT_MAP: Record<string, Prisma.ProductOrderByWithRelationInput> = {
   rating: { avgRating: "desc" },
 };
 
+// ── GET /api/products — قائمة عامة، أو "view=seller" لمتجر التاجر نفسه ──
+// view=seller يتجاوز فلتر status=ACTIVE العام لأن التاجر يحتاج رؤية
+// مسوّداته ومنتجاته المؤرشفة أيضاً — وليس فقط ما يراه المشتري.
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const view = searchParams.get("view");
@@ -49,13 +52,14 @@ export async function GET(req: NextRequest) {
   }
   const { page, limit, storeId, category, city, search, minPrice, maxPrice, sort } = parsed.data;
 
-  const storeFilter: any = {
-    status: "ACTIVE",
-    subscription: { status: { in: GOOD_STANDING_STATUSES } },
+  // ⚠️ فلتر متجر منفصل بنوع صريح — تعديله تدريجياً (city لاحقاً) بدل
+  // تضمينه مباشرة داخل where وتعديله بالسبريد (...where.store) كان يُربك
+  // استدلال TypeScript لنوع الحقل الجديد المُضاف (city) ويُرجعه undefined
+  const storeFilter: Prisma.StoreWhereInput = {
+    status: "ACTIVE", // لا نُظهر منتجات متجر معلّق إدارياً حتى لو المنتج نفسه ACTIVE
+    subscription: { status: { in: GOOD_STANDING_STATUSES } }, // ولا منتجات اشتراك منتهي/معلّق عن الدفع
   };
-  if (city) {
-    storeFilter.city = city;
-  }
+  if (city) storeFilter.city = { equals: city, mode: "insensitive" };
 
   const where: Prisma.ProductWhereInput = {
     status: "ACTIVE",
@@ -63,7 +67,6 @@ export async function GET(req: NextRequest) {
   };
   if (storeId) where.storeId = storeId;
   if (category) where.category = { slug: category };
-
   if (search) {
     where.OR = [
       { nameAr: { contains: search, mode: "insensitive" } },
@@ -113,9 +116,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// ── POST /api/products — إضافة منتج (يتحقق من حد الباقة) ──
 export async function POST(req: NextRequest) {
   try {
     const { storeId } = await requireActiveStore();
+
+    // ✅ يرمي PlanLimitError قبل أي كتابة لو تجاوز حدود باقته
     await assertCanAddProduct(storeId);
 
     const body = await req.json();
