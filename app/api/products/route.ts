@@ -15,9 +15,6 @@ const SORT_MAP: Record<string, Prisma.ProductOrderByWithRelationInput> = {
   rating: { avgRating: "desc" },
 };
 
-// ── GET /api/products — قائمة عامة، أو "view=seller" لمتجر التاجر نفسه ──
-// view=seller يتجاوز فلتر status=ACTIVE العام لأن التاجر يحتاج رؤية
-// مسوّداته ومنتجاته المؤرشفة أيضاً — وليس فقط ما يراه المشتري.
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const view = searchParams.get("view");
@@ -55,13 +52,18 @@ export async function GET(req: NextRequest) {
   const where: Prisma.ProductWhereInput = {
     status: "ACTIVE",
     store: {
-      status: "ACTIVE", // لا نُظهر منتجات متجر معلّق إدارياً حتى لو المنتج نفسه ACTIVE
-      subscription: { status: { in: GOOD_STANDING_STATUSES } }, // ولا منتجات اشتراك منتهي/معلّق عن الدفع
+      status: "ACTIVE",
+      subscription: { status: { in: GOOD_STANDING_STATUSES } },
     },
   };
   if (storeId) where.storeId = storeId;
   if (category) where.category = { slug: category };
-  if (city) where.store = { ...where.store, city: { equals: city, mode: "insensitive" } };
+  if (city) {
+    where.store = {
+      ...where.store,
+      city: city,
+    };
+  }
   if (search) {
     where.OR = [
       { nameAr: { contains: search, mode: "insensitive" } },
@@ -105,18 +107,15 @@ export async function GET(req: NextRequest) {
       products,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
-  } catch (err) {
+  }  catch (err) {
     console.error("[GET /api/products]", err);
     return NextResponse.json({ error: "حدث خطأ في جلب المنتجات" }, { status: 500 });
   }
 }
 
-// ── POST /api/products — إضافة منتج (يتحقق من حد الباقة) ──
 export async function POST(req: NextRequest) {
   try {
     const { storeId } = await requireActiveStore();
-
-    // ✅ يرمي PlanLimitError قبل أي كتابة لو تجاوز حدود باقته
     await assertCanAddProduct(storeId);
 
     const body = await req.json();
