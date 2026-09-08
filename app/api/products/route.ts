@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
   if (city) {
     where.store = {
       ...where.store,
-      city: { contains: city, mode: "insensitive" },
+      city: { equals: city },
     };
   }
   if (search) {
