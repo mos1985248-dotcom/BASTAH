@@ -33,8 +33,8 @@ export default function StoreInfoGrid({ store }: { store: StoreDetail }) {
         </h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: t.spacing["5"] }}>
           {items.map((it) => (
-            <div key={it.label} style={{ textAlign: "center", padding: t.spacing["3"], background: t.colors.cream?.light || "#faf8f5", borderRadius: t.radius.md }}>
-              <it.Icon size={22} strokeWidth={1.6} color={t.colors.primary[800]} style={{ margin: `0 auto ${t.spacing["2"]}` }} />
+<div key={it.label} style={{ textAlign: "center", padding: t.spacing["3"], background: t.colors.cream.bg, borderRadius: t.radius.md }}>
+                <it.Icon size={22} strokeWidth={1.6} color={t.colors.primary[800]} style={{ margin: `0 auto ${t.spacing["2"]}` }} />
               <div style={{ fontSize: t.typography.fontSize.xs, color: t.colors.text.mid }}>{it.label}</div>
               <div style={{ fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.semibold, color: t.colors.text.dark, marginTop: 4 }}>{it.value}</div>
             </div>
