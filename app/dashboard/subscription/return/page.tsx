@@ -1,5 +1,4 @@
 
-
 // app/dashboard/subscription/return/page.tsx
 // صفحة العودة من Moyasar بعد الدفع.
 // useSearchParams موجود داخل Client Component منفصل حتى لا يفشل
@@ -20,3 +19,5 @@ export default function SubscriptionReturnPage() {
     </Suspense>
   );
 }
+
+
