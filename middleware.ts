@@ -53,10 +53,17 @@ export async function middleware(request: NextRequest) {
   // لبيئة middleware تحديداً.
   let response = NextResponse.next({ request: { headers: request.headers } });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
+  // حصانة ضد غياب إعدادات Supabase: عند توفّر المتغيّرات (الإنتاج/الإعداد
+  // الصحيح) يبقى السلوك مطابقاً تماماً؛ وعند غيابها كلياً لا نُسقِط الموقع
+  // بالكامل — الصفحات العامة تُعرض، والمسارات الخاصة تُحوَّل لتسجيل الدخول
+  // كإجراء آمن افتراضي (كأن المستخدم غير مسجَّل).
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  let isLoggedIn = false;
+
+  if (supabaseUrl && supabaseKey) {
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -67,11 +74,11 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
         },
       },
-    }
-  );
+    });
 
-  const { data } = await supabase.auth.getUser();
-  const isLoggedIn = !!data.user;
+    const { data } = await supabase.auth.getUser();
+    isLoggedIn = !!data.user;
+  }
 
   // ── 3) حماية المسارات الخاصة ───────────────────────────
   const needsAuth = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
