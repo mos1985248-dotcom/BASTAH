@@ -82,7 +82,7 @@ export default function SalesTrendChart({ data }: { data: SalesPoint[] }) {
             return (
               <g key={p.date}>
                 {hoverIdx === i && (
-                  <line x1={p.x} y1={padding} x2={p.x} y2={height - padding} stroke={t.colors.primary[300]} strokeDasharray="2 2" strokeWidth="1" />
+                  <line x1={p.x} y1={padding} x2={p.x} y2={height - padding} stroke={t.colors.primary[600]} strokeDasharray="2 2" strokeWidth="1" />
                 )}
                 <circle
                   cx={p.x}
