@@ -6,6 +6,7 @@
 
 import { prisma } from "./prisma";
 import type { NotificationType } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 interface CreateNotificationParams {
   userId: string;
