@@ -2,7 +2,7 @@
 // التحقق والمعالجة الفعلية للصور — sharp يقرأ البايتات الحقيقية للملف
 // (وليس Content-Type المُرسَل من المتصفح، الذي يمكن تزويره بسهولة).
 
-import sharp from "sharp";
+import sharp, { type Metadata } from "sharp";
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8MB قبل الضغط
 export const MIN_DIMENSION = 200; // أقل من هذا = صورة منتج غير مفيدة عملياً
@@ -35,7 +35,7 @@ export async function validateImageBuffer(buffer: Buffer): Promise<ValidatedImag
     throw new ImageValidationError(`حجم الملف أكبر من ${MAX_UPLOAD_BYTES / 1024 / 1024}MB`);
   }
 
-  let metadata: sharp.Metadata;
+  let metadata: Metadata;
   try {
     metadata = await sharp(buffer).metadata();
   } catch {
