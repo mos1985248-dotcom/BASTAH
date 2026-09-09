@@ -44,7 +44,7 @@ export default function AboutExperience() {
                   width: 48,
                   height: 48,
                   borderRadius: t.radius.full,
-                  background: t.colors.primary[150] || t.colors.primary[100],
+                 background: t.colors.primary[100],
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
