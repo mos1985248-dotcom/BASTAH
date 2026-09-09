@@ -35,7 +35,7 @@ export default function MuniraShowcase() {
             alt="منيرة" 
             width={72} 
             height={72} 
-            style={{ borderRadius: "50%", flexShrink: 0, border: `2px solid ${t.colors.primary[200]}` }} 
+            style={{ borderRadius: "50%", flexShrink: 0, border: `2px solid ${t.colors.primary[600]}` }}
           />
 
           <div>
