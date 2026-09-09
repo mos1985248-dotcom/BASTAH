@@ -11,7 +11,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         background: t.colors.cream.bg, 
         display: "flex", 
         flexDirection: "column",
-        fontFamily: t.typography.fontFamily.sans,
+        fontFamily: t.typography.fontFamily.base,
       }}
     >
       <Navbar />
