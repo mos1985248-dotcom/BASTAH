@@ -39,7 +39,7 @@ export default function StoreClosingBanner({ store }: { store: StoreDetail }) {
             alignItems: "center",
             gap: 8,
             padding: "12px 32px",
-            background: t.colors.gold[500],
+            background: t.colors.gold[600],
             color: t.colors.primary[950],
             borderRadius: t.radius.full,
             textDecoration: "none",
