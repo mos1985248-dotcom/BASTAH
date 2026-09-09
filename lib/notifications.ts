@@ -26,7 +26,7 @@ export async function createNotification(params: CreateNotificationParams) {
       titleEn:  params.titleEn ?? null,
       bodyAr:   params.bodyAr,
       bodyEn:   params.bodyEn ?? null,
-      data:     params.data ?? {},
+      data: (params.data ?? {}) as Prisma.InputJsonValue,
     },
   });
 }
