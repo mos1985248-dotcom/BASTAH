@@ -37,7 +37,7 @@ export function DashboardField({
           fontFamily: t.typography.fontFamily.base,
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = t.colors.primary[500];
+          e.currentTarget.style.borderColor = t.colors.primary[600];
           e.currentTarget.style.boxShadow = `0 0 0 3px rgba(217, 119, 6, 0.15)`;
         }}
         onBlur={(e) => {
