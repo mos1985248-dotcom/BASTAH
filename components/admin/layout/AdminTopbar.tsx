@@ -15,8 +15,9 @@ export default function AdminTopbar({ active }: { active: AdminSection }) {
         gap: 10,
       }}
     >
-      <span style={{ fontSize: 20 }}>{section?.icon}</span>
+      {section?.Icon && <section.Icon size={20} strokeWidth={2} />}
       <h1 style={{ margin: 0, fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>{section?.label}</h1>
     </div>
   );
 }
+
