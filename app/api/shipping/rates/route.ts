@@ -50,13 +50,20 @@ export async function POST(req: NextRequest) {
     }
 
     const credentials = decryptShippingCredentials(link.credentialsEnc);
-    const basitaFee = await getBasitaShippingFee();
+const basitaFee = await getBasitaShippingFee();
 
-    const result = await ShippingService.calculateRate(link.carrier, credentials, {
-      originCity: store.city,
-      destCity,
-      weightKg,
-    });
+if (!store.city) {
+  return NextResponse.json(
+    { error: "يجب تحديد مدينة المتجر قبل حساب تكلفة الشحن" },
+    { status: 400 }
+  );
+}
+
+const result = await ShippingService.calculateRate(link.carrier, credentials, {
+  originCity: store.city,
+  destCity,
+  weightKg,
+});
 
     const totalRate = result.carrierRate + basitaFee;
 
