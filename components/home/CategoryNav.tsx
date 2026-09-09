@@ -18,8 +18,9 @@ const CATEGORIES: { slug: string; label: string; Icon: LucideIcon; href?: string
 
 export default function CategoryNav() {
   return (
-    <section style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]} 0`, direction: "rtl" }}>
+    <section aria-labelledby="category-heading" style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]} 0`, direction: "rtl" }}>
       <h2
+        id="category-heading"
         style={{
           fontSize: t.typography.fontSize.xl,
           fontWeight: t.typography.fontWeight.bold,
@@ -47,7 +48,7 @@ export default function CategoryNav() {
                 transition: `transform ${t.motion.base} ${t.motion.ease}, background ${t.motion.base} ${t.motion.ease}`,
               }}
             >
-              <c.Icon size={28} strokeWidth={1.6} color={t.colors.gold[700]} />
+              <c.Icon size={28} strokeWidth={1.6} color={t.colors.gold[700]} aria-hidden="true" />
             </div>
             <span style={{ display: "block", marginTop: t.spacing["2"], fontSize: t.typography.fontSize.sm, color: t.colors.text.body }}>
               {c.label}

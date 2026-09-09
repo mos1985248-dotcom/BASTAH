@@ -12,8 +12,8 @@ const FEATURES = [
 
 export default function WhyBasita() {
   return (
-    <section style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["16"]} ${t.spacing["4"]} ${t.spacing["12"]}` }}>
-      <h2 style={{ textAlign: "center", fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark, margin: `0 0 ${t.spacing["8"]}` }}>
+    <section aria-labelledby="why-heading" style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["16"]} ${t.spacing["4"]} ${t.spacing["12"]}` }}>
+      <h2 id="why-heading" style={{ textAlign: "center", fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark, margin: `0 0 ${t.spacing["8"]}` }}>
         ليش بسطة؟
       </h2>
       <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: t.spacing["8"] }}>
@@ -32,7 +32,7 @@ export default function WhyBasita() {
                 border: `1px solid ${t.colors.cream.border}`
               }}
             >
-              <f.Icon size={24} strokeWidth={1.8} color={t.colors.primary[800]} />
+              <f.Icon size={24} strokeWidth={1.8} color={t.colors.primary[800]} aria-hidden="true" />
             </div>
             <p style={{ margin: `0 0 ${t.spacing["1"]}`, fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>{f.title}</p>
             <p style={{ margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.text.mid, lineHeight: t.typography.lineHeight.relaxed }}>{f.desc}</p>

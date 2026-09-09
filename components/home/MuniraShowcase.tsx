@@ -13,7 +13,7 @@ const CAPABILITIES: { Icon: LucideIcon; label: string }[] = [
 
 export default function MuniraShowcase() {
   return (
-    <section style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]} 0` }}>
+    <section aria-labelledby="munira-heading" style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]} 0` }}>
       <div
         style={{
           background: t.colors.primary[50],
@@ -40,7 +40,7 @@ export default function MuniraShowcase() {
 
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: t.spacing["2"], marginBottom: 4 }}>
-              <h2 style={{ margin: 0, fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>
+              <h2 id="munira-heading" style={{ margin: 0, fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>
                 منيرة
               </h2>
               <span style={{ fontSize: 11, fontWeight: t.typography.fontWeight.bold, background: t.colors.gold[600], color: t.colors.white, padding: "2px 10px", borderRadius: t.radius.full }}>

@@ -13,7 +13,7 @@ const FEATURES: { Icon: LucideIcon; label: string }[] = [
 
 export default function DaftariShowcase() {
   return (
-    <section style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]} 0` }}>
+    <section aria-labelledby="daftari-heading" style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]} 0` }}>
       <div
         style={{
           display: "grid",
@@ -28,7 +28,7 @@ export default function DaftariShowcase() {
       >
         {/* قسم مميزات دفاتري */}
         <div>
-          <h2 style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>
+          <h2 id="daftari-heading" style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>
             دفاتري — محاسبة بسيطة لمتجرك
           </h2>
           <p style={{ margin: `0 0 ${t.spacing["5"]}`, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid, lineHeight: t.typography.lineHeight.relaxed }}>
@@ -50,7 +50,7 @@ export default function DaftariShowcase() {
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
-                  <f.Icon size={24} strokeWidth={1.7} color={t.colors.primary[800]} />
+                  <f.Icon size={24} strokeWidth={1.7} color={t.colors.primary[800]} aria-hidden="true" />
                 </div>
                 <div style={{ fontSize: t.typography.fontSize.xs, color: t.colors.text.body, fontWeight: t.typography.fontWeight.medium }}>
                   {f.label}

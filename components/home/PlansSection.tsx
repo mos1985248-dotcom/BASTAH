@@ -7,7 +7,34 @@
 import { useEffect, useState } from "react";
 import { Check, X, ArrowLeft } from "lucide-react";
 import { t } from "@/theme";
+import Skeleton from "@/components/ui/Skeleton";
 import type { PlanConfig } from "@/components/pricing/plan-types";
+
+function PlanCardSkeleton() {
+  return (
+    <div
+      style={{
+        background: t.colors.white,
+        borderRadius: t.radius.lg,
+        border: `1px solid ${t.colors.cream.border}`,
+        padding: t.spacing["6"],
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: t.spacing["3"],
+        height: "100%",
+      }}
+    >
+      <Skeleton width="55%" height={20} />
+      <Skeleton width="75%" height={12} />
+      <Skeleton width="40%" height={30} style={{ marginTop: 8 }} />
+      <div style={{ width: "100%", borderTop: `1px solid ${t.colors.cream.border}`, margin: `${t.spacing["2"]} 0` }} />
+      <Skeleton width="90%" height={12} />
+      <Skeleton width="80%" height={12} />
+      <Skeleton width="85%" height={12} />
+    </div>
+  );
+}
 
 export default function PlansSection() {
   const [plans, setPlans] = useState<PlanConfig[] | null>(null);
@@ -19,13 +46,20 @@ export default function PlansSection() {
       .catch(() => setPlans([]));
   }, []);
 
-  if (!plans || plans.length === 0) return null;
+  const loading = plans === null;
+
+  // إخفاء القسم فقط عند التأكد من عدم وجود باقات (بعد انتهاء التحميل)
+  if (!loading && plans.length === 0) return null;
 
   return (
-    <section style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]} 0` }}>
+    <section
+      aria-labelledby="plans-heading"
+      aria-busy={loading}
+      style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]} 0` }}
+    >
       {/* عنوان القسم */}
       <div style={{ textAlign: "center", marginBottom: t.spacing["6"] }}>
-        <h2 style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
+        <h2 id="plans-heading" style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
           باقات تناسب كل أسرة منتجة
         </h2>
         <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid, lineHeight: t.typography.lineHeight.relaxed }}>
@@ -33,7 +67,17 @@ export default function PlansSection() {
         </p>
       </div>
 
+      {/* حالة التحميل — هياكل عظمية بدل الفراغ لتفادي قفزات التخطيط */}
+      {loading && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: t.spacing["5"], alignItems: "stretch" }}>
+          {Array.from({ length: 3 }, (_, i) => (
+            <PlanCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
+
       {/* شبكة الباقات */}
+      {!loading && (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: t.spacing["5"], alignItems: "stretch" }}>
         {plans.map((plan) => (
           <div
@@ -111,6 +155,7 @@ export default function PlansSection() {
           </div>
         ))}
       </div>
+      )}
 
       {/* رابط مقارنة الميزات */}
       <div style={{ textAlign: "center", marginTop: t.spacing["6"] }}>
