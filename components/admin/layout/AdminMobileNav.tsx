@@ -39,7 +39,7 @@ export default function AdminMobileNav({ active, onChange, ticketBadge }: { acti
                 position: "relative",
               }}
             >
-              <span style={{ fontSize: 17 }}>{s.icon}</span>
+             <s.Icon size={17} strokeWidth={2} />
               <span style={{ fontSize: 9.5, fontWeight: isActive ? t.typography.fontWeight.bold : t.typography.fontWeight.regular, whiteSpace: "nowrap" }}>{s.label}</span>
               {s.id === "support" && ticketBadge > 0 && (
                 <span style={{ position: "absolute", top: 2, insetInlineEnd: 10, background: t.colors.semantic.danger, color: t.colors.white, fontSize: 8, borderRadius: t.radius.full, padding: "0 4px" }}>
