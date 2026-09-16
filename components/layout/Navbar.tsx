@@ -186,6 +186,78 @@ export default function Navbar() {
           <NavLinks />
         </div>
       </div>
+
+            <style>{`
+        @media (max-width: 768px) {
+          .basita-navbar-main {
+            padding: 10px 12px !important;
+            display: grid !important;
+            grid-template-columns: 1fr auto !important;
+            grid-template-areas:
+              "logo actions"
+              "search search" !important;
+            gap: 10px !important;
+            align-items: center !important;
+          }
+
+          .basita-navbar-logo {
+            grid-area: logo;
+            min-width: 0;
+          }
+
+          .basita-navbar-logo > div:first-child {
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+          }
+
+          .basita-navbar-logo img {
+            width: 30px !important;
+            height: 30px !important;
+          }
+
+          .basita-navbar-logo > span {
+            min-width: 0;
+          }
+
+          .basita-navbar-logo > span > span:first-child {
+            font-size: 19px !important;
+          }
+
+          .basita-navbar-logo > span > span:last-child {
+            font-size: 8px !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .basita-navbar-search {
+            grid-area: search;
+            width: 100% !important;
+          }
+
+          .basita-navbar-actions {
+            grid-area: actions;
+            gap: 6px !important;
+          }
+
+          .basita-navbar-links {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .basita-navbar-links::-webkit-scrollbar {
+            display: none;
+          }
+
+          .basita-navbar-links > div {
+            justify-content: flex-start !important;
+            width: max-content;
+            min-width: 100%;
+            padding: 0 4px;
+          }
+        }
+      `}</style>
     </header>
   );
 }

@@ -597,3 +597,86 @@ textarea:focus-visible {
     opacity: 0;
   }
 }
+/* ─────────────────────────────────────────
+   Auth / Login Responsive
+   ───────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .basita-auth-shell {
+    min-height: 100dvh !important;
+    display: block !important;
+  }
+
+  .basita-auth-brand {
+    display: none !important;
+  }
+
+  .basita-auth-main {
+    min-height: 100dvh !important;
+    width: 100% !important;
+    padding: 24px 16px 32px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+  }
+
+  .basita-auth-main > div {
+    width: 100% !important;
+    max-width: 430px !important;
+  }
+
+  .basita-auth-mobile-logo {
+    display: flex !important;
+    justify-content: center !important;
+    margin-bottom: 18px !important;
+  }
+
+  .basita-auth-mobile-logo > div {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 15px !important;
+  }
+
+  .basita-auth-mobile-logo img {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .basita-auth-main h1 {
+    font-size: 24px !important;
+    line-height: 1.35 !important;
+  }
+
+  .basita-auth-main h1 + p {
+    margin-top: 8px !important;
+    margin-bottom: 22px !important;
+    font-size: 14px !important;
+    line-height: 1.7 !important;
+  }
+
+  .basita-auth-main > div > div:last-child {
+    border-radius: 18px !important;
+    padding: 20px 16px !important;
+    box-shadow: 0 8px 24px rgba(67, 48, 29, 0.06) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .basita-auth-main {
+    padding: 18px 12px 24px !important;
+  }
+
+  .basita-auth-main h1 {
+    font-size: 22px !important;
+  }
+
+  .basita-auth-main h1 + p {
+    font-size: 13px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .basita-auth-main > div > div:last-child {
+    padding: 18px 14px !important;
+  }
+}
