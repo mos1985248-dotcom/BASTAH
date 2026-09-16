@@ -19,6 +19,7 @@ export default function PricingClient() {
 
   const load = () => {
     setError("");
+
     fetch("/api/subscription/plans")
       .then((r) => r.json())
       .then((d) => setPlans(d.plans))
@@ -29,20 +30,146 @@ export default function PricingClient() {
 
   return (
     <SiteShell>
-      <div style={{ direction: "rtl", textAlign: "right" }}>
-        <PricingHeader billing={billing} onBillingChange={setBilling} />
-        {error ? (
-          <div style={{ padding: t.spacing["8"], maxWidth: 480, margin: "0 auto" }}>
-            <ErrorState message={error} onRetry={load} />
-          </div>
-        ) : !plans ? (
-          <div style={{ padding: t.spacing["16"] }}><LoadingState label="جاري تحميل الباقات..." /></div>
-        ) : (
-          <PricingGrid billing={billing} plans={plans} />
-        )}
-        <NoCommissionBanner />
-        <PricingFAQ />
+      <div
+        dir="rtl"
+        className="basita-pricing-page"
+        style={{
+          width: "100%",
+          boxSizing: "border-box",
+          textAlign: "right",
+          paddingBottom: t.spacing["16"],
+        }}
+      >
+        {/* رأس صفحة الأسعار */}
+        <section className="basita-pricing-header-section">
+          <PricingHeader
+            billing={billing}
+            onBillingChange={setBilling}
+          />
+        </section>
+
+        {/* محتوى الباقات */}
+        <main
+          className="basita-pricing-main"
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        >
+          {error ? (
+            <section
+              style={{
+                width: "100%",
+                maxWidth: 520,
+                margin: "0 auto",
+                padding: `${t.spacing["10"]} ${t.spacing["4"]}`,
+                boxSizing: "border-box",
+              }}
+            >
+              <ErrorState
+                message={error}
+                onRetry={load}
+              />
+            </section>
+          ) : !plans ? (
+            <section
+              style={{
+                minHeight: 280,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: `${t.spacing["12"]} ${t.spacing["4"]}`,
+                boxSizing: "border-box",
+              }}
+            >
+              <LoadingState label="جاري تحميل الباقات..." />
+            </section>
+          ) : (
+            <section
+              className="basita-pricing-grid-section"
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            >
+              <PricingGrid
+                billing={billing}
+                plans={plans}
+              />
+            </section>
+          )}
+        </main>
+
+        {/* مزايا بسطة */}
+        <section
+          className="basita-pricing-commission-section"
+          style={{
+            width: "100%",
+            marginTop: t.spacing["10"],
+          }}
+        >
+          <NoCommissionBanner />
+        </section>
+
+        {/* الأسئلة الشائعة */}
+        <section
+          className="basita-pricing-faq-section"
+          style={{
+            width: "100%",
+            marginTop: t.spacing["8"],
+          }}
+        >
+          <PricingFAQ />
+        </section>
+
+        <style jsx>{`
+          .basita-pricing-page {
+            overflow-x: hidden;
+          }
+
+          .basita-pricing-header-section {
+            width: 100%;
+          }
+
+          .basita-pricing-main {
+            width: 100%;
+          }
+
+          .basita-pricing-grid-section {
+            width: 100%;
+          }
+
+          .basita-pricing-commission-section,
+          .basita-pricing-faq-section {
+            width: 100%;
+          }
+
+          @media (max-width: 768px) {
+            .basita-pricing-commission-section {
+              margin-top: ${t.spacing["8"]} !important;
+            }
+
+            .basita-pricing-faq-section {
+              margin-top: ${t.spacing["6"]} !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .basita-pricing-page {
+              padding-bottom: ${t.spacing["10"]} !important;
+            }
+
+            .basita-pricing-commission-section {
+              margin-top: ${t.spacing["6"]} !important;
+            }
+
+            .basita-pricing-faq-section {
+              margin-top: ${t.spacing["5"]} !important;
+            }
+          }
+        `}</style>
       </div>
     </SiteShell>
   );
 }
+

@@ -14,9 +14,10 @@
 // تثبيت Contract، وليس ادّعاءً بأن إنشاء الشحنات الحقيقي يعمل اليوم.
 
 import { prisma } from "../prisma";
-import type { ShippingStatus } from "@prisma/client";
+import type { ShippingStatus, ShippingCarrier } from "@prisma/client";
 import { getShippingProvider } from "./registry";
 import { decryptShippingCredentials } from "./credentials";
+import { decryptSecret } from "../crypto";
 import { withRetry, normalizeShippingError } from "./reliability";
 import { RateRequest, RateResult, ShipmentRequest, ShippingProviderError } from "./types";
 
@@ -24,9 +25,50 @@ import { RateRequest, RateResult, ShipmentRequest, ShippingProviderError } from 
 // بديلة بعدها، مثلاً إعادة شحن بعد فشل أو إرجاع)
 const INACTIVE_STATUSES: ShippingStatus[] = ["FAILED", "RETURNED"];
 
-async function resolveStoreShipping(storeId: string) {
-  const link = await prisma.storeShipping.findFirst({ where: { storeId, isActive: true }, orderBy: { connectedAt: "asc" } });
+export async function resolveStoreShipping(
+  storeId: string
+): Promise<{ carrier: ShippingCarrier; credentials: Record<string, string> }> {
+  const link = await prisma.storeShipping.findFirst({
+    where: { storeId, isActive: true },
+    orderBy: { connectedAt: "asc" },
+    include: { customProvider: true }, // فاضي (null) لغير CUSTOM — لا تكلفة إضافية تُذكر
+  });
   if (!link) throw new ShippingProviderError("لا توجد شركة شحن مربوطة ونشطة لهذا المتجر", "UNKNOWN", "invalid_request");
+
+  // ⚠️ CUSTOM: بيانات الاعتماد الحقيقية مشتركة على مستوى المنصة (يدخلها
+  // الأدمن مرة وحدة بـShippingProviderConfig)، مو credentialsEnc الخاص
+  // بكل تاجر كما هو الحال لـARAMEX/SPL — راجع تعليق StoreShipping.customProviderId
+  if (link.carrier === "CUSTOM") {
+    const config = link.customProvider;
+    if (!config || !config.isActive) {
+      throw new ShippingProviderError("شركة الشحن المخصَّصة غير مفعّلة حالياً من الإدارة", "CUSTOM", "invalid_request");
+    }
+
+    if (config.providerType === "MANUAL") {
+      // ⚠️ شركة بدون أي نظام تقني — سعر ثابت محلي، بدون baseUrl/apiKey إطلاقاً
+      return {
+        carrier: link.carrier,
+        credentials: {
+          flatFee: String(config.flatFee ?? 0),
+          perKgFee: String(config.perKgFee ?? 0),
+        },
+      };
+    }
+
+    // REST — الشركة عندها API فعلي
+    if (!config.baseUrl || !config.ratePath || !config.apiKeyEnc) {
+      throw new ShippingProviderError("إعدادات شركة الشحن ناقصة من لوحة الإدارة", "CUSTOM", "invalid_request");
+    }
+    return {
+      carrier: link.carrier,
+      credentials: {
+        baseUrl: config.baseUrl,
+        ratePath: config.ratePath,
+        apiKey: decryptSecret(config.apiKeyEnc),
+      },
+    };
+  }
+
   return { carrier: link.carrier, credentials: decryptShippingCredentials(link.credentialsEnc) };
 }
 

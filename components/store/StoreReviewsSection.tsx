@@ -1,8 +1,8 @@
 // components/store/StoreReviewsSection.tsx
-// يستبدل StoreRatingSummary — يعرض المعدّل الحقيقي + توزيع النجوم الفعلي
-// (من GROUP BY على Review) + قائمة مراجعات معتمدة حقيقية عبر
-// GET /api/stores/[slug]/reviews. لا بيانات ملفّقة: لو لا توجد مراجعات
-// بعد، تُعرض حالة فارغة صادقة بدل تلفيق محتوى.
+// يعرض المعدّل الحقيقي + توزيع النجوم الفعلي
+// + قائمة مراجعات معتمدة حقيقية.
+// لا توجد بيانات ملفّقة: عند عدم وجود مراجعات تظهر حالة فارغة صادقة.
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,70 +14,290 @@ import { timeAgoAr } from "@/lib/store-helpers";
 import { StoreDetail, StoreReviewsResponse } from "./types";
 import Skeleton from "@/components/ui/Skeleton";
 
-function StarRow({ rating, size = 13 }: { rating: number; size?: number }) {
+function StarRow({
+  rating,
+  size = 13,
+}: {
+  rating: number;
+  size?: number;
+}) {
   return (
-    <div style={{ display: "flex", gap: 1 }}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} size={size} strokeWidth={1.5} color={t.colors.gold[600]} fill={i < rating ? t.colors.gold[600] : "none"} />
+    <div
+      aria-label={`التقييم ${rating} من 5`}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 2,
+      }}
+    >
+      {Array.from({ length: 5 }).map((_, index) => (
+        <Star
+          key={index}
+          size={size}
+          strokeWidth={1.6}
+          color={t.colors.gold[600]}
+          fill={index < rating ? t.colors.gold[600] : "none"}
+        />
       ))}
     </div>
   );
 }
 
-export default function StoreReviewsSection({ store }: { store: StoreDetail }) {
+export default function StoreReviewsSection({
+  store,
+}: {
+  store: StoreDetail;
+}) {
   const [data, setData] = useState<StoreReviewsResponse | null>(null);
-  const [reviews, setReviews] = useState<StoreReviewsResponse["reviews"]>([]);
+  const [reviews, setReviews] =
+    useState<StoreReviewsResponse["reviews"]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
+    let active = true;
+
     setLoading(true);
+
     api
-      .get<StoreReviewsResponse>(`/api/stores/${store.slug}/reviews?page=${page}&limit=6`)
+      .get<StoreReviewsResponse>(
+        `/api/stores/${store.slug}/reviews?page=${page}&limit=6`
+      )
       .then((res) => {
+        if (!active) return;
+
         setData(res);
-        setReviews((prev) => (page === 1 ? res.reviews : [...prev, ...res.reviews]));
+
+        setReviews((prev) =>
+          page === 1 ? res.reviews : [...prev, ...res.reviews]
+        );
       })
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!active) return;
+
+        if (page === 1) {
+          setData(null);
+          setReviews([]);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   }, [store.slug, page]);
 
   const avg = data?.avgRating ?? store.avgRating;
   const total = data?.totalReviews ?? store.totalReviews;
   const distribution = data?.distribution;
-  const maxCount = distribution ? Math.max(1, ...Object.values(distribution)) : 1;
+
+  const maxCount = distribution
+    ? Math.max(1, ...Object.values(distribution))
+    : 1;
+
+  const hasReviews = reviews.length > 0;
+  const hasDistribution = Boolean(distribution);
 
   return (
-    <section style={{ maxWidth: 1080, margin: `${t.spacing["6"]} auto 0`, padding: `0 ${t.spacing["4"]}`, direction: "rtl" }}>
-      <h2 style={{ fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark, margin: `0 0 ${t.spacing["4"]}` }}>
-        تقييمات العملاء
-      </h2>
+    <section
+      id="reviews"
+      aria-label="تقييمات العملاء"
+      style={{
+        width: "100%",
+        maxWidth: 1200,
+        margin: `${t.spacing["8"]} auto 0`,
+        padding: `0 ${t.spacing["5"]}`,
+        boxSizing: "border-box",
+        direction: "rtl",
+      }}
+    >
+      {/* Section heading */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          gap: 16,
+          marginBottom: t.spacing["5"],
+        }}
+      >
+        <div>
+          <h2
+            style={{
+              margin: 0,
+              color: t.colors.text.dark,
+              fontSize: t.typography.fontSize["2xl"],
+              fontWeight: t.typography.fontWeight.bold,
+              lineHeight: 1.4,
+            }}
+          >
+            تقييمات العملاء
+          </h2>
 
-      <div style={{ background: t.colors.white, border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.lg, padding: t.spacing["6"] }}>
-        {/* الملخص العلوي */}
-        <div style={{ display: "flex", gap: t.spacing["6"], flexWrap: "wrap", alignItems: "center", paddingBottom: t.spacing["5"], borderBottom: `1px solid ${t.colors.cream.border}` }}>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: t.typography.fontSize["3xl"], fontWeight: t.typography.fontWeight.bold, color: t.colors.gold[600] }}>{avg.toFixed(1)}</div>
-            <div style={{ display: "flex", justifyContent: "center", marginTop: 4 }}>
-              <StarRow rating={Math.round(avg)} size={16} />
+          <p
+            style={{
+              margin: "4px 0 0",
+              color: t.colors.text.light,
+              fontSize: t.typography.fontSize.sm,
+              lineHeight: 1.7,
+            }}
+          >
+            آراء عملاء حقيقيين بعد تجربة المتجر
+          </p>
+        </div>
+
+        {total > 0 && (
+          <span
+            style={{
+              flexShrink: 0,
+              padding: "5px 10px",
+              borderRadius: t.radius.full,
+              background: t.colors.cream.warm,
+              color: t.colors.text.mid,
+              fontSize: t.typography.fontSize.xs,
+              fontWeight: t.typography.fontWeight.semibold,
+            }}
+          >
+            {total} مراجعة
+          </span>
+        )}
+      </div>
+
+      <div
+        style={{
+          background: t.colors.white,
+          border: `1px solid ${t.colors.cream.border}`,
+          borderRadius: t.radius.xl,
+          padding: t.spacing["6"],
+          boxShadow: t.shadows.sm,
+        }}
+      >
+        {/* Summary */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: hasDistribution
+              ? "200px minmax(280px, 1fr)"
+              : "1fr",
+            gap: t.spacing["6"],
+            alignItems: "center",
+            paddingBottom: t.spacing["6"],
+            borderBottom: `1px solid ${t.colors.cream.border}`,
+          }}
+        >
+          {/* Overall rating */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              padding: t.spacing["3"],
+            }}
+          >
+            <div
+              style={{
+                color: t.colors.gold[600],
+                fontSize: 38,
+                fontWeight: t.typography.fontWeight.bold,
+                lineHeight: 1,
+              }}
+            >
+              {avg.toFixed(1)}
             </div>
-            <div style={{ fontSize: t.typography.fontSize.xs, color: t.colors.text.mid, marginTop: 4 }}>{total} مراجعة</div>
+
+            <div style={{ marginTop: 9 }}>
+              <StarRow rating={Math.round(avg)} size={17} />
+            </div>
+
+            <div
+              style={{
+                marginTop: 7,
+                color: t.colors.text.mid,
+                fontSize: t.typography.fontSize.xs,
+              }}
+            >
+              من 5 · {total} مراجعة
+            </div>
           </div>
 
+          {/* Distribution */}
           {distribution && (
-            <div style={{ flex: 1, minWidth: 220, display: "flex", flexDirection: "column", gap: 6 }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                minWidth: 0,
+              }}
+            >
               {(["5", "4", "3", "2", "1"] as const).map((star) => {
                 const count = distribution[star];
-                const pct = total > 0 ? (count / maxCount) * 100 : 0;
+                const percent =
+                  total > 0 ? (count / maxCount) * 100 : 0;
+
                 return (
-                  <div key={star} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: t.typography.fontSize.xs, color: t.colors.text.mid, width: 34, flexShrink: 0 }}>
-                      {star} <Star size={11} strokeWidth={1.8} color={t.colors.gold[600]} fill={t.colors.gold[600]} />
+                  <div
+                    key={star}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "38px minmax(80px, 1fr) 30px",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        gap: 3,
+                        color: t.colors.text.mid,
+                        fontSize: t.typography.fontSize.xs,
+                      }}
+                    >
+                      {star}
+                      <Star
+                        size={11}
+                        strokeWidth={1.8}
+                        color={t.colors.gold[600]}
+                        fill={t.colors.gold[600]}
+                      />
                     </span>
-                    <div style={{ flex: 1, height: 6, borderRadius: t.radius.full, background: t.colors.cream.border, overflow: "hidden" }}>
-                      <div style={{ width: `${pct}%`, height: "100%", background: t.colors.gold[600] }} />
+
+                    <div
+                      style={{
+                        height: 7,
+                        borderRadius: t.radius.full,
+                        background: t.colors.cream.border,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${percent}%`,
+                          height: "100%",
+                          borderRadius: t.radius.full,
+                          background: t.colors.gold[600],
+                          transition: "width 0.25s ease",
+                        }}
+                      />
                     </div>
-                    <span style={{ fontSize: t.typography.fontSize.xs, color: t.colors.text.mid, width: 24, flexShrink: 0, textAlign: "end" }}>{count}</span>
+
+                    <span
+                      style={{
+                        color: t.colors.text.mid,
+                        fontSize: t.typography.fontSize.xs,
+                        textAlign: "left",
+                      }}
+                    >
+                      {count}
+                    </span>
                   </div>
                 );
               })}
@@ -85,71 +305,286 @@ export default function StoreReviewsSection({ store }: { store: StoreDetail }) {
           )}
         </div>
 
-        {/* قائمة المراجعات */}
-        <div style={{ paddingTop: t.spacing["5"] }}>
+        {/* Reviews */}
+        <div style={{ paddingTop: t.spacing["6"] }}>
           {loading && page === 1 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["4"] }}>
-              {[1, 2, 3].map((n) => (
-                <div key={n} style={{ display: "flex", gap: t.spacing["3"] }}>
-                  <Skeleton width={38} height={38} radius="50%" />
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <Skeleton width="40%" height={16} />
-                    <Skeleton width="80%" height={14} />
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: t.spacing["5"],
+              }}
+            >
+              {[1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  style={{
+                    display: "flex",
+                    gap: t.spacing["3"],
+                  }}
+                >
+                  <Skeleton
+                    width={42}
+                    height={42}
+                    radius="50%"
+                  />
+
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 8,
+                    }}
+                  >
+                    <Skeleton width="34%" height={15} />
+                    <Skeleton width="92%" height={13} />
+                    <Skeleton width="66%" height={13} />
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {!loading && reviews.length === 0 && (
-            <div style={{ textAlign: "center", padding: `${t.spacing["8"]} 0` }}>
-              <p style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, color: t.colors.text.mid, margin: 0, fontSize: t.typography.fontSize.sm }}>
-                لا توجد مراجعات معتمدة بعد — كوني أول من يقيّم هذا المتجر بعد استلام طلبك
-                <Leaf size={14} strokeWidth={1.8} color={t.colors.primary[600]} />
+          {!loading && !hasReviews && (
+            <div
+              style={{
+                minHeight: 150,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: t.spacing["6"],
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: t.radius.full,
+                  background: t.colors.primary[50],
+                  color: t.colors.primary[700],
+                  marginBottom: 10,
+                }}
+              >
+                <Leaf size={20} strokeWidth={1.7} />
+              </div>
+
+              <p
+                style={{
+                  maxWidth: 520,
+                  margin: 0,
+                  color: t.colors.text.mid,
+                  fontSize: t.typography.fontSize.sm,
+                  lineHeight: 1.8,
+                }}
+              >
+                لا توجد مراجعات معتمدة بعد. يمكنك أن تكون أول من
+                يقيّم المتجر بعد استلام طلبك.
               </p>
             </div>
           )}
 
-          {reviews.length > 0 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["4"] }}>
-              {reviews.map((r) => (
-                <div key={r.id} style={{ display: "flex", gap: t.spacing["3"], paddingBottom: t.spacing["4"], borderBottom: `1px solid ${t.colors.cream.borderLight}` }}>
-                  {r.user.avatar ? (
-                    <Image src={r.user.avatar} alt={r.user.name} width={38} height={38} style={{ borderRadius: "50%", flexShrink: 0, objectFit: "cover" }} />
+          {hasReviews && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {reviews.map((review, index) => (
+                <article
+                  key={review.id}
+                  style={{
+                    display: "flex",
+                    gap: t.spacing["3"],
+                    paddingBottom: t.spacing["5"],
+                    paddingTop: index === 0 ? 0 : t.spacing["5"],
+                    borderBottom:
+                      index === reviews.length - 1
+                        ? "none"
+                        : `1px solid ${t.colors.cream.borderLight}`,
+                  }}
+                >
+                  {/* Avatar */}
+                  {review.user.avatar ? (
+                    <Image
+                      src={review.user.avatar}
+                      alt={review.user.name}
+                      width={42}
+                      height={42}
+                      style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                        objectFit: "cover",
+                      }}
+                    />
                   ) : (
-                    <div style={{ width: 38, height: 38, borderRadius: "50%", background: t.colors.primary[100], color: t.colors.primary[800], display: "flex", alignItems: "center", justifyContent: "center", fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, flexShrink: 0 }}>
-                      {r.user.name.trim().charAt(0)}
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: "50%",
+                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: t.colors.primary[100],
+                        color: t.colors.primary[800],
+                        fontSize: t.typography.fontSize.sm,
+                        fontWeight: t.typography.fontWeight.bold,
+                      }}
+                    >
+                      {review.user.name.trim().charAt(0)}
                     </div>
                   )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: t.spacing["2"], flexWrap: "wrap" }}>
-                      <span style={{ fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.semibold, color: t.colors.text.dark }}>{r.user.name}</span>
-                      <span style={{ fontSize: t.typography.fontSize.xs, color: t.colors.text.light }}>{timeAgoAr(r.createdAt)}</span>
+
+                  <div
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    {/* Reviewer header */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 12,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <strong
+                        style={{
+                          color: t.colors.text.dark,
+                          fontSize: t.typography.fontSize.sm,
+                          fontWeight:
+                            t.typography.fontWeight.semibold,
+                        }}
+                      >
+                        {review.user.name}
+                      </strong>
+
+                      <span
+                        style={{
+                          color: t.colors.text.light,
+                          fontSize: t.typography.fontSize.xs,
+                        }}
+                      >
+                        {timeAgoAr(review.createdAt)}
+                      </span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", margin: "4px 0" }}>
-                      <StarRow rating={r.rating} />
-                      {r.product?.nameAr && <span style={{ color: t.colors.text.light, fontSize: t.typography.fontSize.xs, marginInlineStart: 6 }}>· {r.product.nameAr}</span>}
+
+                    {/* Rating / product */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 7,
+                        flexWrap: "wrap",
+                        marginTop: 5,
+                      }}
+                    >
+                      <StarRow rating={review.rating} />
+
+                      {review.product?.nameAr && (
+                        <span
+                          style={{
+                            color: t.colors.text.light,
+                            fontSize: t.typography.fontSize.xs,
+                          }}
+                        >
+                          · {review.product.nameAr}
+                        </span>
+                      )}
                     </div>
-                    {r.comment && <p style={{ margin: `4px 0 0`, fontSize: t.typography.fontSize.sm, color: t.colors.text.body, lineHeight: t.typography.lineHeight.snug }}>{r.comment}</p>}
-                    {r.sellerReply && (
-                      <div style={{ marginTop: 8, background: t.colors.cream?.warm || "#fdfbf7", borderRadius: t.radius.sm, padding: "8px 12px", borderInlineStart: `3px solid ${t.colors.primary[800]}` }}>
-                        <span style={{ fontSize: t.typography.fontSize.xs, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>رد المتجر: </span>
-                        <span style={{ fontSize: t.typography.fontSize.xs, color: t.colors.text.body }}>{r.sellerReply}</span>
+
+                    {/* Comment */}
+                    {review.comment && (
+                      <p
+                        style={{
+                          margin: "8px 0 0",
+                          color: t.colors.text.body,
+                          fontSize: t.typography.fontSize.sm,
+                          lineHeight: 1.9,
+                        }}
+                      >
+                        {review.comment}
+                      </p>
+                    )}
+
+                    {/* Seller reply */}
+                    {review.sellerReply && (
+                      <div
+                        style={{
+                          marginTop: 10,
+                          padding: "9px 12px",
+                          borderRadius: t.radius.md,
+                          background: t.colors.cream.warm,
+                          borderInlineStart: `3px solid ${t.colors.primary[700]}`,
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: t.colors.primary[800],
+                            fontSize: t.typography.fontSize.xs,
+                            fontWeight:
+                              t.typography.fontWeight.bold,
+                          }}
+                        >
+                          رد المتجر:
+                        </span>{" "}
+                        <span
+                          style={{
+                            color: t.colors.text.body,
+                            fontSize: t.typography.fontSize.xs,
+                            lineHeight: 1.8,
+                          }}
+                        >
+                          {review.sellerReply}
+                        </span>
                       </div>
                     )}
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           )}
 
+          {/* Load more */}
           {data && data.total > data.page * data.limit && (
-            <div style={{ textAlign: "center", marginTop: t.spacing["5"] }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: t.spacing["6"],
+              }}
+            >
               <button
-                onClick={() => setPage((p) => p + 1)}
+                type="button"
+                onClick={() => setPage((current) => current + 1)}
                 disabled={loading}
                 className="basita-btn-interactive"
-                style={{ padding: "9px 22px", background: t.colors.white, border: `1.5px solid ${t.colors.primary[800]}`, color: t.colors.primary[800], borderRadius: t.radius.full, fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, cursor: loading ? "wait" : "pointer" }}
+                style={{
+                  minHeight: 42,
+                  padding: "9px 24px",
+                  border: `1.5px solid ${t.colors.primary[800]}`,
+                  borderRadius: t.radius.full,
+                  background: t.colors.white,
+                  color: t.colors.primary[800],
+                  fontSize: t.typography.fontSize.sm,
+                  fontWeight: t.typography.fontWeight.bold,
+                  cursor: loading ? "wait" : "pointer",
+                  opacity: loading ? 0.65 : 1,
+                }}
               >
                 {loading ? "جاري التحميل..." : "عرض المزيد"}
               </button>

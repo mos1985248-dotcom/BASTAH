@@ -3,7 +3,11 @@ import { t } from "@/theme";
 import { SOCIAL_LINKS, SocialLinks } from "@/lib/social-links";
 import SocialIcon, { SocialPlatform } from "./SocialIcon";
 
-const SOCIAL_META: { key: keyof SocialLinks; platform: SocialPlatform; label: string }[] = [
+const SOCIAL_META: {
+  key: keyof SocialLinks;
+  platform: SocialPlatform;
+  label: string;
+}[] = [
   { key: "instagram", platform: "instagram", label: "إنستقرام" },
   { key: "tiktok", platform: "tiktok", label: "تيك توك" },
   { key: "snapchat", platform: "snapchat", label: "سناب شات" },
@@ -11,16 +15,23 @@ const SOCIAL_META: { key: keyof SocialLinks; platform: SocialPlatform; label: st
   { key: "whatsapp", platform: "whatsapp", label: "واتساب" },
 ];
 
-const ACTIVE_SOCIALS = SOCIAL_META.filter((s) => Boolean(SOCIAL_LINKS[s.key]));
+const ACTIVE_SOCIALS = SOCIAL_META.filter((s) =>
+  Boolean(SOCIAL_LINKS[s.key]),
+);
 
 const PAYMENT_METHODS = ["Visa", "Mastercard", "مدى", "Apple Pay", "STC Pay"];
 
 export default function FooterBottom() {
   return (
-    <div style={{ borderTop: `1px solid rgba(255,255,255,0.12)` }}>
+    <div
+      style={{
+        borderTop: "1px solid rgba(255,255,255,0.12)",
+      }}
+    >
       <div
+        className="basita-footer-bottom-inner"
         style={{
-          maxWidth: 1200,
+          maxWidth: t.layout.containerMaxWidth,
           margin: "0 auto",
           padding: `${t.spacing["6"]} ${t.spacing["4"]}`,
           display: "flex",
@@ -30,11 +41,22 @@ export default function FooterBottom() {
           gap: t.spacing["4"],
         }}
       >
-        <span style={{ color: t.colors.text.onDarkMuted, fontSize: t.typography.fontSize.sm }}>
+        <span
+          style={{
+            color: t.colors.text.onDarkMuted,
+            fontSize: t.typography.fontSize.sm,
+          }}
+        >
           بسطة © 2026 — جميع الحقوق محفوظة
         </span>
 
-        <div style={{ display: "flex", gap: t.spacing["2"], flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: t.spacing["2"],
+            flexWrap: "wrap",
+          }}
+        >
           {PAYMENT_METHODS.map((m) => (
             <span
               key={m}
@@ -52,7 +74,13 @@ export default function FooterBottom() {
         </div>
 
         {ACTIVE_SOCIALS.length > 0 && (
-          <div style={{ display: "flex", gap: t.spacing["3"] }} className="basita-footer-socials">
+          <div
+            className="basita-footer-socials"
+            style={{
+              display: "flex",
+              gap: t.spacing["3"],
+            }}
+          >
             {ACTIVE_SOCIALS.map((s) => (
               <a
                 key={s.key}
@@ -62,11 +90,17 @@ export default function FooterBottom() {
                 aria-label={s.label}
                 className="basita-social-icon"
                 style={{
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  width: 38, height: 38, borderRadius: t.radius.full,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 38,
+                  height: 38,
+                  borderRadius: t.radius.full,
                   border: "1px solid rgba(255,255,255,0.2)",
                   color: t.colors.text.onDarkMuted,
-                  transition: `color ${t.motion.fast} ${t.motion.ease}, border-color ${t.motion.fast} ${t.motion.ease}`,
+                  transition:
+                    `color ${t.motion.fast} ${t.motion.ease}, ` +
+                    `border-color ${t.motion.fast} ${t.motion.ease}`,
                 }}
               >
                 <SocialIcon platform={s.platform} size={18} />
@@ -75,13 +109,6 @@ export default function FooterBottom() {
           </div>
         )}
       </div>
-
-      <style>{`
-        .basita-social-icon:hover { color: ${t.colors.gold[400]} !important; border-color: ${t.colors.gold[400]} !important; }
-        @media (max-width: 480px) {
-          .basita-footer-socials { width: 100%; justify-content: center; }
-        }
-      `}</style>
     </div>
   );
 }

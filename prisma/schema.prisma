@@ -117,6 +117,7 @@ enum AuditAction {
   USER_ROLE_CHANGED
   PRODUCT_REMOVED
   PAYOUT_PROCESSED
+  SHIPPING_PROVIDER_ADDED
 }
 
 enum TicketStatus {
@@ -908,6 +909,14 @@ model ShipmentEvent {
 enum ShippingCarrier {
   ARAMEX
   SPL // البريد السعودي (Saudi Post)
+  // ⚠️ أي شركة يضيفها الأدمن من اللوحة (بدون كود) — التفاصيل الفعلية
+  // (اسمها، رابط الـAPI، المفتاح) بجدول ShippingProviderConfig أدناه،
+  // مربوطة عبر StoreShipping.customProviderId. قيد معروف حالياً: صف
+  // StoreShipping واحد بقيمة CUSTOM لكل متجر (نفس قيد ARAMEX/SPL
+  // الأصلي @@unique([storeId, carrier]) لم يُغيَّر عمداً) — يعني متجر
+  // واحد يقدر يربط شركة "بدون كود" وحدة بنفس الوقت حالياً. توسعته لعدة
+  // شركات مخصَّصة بنفس المتجر قرار مستقبلي منفصل.
+  CUSTOM
 }
 
 // بيانات اتصال التاجر بشركة شحن — صف واحد لكل (متجر، شركة)، لذا يمكن
@@ -924,6 +933,14 @@ model StoreShipping {
   // ولهذا اختيار JSON مشفّر واحد بدل أعمدة منفصلة لكل شركة، فإضافة شركة
   // بحقول اعتماد مختلفة كلياً لا تحتاج أي تعديل على هذا الموديل.
   credentialsEnc String
+
+  // ⚠️ فقط لـcarrier=CUSTOM — يحدد أي صف من ShippingProviderConfig
+  // يستخدمه هذا الربط. فاضي دائماً لـARAMEX/SPL. لاحظي: بعكس ARAMEX/SPL،
+  // بيانات اعتماد CUSTOM (المفتاح الحقيقي) تُقرأ من ShippingProviderConfig
+  // مباشرة (مشتركة، يدخلها الأدمن مرة وحدة) — credentialsEnc هنا يبقى
+  // قيمة placeholder غير مستخدَمة فعلياً لهذي الحالة (راجع service.ts)
+  customProviderId String?
+  customProvider    ShippingProviderConfig? @relation(fields: [customProviderId], references: [id])
 
   isActive       Boolean         @default(true)
   connectedAt    DateTime        @default(now())
@@ -1587,4 +1604,47 @@ model AdCampaign {
 
   @@index([storeId])
   @@map("ad_campaigns")
+}
+
+// ======================================================
+// SHIPPING PROVIDER CONFIG (شركات شحن يضيفها الأدمن بدون كود)
+// ======================================================
+// ⚠️ يغطي فقط شركات بواجهة REST بسيطة (وزن + مدينتين → سعر). شركة بشكل
+// API مختلف كلياً (OAuth معقّد، حقول غريبة) لسه تحتاج كود مخصّص يطبّق
+// ShippingProvider (راجع lib/shipping/providers/). المفتاح هنا مشترك
+// على مستوى المنصة كاملة (يدخله الأدمن مرة وحدة) — بعكس ARAMEX/SPL حيث
+// كل تاجر يدخل حساباته الخاصة.
+// ⚠️ REST: شركة عندها API فعلي (حتى لو بسيط) — نستدعيه بمفتاح.
+// MANUAL: شركة بدون أي نظام تقني إطلاقاً (مندوب/مكتب شحن صغير) — سعر
+// ثابت يدخله الأدمن يدوياً، بدون أي اتصال شبكي عند حساب السعر.
+enum ShippingProviderType {
+  REST
+  MANUAL
+}
+
+model ShippingProviderConfig {
+  id            String                @id @default(cuid())
+  // معرّف نصي مختصر يُستخدم بالسجلات/التشخيص، غير معروض للمشتري
+  carrierKey    String                @unique
+  displayNameAr String
+  providerType  ShippingProviderType  @default(REST)
+
+  // ── REST فقط — فاضية دائماً لـMANUAL ──
+  baseUrl       String?
+  // مسار حساب السعر تحت baseUrl — راجع lib/shipping/providers/generic.ts
+  ratePath      String?               @default("/rates")
+  // مشفّر بـ AES-256-GCM (نفس lib/crypto.ts المستخدَم لمفتاح Moyasar)
+  apiKeyEnc     String?
+
+  // ── MANUAL فقط — فاضية دائماً لـREST ──
+  flatFee       Float?
+  perKgFee      Float?
+
+  isActive      Boolean               @default(true)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  storeLinks    StoreShipping[]
+
+  @@map("shipping_provider_configs")
 }

@@ -1,10 +1,11 @@
 // components/about/StorySection.tsx
+
 import { t } from "@/theme";
 
 export default function StorySection({
   title,
   children,
-  alt,
+  alt = false,
   id,
 }: {
   title?: string;
@@ -13,14 +14,45 @@ export default function StorySection({
   id?: string;
 }) {
   return (
-    <section id={id} style={{ background: alt ? (t.colors.cream?.warm || "#fdfbf7") : "transparent", padding: `${t.spacing["16"]} ${t.spacing["4"]}`, direction: "rtl" }}>
-      <div style={{ maxWidth: 740, margin: "0 auto" }}>
+    <section
+      id={id}
+      style={{
+        background: alt ? t.colors.cream.warm : "transparent",
+        padding: `${t.spacing["16"]} ${t.spacing["5"]}`,
+        direction: "rtl",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 820,
+          margin: "0 auto",
+        }}
+      >
         {title && (
-          <h2 style={{ margin: `0 0 ${t.spacing["5"]}`, fontSize: t.typography.fontSize["2xl"], fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>
+          <h2
+            style={{
+              margin: `0 0 ${t.spacing["5"]}`,
+              color: t.colors.text.dark,
+              fontSize: t.typography.fontSize["2xl"],
+              fontWeight: t.typography.fontWeight.bold,
+              lineHeight: 1.5,
+            }}
+          >
             {title}
           </h2>
         )}
-        <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["4"], fontSize: t.typography.fontSize.base, color: t.colors.text.body, lineHeight: t.typography.lineHeight.relaxed }}>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: t.spacing["4"],
+            color: t.colors.text.body,
+            fontSize: t.typography.fontSize.base,
+            lineHeight: 2,
+          }}
+        >
           {children}
         </div>
       </div>

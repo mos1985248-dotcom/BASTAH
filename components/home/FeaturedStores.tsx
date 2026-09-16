@@ -23,8 +23,15 @@ export default function FeaturedStores() {
   }, []);
 
   return (
-    <section aria-labelledby="stores-heading" aria-busy={loading} style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["10"]} ${t.spacing["4"]}` }}>
-      {/* عنوان القسم ورابط "عرض الكل" */}
+<section
+  aria-labelledby="stores-heading"
+  aria-busy={loading}
+  style={{
+    maxWidth: t.layout.containerMaxWidth,
+    margin: "0 auto",
+    padding: `${t.spacing["10"]} ${t.spacing["4"]}`,
+  }}
+>      {/* عنوان القسم ورابط "عرض الكل" */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: t.spacing["5"], gap: t.spacing["3"] }}>
         <h2 id="stores-heading" style={{ fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark, margin: 0 }}>
           تصفّح المتاجر

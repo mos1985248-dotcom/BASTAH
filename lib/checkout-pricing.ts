@@ -7,8 +7,7 @@
 //    فقط منقول لملف مستقل بدون أي تغيير بالسلوك.
 
 import { prisma } from "./prisma";
-import { ShippingService } from "./shipping/service";
-import { decryptShippingCredentials } from "./shipping/credentials";
+import { ShippingService, resolveStoreShipping } from "./shipping/service";
 import { getBasitaShippingFee } from "./platform-settings";
 
 export interface ResolvedCheckoutItem {
@@ -109,23 +108,30 @@ export async function computeShippingCost(
 
   const totalWeightKg = resolved.reduce((sum, item) => sum + (item.weight ?? 0.5) * item.quantity, 0);
 
-  const carrierLink = await prisma.storeShipping.findFirst({
-    where: { storeId, isActive: true },
-    orderBy: { connectedAt: "asc" },
-  });
+  // ⚠️ نستخدم resolveStoreShipping المصدَّرة من service.ts (بدل نسخة
+  // مكرّرة هنا) — هي وحدها تعرف كيف تجلب بيانات اعتماد CUSTOM (من
+  // ShippingProviderConfig المشترك) بعكس ARAMEX/SPL (credentialsEnc
+  // الخاص بالمتجر). نسخة قديمة مكرّرة هنا كانت تفوّت هذا الفرق وتفشل
+  // فعلياً على أي شراء حقيقي بشركة CUSTOM.
+  let carrierLink: { carrier: string; credentials: Record<string, string> } | null = null;
+  try {
+    carrierLink = await resolveStoreShipping(storeId);
+  } catch {
+    carrierLink = null; // لا شركة مربوطة/نشطة — نكمل لمسار ShippingZone الثابت تحت
+  }
 
   if (carrierLink) {
     try {
-      const credentials = decryptShippingCredentials(carrierLink.credentialsEnc);
+      const { carrier, credentials } = carrierLink;
       const storeCity = (await prisma.store.findUnique({ where: { id: storeId }, select: { city: true } }))?.city ?? address.city;
       const basitaFee = await getBasitaShippingFee();
 
-      const rate = await ShippingService.calculateRate(carrierLink.carrier, credentials, { originCity: storeCity, destCity: address.city, weightKg: totalWeightKg });
+      const rate = await ShippingService.calculateRate(carrier as any, credentials, { originCity: storeCity, destCity: address.city, weightKg: totalWeightKg });
       const shippingCost = rate.carrierRate + basitaFee;
 
       const logged = await prisma.shippingRate.create({
         data: {
-          storeId, carrier: carrierLink.carrier, destCity: address.city, weightKg: totalWeightKg,
+          storeId, carrier: carrier as any, destCity: address.city, weightKg: totalWeightKg,
           carrierRate: rate.carrierRate, basitaFee, totalRate: shippingCost,
           currency: rate.currency, estimatedDays: rate.estimatedDays ?? null,
         },

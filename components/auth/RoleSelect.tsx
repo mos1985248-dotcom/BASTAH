@@ -14,28 +14,55 @@ export default function RoleSelect({
   onChange: (v: "SELLER" | "BUYER") => void;
 }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: t.spacing["2"] }}>
-      {OPTIONS.map((r) => {
-        const active = value === r.id;
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: t.spacing["3"],
+        direction: "rtl",
+      }}
+    >
+      {OPTIONS.map((role) => {
+        const active = value === role.id;
+
         return (
           <button
-            key={r.id}
+            key={role.id}
             type="button"
-            onClick={() => onChange(r.id)}
+            onClick={() => onChange(role.id)}
+            aria-pressed={active}
+            className="basita-role-option"
             style={{
-              padding: t.spacing["3"],
-              borderRadius: t.radius.md,
+              minHeight: 52,
+              padding: "0 14px",
+              borderRadius: 14,
               textAlign: "center",
               cursor: "pointer",
-              fontSize: t.typography.fontSize.base,
+              fontFamily: t.typography.fontFamily.base,
+              fontSize: t.typography.fontSize.sm,
               fontWeight: t.typography.fontWeight.semibold,
-              border: `2px solid ${active ? t.colors.primary[800] : t.colors.cream.border}`,
-              background: active ? t.colors.primary[100] : t.colors.white,
-              color: active ? t.colors.primary[800] : t.colors.text.mid,
-              transition: "all 0.15s ease",
+              border: `1px solid ${
+                active
+                  ? t.colors.primary[700]
+                  : t.colors.cream.border
+              }`,
+              background: active
+                ? t.colors.primary[50]
+                : t.colors.cream.card,
+              color: active
+                ? t.colors.primary[800]
+                : t.colors.text.mid,
+              boxShadow: active
+                ? "0 4px 12px rgba(27,77,62,0.08)"
+                : "none",
+              transition:
+                `background ${t.motion.base} ${t.motion.ease}, ` +
+                `border-color ${t.motion.base} ${t.motion.ease}, ` +
+                `box-shadow ${t.motion.base} ${t.motion.ease}, ` +
+                `transform ${t.motion.fast} ${t.motion.ease}`,
             }}
           >
-            {r.label}
+            {role.label}
           </button>
         );
       })}

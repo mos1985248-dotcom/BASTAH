@@ -1,4 +1,5 @@
 // components/cart/CartStoreGroup.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -27,12 +28,26 @@ export default function CartStoreGroup({
   busyId: string | null;
   favoriteIds: Set<string>;
   addressId: string;
-  onQtyChange: (productId: string, variantId: string | null, qty: number) => void;
+  onQtyChange: (
+    productId: string,
+    variantId: string | null,
+    qty: number
+  ) => void;
   onRemove: (productId: string, variantId: string | null) => void;
   onToggleFavorite: (productId: string) => void;
 }) {
-  const subtotal = items.reduce((s, i) => s + (i.variant?.price ?? i.product.price) * i.quantity, 0);
-  const hasIssue = items.some((i) => i.product.status !== "ACTIVE" || (i.variant ? i.variant.quantity === 0 : i.product.quantity === 0));
+  const subtotal = items.reduce(
+    (s, i) => s + (i.variant?.price ?? i.product.price) * i.quantity,
+    0
+  );
+
+  const hasIssue = items.some(
+    (i) =>
+      i.product.status !== "ACTIVE" ||
+      (i.variant
+        ? i.variant.quantity === 0
+        : i.product.quantity === 0)
+  );
 
   const [preview, setPreview] = useState<CheckoutPreview | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -43,53 +58,282 @@ export default function CartStoreGroup({
       setPreview(null);
       return;
     }
+
     setPreviewLoading(true);
+
     api
       .post<CheckoutPreview>("/api/checkout/preview", {
         storeId,
-        items: items.map((i) => ({ productId: i.product.id, variantId: i.variantId ?? undefined, quantity: i.quantity })),
+        items: items.map((i) => ({
+          productId: i.product.id,
+          variantId: i.variantId ?? undefined,
+          quantity: i.quantity,
+        })),
         addressId,
         paymentMethod: "CREDIT_CARD",
       })
       .then(setPreview)
       .catch(() => setPreview(null))
       .finally(() => setPreviewLoading(false));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeId, addressId, hasIssue, items.map((i) => `${i.product.id}:${i.variantId}:${i.quantity}`).join(",")]);
+  }, [
+    storeId,
+    addressId,
+    hasIssue,
+    items
+      .map(
+        (i) =>
+          `${i.product.id}:${i.variantId}:${i.quantity}`
+      )
+      .join(","),
+  ]);
 
   return (
-    <div style={{ marginBottom: t.spacing["6"] }}>
-      <div className="basita-cart-group-grid" style={{ display: "grid", gridTemplateColumns: "1.7fr 1fr", gap: t.spacing["5"], alignItems: "start" }}>
-        <div style={{ background: t.colors.white, borderRadius: t.radius.lg, padding: t.spacing["4"] }}>
-          <h3 style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.base, color: t.colors.primary[800], display: "flex", alignItems: "center", gap: 6 }}>
-            <Store size={15} strokeWidth={1.8} />
-            {storeName} <span style={{ color: t.colors.text.light, fontWeight: t.typography.fontWeight.regular, fontSize: t.typography.fontSize.sm }}>({items.length} {items.length === 1 ? "منتج" : "منتجات"})</span>
-          </h3>
+    <section
+      dir="rtl"
+      className="basita-cart-store-group"
+      aria-labelledby={`cart-store-${storeId}`}
+      style={{
+        marginBottom: t.spacing["6"],
+      }}
+    >
+      <div
+        className="basita-cart-group-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.7fr) minmax(320px, 1fr)",
+          gap: t.spacing["5"],
+          alignItems: "start",
+        }}
+      >
+        {/* Store products */}
+        <div
+          className="basita-cart-store-products"
+          style={{
+            minWidth: 0,
+            background: t.colors.white,
+            border: `1px solid ${t.colors.cream.border}`,
+            borderRadius: t.radius.lg,
+            overflow: "hidden",
+            boxShadow: "0 6px 22px rgba(75, 56, 34, 0.05)",
+          }}
+        >
+          {/* Store header */}
+          <div
+            className="basita-cart-store-header"
+            style={{
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: t.spacing["3"],
+              padding: `${t.spacing["4"]} ${t.spacing["5"]}`,
+              background: t.colors.cream.bg,
+              borderBottom: `1px solid ${t.colors.cream.border}`,
+              overflow: "hidden",
+            }}
+          >
+            <span
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                insetInlineStart: 0,
+                top: 0,
+                width: 4,
+                height: "100%",
+                background: t.colors.gold[600],
+              }}
+            />
 
-          <div style={{ borderTop: `1px solid ${t.colors.cream.border}` }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                minWidth: 0,
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 38,
+                  height: 38,
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: t.radius.md,
+                  background: t.colors.white,
+                  border: `1px solid ${t.colors.cream.border}`,
+                  color: t.colors.primary[800],
+                  boxShadow: "0 2px 8px rgba(75, 56, 34, 0.05)",
+                }}
+              >
+                <Store
+                  size={19}
+                  strokeWidth={1.7}
+                />
+              </span>
+
+              <div
+                style={{
+                  minWidth: 0,
+                }}
+              >
+                <h3
+                  id={`cart-store-${storeId}`}
+                  style={{
+                    margin: 0,
+                    color: t.colors.primary[800],
+                    fontSize: t.typography.fontSize.base,
+                    fontWeight: t.typography.fontWeight.bold,
+                    lineHeight: 1.45,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {storeName}
+                </h3>
+
+                <span
+                  style={{
+                    display: "block",
+                    marginTop: 2,
+                    color: t.colors.text.light,
+                    fontSize: t.typography.fontSize.xs,
+                    fontWeight: t.typography.fontWeight.regular,
+                  }}
+                >
+                  {items.length}{" "}
+                  {items.length === 1 ? "منتج" : "منتجات"} في السلة
+                </span>
+              </div>
+            </div>
+
+            <span
+              style={{
+                flexShrink: 0,
+                padding: "6px 10px",
+                borderRadius: t.radius.full,
+                background: t.colors.white,
+                border: `1px solid ${t.colors.cream.border}`,
+                color: t.colors.text.mid,
+                fontSize: t.typography.fontSize.xs,
+                fontWeight: t.typography.fontWeight.medium,
+                whiteSpace: "nowrap",
+              }}
+            >
+              متجر واحد
+            </span>
+          </div>
+
+          {/* Cart items */}
+          <div>
             {items.map((item) => (
-              <div key={item.id} style={{ borderBottom: `1px solid ${t.colors.cream.borderLight}` }}>
+              <div
+                key={item.id}
+                className="basita-cart-item-wrapper"
+                style={{
+                  borderBottom: `1px solid ${t.colors.cream.borderLight}`,
+                }}
+              >
                 <CartItemRow
                   item={item}
                   busy={busyId === item.id}
                   isFavorite={favoriteIds.has(item.product.id)}
-                  onQtyChange={(q) => onQtyChange(item.product.id, item.variantId, q)}
-                  onRemove={() => onRemove(item.product.id, item.variantId)}
-                  onToggleFavorite={() => onToggleFavorite(item.product.id)}
+                  onQtyChange={(q) =>
+                    onQtyChange(
+                      item.product.id,
+                      item.variantId,
+                      q
+                    )
+                  }
+                  onRemove={() =>
+                    onRemove(
+                      item.product.id,
+                      item.variantId
+                    )
+                  }
+                  onToggleFavorite={() =>
+                    onToggleFavorite(item.product.id)
+                  }
                 />
               </div>
             ))}
           </div>
         </div>
 
-        <CartOrderSummaryCard storeId={storeId} subtotal={subtotal} preview={preview} previewLoading={previewLoading} hasAddress={!!addressId} disabled={hasIssue} />
+        {/* Order summary */}
+        <div
+          className="basita-cart-summary-column"
+          style={{
+            minWidth: 0,
+          }}
+        >
+          <CartOrderSummaryCard
+            storeId={storeId}
+            subtotal={subtotal}
+            preview={preview}
+            previewLoading={previewLoading}
+            hasAddress={!!addressId}
+            disabled={hasIssue}
+          />
+        </div>
       </div>
 
       <style>{`
-        @media (max-width: 860px) {
-          .basita-cart-group-grid { grid-template-columns: 1fr !important; }
+        .basita-cart-item-wrapper:last-child {
+          border-bottom: none !important;
+        }
+
+        @media (max-width: 980px) {
+          .basita-cart-group-grid {
+            grid-template-columns: minmax(0, 1fr) !important;
+          }
+
+          .basita-cart-summary-column {
+            width: 100%;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .basita-cart-store-header {
+            padding: ${t.spacing["3"]} ${t.spacing["4"]} !important;
+          }
+
+          .basita-cart-store-header > span:last-child {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .basita-cart-store-products {
+            border-radius: ${t.radius.md} !important;
+          }
+
+          .basita-cart-store-header {
+            padding: ${t.spacing["3"]} !important;
+          }
+
+          .basita-cart-store-header > div > span {
+            width: 34px !important;
+            height: 34px !important;
+          }
+
+          .basita-cart-store-header > div > span svg {
+            width: 17px !important;
+            height: 17px !important;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .basita-cart-store-products {
+            scroll-behavior: auto !important;
+          }
         }
       `}</style>
-    </div>
+    </section>
   );
 }

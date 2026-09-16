@@ -9,6 +9,7 @@ import { spacing } from "./spacing";
 import { radius } from "./radius";
 import { shadows } from "./shadows";
 import { motion } from "./motion";
+import { layout } from "./layout";
 
 export const t = {
   colors,
@@ -17,6 +18,7 @@ export const t = {
   radius,
   shadows,
   motion,
+  layout,
 } as const;
 
 export type Theme = typeof t;
@@ -27,3 +29,4 @@ export { spacing } from "./spacing";
 export { radius } from "./radius";
 export { shadows } from "./shadows";
 export { motion } from "./motion";
+export { layout } from "./layout";

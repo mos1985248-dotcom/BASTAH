@@ -7,10 +7,12 @@ import type { ShippingCarrier } from "@prisma/client";
 import type { ShippingProvider } from "./types";
 import { AramexProvider } from "./providers/aramex";
 import { SplProvider } from "./providers/spl";
+import { GenericRestProvider } from "./providers/generic";
 
 const providers: Record<ShippingCarrier, ShippingProvider> = {
   ARAMEX: new AramexProvider(),
   SPL: new SplProvider(),
+  CUSTOM: new GenericRestProvider(),
 };
 
 export function getShippingProvider(carrier: ShippingCarrier): ShippingProvider {

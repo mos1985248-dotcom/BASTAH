@@ -3,96 +3,328 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { t } from "@/theme";
 import {
-  Home, Package, List, Plus, Receipt, Wallet, Store, Settings, CreditCard,
-  FileText, Truck, Sparkles, Headset, User, ShoppingBag, ShieldCheck, ChevronDown,
-  Landmark, Megaphone,
+  Home,
+  Package,
+  List,
+  Plus,
+  Receipt,
+  Wallet,
+  Store,
+  Settings,
+  CreditCard,
+  FileText,
+  Truck,
+  Sparkles,
+  Headset,
+  User,
+  ShoppingBag,
+  ShieldCheck,
+  ChevronDown,
+  Landmark,
+  Megaphone,
   type LucideIcon,
 } from "lucide-react";
 
-interface NavItem { href: string; label: string; Icon: LucideIcon }
-interface NavGroup { label: string; Icon: LucideIcon; items: NavItem[] }
+interface NavItem {
+  href: string;
+  label: string;
+  Icon: LucideIcon;
+}
 
-const TOP_LINK: NavItem = { href: "/dashboard", label: "الرئيسية", Icon: Home };
+interface NavGroup {
+  label: string;
+  Icon: LucideIcon;
+  items: NavItem[];
+}
+
+const TOP_LINK: NavItem = {
+  href: "/dashboard",
+  label: "الرئيسية",
+  Icon: Home,
+};
 
 const GROUPS: NavGroup[] = [
   {
-    label: "المنتجات", Icon: Package,
+    label: "المنتجات",
+    Icon: Package,
     items: [
-      { href: "/dashboard/products", label: "كل المنتجات", Icon: List },
-      { href: "/dashboard/products/new", label: "إضافة منتج", Icon: Plus },
+      {
+        href: "/dashboard/products",
+        label: "كل المنتجات",
+        Icon: List,
+      },
+      {
+        href: "/dashboard/products/new",
+        label: "إضافة منتج",
+        Icon: Plus,
+      },
     ],
   },
 ];
 
 const MID_LINKS: NavItem[] = [
-  { href: "/dashboard/orders", label: "الطلبات", Icon: Receipt },
-  { href: "/dashboard/daftari", label: "دفاتري", Icon: Wallet },
+  {
+    href: "/dashboard/orders",
+    label: "الطلبات",
+    Icon: Receipt,
+  },
+  {
+    href: "/dashboard/daftari",
+    label: "دفاتري",
+    Icon: Wallet,
+  },
 ];
 
 const STORE_GROUP: NavGroup = {
-  label: "المتجر", Icon: Store,
+  label: "المتجر",
+  Icon: Store,
   items: [
-    { href: "/dashboard#settings", label: "إعدادات المتجر", Icon: Settings },
-    { href: "/dashboard/payment-gateway", label: "بوابة الدفع", Icon: CreditCard },
-    { href: "/dashboard/bank-transfer", label: "التحويل البنكي", Icon: Landmark },
-    { href: "/dashboard/subscription", label: "الاشتراك والفوترة", Icon: FileText },
-    { href: "/dashboard/shipping", label: "الشحن", Icon: Truck },
-    { href: "/dashboard/marketing", label: "التسويق", Icon: Megaphone },
-    { href: "/dashboard/munira", label: "منيرة", Icon: Sparkles },
+    {
+      href: "/dashboard#settings",
+      label: "إعدادات المتجر",
+      Icon: Settings,
+    },
+    {
+      href: "/dashboard/payment-gateway",
+      label: "بوابة الدفع",
+      Icon: CreditCard,
+    },
+    {
+      href: "/dashboard/bank-transfer",
+      label: "التحويل البنكي",
+      Icon: Landmark,
+    },
+    {
+      href: "/dashboard/subscription",
+      label: "الاشتراك والفوترة",
+      Icon: FileText,
+    },
+    {
+      href: "/dashboard/shipping",
+      label: "الشحن",
+      Icon: Truck,
+    },
+    {
+      href: "/dashboard/marketing",
+      label: "التسويق",
+      Icon: Megaphone,
+    },
+    {
+      href: "/dashboard/munira",
+      label: "منيرة",
+      Icon: Sparkles,
+    },
   ],
 };
 
 const BOTTOM_LINKS: NavItem[] = [
-  { href: "/dashboard/support", label: "الدعم", Icon: Headset },
-  { href: "/account/settings", label: "حسابي الشخصي", Icon: User },
-  { href: "/marketplace", label: "الماركت", Icon: ShoppingBag },
+  {
+    href: "/dashboard/support",
+    label: "الدعم",
+    Icon: Headset,
+  },
+  {
+    href: "/account/settings",
+    label: "حسابي الشخصي",
+    Icon: User,
+  },
+  {
+    href: "/marketplace",
+    label: "الماركت",
+    Icon: ShoppingBag,
+  },
 ];
 
-function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
-  const active = pathname === item.href;
+const ALL_LEAF_LINKS: NavItem[] = [
+  TOP_LINK,
+  ...GROUPS.flatMap((group) => group.items),
+  ...MID_LINKS,
+  ...STORE_GROUP.items,
+  ...BOTTOM_LINKS,
+];
+
+function isItemActive(item: NavItem, pathname: string) {
+  if (item.href.includes("#")) {
+    return pathname === item.href.split("#")[0];
+  }
+
+  return pathname === item.href;
+}
+
+function NavLink({
+  item,
+  pathname,
+  mobile = false,
+}: {
+  item: NavItem;
+  pathname: string;
+  mobile?: boolean;
+}) {
+  const active = isItemActive(item, pathname);
+
   return (
     <a
       href={item.href}
       title={item.label}
+      className={`basita-dashboard-nav-link ${
+        active ? "is-active" : ""
+      } ${mobile ? "is-mobile" : ""}`}
       style={{
-        display: "flex", alignItems: "center", gap: t.spacing["3"], padding: "10px 14px",
-        borderRadius: t.radius.md, whiteSpace: "nowrap",
-        color: active ? t.colors.white : t.colors.text.onDarkMuted,
-        background: active ? "rgba(255,255,255,0.14)" : "transparent",
-        fontSize: t.typography.fontSize.sm, fontWeight: active ? t.typography.fontWeight.bold : t.typography.fontWeight.medium,
-        textDecoration: "none", transition: `background ${t.motion.fast} ${t.motion.ease}`,
+        display: "flex",
+        alignItems: "center",
+        gap: 11,
+        minHeight: 44,
+        padding: "0 13px",
+        borderRadius: 13,
+        textDecoration: "none",
+        color: active
+          ? t.colors.white
+          : t.colors.text.onDarkMuted,
+        background: active
+          ? "rgba(255,255,255,0.11)"
+          : "transparent",
+        fontFamily: t.typography.fontFamily.base,
+        fontSize: t.typography.fontSize.sm,
+        fontWeight: active
+          ? t.typography.fontWeight.bold
+          : t.typography.fontWeight.medium,
+        position: "relative",
+        transition:
+          `background ${t.motion.fast} ${t.motion.ease}, ` +
+          `color ${t.motion.fast} ${t.motion.ease}, ` +
+          `transform ${t.motion.fast} ${t.motion.ease}`,
+        whiteSpace: "nowrap",
+        flexShrink: 0,
       }}
     >
-      <item.Icon size={18} strokeWidth={1.8} style={{ flexShrink: 0, color: active ? t.colors.gold[400] : t.colors.text.onDarkMuted }} />
-      <span className="basita-sidebar-label">{item.label}</span>
+      {active && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 8,
+            bottom: 8,
+            width: 3,
+            borderRadius: 999,
+            background: t.colors.gold[400],
+          }}
+        />
+      )}
+
+      <item.Icon
+        size={18}
+        strokeWidth={1.9}
+        style={{
+          flexShrink: 0,
+          color: active
+            ? t.colors.gold[400]
+            : t.colors.text.onDarkMuted,
+        }}
+      />
+
+      {!mobile && (
+        <span className="basita-dashboard-nav-label">
+          {item.label}
+        </span>
+      )}
     </a>
   );
 }
 
-function NavGroupBlock({ group, pathname }: { group: NavGroup; pathname: string }) {
-  const [open, setOpen] = useState<boolean>(group.items.some((i) => i.href === pathname) || true);
+function NavGroupBlock({
+  group,
+  pathname,
+}: {
+  group: NavGroup;
+  pathname: string;
+}) {
+  const containsActive = group.items.some((item) =>
+    isItemActive(item, pathname),
+  );
+
+  const [open, setOpen] = useState(containsActive);
+
   return (
-    <div>
+    <div
+      className="basita-dashboard-nav-group"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+      }}
+    >
       <button
-        onClick={() => setOpen((v) => !v)}
-        className="basita-sidebar-label"
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className="basita-dashboard-group-button"
+        aria-expanded={open}
         style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",
-          padding: "10px 14px", background: "none", border: "none", cursor: "pointer",
-          color: t.colors.text.onDarkMuted, fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.medium,
+          width: "100%",
+          minHeight: 42,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 10,
+          padding: "0 13px",
+          border: "none",
+          borderRadius: 12,
+          background: "transparent",
+          color: t.colors.text.onDarkMuted,
+          fontFamily: t.typography.fontFamily.base,
+          fontSize: t.typography.fontSize.sm,
+          fontWeight: t.typography.fontWeight.semibold,
+          cursor: "pointer",
+          textAlign: "right",
+          transition:
+            `background ${t.motion.fast} ${t.motion.ease}, ` +
+            `color ${t.motion.fast} ${t.motion.ease}`,
         }}
       >
-        <span style={{ display: "flex", alignItems: "center", gap: t.spacing["3"] }}>
-          <group.Icon size={18} strokeWidth={1.8} /> {group.label}
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 11,
+          }}
+        >
+          <group.Icon size={18} strokeWidth={1.9} />
+          {group.label}
         </span>
-        <ChevronDown size={15} style={{ transform: open ? "rotate(0deg)" : "rotate(-90deg)", transition: `transform ${t.motion.fast} ${t.motion.ease}` }} />
+
+        <ChevronDown
+          size={16}
+          strokeWidth={1.8}
+          style={{
+            transform: open
+              ? "rotate(0deg)"
+              : "rotate(90deg)",
+            transition:
+              `transform ${t.motion.fast} ${t.motion.ease}`,
+            flexShrink: 0,
+          }}
+        />
       </button>
+
       {open && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingInlineStart: t.spacing["4"] }} className="basita-sidebar-label">
-          {group.items.map((i) => (
-            <NavLink key={i.href} item={i} pathname={pathname} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            paddingRight: 10,
+            paddingLeft: 0,
+          }}
+        >
+          {group.items.map((item) => (
+            <NavLink
+              key={item.href}
+              item={item}
+              pathname={pathname}
+            />
           ))}
         </div>
       )}
@@ -100,83 +332,231 @@ function NavGroupBlock({ group, pathname }: { group: NavGroup; pathname: string 
   );
 }
 
-const ALL_LEAF_LINKS: NavItem[] = [
-  TOP_LINK,
-  ...GROUPS.flatMap((g) => g.items),
-  ...MID_LINKS,
-  ...STORE_GROUP.items,
-  ...BOTTOM_LINKS,
-];
-
-export default function DashboardSidebar({ isAdmin }: { isAdmin: boolean }) {
+export default function DashboardSidebar({
+  isAdmin,
+}: {
+  isAdmin: boolean;
+}) {
   const pathname = usePathname();
+
+  const mobileItems = [
+    ...ALL_LEAF_LINKS,
+    ...(isAdmin
+      ? [
+          {
+            href: "/admin",
+            label: "لوحة الإدارة",
+            Icon: ShieldCheck,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <aside
       className="basita-dashboard-sidebar"
       style={{
-        width: 250, flexShrink: 0,
-        background: `linear-gradient(180deg, ${t.colors.primary[900]}, ${t.colors.primary[800]})`,
-        minHeight: "100vh", padding: `${t.spacing["5"]} ${t.spacing["4"]}`,
-        display: "flex", flexDirection: "column", gap: t.spacing["4"],
-        direction: "rtl", textAlign: "right",
-        borderLeft: `1px solid rgba(255,255,255,0.08)`,
-        boxShadow: t.shadows.lg,
-        order: 2, // ضمان تمركز القائمة في اليمين داخل التخطيط المرن (Flexbox)
+        width: 268,
+        flexShrink: 0,
+        minHeight: "100vh",
+        background: `linear-gradient(
+          180deg,
+          ${t.colors.primary[950]} 0%,
+          ${t.colors.primary[900]} 55%,
+          ${t.colors.primary[800]} 100%
+        )`,
+        display: "flex",
+        flexDirection: "column",
+        direction: "rtl",
+        textAlign: "right",
+        padding: "18px 14px",
+        borderLeft: "1px solid rgba(255,255,255,0.07)",
+        boxShadow: "0 10px 30px rgba(15,61,46,0.10)",
+        position: "relative",
+        zIndex: 20,
+        order: 2,
       }}
     >
-      <a href="/" className="basita-sidebar-logo" style={{ display: "flex", alignItems: "center", gap: t.spacing["3"], textDecoration: "none", flexShrink: 0, marginBottom: t.spacing["2"], paddingInline: t.spacing["2"] }}>
-        <div style={{ width: 34, height: 34, borderRadius: t.radius.full, background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${t.colors.gold[400]}` }}>
-          <Store size={18} color={t.colors.gold[400]} strokeWidth={1.8} />
-        </div>
-        <span style={{ color: t.colors.text.onDark, fontSize: t.typography.fontSize.lg, fontWeight: t.typography.fontWeight.bold, letterSpacing: "-0.01em" }}>بسطة</span>
-      </a>
+      {/* رأس الشريط */}
+      <div
+        style={{
+          padding: "4px 6px 16px",
+          marginBottom: 8,
+          borderBottom: "1px solid rgba(255,255,255,0.09)",
+        }}
+      >
+        <a
+          href="/"
+          className="basita-dashboard-brand"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 11,
+            textDecoration: "none",
+          }}
+        >
+          <div
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 13,
+              background: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              flexShrink: 0,
+              boxShadow: "0 6px 16px rgba(0,0,0,0.12)",
+            }}
+          >
+            <Image
+              src="/images/logo-icon.png"
+              alt="بسطة"
+              width={32}
+              height={32}
+              style={{
+                width: 32,
+                height: 32,
+                objectFit: "contain",
+              }}
+            />
+          </div>
 
-      {/* نسخة سطح المكتب — مجموعات قابلة للطي */}
-      <nav className="basita-sidebar-nav-desktop" style={{ display: "flex", flexDirection: "column", gap: t.spacing["1"] }}>
-        <NavLink item={TOP_LINK} pathname={pathname} />
-        {GROUPS.map((g) => (
-          <NavGroupBlock key={g.label} group={g} pathname={pathname} />
+          <div>
+            <div
+              style={{
+                fontFamily: t.typography.fontFamily.heading,
+                color: t.colors.text.onDark,
+                fontSize: "20px",
+                fontWeight: t.typography.fontWeight.bold,
+                lineHeight: 1.15,
+              }}
+            >
+              بسطة
+            </div>
+
+            <div
+              style={{
+                marginTop: 3,
+                color: t.colors.text.onDarkMuted,
+                fontSize: "10px",
+                lineHeight: 1.3,
+              }}
+            >
+              لوحة إدارة المتجر
+            </div>
+          </div>
+        </a>
+      </div>
+
+      {/* القائمة */}
+      <nav
+        className="basita-sidebar-nav-desktop"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+          overflowY: "auto",
+          paddingTop: 3,
+        }}
+      >
+        <NavLink
+          item={TOP_LINK}
+          pathname={pathname}
+        />
+
+        {GROUPS.map((group) => (
+          <NavGroupBlock
+            key={group.label}
+            group={group}
+            pathname={pathname}
+          />
         ))}
-        {MID_LINKS.map((l) => (
-          <NavLink key={l.href} item={l} pathname={pathname} />
+
+        {MID_LINKS.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            pathname={pathname}
+          />
         ))}
-        <NavGroupBlock group={STORE_GROUP} pathname={pathname} />
-        {BOTTOM_LINKS.map((l) => (
-          <NavLink key={l.href} item={l} pathname={pathname} />
+
+        <NavGroupBlock
+          group={STORE_GROUP}
+          pathname={pathname}
+        />
+
+        <div
+          style={{
+            height: 1,
+            background: "rgba(255,255,255,0.08)",
+            margin: "7px 4px",
+          }}
+        />
+
+        {BOTTOM_LINKS.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            pathname={pathname}
+          />
         ))}
 
         {isAdmin && (
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)", marginTop: t.spacing["3"], paddingTop: t.spacing["3"] }}>
-            <a href="/admin" className="basita-btn-interactive" style={{ display: "flex", alignItems: "center", gap: t.spacing["3"], padding: "10px 14px", borderRadius: t.radius.md, color: t.colors.gold[400], fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, textDecoration: "none", background: "rgba(217, 119, 6, 0.15)", border: `1px solid ${t.colors.gold[400]}` }}>
-              <ShieldCheck size={18} strokeWidth={1.8} /> لوحة الإدارة
+          <div
+            style={{
+              marginTop: 6,
+              paddingTop: 10,
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <a
+              href="/admin"
+              className="basita-dashboard-admin-link basita-btn-interactive"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 9,
+                minHeight: 44,
+                padding: "0 13px",
+                borderRadius: 12,
+                textDecoration: "none",
+                color: t.colors.gold[400],
+                background: "rgba(221,179,95,0.08)",
+                border: `1px solid rgba(221,179,95,0.25)`,
+                fontSize: t.typography.fontSize.sm,
+                fontWeight: t.typography.fontWeight.bold,
+              }}
+            >
+              <ShieldCheck size={18} strokeWidth={1.9} />
+              لوحة الإدارة
             </a>
           </div>
         )}
       </nav>
 
-      {/* نسخة الجوال — قائمة مسطّحة أيقونات فقط */}
-      <nav className="basita-sidebar-nav-mobile" style={{ display: "none", flexDirection: "row", gap: t.spacing["1"] }}>
-        {[...ALL_LEAF_LINKS, ...(isAdmin ? [{ href: "/admin", label: "لوحة الإدارة", Icon: ShieldCheck }] : [])].map((l) => (
-          <NavLink key={l.href} item={l} pathname={pathname} />
+      {/* نسخة الجوال */}
+      <nav
+        className="basita-sidebar-nav-mobile"
+        style={{
+          display: "none",
+          alignItems: "center",
+          gap: 7,
+          overflowX: "auto",
+          width: "100%",
+          padding: "1px 0",
+        }}
+      >
+        {mobileItems.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            pathname={pathname}
+            mobile
+          />
         ))}
       </nav>
-
-      <style>{`
-        @media (max-width: 820px) {
-          .basita-dashboard-sidebar {
-            width: 100% !important; min-height: auto !important; flex-direction: row !important;
-            align-items: center; gap: ${t.spacing["3"]} !important;
-            padding: ${t.spacing["3"]} ${t.spacing["4"]} !important; overflow-x: auto;
-            border-left: none !important; border-bottom: 1px solid rgba(255,255,255,0.08);
-            order: unset !important;
-          }
-          .basita-sidebar-logo { display: none; }
-          .basita-sidebar-nav-desktop { display: none !important; }
-          .basita-sidebar-nav-mobile { display: flex !important; }
-          .basita-sidebar-nav-mobile span:last-child { display: none; }
-        }
-      `}</style>
     </aside>
   );
 }

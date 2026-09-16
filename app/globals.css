@@ -2,19 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* القيم هنا مطابقة حرفياً لـ theme/ (colors.ts, motion.ts, shadows.ts) —
-   ملفات CSS خام ما تقدر تستورد TypeScript، فهذا هو الاستثناء التقني
-   الوحيد الموثّق. أي تغيير بـtheme/ لازم يُعكَس هنا يدوياً. */
+/*
+  BASITA — Global Styles
+
+  القيم الأساسية متوافقة مع theme/
+  أي تغيير جوهري في theme/ يجب مراجعته هنا عند الحاجة.
+*/
+
 :root {
   --color-bg: #FBF8F2;
   --color-text: #1A1A1A;
   --color-primary-600: #2A6B57;
+
   --shadow-md: 0 6px 16px rgba(27, 77, 62, 0.10);
   --shadow-sm: 0 2px 6px rgba(27, 77, 62, 0.08);
+
   --motion-base: 200ms;
   --motion-fast: 150ms;
   --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ─────────────────────────────────────────
+   Base
+   ───────────────────────────────────────── */
 
 * {
   box-sizing: border-box;
@@ -26,7 +36,41 @@ body {
   padding: 0;
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-plex-arabic), "IBM Plex Sans Arabic", system-ui, sans-serif;
+
+  font-family:
+    var(--font-plex-arabic),
+    "IBM Plex Sans Arabic",
+    system-ui,
+    sans-serif;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* ─────────────────────────────────────────
+   Typography
+   ───────────────────────────────────────── */
+
+/*
+  العناوين:
+  Noto Kufi Arabic
+
+  النصوص:
+  IBM Plex Sans Arabic
+*/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family:
+    var(--font-kufi-arabic),
+    "Noto Kufi Arabic",
+    system-ui,
+    sans-serif;
 }
 
 button,
@@ -40,8 +84,14 @@ button {
   cursor: pointer;
 }
 
-/* حلقة تركيز موحّدة لكل عنصر تفاعلي (لوحة المفاتيح) — تستبدل outline
-   المتصفح الافتراضي القبيح بحلقة بلون العلامة التجارية. */
+a {
+  color: inherit;
+}
+
+/* ─────────────────────────────────────────
+   Accessibility / Focus
+   ───────────────────────────────────────── */
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -52,51 +102,498 @@ textarea:focus-visible {
   border-radius: 4px;
 }
 
-/* بطاقة تفاعلية عامة (متجر، منتج، مقال، عرض) — hover lift + ظل + انتقال خفيف.
-   مصدر وحيد بدل تكرار نفس الـ transition بكل مكوّن بطاقة على حدة. */
+/* ─────────────────────────────────────────
+   Interactive Cards
+   ───────────────────────────────────────── */
+
 .basita-card-interactive {
-  transition: transform var(--motion-base) var(--motion-ease),
-              box-shadow var(--motion-base) var(--motion-ease),
-              border-color var(--motion-base) var(--motion-ease);
+  transition:
+    transform var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease),
+    border-color var(--motion-base) var(--motion-ease);
 }
+
 .basita-card-interactive:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
   border-color: var(--color-primary-600);
 }
+
 .basita-card-interactive:active {
   transform: translateY(-1px);
 }
 
-/* زر تفاعلي عام — ضغطة خفيفة عند :active، بدون تغيير الحجم المفاجئ. */
+/* ─────────────────────────────────────────
+   Interactive Buttons
+   ───────────────────────────────────────── */
+
 .basita-btn-interactive {
-  transition: transform var(--motion-fast) var(--motion-ease),
-              box-shadow var(--motion-base) var(--motion-ease),
-              opacity var(--motion-fast) var(--motion-ease),
-              background var(--motion-base) var(--motion-ease);
+  transition:
+    transform var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease),
+    opacity var(--motion-fast) var(--motion-ease),
+    background var(--motion-base) var(--motion-ease);
 }
+
 .basita-btn-interactive:hover {
   box-shadow: var(--shadow-sm);
 }
+
 .basita-btn-interactive:active {
   transform: scale(0.97);
 }
+
 .basita-btn-interactive:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
 }
 
+/* ─────────────────────────────────────────
+   Skeleton
+   ───────────────────────────────────────── */
+
 @keyframes basita-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
-/* احترام تفضيل المستخدم بتقليل الحركة — تعطيل الانتقالات/الأنيميشن. */
+/* ─────────────────────────────────────────
+   Category Navigation
+   ───────────────────────────────────────── */
+
+.basita-category-card-inner {
+  transition:
+    transform var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease),
+    border-color var(--motion-base) var(--motion-ease),
+    background var(--motion-base) var(--motion-ease);
+}
+
+.basita-category-card:hover .basita-category-card-inner {
+  transform: translateY(-4px);
+  background: #FCF8EE;
+  border-color: rgba(170, 130, 47, 0.28);
+  box-shadow: 0 10px 24px rgba(73, 53, 31, 0.09);
+}
+
+.basita-category-icon {
+  transition:
+    transform var(--motion-base) var(--motion-ease);
+}
+
+.basita-category-card:hover .basita-category-icon {
+  transform: scale(1.05);
+}
+
+@media (max-width: 1100px) {
+  .basita-category-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .basita-category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .basita-category-card-inner {
+    height: 112px !important;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Hero Slideshow
+   ───────────────────────────────────────── */
+
+.basita-hero-slide {
+  opacity: 0;
+  animation: basita-hero-fade 12s infinite;
+  transform: scale(1.02);
+  will-change: opacity, transform;
+}
+
+.basita-hero-slide-1 {
+  animation-delay: 0s;
+}
+
+.basita-hero-slide-2 {
+  animation-delay: 4s;
+}
+
+.basita-hero-slide-3 {
+  animation-delay: 8s;
+}
+
+@keyframes basita-hero-fade {
+  0%,
+  28% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  33%,
+  95% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.basita-hero-visual {
+  overflow: hidden;
+}
+
+.basita-hero-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Hero responsive */
+
+@media (max-width: 900px) {
+  .basita-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .basita-hero-visual {
+    min-height: 380px !important;
+    order: -1;
+  }
+
+  .basita-hero-content {
+    padding: 34px 28px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .basita-hero-visual {
+    min-height: 300px !important;
+  }
+
+  .basita-hero-content {
+    padding: 28px 20px !important;
+  }
+
+  .basita-hero-content h1 {
+    font-size: 27px !important;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Why Basita
+   ───────────────────────────────────────── */
+
+.basita-why-card {
+  transition:
+    transform var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease),
+    border-color var(--motion-base) var(--motion-ease);
+}
+
+.basita-why-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(166, 124, 45, 0.26) !important;
+  box-shadow: 0 12px 26px rgba(67, 48, 29, 0.08);
+}
+
+@media (max-width: 1000px) {
+  .basita-why-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .basita-why-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .basita-why-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Newsletter
+   ───────────────────────────────────────── */
+
+.basita-newsletter-section {
+  width: 100%;
+}
+
+.basita-newsletter-form {
+  transition:
+    border-color var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease);
+}
+
+.basita-newsletter-form:focus-within {
+  border-color: rgba(221, 179, 95, 0.55);
+  box-shadow: 0 0 0 3px rgba(221, 179, 95, 0.08);
+}
+
+@media (max-width: 850px) {
+  .basita-newsletter-inner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .basita-newsletter-copy {
+    justify-content: center;
+  }
+
+  .basita-newsletter-form {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .basita-newsletter-copy {
+    align-items: flex-start;
+  }
+
+  .basita-newsletter-form {
+    flex-direction: column;
+    border-radius: 16px !important;
+    padding: 6px !important;
+  }
+
+  .basita-newsletter-form input,
+  .basita-newsletter-form button {
+    width: 100%;
+    min-height: 40px;
+    height: 40px;
+  }
+
+  .basita-newsletter-inner {
+    gap: 10px !important;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Navbar
+   ───────────────────────────────────────── */
+
+.basita-navbar-logo {
+  transition:
+    transform var(--motion-base) var(--motion-ease);
+}
+
+.basita-navbar-logo:hover {
+  transform: translateY(-1px);
+}
+
+.basita-navbar-logo:hover > div {
+  border-color: rgba(166, 124, 45, 0.25) !important;
+  box-shadow: 0 6px 14px rgba(67, 48, 29, 0.08) !important;
+}
+
+@media (max-width: 1050px) {
+  .basita-navbar-main {
+    grid-template-columns: auto 1fr auto !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .basita-navbar-main {
+    grid-template-columns: auto 1fr !important;
+  }
+
+  .basita-navbar-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .basita-navbar-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .basita-navbar-main {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .basita-navbar-logo span span:last-child {
+    display: none !important;
+  }
+
+  .basita-navbar-logo > div {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 13px !important;
+  }
+
+  .basita-navbar-logo img {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .basita-navbar-actions {
+    gap: 6px !important;
+  }
+
+  .basita-navbar-links {
+    overflow-x: auto;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Top Bar
+   ───────────────────────────────────────── */
+
+.basita-topbar-inner {
+  gap: 24px;
+}
+
+@media (max-width: 600px) {
+  .basita-topbar-inner {
+    gap: 10px !important;
+    min-height: 32px !important;
+  }
+
+  .basita-topbar-inner > span {
+    font-size: 11px;
+  }
+
+  .basita-topbar-inner > span:nth-child(3) {
+    display: none;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Navigation Links
+   ───────────────────────────────────────── */
+
+.basita-nav-link {
+  transition:
+    color var(--motion-fast) var(--motion-ease);
+}
+
+.basita-nav-link:hover {
+  color: var(--color-primary-600) !important;
+}
+
+/* ─────────────────────────────────────────
+   Navigation Icons
+   ───────────────────────────────────────── */
+
+.basita-nav-icon {
+  transition:
+    transform var(--motion-fast) var(--motion-ease),
+    background var(--motion-base) var(--motion-ease),
+    border-color var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease);
+}
+
+.basita-nav-icon:hover {
+  transform: translateY(-2px);
+  background: #F7F1E5 !important;
+  border-color: rgba(166, 124, 45, 0.24) !important;
+  box-shadow: 0 6px 14px rgba(67, 48, 29, 0.07);
+}
+
+/* ─────────────────────────────────────────
+   Search
+   ───────────────────────────────────────── */
+
+.basita-search {
+  transition:
+    border-color var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease);
+}
+
+.basita-search:focus-within {
+  border-color: rgba(166, 124, 45, 0.38);
+  box-shadow: 0 0 0 3px rgba(166, 124, 45, 0.07);
+}
+
+/* ─────────────────────────────────────────
+   Footer
+   ───────────────────────────────────────── */
+
+.basita-footer-link {
+  transition:
+    color var(--motion-fast) var(--motion-ease);
+}
+
+.basita-footer-link:hover {
+  color: #DDB35F !important;
+}
+
+.basita-social-icon {
+  transition:
+    color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+
+.basita-social-icon:hover {
+  color: #DDB35F !important;
+  border-color: #DDB35F !important;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 900px) {
+  .basita-footer-grid {
+    grid-template-columns: 1fr 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .basita-footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .basita-footer-socials {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Reduced Motion
+   ───────────────────────────────────────── */
+
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .basita-hero-slide {
+    animation: none;
+  }
+
+  .basita-hero-slide-1 {
+    opacity: 1;
+  }
+
+  .basita-hero-slide-2,
+  .basita-hero-slide-3 {
+    opacity: 0;
   }
 }

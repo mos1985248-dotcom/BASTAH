@@ -1,6 +1,15 @@
 // components/product/types.ts
-// يطابق حرفياً استجابة GET /api/products/[id] (بعد حذف userId/subscription من store).
-// نوع Address انتقل لـ components/shared/address-types.ts (مشترك مع صفحة الدفع).
+
+// يطابق حرفيًا استجابة GET /api/products/[id]
+// بعد حذف userId/subscription من store.
+//
+// نوع Address انتقل إلى:
+// components/shared/address-types.ts
+// وهو مشترك مع صفحة الدفع.
+
+/* ─────────────────────────────────────────────
+   Product Images
+───────────────────────────────────────────── */
 
 export interface ProductImageItem {
   id: string;
@@ -10,15 +19,26 @@ export interface ProductImageItem {
   position: number;
 }
 
+/* ─────────────────────────────────────────────
+   Product Variants
+───────────────────────────────────────────── */
+
 export interface ProductVariantItem {
   id: string;
   nameAr: string;
-  options: { name: string; value: string }[];
+  options: {
+    name: string;
+    value: string;
+  }[];
   price: number | null;
   quantity: number;
   sku: string | null;
   image: string | null;
 }
+
+/* ─────────────────────────────────────────────
+   Store Public Information
+───────────────────────────────────────────── */
 
 export interface ProductStorePublicInfo {
   workingHours: string | null;
@@ -29,42 +49,73 @@ export interface ProductStorePublicInfo {
   prepTimeDays: string;
 }
 
+/* ─────────────────────────────────────────────
+   Product Store
+───────────────────────────────────────────── */
+
 export interface ProductStore {
   id: string;
   nameAr: string;
   slug: string;
   city: string | null;
   whatsapp: string | null;
+
   isVerified: boolean;
   logo: string | null;
+
   avgRating: number;
   totalReviews: number;
   totalFollowers: number;
+
   publicInfo: ProductStorePublicInfo | null;
-  isFollowing?: boolean; // undefined لو زائر غير مسجّل
+
+  /**
+   * undefined عندما يكون الزائر غير مسجّل الدخول.
+   */
+  isFollowing?: boolean;
 }
+
+/* ─────────────────────────────────────────────
+   Product Detail
+───────────────────────────────────────────── */
 
 export interface ProductDetail {
   id: string;
   nameAr: string;
   descAr: string | null;
+
   price: number;
   comparePrice: number | null;
   quantity: number;
+
   mainImage: string | null;
   videoUrl: string | null;
+
   avgRating: number;
   totalReviews: number;
   totalSold: number;
+
   isHandmade: boolean;
   isFeatured: boolean;
+
   tags: string[];
+
   productImages: ProductImageItem[];
   variants: ProductVariantItem[];
-  category: { nameAr: string; slug: string } | null;
+
+  category: {
+    nameAr: string;
+    slug: string;
+  } | null;
+
   store: ProductStore;
+
   subscriptionWarning?: string;
 }
+
+/* ─────────────────────────────────────────────
+   Product Reviews
+───────────────────────────────────────────── */
 
 export interface ProductReview {
   id: string;
@@ -73,15 +124,29 @@ export interface ProductReview {
   images: string[];
   sellerReply: string | null;
   createdAt: string;
-  user: { name: string; avatar: string | null };
+
+  user: {
+    name: string;
+    avatar: string | null;
+  };
 }
+
+/* ─────────────────────────────────────────────
+   Product Reviews Response
+───────────────────────────────────────────── */
 
 export interface ProductReviewsResponse {
   reviews: ProductReview[];
+
   total: number;
   page: number;
   limit: number;
-  distribution: Record<"5" | "4" | "3" | "2" | "1", number>;
+
+  distribution: Record<
+    "5" | "4" | "3" | "2" | "1",
+    number
+  >;
+
   avgRating: number;
   totalReviews: number;
 }

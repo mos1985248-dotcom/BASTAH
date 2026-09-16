@@ -1,4 +1,5 @@
 // components/admin/blog/types.ts
+
 export interface BlogPostListItem {
   id: string;
   titleAr: string;
@@ -26,8 +27,20 @@ export interface BlogPostFull {
 }
 
 export const CATEGORY_OPTIONS: { value: string; label: string }[] = [
-  { value: "platform-news", label: "أخبار المنصة" },
-  { value: "success-stories", label: "قصص نجاح" },
-  { value: "store-management", label: "إدارة المتجر" },
-  { value: "crafts", label: "حرف يدوية" },
+  {
+    value: "platform-news",
+    label: "أخبار المنصة",
+  },
+  {
+    value: "success-stories",
+    label: "قصص نجاح",
+  },
+  {
+    value: "store-management",
+    label: "إدارة المتجر",
+  },
+  {
+    value: "crafts",
+    label: "حرف يدوية",
+  },
 ];

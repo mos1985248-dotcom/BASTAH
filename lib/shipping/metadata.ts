@@ -15,4 +15,7 @@ export interface ShippingProviderMeta {
 export const SHIPPING_PROVIDER_METADATA: Record<string, ShippingProviderMeta> = {
   ARAMEX: { displayNameAr: "أرامكس", logoUrl: null, capability: "rate_only" },
   SPL: { displayNameAr: "البريد السعودي (SPL)", logoUrl: null, capability: "rate_only" },
+  // تسمية عامة فقط — الاسم الحقيقي لكل شركة "بدون كود" يُعرض من قائمة
+  // customProviders بـGET /api/stores/shipping (كل واحدة لها displayNameAr خاص بها)
+  CUSTOM: { displayNameAr: "شركة شحن مخصَّصة", logoUrl: null, capability: "rate_only" },
 };

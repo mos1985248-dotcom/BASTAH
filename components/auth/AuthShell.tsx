@@ -1,8 +1,7 @@
 // components/auth/AuthShell.tsx
 // القالب المشترك لصفحات المصادقة (Login/Register/Reset).
-// لوحة هوية خضراء + بطاقة نموذج بيضاء. كل القيم من theme/ فقط.
-// ⚠️ لا أرقام/إحصاءات هنا عمداً — لا بيانات وهمية على أي صفحة تواجه
-// المستخدم، خصوصاً أول صفحة يراها قبل التسجيل.
+// يحافظ على نفس الهيكل المشترك مع تحسين الهوية البصرية لبسطة.
+
 import Image from "next/image";
 import { t } from "@/theme";
 
@@ -17,6 +16,7 @@ export default function AuthShell({
 }) {
   return (
     <div
+      className="basita-auth-shell"
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -24,121 +24,306 @@ export default function AuthShell({
         background: t.colors.cream.bg,
       }}
     >
-      {/* لوحة الهوية — تختفي على الشاشات الصغيرة وتصبح شريط علوي */}
+      {/* لوحة الهوية */}
       <aside
         className="basita-auth-brand"
         style={{
           flex: "1 1 46%",
           minHeight: "100vh",
-          background: `linear-gradient(160deg, ${t.colors.primary[900]} 0%, ${t.colors.primary[800]} 55%, ${t.colors.primary[700]} 100%)`,
+          background:
+            `linear-gradient(150deg, ${t.colors.primary[950]} 0%, ` +
+            `${t.colors.primary[900]} 45%, ${t.colors.primary[700]} 100%)`,
           position: "relative",
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: t.spacing["10"],
+          padding: "clamp(32px, 5vw, 64px)",
+          direction: "rtl",
         }}
       >
-        {/* زخرفة هندسية دلالتها التراث السعودي — لا تحمل نصاً وظيفياً */}
+        {/* زخرفة هندسية */}
         <div
-          aria-hidden
+          aria-hidden="true"
           style={{
             position: "absolute",
             inset: 0,
-            opacity: 0.08,
-            backgroundImage:
-              `radial-gradient(${t.colors.gold[400]} 2px, transparent 2px)`,
-            backgroundSize: "28px 28px",
+            opacity: 0.06,
+            backgroundImage: `radial-gradient(${t.colors.gold[400]} 1.5px, transparent 1.5px)`,
+            backgroundSize: "26px 26px",
+            pointerEvents: "none",
           }}
         />
 
-        <div style={{ position: "relative", display: "flex", alignItems: "center", gap: t.spacing["3"] }}>
-          <Image src="/images/logo-icon.png" alt="بسطة" width={44} height={44} />
-          <span
+        {/* دوائر زخرفية */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            width: 360,
+            height: 360,
+            borderRadius: "50%",
+            top: -190,
+            left: -150,
+            border: "1px solid rgba(239,220,176,0.16)",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            width: 260,
+            height: 260,
+            borderRadius: "50%",
+            bottom: -160,
+            right: -120,
+            border: "1px solid rgba(239,220,176,0.12)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* الهوية */}
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            gap: t.spacing["3"],
+          }}
+        >
+          <div
             style={{
-              color: t.colors.text.onDark,
-              fontSize: t.typography.fontSize.xl,
-              fontWeight: t.typography.fontWeight.bold,
+              width: 48,
+              height: 48,
+              borderRadius: 14,
+              background: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+              flexShrink: 0,
+              boxShadow: "0 6px 18px rgba(0,0,0,0.10)",
             }}
           >
-            بسطة
-          </span>
+            <Image
+              src="/images/logo-icon.png"
+              alt="بسطة"
+              width={36}
+              height={36}
+              style={{
+                width: 36,
+                height: 36,
+                objectFit: "contain",
+              }}
+            />
+          </div>
+
+          <div>
+            <div
+              style={{
+                fontFamily: t.typography.fontFamily.heading,
+                color: t.colors.text.onDark,
+                fontSize: "22px",
+                fontWeight: t.typography.fontWeight.bold,
+                lineHeight: 1.15,
+              }}
+            >
+              بسطة
+            </div>
+
+            <div
+              style={{
+                marginTop: 3,
+                fontFamily: t.typography.fontFamily.heading,
+                color: t.colors.text.onDarkMuted,
+                fontSize: "10px",
+                fontWeight: t.typography.fontWeight.medium,
+                lineHeight: 1.3,
+              }}
+            >
+              منصة الأسر المنتجة السعودية
+            </div>
+          </div>
         </div>
 
-        <div style={{ position: "relative" }}>
+        {/* الرسالة */}
+        <div
+          style={{
+            position: "relative",
+            maxWidth: 560,
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: t.spacing["4"],
+              padding: "7px 12px",
+              borderRadius: 999,
+              background: "rgba(255,255,255,0.07)",
+              border: "1px solid rgba(239,220,176,0.16)",
+              color: t.colors.gold[400],
+              fontSize: t.typography.fontSize.xs,
+              fontWeight: t.typography.fontWeight.semibold,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: t.colors.gold[400],
+              }}
+            />
+            من قلب السوق السعودي
+          </div>
+
           <h2
             style={{
+              fontFamily: t.typography.fontFamily.heading,
               color: t.colors.text.onDark,
-              fontSize: t.typography.fontSize["3xl"],
+              fontSize: "clamp(28px, 3vw, 42px)",
               fontWeight: t.typography.fontWeight.bold,
-              lineHeight: t.typography.lineHeight.snug,
-              margin: `0 0 ${t.spacing["3"]}`,
+              lineHeight: 1.4,
+              margin: `0 0 ${t.spacing["4"]}`,
+              letterSpacing: "-0.02em",
             }}
           >
             ادعم الأسر المنتجة
             <br />
             واكتشف منتجات سعودية أصيلة
           </h2>
+
           <p
             style={{
               color: t.colors.text.onDarkMuted,
               fontSize: t.typography.fontSize.md,
               lineHeight: t.typography.lineHeight.relaxed,
               margin: 0,
-              maxWidth: 380,
+              maxWidth: 470,
             }}
           >
-            منصة بسطة تجمع أفضل المنتجات من الأسر السعودية المنتجة بجودة وشغف وحب.
+            منصة بسطة تجمع منتجات الأسر السعودية المنتجة في مكان واحد، لتكتشف
+            منتجات محلية أصيلة وتدعم أصحاب المشاريع الصغيرة.
           </p>
         </div>
 
-        <div style={{ position: "relative", display: "flex", gap: t.spacing["3"], flexWrap: "wrap" }}>
-          {["دعم الأسرة المنتجة", "منتجات شعبية أصيلة", "بدون عمولة على المبيعات"].map((label) => (
+        {/* المزايا */}
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            gap: t.spacing["4"],
+            flexWrap: "wrap",
+          }}
+        >
+          {[
+            "دعم الأسرة المنتجة",
+            "منتجات سعودية أصيلة",
+            "تجربة تسوق سهلة",
+          ].map((label) => (
             <div
               key={label}
               style={{
-                display: "flex", alignItems: "center", gap: 6,
-                fontSize: t.typography.fontSize.xs, color: t.colors.text.onDarkMuted,
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+                fontSize: t.typography.fontSize.xs,
+                color: t.colors.text.onDarkMuted,
               }}
             >
-              <span style={{ width: 5, height: 5, borderRadius: t.radius.full, background: t.colors.gold[400], flexShrink: 0 }} />
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: t.radius.full,
+                  background: t.colors.gold[400],
+                  flexShrink: 0,
+                }}
+              />
+
               {label}
             </div>
           ))}
         </div>
       </aside>
 
-      {/* بطاقة النموذج */}
+      {/* مساحة النموذج */}
       <main
+        className="basita-auth-main"
         style={{
           flex: "1 1 54%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: t.spacing["6"],
+          padding: "clamp(24px, 5vw, 64px)",
+          direction: "rtl",
         }}
       >
-        <div style={{ width: "100%", maxWidth: 400 }}>
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 430,
+          }}
+        >
+          {/* شعار الجوال */}
           <div
             className="basita-auth-mobile-logo"
-            style={{ display: "none", justifyContent: "center", marginBottom: t.spacing["6"] }}
+            style={{
+              display: "none",
+              justifyContent: "center",
+              marginBottom: t.spacing["5"],
+            }}
           >
-            <Image src="/images/logo-icon.png" alt="بسطة" width={48} height={48} />
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: 16,
+                background: "#FFFFFF",
+                border: `1px solid ${t.colors.cream.border}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                boxShadow: "0 6px 18px rgba(67,48,29,0.07)",
+              }}
+            >
+              <Image
+                src="/images/logo-icon.png"
+                alt="بسطة"
+                width={42}
+                height={42}
+                style={{
+                  width: 42,
+                  height: 42,
+                  objectFit: "contain",
+                }}
+              />
+            </div>
           </div>
 
+          {/* العنوان */}
           {title && (
             <h1
               style={{
+                fontFamily: t.typography.fontFamily.heading,
                 margin: 0,
                 fontSize: t.typography.fontSize["2xl"],
                 fontWeight: t.typography.fontWeight.bold,
                 color: t.colors.primary[800],
                 textAlign: "center",
+                lineHeight: 1.4,
               }}
             >
               {title}
             </h1>
           )}
+
+          {/* الوصف */}
           {subtitle && (
             <p
               style={{
@@ -146,22 +331,27 @@ export default function AuthShell({
                 fontSize: t.typography.fontSize.base,
                 color: t.colors.text.mid,
                 textAlign: "center",
+                lineHeight: t.typography.lineHeight.relaxed,
               }}
             >
               {subtitle}
             </p>
           )}
 
-          {children}
+          {/* النموذج */}
+          <div
+            style={{
+              background: t.colors.cream.card,
+              border: `1px solid ${t.colors.cream.border}`,
+              borderRadius: 22,
+              padding: "clamp(22px, 4vw, 30px)",
+              boxShadow: "0 12px 34px rgba(67,48,29,0.065)",
+            }}
+          >
+            {children}
+          </div>
         </div>
       </main>
-
-      <style>{`
-        @media (max-width: 860px) {
-          .basita-auth-brand { display: none; }
-          .basita-auth-mobile-logo { display: flex !important; }
-        }
-      `}</style>
     </div>
   );
 }

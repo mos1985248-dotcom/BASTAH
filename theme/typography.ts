@@ -1,9 +1,12 @@
 // theme/typography.ts
-// الخط الوحيد المسموح في كامل المنصة: IBM Plex Sans Arabic.
-// يُحمَّل عبر next/font/google في app/layout.tsx ويُربط بمتغيّر CSS var(--font-plex-arabic).
+
+// نظام الخطوط المركزي لمنصة بسطة:
+// - IBM Plex Sans Arabic للنصوص والأزرار والمحتوى العام.
+// - Noto Kufi Arabic للعناوين الرئيسية لإضافة لمسة عربية تراثية حديثة.
 
 export const fontFamily = {
   base: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
+  heading: "var(--font-kufi-arabic), 'Noto Kufi Arabic', system-ui, sans-serif",
 } as const;
 
 export const fontWeight = {
@@ -14,7 +17,6 @@ export const fontWeight = {
   bold: 700,
 } as const;
 
-// سلّم أحجام واضح لكل الاستخدامات (px) - تم تكبيره قليلاً لنمط سلة الفاخر
 export const fontSize = {
   xs: "13px",
   sm: "14px",

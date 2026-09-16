@@ -211,7 +211,12 @@ const SUPPORTED_CARRIERS = listSupportedCarriers() as [string, ...string[]];
 
 export const connectShippingSchema = z.object({
   carrier: z.enum(SUPPORTED_CARRIERS),
-  credentials: z.record(z.string().trim().min(1)),
+  // ⚠️ إلزامي فقط لـcarrier=CUSTOM (يُتحقَّق منه بالـroute، لا هنا) — يحدد
+  // أي شركة من ShippingProviderConfig يريد التاجر ربطها
+  customProviderId: z.string().cuid().optional(),
+  // فاضٍ افتراضياً — لـCUSTOM لا نحتاج بيانات اعتماد من التاجر إطلاقاً
+  // (مشتركة على مستوى المنصة، راجع ShippingProviderConfig)
+  credentials: z.record(z.string().trim().min(1)).default({}),
 });
 
 export const shippingRateRequestSchema = z.object({
@@ -284,3 +289,31 @@ export const createAdCampaignSchema = z.object({
   name: z.string().trim().min(2, "اسم الحملة مطلوب").max(100),
   budget: z.coerce.number().positive("الميزانية يجب أن تكون أكبر من صفر").max(1_000_000),
 });
+
+// ── شركة شحن مخصَّصة (بدون كود — تضيفها الإدارة من اللوحة) ──────
+// REST: شركة عندها API فعلي. MANUAL: شركة بدون أي نظام تقني (سعر ثابت).
+const carrierKeySchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(/^[A-Z0-9_]{2,30}$/, "المعرّف يجب أن يكون حروفاً إنجليزية/أرقام/شرطة سفلية فقط");
+const displayNameArSchema = z.string().trim().min(2, "اسم الشركة مطلوب").max(50);
+
+export const createShippingProviderConfigSchema = z.discriminatedUnion("providerType", [
+  z.object({
+    providerType: z.literal("REST"),
+    carrierKey: carrierKeySchema,
+    displayNameAr: displayNameArSchema,
+    baseUrl: z.string().trim().url("رابط الـAPI غير صحيح"),
+    ratePath: z.string().trim().regex(/^\//, "المسار يجب أن يبدأ بـ/").max(200).default("/rates"),
+    apiKey: z.string().trim().min(8, "المفتاح قصير جداً"),
+  }),
+  z.object({
+    providerType: z.literal("MANUAL"),
+    carrierKey: carrierKeySchema,
+    displayNameAr: displayNameArSchema,
+    // ⚠️ لشركة بدون أي نظام تقني (مندوب/مكتب شحن صغير) — سعر ثابت
+    flatFee: z.coerce.number().min(0, "الرسوم الأساسية يجب أن تكون صفر أو أكبر").max(1000),
+    perKgFee: z.coerce.number().min(0, "الرسوم لكل كيلو يجب أن تكون صفر أو أكبر").max(500),
+  }),
+]);

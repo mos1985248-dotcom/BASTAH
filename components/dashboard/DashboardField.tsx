@@ -1,6 +1,8 @@
 // components/dashboard/DashboardField.tsx
 import { t } from "@/theme";
 
+const LTR_TYPES = new Set(["number", "email", "url", "tel"]);
+
 export function DashboardField({
   label,
   type = "text",
@@ -12,37 +14,54 @@ export function DashboardField({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const isLTR = LTR_TYPES.has(type);
+
   return (
-    <label style={{ display: "block", direction: "rtl", textAlign: "right" }}>
-      <span style={{ display: "block", fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, marginBottom: t.spacing["1"], color: t.colors.text.dark }}>
+    <label
+      style={{
+        display: "block",
+        width: "100%",
+        direction: "rtl",
+        textAlign: "right",
+      }}
+    >
+      <span
+        style={{
+          display: "block",
+          marginBottom: 7,
+          fontFamily: t.typography.fontFamily.base,
+          fontSize: t.typography.fontSize.sm,
+          fontWeight: t.typography.fontWeight.bold,
+          color: t.colors.text.dark,
+          lineHeight: 1.5,
+        }}
+      >
         {label}
       </span>
+
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        className="basita-dashboard-field"
         style={{
           width: "100%",
-          padding: "11px 14px",
-          border: `1.5px solid ${t.colors.cream.border}`,
-          borderRadius: t.radius.md,
+          height: 48,
+          padding: "0 14px",
+          border: `1px solid ${t.colors.cream.border}`,
+          borderRadius: 13,
+          fontFamily: t.typography.fontFamily.base,
           fontSize: t.typography.fontSize.base,
-          background: t.colors.white,
+          background: t.colors.cream.card,
           color: t.colors.text.dark,
-          direction: type === "number" || type === "email" || type === "url" || type === "tel" ? "ltr" : "rtl",
-          textAlign: type === "number" || type === "email" || type === "url" || type === "tel" ? "left" : "right",
+          direction: isLTR ? "ltr" : "rtl",
+          textAlign: isLTR ? "left" : "right",
           boxSizing: "border-box",
           outline: "none",
-          transition: `border-color ${t.motion.fast} ${t.motion.ease}, box-shadow ${t.motion.fast} ${t.motion.ease}`,
-          fontFamily: t.typography.fontFamily.base,
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.borderColor = t.colors.primary[600];
-          e.currentTarget.style.boxShadow = `0 0 0 3px rgba(217, 119, 6, 0.15)`;
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.borderColor = t.colors.cream.border;
-          e.currentTarget.style.boxShadow = "none";
+          transition:
+            `border-color ${t.motion.fast} ${t.motion.ease}, ` +
+            `box-shadow ${t.motion.fast} ${t.motion.ease}, ` +
+            `background ${t.motion.fast} ${t.motion.ease}`,
         }}
       />
     </label>
@@ -61,37 +80,53 @@ export function DashboardTextarea({
   rows?: number;
 }) {
   return (
-    <label style={{ display: "block", direction: "rtl", textAlign: "right" }}>
-      <span style={{ display: "block", fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, marginBottom: t.spacing["1"], color: t.colors.text.dark }}>
+    <label
+      style={{
+        display: "block",
+        width: "100%",
+        direction: "rtl",
+        textAlign: "right",
+      }}
+    >
+      <span
+        style={{
+          display: "block",
+          marginBottom: 7,
+          fontFamily: t.typography.fontFamily.base,
+          fontSize: t.typography.fontSize.sm,
+          fontWeight: t.typography.fontWeight.bold,
+          color: t.colors.text.dark,
+          lineHeight: 1.5,
+        }}
+      >
         {label}
       </span>
+
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={rows}
+        className="basita-dashboard-field basita-dashboard-textarea"
         style={{
           width: "100%",
-          padding: "11px 14px",
-          border: `1.5px solid ${t.colors.cream.border}`,
-          borderRadius: t.radius.md,
+          minHeight: 110,
+          padding: "12px 14px",
+          border: `1px solid ${t.colors.cream.border}`,
+          borderRadius: 13,
+          fontFamily: t.typography.fontFamily.base,
           fontSize: t.typography.fontSize.base,
-          background: t.colors.white,
+          background: t.colors.cream.card,
           color: t.colors.text.dark,
           direction: "rtl",
           textAlign: "right",
-          resize: "none",
+          resize: "vertical",
           boxSizing: "border-box",
           outline: "none",
-          fontFamily: t.typography.fontFamily.base,
-          transition: `border-color ${t.motion.fast} ${t.motion.ease}, box-shadow ${t.motion.fast} ${t.motion.ease}`,
-        }}
-        onFocus={(e) => {
-          e.currentTarget.style.borderColor = t.colors.primary[600];
-          e.currentTarget.style.boxShadow = `0 0 0 3px rgba(217, 119, 6, 0.15)`;
-        }}
-        onBlur={(e) => {
-          e.currentTarget.style.borderColor = t.colors.cream.border;
-          e.currentTarget.style.boxShadow = "none";
+          lineHeight: t.typography.lineHeight.relaxed,
+          transition:
+            `border-color ${t.motion.fast} ${t.motion.ease}, ` +
+            `box-shadow ${t.motion.fast} ${t.motion.ease}, ` +
+            `background ${t.motion.fast} ${t.motion.ease}`,
         }}
       />
     </label>

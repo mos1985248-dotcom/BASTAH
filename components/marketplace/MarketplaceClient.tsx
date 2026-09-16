@@ -68,7 +68,7 @@ function MarketplaceContent() {
         <CategoryNav />
       </div>
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: t.spacing["6"] }}>
+      <div style={{ maxWidth: t.layout.containerMaxWidth, margin: "0 auto", padding: t.spacing["6"] }}>
         {category && (
           <button
             onClick={() => setCategory("")}

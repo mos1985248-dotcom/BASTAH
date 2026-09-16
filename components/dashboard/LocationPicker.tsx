@@ -1,18 +1,23 @@
 // components/dashboard/LocationPicker.tsx
-// خريطة تفاعلية لتحديد موقع المتجر — بديل اختياري للحقلين الرقميين
-// اليدويين. يحتاج NEXT_PUBLIC_MAPBOX_TOKEN (راجع .env.example)؛ بدونه
-// يعرض رسالة توضيحية بدل ما ينهار، ويبقى الإدخال اليدوي شغّالاً كاملاً.
+// خريطة تفاعلية لتحديد موقع المتجر.
+// تحتاج NEXT_PUBLIC_MAPBOX_TOKEN؛ وفي حال عدم وجوده
+// يبقى الإدخال اليدوي متاحًا بالكامل دون انهيار الصفحة.
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { MapPin } from "lucide-react";
+import { MapPin, Map, AlertTriangle } from "lucide-react";
 import { t } from "@/theme";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-// مركز افتراضي (الرياض) لو ما فيه موقع محفوظ بعد
-const DEFAULT_CENTER: [number, number] = [46.6753, 24.7136];
+
+// مركز افتراضي عند عدم وجود موقع محفوظ.
+const DEFAULT_CENTER: [number, number] = [
+  46.6753,
+  24.7136,
+];
 
 interface Props {
   latitude: number | null;
@@ -20,22 +25,31 @@ interface Props {
   onChange: (lat: number, lng: number) => void;
 }
 
-export default function LocationPicker({ latitude, longitude, onChange }: Props) {
+export default function LocationPicker({
+  latitude,
+  longitude,
+  onChange,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
+
   const [mapError, setMapError] = useState("");
 
-  // تهيئة الخريطة مرة وحدة فقط
+  /*
+   * تهيئة الخريطة مرة واحدة.
+   */
   useEffect(() => {
-    if (!MAPBOX_TOKEN) return; // بدون توكن — نعرض رسالة بدل الخريطة (الشرط بالـJSX تحت)
+    if (!MAPBOX_TOKEN) return;
     if (!containerRef.current || mapRef.current) return;
 
     try {
       mapboxgl.accessToken = MAPBOX_TOKEN;
 
       const startCenter: [number, number] =
-        latitude != null && longitude != null ? [longitude, latitude] : DEFAULT_CENTER;
+        latitude != null && longitude != null
+          ? [longitude, latitude]
+          : DEFAULT_CENTER;
 
       const map = new mapboxgl.Map({
         container: containerRef.current,
@@ -43,79 +57,239 @@ export default function LocationPicker({ latitude, longitude, onChange }: Props)
         center: startCenter,
         zoom: latitude != null ? 14 : 5,
       });
-      map.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-      const marker = new mapboxgl.Marker({ draggable: true, color: t.colors.primary[800] })
+      map.addControl(
+        new mapboxgl.NavigationControl(),
+        "top-right",
+      );
+
+      const marker = new mapboxgl.Marker({
+        draggable: true,
+        color: t.colors.primary[800],
+      })
         .setLngLat(startCenter)
         .addTo(map);
 
+      /*
+       * عند تحريك العلامة.
+       */
       marker.on("dragend", () => {
         const { lat, lng } = marker.getLngLat();
+
         onChange(lat, lng);
       });
 
-      // نقرة على أي مكان بالخريطة تنقل العلامة له مباشرة — أسهل من السحب الدقيق
-      map.on("click", (e) => {
-        marker.setLngLat(e.lngLat);
-        onChange(e.lngLat.lat, e.lngLat.lng);
+      /*
+       * النقر على الخريطة ينقل العلامة مباشرة.
+       */
+      map.on("click", (event) => {
+        marker.setLngLat(event.lngLat);
+
+        onChange(
+          event.lngLat.lat,
+          event.lngLat.lng,
+        );
       });
 
       mapRef.current = map;
       markerRef.current = marker;
-    } catch (err) {
-      console.error("[LocationPicker]", err);
-      setMapError("تعذّر تحميل الخريطة — تأكدي من صحة التوكن");
+    } catch (error) {
+      console.error("[LocationPicker]", error);
+
+      setMapError(
+        "تعذّر تحميل الخريطة. تحقّق من إعدادات الخريطة ثم أعد المحاولة.",
+      );
     }
 
     return () => {
       mapRef.current?.remove();
+
       mapRef.current = null;
       markerRef.current = null;
     };
+
+    // التهيئة مطلوبة مرة واحدة فقط.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // مزامنة العلامة لو التاجر عدّل الإحداثيات يدوياً بالحقول الرقمية
-  // (أو ضغط "استخدمي موقعي الحالي") — بدون إعادة إنشاء الخريطة كاملة
+  /*
+   * مزامنة العلامة مع الإحداثيات التي قد تتغير
+   * من الحقول اليدوية أو أي مصدر آخر.
+   */
   useEffect(() => {
     if (!mapRef.current || !markerRef.current) return;
+
     if (latitude == null || longitude == null) return;
-    markerRef.current.setLngLat([longitude, latitude]);
-    mapRef.current.flyTo({ center: [longitude, latitude], zoom: 14 });
+
+    markerRef.current.setLngLat([
+      longitude,
+      latitude,
+    ]);
+
+    mapRef.current.flyTo({
+      center: [longitude, latitude],
+      zoom: 14,
+    });
   }, [latitude, longitude]);
 
+  /*
+   * في حال عدم وجود Mapbox token.
+   */
   if (!MAPBOX_TOKEN) {
     return (
       <div
         style={{
-          height: 220, borderRadius: t.radius.md, border: `1px dashed ${t.colors.cream.border}`,
-          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8,
-          background: t.colors.cream.bg, color: t.colors.text.light, fontSize: t.typography.fontSize.xs, textAlign: "center", padding: t.spacing["4"],
+          minHeight: 220,
+          padding: t.spacing["5"],
+          borderRadius: 16,
+          border: `1px dashed ${t.colors.cream.border}`,
+          background: t.colors.cream.bg,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+          color: t.colors.text.mid,
+          fontSize: t.typography.fontSize.sm,
+          lineHeight: t.typography.lineHeight.relaxed,
+          textAlign: "center",
           direction: "rtl",
+          boxSizing: "border-box",
         }}
       >
-        <div style={{ width: 36, height: 36, borderRadius: t.radius.full, background: t.colors.white, display: "flex", alignItems: "center", justifyContent: "center", border: `1px solid ${t.colors.cream.border}` }}>
-          <MapPin size={18} strokeWidth={1.8} color={t.colors.primary[800]} />
+        <div
+          style={{
+            width: 46,
+            height: 46,
+            borderRadius: 14,
+            background: t.colors.white,
+            border: `1px solid ${t.colors.cream.border}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(67,48,29,0.04)",
+          }}
+        >
+          <MapPin
+            size={22}
+            strokeWidth={1.8}
+            color={t.colors.primary[800]}
+          />
         </div>
-        <span>الخريطة التفاعلية غير مفعّلة — استخدمي الحقول أو الزر بالأسفل لتحديد موقعك يدوياً</span>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            fontFamily: t.typography.fontFamily.heading,
+            fontSize: t.typography.fontSize.sm,
+            fontWeight: t.typography.fontWeight.bold,
+            color: t.colors.primary[800],
+          }}
+        >
+          <Map size={16} strokeWidth={1.8} />
+          الخريطة التفاعلية غير مفعّلة
+        </div>
+
+        <span
+          style={{
+            maxWidth: 440,
+            color: t.colors.text.mid,
+            fontSize: t.typography.fontSize.xs,
+          }}
+        >
+          يمكنك تحديد الموقع باستخدام حقول الإحداثيات
+          اليدوية أو الخيار المتاح أسفل هذا القسم.
+        </span>
       </div>
     );
   }
 
+  /*
+   * خطأ تحميل الخريطة.
+   */
   if (mapError) {
     return (
-      <div style={{ padding: t.spacing["3"], borderRadius: t.radius.md, background: t.colors.semantic.dangerBg, color: t.colors.semantic.danger, fontSize: t.typography.fontSize.xs, direction: "rtl", textAlign: "right" }}>
-        {mapError}
+      <div
+        role="alert"
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 9,
+          padding: t.spacing["4"],
+          borderRadius: 13,
+          background: t.colors.semantic.dangerBg,
+          border: "1px solid rgba(220,38,38,0.12)",
+          borderRight: `3px solid ${t.colors.semantic.danger}`,
+          color: t.colors.semantic.danger,
+          fontSize: t.typography.fontSize.sm,
+          lineHeight: t.typography.lineHeight.relaxed,
+          direction: "rtl",
+          textAlign: "right",
+        }}
+      >
+        <AlertTriangle
+          size={18}
+          strokeWidth={1.9}
+          style={{
+            flexShrink: 0,
+            marginTop: 2,
+          }}
+        />
+
+        <span>{mapError}</span>
       </div>
     );
   }
 
+  /*
+   * الخريطة.
+   */
   return (
-    <div style={{ direction: "rtl", textAlign: "right" }}>
-      <div ref={containerRef} style={{ height: 220, borderRadius: t.radius.md, overflow: "hidden", border: `1px solid ${t.colors.cream.border}`, boxShadow: t.shadows.sm }} />
-      <p style={{ margin: "6px 0 0", fontSize: t.typography.fontSize.xs, color: t.colors.text.mid, fontWeight: t.typography.fontWeight.medium }}>
-        اضغطي على أي مكان بالخريطة أو اسحبي العلامة لتحديد موقعك بدقة
-      </p>
+    <div
+      style={{
+        width: "100%",
+        direction: "rtl",
+        textAlign: "right",
+      }}
+    >
+      <div
+        ref={containerRef}
+        className="basita-location-map"
+        style={{
+          height: 280,
+          width: "100%",
+          borderRadius: 16,
+          overflow: "hidden",
+          border: `1px solid ${t.colors.cream.border}`,
+          boxShadow: "0 6px 18px rgba(67,48,29,0.06)",
+          background: t.colors.cream.warm,
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 7,
+          marginTop: 8,
+          color: t.colors.text.mid,
+          fontSize: t.typography.fontSize.xs,
+          lineHeight: t.typography.lineHeight.relaxed,
+        }}
+      >
+        <MapPin
+          size={14}
+          strokeWidth={1.8}
+          color={t.colors.gold[600]}
+        />
+
+        <span>
+          انقر على الموقع المطلوب في الخريطة أو اسحب العلامة
+          لتحديد موقع المتجر بدقة.
+        </span>
+      </div>
     </div>
   );
 }
