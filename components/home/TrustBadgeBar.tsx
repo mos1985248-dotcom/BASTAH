@@ -19,21 +19,6 @@ const BADGES: { Icon: LucideIcon; label: string }[] = [
 
 export default function TrustBadgeBar() {
   return (
-<<<<<<< HEAD
-    <section aria-label="مزايا التسوّق في بسطة" style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["4"]} ${t.spacing["4"]} 0` }}>
-      <ul
-        style={{
-          background: t.colors.white,
-          border: `1px solid ${t.colors.cream.border}`,
-          borderRadius: t.radius.lg,
-          display: "flex",
-          justifyContent: "space-around",
-          alignItems: "center",
-          padding: `${t.spacing["4"]} ${t.spacing["2"]}`,
-          margin: 0,
-          listStyle: "none",
-        }}
-=======
     <section
       style={{
         maxWidth: t.layout.containerMaxWidth,
@@ -43,7 +28,6 @@ export default function TrustBadgeBar() {
       }}
     >
       <div
->>>>>>> 239c0d7 (Improve Basita UI and dashboard)
         className="basita-badge-row"
         style={{
           display: "grid",
@@ -56,13 +40,8 @@ export default function TrustBadgeBar() {
           boxShadow: "0 4px 14px rgba(67,48,29,0.035)",
         }}
       >
-<<<<<<< HEAD
-        {BADGES.map((b, i) => (
-          <li
-=======
         {BADGES.map((b) => (
           <div
->>>>>>> 239c0d7 (Improve Basita UI and dashboard)
             key={b.label}
             className="basita-badge-item"
             style={{
@@ -82,11 +61,6 @@ export default function TrustBadgeBar() {
                 `border-color ${t.motion.base} ${t.motion.ease}`,
             }}
           >
-<<<<<<< HEAD
-            <b.Icon size={20} strokeWidth={1.7} color={t.colors.primary[800]} aria-hidden="true" />
-            <span style={{ fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.semibold, color: t.colors.text.dark, whiteSpace: "nowrap" }}>{b.label}</span>
-          </li>
-=======
             <span
               style={{
                 width: 34,
@@ -117,9 +91,8 @@ export default function TrustBadgeBar() {
               {b.label}
             </span>
           </div>
->>>>>>> 239c0d7 (Improve Basita UI and dashboard)
         ))}
-      </ul>
+      </div>
 
       <style>{`
         .basita-badge-item:hover {

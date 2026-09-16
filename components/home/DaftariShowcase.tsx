@@ -21,15 +21,14 @@ const FEATURES: {
 
 export default function DaftariShowcase() {
   return (
-<section
-  aria-labelledby="daftari-heading"
-  style={{
-    maxWidth: t.layout.containerMaxWidth,
-    margin: "0 auto",
-    padding: `${t.spacing["10"]} ${t.spacing["4"]} 0`,
-    direction: "rtl",
-  }}
->
+    <section
+      style={{
+        maxWidth: t.layout.containerMaxWidth,
+        margin: "0 auto",
+        padding: `${t.spacing["10"]} ${t.spacing["4"]} 0`,
+        direction: "rtl",
+      }}
+    >
       <div
         className="basita-daftari-shell"
         style={{
@@ -44,11 +43,6 @@ export default function DaftariShowcase() {
           boxShadow: "0 6px 20px rgba(67, 48, 29, 0.045)",
         }}
       >
-<<<<<<< HEAD
-        {/* قسم مميزات دفاتري */}
-        <div>
-          <h2 id="daftari-heading" style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>
-=======
         {/* المحتوى الرئيسي */}
         <div
           style={{
@@ -88,7 +82,6 @@ export default function DaftariShowcase() {
               lineHeight: 1.4,
             }}
           >
->>>>>>> 239c0d7 (Improve Basita UI and dashboard)
             دفاتري — محاسبة بسيطة لمتجرك
           </h2>
 
@@ -136,10 +129,6 @@ export default function DaftariShowcase() {
                     `border-color ${t.motion.base} ${t.motion.ease}`,
                 }}
               >
-<<<<<<< HEAD
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
-                  <f.Icon size={24} strokeWidth={1.7} color={t.colors.primary[800]} aria-hidden="true" />
-=======
                 <div
                   style={{
                     width: 42,
@@ -157,7 +146,6 @@ export default function DaftariShowcase() {
                     strokeWidth={1.75}
                     color={t.colors.gold[700]}
                   />
->>>>>>> 239c0d7 (Improve Basita UI and dashboard)
                 </div>
 
                 <div
