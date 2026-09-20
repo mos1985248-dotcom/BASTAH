@@ -46,6 +46,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
       >
         {/* غلاف المتجر */}
         <div
+          className="basita-store-cover"
           style={{
             position: "relative",
             width: "100%",
@@ -58,6 +59,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
         >
           {/* طبقة خفيفة لتحسين وضوح الغلاف */}
           <div
+            aria-hidden="true"
             style={{
               position: "absolute",
               inset: 0,
@@ -69,6 +71,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
           {/* شارة المتجر الموثق */}
           {store.isVerified && (
             <div
+              className="basita-store-verified-badge"
               style={{
                 position: "absolute",
                 top: 10,
@@ -94,6 +97,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
 
         {/* المحتوى */}
         <div
+          className="basita-store-content"
           style={{
             position: "relative",
             flex: 1,
@@ -104,6 +108,8 @@ export default function StoreCard({ store }: { store: HomeStore }) {
         >
           {/* شعار المتجر */}
           <div
+            className="basita-store-logo"
+            aria-hidden="true"
             style={{
               position: "absolute",
               top: -30,
@@ -122,6 +128,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
 
           {/* اسم المتجر */}
           <div
+            className="basita-store-name-row"
             style={{
               display: "flex",
               alignItems: "center",
@@ -159,6 +166,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
 
           {/* المدينة والتقييم */}
           <div
+            className="basita-store-meta"
             style={{
               display: "flex",
               alignItems: "center",
@@ -183,6 +191,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
             {store.totalReviews > 0 && (
               <>
                 <span
+                  aria-hidden="true"
                   style={{
                     width: 3,
                     height: 3,
@@ -219,6 +228,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
           {/* وصف مختصر */}
           {store.shortDesc && (
             <p
+              className="basita-store-description"
               style={{
                 margin: 0,
                 color: t.colors.text.mid,
@@ -236,6 +246,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
 
           {/* شريط سفلي */}
           <div
+            className="basita-store-footer"
             style={{
               marginTop: "auto",
               paddingTop: 12,
@@ -277,6 +288,119 @@ export default function StoreCard({ store }: { store: HomeStore }) {
           </div>
         </div>
       </article>
+
+      {/* Mobile card refinement */}
+      <style jsx>{`
+        @media (max-width: 767px) {
+          .basita-store-card {
+            min-height: 0 !important;
+            height: auto !important;
+            border-radius: 14px !important;
+            box-shadow: 0 2px 8px rgba(67, 48, 29, 0.05) !important;
+          }
+
+          .basita-store-cover {
+            height: 92px !important;
+          }
+
+          .basita-store-verified-badge {
+            top: 7px !important;
+            right: 7px !important;
+            padding: 4px 7px !important;
+            gap: 4px !important;
+            font-size: 10px !important;
+          }
+
+          .basita-store-verified-badge svg {
+            width: 12px !important;
+            height: 12px !important;
+          }
+
+          .basita-store-content {
+            padding: 28px 12px 11px !important;
+          }
+
+          .basita-store-logo {
+            top: -24px !important;
+            right: 12px !important;
+            width: 48px !important;
+            height: 48px !important;
+            border-width: 2px !important;
+            border-radius: 11px !important;
+          }
+
+          .basita-store-name-row {
+            gap: 5px !important;
+            margin-bottom: 4px !important;
+          }
+
+          .basita-store-name-row p {
+            font-size: 14px !important;
+            line-height: 1.4 !important;
+          }
+
+          .basita-store-name-row svg {
+            width: 15px !important;
+            height: 15px !important;
+          }
+
+          .basita-store-meta {
+            gap: 6px !important;
+            margin-bottom: 7px !important;
+            font-size: 11px !important;
+          }
+
+          .basita-store-meta svg {
+            width: 12px !important;
+            height: 12px !important;
+          }
+
+          .basita-store-description {
+            font-size: 11px !important;
+            line-height: 1.65 !important;
+            -webkit-line-clamp: 2 !important;
+          }
+
+          .basita-store-footer {
+            margin-top: 9px !important;
+            padding-top: 8px !important;
+          }
+
+          .basita-store-footer > span:first-child {
+            font-size: 11px !important;
+          }
+
+          .basita-store-arrow {
+            width: 24px !important;
+            height: 24px !important;
+            font-size: 13px !important;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .basita-store-cover {
+            height: 86px !important;
+          }
+
+          .basita-store-content {
+            padding: 27px 11px 10px !important;
+          }
+
+          .basita-store-logo {
+            right: 11px !important;
+            width: 46px !important;
+            height: 46px !important;
+          }
+
+          .basita-store-name-row p {
+            font-size: 13px !important;
+          }
+
+          .basita-store-description {
+            font-size: 10.5px !important;
+          }
+        }
+      `}</style>
     </a>
   );
 }

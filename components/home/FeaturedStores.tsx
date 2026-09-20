@@ -285,6 +285,7 @@ export default function FeaturedStores() {
             alignItems: "stretch",
           }}
         >
+          {/* البسطات */}
           <div
             className="basita-featured-stores-grid"
             style={{
@@ -304,6 +305,7 @@ export default function FeaturedStores() {
                 ))}
           </div>
 
+          {/* بطاقة الثقة */}
           <div
             className="basita-featured-stores-cta"
             style={{
@@ -314,6 +316,114 @@ export default function FeaturedStores() {
           </div>
         </div>
       )}
+
+      {/* Mobile responsive */}
+      <style jsx>{`
+        @media (max-width: 767px) {
+          .basita-featured-stores {
+            padding: 32px 10px !important;
+          }
+
+          .basita-featured-stores-header {
+            align-items: flex-start !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            margin-bottom: 18px !important;
+          }
+
+          .basita-featured-stores-header h2 {
+            font-size: 22px !important;
+            line-height: 1.35 !important;
+          }
+
+          .basita-featured-stores-header p {
+            margin-top: 5px !important;
+            font-size: 13px !important;
+            line-height: 1.7 !important;
+          }
+
+          .basita-featured-stores-header > div:first-child {
+            width: 100%;
+          }
+
+          .basita-featured-stores-all {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 38px !important;
+            padding: 7px 12px !important;
+            font-size: 12px !important;
+          }
+
+          /*
+           * الجوال:
+           * نلغي تقسيم العمودين بالكامل.
+           * المتاجر تأتي أولاً، ثم بطاقة الثقة أسفلها.
+           */
+          .basita-featured-stores-layout {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 14px !important;
+            width: 100%;
+          }
+
+          /*
+           * كل متجر في صف مستقل.
+           */
+          .basita-featured-stores-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+            width: 100%;
+          }
+
+          .basita-featured-stores-grid > * {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            grid-column: auto !important;
+            grid-row: auto !important;
+          }
+
+          /*
+           * بطاقة الثقة لا تدخل بين المتاجر.
+           */
+          .basita-featured-stores-cta {
+            width: 100%;
+            margin-top: 2px;
+          }
+
+          .basita-featured-stores-cta > * {
+            width: 100% !important;
+            max-width: none !important;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .basita-featured-stores {
+            padding: 28px 8px !important;
+          }
+
+          .basita-featured-stores-header {
+            margin-bottom: 15px !important;
+          }
+
+          .basita-featured-stores-header h2 {
+            font-size: 21px !important;
+          }
+
+          .basita-featured-stores-header p {
+            font-size: 12px !important;
+          }
+
+          .basita-featured-stores-grid {
+            gap: 8px !important;
+          }
+
+          .basita-featured-stores-layout {
+            gap: 12px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

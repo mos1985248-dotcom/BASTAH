@@ -22,11 +22,13 @@ const FEATURES: {
 export default function DaftariShowcase() {
   return (
     <section
+      className="basita-daftari-section"
       style={{
         maxWidth: t.layout.containerMaxWidth,
         margin: "0 auto",
         padding: `${t.spacing["10"]} ${t.spacing["4"]} 0`,
         direction: "rtl",
+        boxSizing: "border-box",
       }}
     >
       <div
@@ -46,6 +48,7 @@ export default function DaftariShowcase() {
       >
         {/* المحتوى الرئيسي */}
         <div
+          className="basita-daftari-main"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -142,6 +145,7 @@ export default function DaftariShowcase() {
                     alignItems: "center",
                     justifyContent: "center",
                     marginBottom: 8,
+                    flexShrink: 0,
                   }}
                 >
                   <f.Icon
@@ -211,6 +215,7 @@ export default function DaftariShowcase() {
           />
 
           <div
+            className="basita-daftari-benefit-content"
             style={{
               position: "relative",
               zIndex: 1,
@@ -242,6 +247,7 @@ export default function DaftariShowcase() {
                 fontSize: t.typography.fontSize.xl,
                 fontWeight: t.typography.fontWeight.bold,
                 color: t.colors.text.onDark,
+                lineHeight: 1.4,
               }}
             >
               بدون عمولات
@@ -284,6 +290,196 @@ export default function DaftariShowcase() {
           </div>
         </div>
       </div>
+
+      <style>{`
+        /* =========================
+           Daftari - Tablet
+           ========================= */
+        @media (max-width: 980px) {
+          .basita-daftari-shell {
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 0.72fr) !important;
+            gap: 16px !important;
+            padding: 20px !important;
+          }
+
+          .basita-daftari-features {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+
+          .basita-daftari-feature {
+            min-height: 100px !important;
+          }
+
+          .basita-daftari-benefit {
+            min-height: 100% !important;
+            padding: 22px !important;
+          }
+        }
+
+        /* =========================
+           Daftari - Mobile
+           ========================= */
+        @media (max-width: 767px) {
+          .basita-daftari-section {
+            padding: 28px 10px 0 !important;
+          }
+
+          .basita-daftari-shell {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            padding: 12px !important;
+            border-radius: 18px !important;
+          }
+
+          .basita-daftari-main {
+            width: 100% !important;
+          }
+
+          .basita-daftari-main > div:first-child {
+            margin-bottom: 9px !important;
+            padding: 5px 9px !important;
+            gap: 6px !important;
+            font-size: 11px !important;
+          }
+
+          .basita-daftari-main > div:first-child svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
+
+          .basita-daftari-main h2 {
+            margin-bottom: 6px !important;
+            font-size: 20px !important;
+            line-height: 1.45 !important;
+          }
+
+          .basita-daftari-main > p {
+            margin-bottom: 13px !important;
+            font-size: 12.5px !important;
+            line-height: 1.8 !important;
+          }
+
+          .basita-daftari-features {
+            width: 100% !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 7px !important;
+          }
+
+          .basita-daftari-feature {
+            min-height: 82px !important;
+            padding: 9px 6px !important;
+            border-radius: 12px !important;
+          }
+
+          .basita-daftari-feature > div:first-child {
+            width: 34px !important;
+            height: 34px !important;
+            margin-bottom: 5px !important;
+            border-radius: 9px !important;
+          }
+
+          .basita-daftari-feature > div:first-child svg {
+            width: 18px !important;
+            height: 18px !important;
+          }
+
+          .basita-daftari-feature > div:last-child {
+            font-size: 10.5px !important;
+            line-height: 1.45 !important;
+          }
+
+          .basita-daftari-benefit {
+            width: 100% !important;
+            min-height: 0 !important;
+            padding: 20px 16px !important;
+            border-radius: 14px !important;
+          }
+
+          .basita-daftari-benefit-content > div:first-child {
+            width: 44px !important;
+            height: 44px !important;
+            margin-bottom: 9px !important;
+            border-radius: 11px !important;
+          }
+
+          .basita-daftari-benefit-content > div:first-child svg {
+            width: 21px !important;
+            height: 21px !important;
+          }
+
+          .basita-daftari-benefit-content p:first-of-type {
+            margin-bottom: 5px !important;
+            font-size: 18px !important;
+          }
+
+          .basita-daftari-benefit-content p:nth-of-type(2) {
+            margin-bottom: 12px !important;
+            font-size: 12px !important;
+            line-height: 1.8 !important;
+          }
+
+          .basita-daftari-link {
+            font-size: 12px !important;
+          }
+        }
+
+        /* =========================
+           Daftari - Small phones
+           ========================= */
+        @media (max-width: 420px) {
+          .basita-daftari-section {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+          }
+
+          .basita-daftari-shell {
+            padding: 10px !important;
+            gap: 10px !important;
+            border-radius: 16px !important;
+          }
+
+          .basita-daftari-main h2 {
+            font-size: 18px !important;
+          }
+
+          .basita-daftari-main > p {
+            font-size: 12px !important;
+          }
+
+          .basita-daftari-features {
+            gap: 6px !important;
+          }
+
+          .basita-daftari-feature {
+            min-height: 76px !important;
+            padding: 8px 5px !important;
+          }
+
+          .basita-daftari-feature > div:first-child {
+            width: 31px !important;
+            height: 31px !important;
+            margin-bottom: 4px !important;
+          }
+
+          .basita-daftari-feature > div:first-child svg {
+            width: 16px !important;
+            height: 16px !important;
+          }
+
+          .basita-daftari-feature > div:last-child {
+            font-size: 10px !important;
+          }
+
+          .basita-daftari-benefit {
+            padding: 18px 13px !important;
+          }
+
+          .basita-daftari-benefit-content p:nth-of-type(2) {
+            font-size: 11.5px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -46,6 +46,7 @@ export default function HeroSection({
         {/* زخرفة خلفية خفيفة */}
         <div
           aria-hidden="true"
+          className="basita-hero-decoration-top"
           style={{
             position: "absolute",
             width: 260,
@@ -61,6 +62,7 @@ export default function HeroSection({
 
         <div
           aria-hidden="true"
+          className="basita-hero-decoration-bottom"
           style={{
             position: "absolute",
             width: 180,
@@ -89,6 +91,7 @@ export default function HeroSection({
         >
           {/* الشارة */}
           <div
+            className="basita-hero-badge"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -119,6 +122,7 @@ export default function HeroSection({
 
           {/* العنوان */}
           <h1
+            className="basita-hero-title"
             style={{
               fontFamily: t.typography.fontFamily.heading,
               margin: `0 0 ${t.spacing["4"]}`,
@@ -129,7 +133,6 @@ export default function HeroSection({
               letterSpacing: "-0.025em",
             }}
           >
-            {/* السطر الأول */}
             <span
               style={{
                 display: "block",
@@ -140,7 +143,6 @@ export default function HeroSection({
               ادعم الأسر المنتجة
             </span>
 
-            {/* السطر الثاني */}
             <span
               style={{
                 display: "block",
@@ -154,7 +156,6 @@ export default function HeroSection({
               واكتشف
             </span>
 
-            {/* السطر الثالث */}
             <span
               style={{
                 display: "block",
@@ -175,6 +176,7 @@ export default function HeroSection({
 
           {/* الوصف */}
           <p
+            className="basita-hero-description"
             style={{
               margin: `0 0 ${t.spacing["6"]}`,
               maxWidth: 600,
@@ -295,6 +297,7 @@ export default function HeroSection({
 
           {/* سطر الثقة */}
           <div
+            className="basita-hero-trust"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -367,6 +370,7 @@ export default function HeroSection({
 
           {/* بطاقة صنع في السعودية */}
           <div
+            className="basita-hero-made-card"
             style={{
               position: "absolute",
               top: 24,
@@ -456,6 +460,206 @@ export default function HeroSection({
           </div>
         </div>
       </div>
+
+      {/* Responsive mobile */}
+      <style jsx>{`
+        @media (max-width: 767px) {
+          section {
+            padding: 10px 10px 0 !important;
+          }
+
+          .basita-hero-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 0 !important;
+            border-radius: 18px !important;
+          }
+
+          .basita-hero-visual {
+            order: 1;
+            width: 100%;
+            min-height: 0 !important;
+            height: clamp(205px, 58vw, 270px) !important;
+            flex: none !important;
+            border-radius: 18px 18px 0 0;
+          }
+
+          .basita-hero-slides {
+            border-radius: 18px 18px 0 0 !important;
+          }
+
+          .basita-hero-slide {
+            background-size: cover !important;
+            background-position: center !important;
+          }
+
+          .basita-hero-made-card {
+            top: 12px !important;
+            left: 12px !important;
+            min-width: 0 !important;
+            padding: 7px 9px !important;
+            border-radius: 10px !important;
+          }
+
+          .basita-hero-made-card > div:first-child {
+            font-size: 10px !important;
+          }
+
+          .basita-hero-made-card > div:last-child {
+            font-size: 11px !important;
+            gap: 4px !important;
+          }
+
+          .basita-hero-made-card svg {
+            width: 12px !important;
+            height: 12px !important;
+          }
+
+          .basita-hero-dots {
+            bottom: 10px !important;
+            gap: 5px !important;
+          }
+
+          .basita-hero-dot-1 {
+            width: 18px !important;
+            height: 5px !important;
+          }
+
+          .basita-hero-dot-2,
+          .basita-hero-dot-3 {
+            width: 5px !important;
+            height: 5px !important;
+          }
+
+          .basita-hero-content {
+            order: 2;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 22px 18px 20px !important;
+            align-items: stretch !important;
+          }
+
+          .basita-hero-badge {
+            align-self: flex-start;
+            margin-bottom: 12px !important;
+            padding: 6px 10px !important;
+            font-size: 11px !important;
+          }
+
+          .basita-hero-badge > span {
+            width: 6px !important;
+            height: 6px !important;
+          }
+
+          .basita-hero-title {
+            margin-bottom: 12px !important;
+            letter-spacing: -0.02em !important;
+          }
+
+          .basita-hero-title > span:first-child {
+            font-size: 26px !important;
+            margin-bottom: 3px !important;
+            line-height: 1.35 !important;
+          }
+
+          .basita-hero-title > span:nth-child(2) {
+            font-size: 20px !important;
+            margin-bottom: 2px !important;
+            line-height: 1.35 !important;
+          }
+
+          .basita-hero-title > span:nth-child(3) {
+            font-size: 25px !important;
+            line-height: 1.35 !important;
+          }
+
+          .basita-hero-description {
+            margin-bottom: 16px !important;
+            font-size: 14px !important;
+            line-height: 1.8 !important;
+          }
+
+          .basita-hero-actions {
+            width: 100%;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px !important;
+          }
+
+          .basita-hero-actions a {
+            min-height: 43px !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+            font-size: 13px !important;
+            gap: 6px !important;
+          }
+
+          .basita-hero-primary {
+            grid-column: 1 / -1;
+          }
+
+          .basita-hero-store-cta {
+            grid-column: 1 / -1;
+          }
+
+          .basita-hero-trust {
+            align-self: flex-start;
+            margin-top: 14px !important;
+            padding: 6px 9px !important;
+            font-size: 10px !important;
+          }
+
+          .basita-hero-decoration-top {
+            width: 150px !important;
+            height: 150px !important;
+            top: -95px !important;
+            right: -80px !important;
+          }
+
+          .basita-hero-decoration-bottom {
+            width: 120px !important;
+            height: 120px !important;
+            bottom: -85px !important;
+            left: -45px !important;
+          }
+        }
+
+        @media (max-width: 420px) {
+          section {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+          }
+
+          .basita-hero-content {
+            padding: 20px 15px 18px !important;
+          }
+
+          .basita-hero-title > span:first-child {
+            font-size: 24px !important;
+          }
+
+          .basita-hero-title > span:nth-child(2) {
+            font-size: 19px !important;
+          }
+
+          .basita-hero-title > span:nth-child(3) {
+            font-size: 23px !important;
+          }
+
+          .basita-hero-description {
+            font-size: 13px !important;
+            line-height: 1.75 !important;
+          }
+
+          .basita-hero-actions a {
+            font-size: 12px !important;
+          }
+
+          .basita-hero-trust {
+            max-width: 100%;
+          }
+        }
+      `}</style>
     </section>
   );
 }

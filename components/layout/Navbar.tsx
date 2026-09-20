@@ -33,7 +33,7 @@ export default function Navbar() {
         top: 0,
         zIndex: 40,
         background: "#FFFDF8",
-        boxShadow: "0 3px 14px rgba(67,48,29,0.07)",
+        boxShadow: "0 2px 12px rgba(67,48,29,0.06)",
       }}
     >
       <NavTopBar />
@@ -61,9 +61,10 @@ export default function Navbar() {
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 10,
+            gap: 9,
             textDecoration: "none",
             flexShrink: 0,
+            minWidth: 0,
           }}
         >
           <div
@@ -77,7 +78,8 @@ export default function Navbar() {
               alignItems: "center",
               justifyContent: "center",
               overflow: "hidden",
-              boxShadow: "0 3px 10px rgba(67,48,29,0.05)",
+              boxShadow: "0 2px 8px rgba(67,48,29,0.05)",
+              flexShrink: 0,
             }}
           >
             <Image
@@ -85,6 +87,7 @@ export default function Navbar() {
               alt="بسطة"
               width={34}
               height={34}
+              priority
               style={{
                 width: 34,
                 height: 34,
@@ -95,10 +98,12 @@ export default function Navbar() {
           </div>
 
           <span
+            className="basita-navbar-brand-text"
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
+              minWidth: 0,
             }}
           >
             <span
@@ -115,6 +120,7 @@ export default function Navbar() {
             </span>
 
             <span
+              className="basita-navbar-tagline"
               style={{
                 display: "block",
                 marginTop: 2,
@@ -175,6 +181,99 @@ export default function Navbar() {
           <NavAuthArea user={user} loading={loading} />
         </div>
       </div>
+
+      {/* تحسينات الجوال */}
+      <style jsx>{`
+        @media (max-width: 767px) {
+          .basita-navbar-main {
+            min-height: 58px !important;
+            height: 58px;
+            padding: 6px 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+            overflow: hidden;
+          }
+
+          .basita-navbar-logo {
+            gap: 7px !important;
+            flex: 0 0 auto;
+          }
+
+          .basita-navbar-logo > div {
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 11px !important;
+          }
+
+          .basita-navbar-logo img {
+            width: 31px !important;
+            height: 31px !important;
+          }
+
+          .basita-navbar-brand-text {
+            display: flex !important;
+          }
+
+          .basita-navbar-brand-text > span:first-child {
+            font-size: 18px !important;
+          }
+
+          .basita-navbar-tagline {
+            display: none !important;
+          }
+
+          .basita-navbar-navigation {
+            display: none !important;
+          }
+
+          .basita-navbar-search {
+            display: none !important;
+          }
+
+          .basita-navbar-actions {
+            flex: 1 1 auto !important;
+            min-width: 0;
+            gap: 4px !important;
+            overflow: hidden;
+          }
+
+          .basita-navbar-actions > * {
+            flex-shrink: 0;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .basita-navbar-main {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+          }
+
+          .basita-navbar-logo {
+            gap: 6px !important;
+          }
+
+          .basita-navbar-logo > div {
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+          }
+
+          .basita-navbar-logo img {
+            width: 29px !important;
+            height: 29px !important;
+          }
+
+          .basita-navbar-brand-text > span:first-child {
+            font-size: 17px !important;
+          }
+
+          .basita-navbar-actions {
+            gap: 2px !important;
+          }
+        }
+      `}</style>
     </header>
   );
 }
