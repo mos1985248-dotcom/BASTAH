@@ -1,4 +1,4 @@
-// components/cart/CartStoreGroup.tsx
+ // components/cart/CartStoreGroup.tsx
 
 "use client";
 
@@ -33,11 +33,17 @@ export default function CartStoreGroup({
     variantId: string | null,
     qty: number
   ) => void;
-  onRemove: (productId: string, variantId: string | null) => void;
+  onRemove: (
+    productId: string,
+    variantId: string | null
+  ) => void;
   onToggleFavorite: (productId: string) => void;
 }) {
   const subtotal = items.reduce(
-    (s, i) => s + (i.variant?.price ?? i.product.price) * i.quantity,
+    (s, i) =>
+      s +
+      (i.variant?.price ?? i.product.price) *
+        i.quantity,
     0
   );
 
@@ -49,8 +55,10 @@ export default function CartStoreGroup({
         : i.product.quantity === 0)
   );
 
-  const [preview, setPreview] = useState<CheckoutPreview | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [preview, setPreview] =
+    useState<CheckoutPreview | null>(null);
+  const [previewLoading, setPreviewLoading] =
+    useState(false);
 
   // ⚠️ نفس نقطة النهاية المستخدمة فعلياً بصفحة الدفع — لا حساب مستقل هنا
   useEffect(() => {
@@ -62,19 +70,25 @@ export default function CartStoreGroup({
     setPreviewLoading(true);
 
     api
-      .post<CheckoutPreview>("/api/checkout/preview", {
-        storeId,
-        items: items.map((i) => ({
-          productId: i.product.id,
-          variantId: i.variantId ?? undefined,
-          quantity: i.quantity,
-        })),
-        addressId,
-        paymentMethod: "CREDIT_CARD",
-      })
+      .post<CheckoutPreview>(
+        "/api/checkout/preview",
+        {
+          storeId,
+          items: items.map((i) => ({
+            productId: i.product.id,
+            variantId:
+              i.variantId ?? undefined,
+            quantity: i.quantity,
+          })),
+          addressId,
+          paymentMethod: "CREDIT_CARD",
+        }
+      )
       .then(setPreview)
       .catch(() => setPreview(null))
-      .finally(() => setPreviewLoading(false));
+      .finally(() =>
+        setPreviewLoading(false)
+      );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -95,15 +109,16 @@ export default function CartStoreGroup({
       className="basita-cart-store-group"
       aria-labelledby={`cart-store-${storeId}`}
       style={{
-        marginBottom: t.spacing["6"],
+        marginBottom: t.spacing["5"],
       }}
     >
       <div
         className="basita-cart-group-grid"
         style={{
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1.7fr) minmax(320px, 1fr)",
-          gap: t.spacing["5"],
+          gridTemplateColumns:
+            "minmax(0, 1.72fr) minmax(300px, 0.95fr)",
+          gap: t.spacing["4"],
           alignItems: "start",
         }}
       >
@@ -116,7 +131,8 @@ export default function CartStoreGroup({
             border: `1px solid ${t.colors.cream.border}`,
             borderRadius: t.radius.lg,
             overflow: "hidden",
-            boxShadow: "0 6px 22px rgba(75, 56, 34, 0.05)",
+            boxShadow:
+              "0 5px 18px rgba(75, 56, 34, 0.035)",
           }}
         >
           {/* Store header */}
@@ -128,7 +144,7 @@ export default function CartStoreGroup({
               alignItems: "center",
               justifyContent: "space-between",
               gap: t.spacing["3"],
-              padding: `${t.spacing["4"]} ${t.spacing["5"]}`,
+              padding: `${t.spacing["3"]} ${t.spacing["4"]}`,
               background: t.colors.cream.bg,
               borderBottom: `1px solid ${t.colors.cream.border}`,
               overflow: "hidden",
@@ -140,7 +156,7 @@ export default function CartStoreGroup({
                 position: "absolute",
                 insetInlineStart: 0,
                 top: 0,
-                width: 4,
+                width: 3,
                 height: "100%",
                 background: t.colors.gold[600],
               }}
@@ -150,15 +166,15 @@ export default function CartStoreGroup({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
+                gap: 9,
                 minWidth: 0,
               }}
             >
               <span
                 aria-hidden="true"
                 style={{
-                  width: 38,
-                  height: 38,
+                  width: 35,
+                  height: 35,
                   flexShrink: 0,
                   display: "flex",
                   alignItems: "center",
@@ -167,11 +183,12 @@ export default function CartStoreGroup({
                   background: t.colors.white,
                   border: `1px solid ${t.colors.cream.border}`,
                   color: t.colors.primary[800],
-                  boxShadow: "0 2px 8px rgba(75, 56, 34, 0.05)",
+                  boxShadow:
+                    "0 2px 6px rgba(75, 56, 34, 0.035)",
                 }}
               >
                 <Store
-                  size={19}
+                  size={17}
                   strokeWidth={1.7}
                 />
               </span>
@@ -186,8 +203,10 @@ export default function CartStoreGroup({
                   style={{
                     margin: 0,
                     color: t.colors.primary[800],
-                    fontSize: t.typography.fontSize.base,
-                    fontWeight: t.typography.fontWeight.bold,
+                    fontSize:
+                      t.typography.fontSize.sm,
+                    fontWeight:
+                      t.typography.fontWeight.bold,
                     lineHeight: 1.45,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -200,14 +219,19 @@ export default function CartStoreGroup({
                 <span
                   style={{
                     display: "block",
-                    marginTop: 2,
+                    marginTop: 1,
                     color: t.colors.text.light,
-                    fontSize: t.typography.fontSize.xs,
-                    fontWeight: t.typography.fontWeight.regular,
+                    fontSize: 11,
+                    fontWeight:
+                      t.typography.fontWeight.regular,
+                    lineHeight: 1.45,
                   }}
                 >
                   {items.length}{" "}
-                  {items.length === 1 ? "منتج" : "منتجات"} في السلة
+                  {items.length === 1
+                    ? "منتج"
+                    : "منتجات"}{" "}
+                  في السلة
                 </span>
               </div>
             </div>
@@ -215,13 +239,14 @@ export default function CartStoreGroup({
             <span
               style={{
                 flexShrink: 0,
-                padding: "6px 10px",
+                padding: "5px 9px",
                 borderRadius: t.radius.full,
                 background: t.colors.white,
                 border: `1px solid ${t.colors.cream.border}`,
                 color: t.colors.text.mid,
-                fontSize: t.typography.fontSize.xs,
-                fontWeight: t.typography.fontWeight.medium,
+                fontSize: 11,
+                fontWeight:
+                  t.typography.fontWeight.medium,
                 whiteSpace: "nowrap",
               }}
             >
@@ -242,7 +267,9 @@ export default function CartStoreGroup({
                 <CartItemRow
                   item={item}
                   busy={busyId === item.id}
-                  isFavorite={favoriteIds.has(item.product.id)}
+                  isFavorite={favoriteIds.has(
+                    item.product.id
+                  )}
                   onQtyChange={(q) =>
                     onQtyChange(
                       item.product.id,
@@ -257,7 +284,9 @@ export default function CartStoreGroup({
                     )
                   }
                   onToggleFavorite={() =>
-                    onToggleFavorite(item.product.id)
+                    onToggleFavorite(
+                      item.product.id
+                    )
                   }
                 />
               </div>
@@ -290,7 +319,9 @@ export default function CartStoreGroup({
 
         @media (max-width: 980px) {
           .basita-cart-group-grid {
-            grid-template-columns: minmax(0, 1fr) !important;
+            grid-template-columns:
+              minmax(0, 1fr) !important;
+            gap: ${t.spacing["4"]} !important;
           }
 
           .basita-cart-summary-column {
@@ -300,7 +331,9 @@ export default function CartStoreGroup({
 
         @media (max-width: 640px) {
           .basita-cart-store-header {
-            padding: ${t.spacing["3"]} ${t.spacing["4"]} !important;
+            padding:
+              ${t.spacing["3"]}
+              ${t.spacing["3"]} !important;
           }
 
           .basita-cart-store-header > span:last-child {
@@ -310,21 +343,39 @@ export default function CartStoreGroup({
 
         @media (max-width: 420px) {
           .basita-cart-store-products {
-            border-radius: ${t.radius.md} !important;
+            border-radius:
+              ${t.radius.md} !important;
           }
 
           .basita-cart-store-header {
-            padding: ${t.spacing["3"]} !important;
+            padding:
+              ${t.spacing["2"]}
+              ${t.spacing["3"]} !important;
+          }
+
+          .basita-cart-store-header > div {
+            gap: 8px !important;
           }
 
           .basita-cart-store-header > div > span {
-            width: 34px !important;
-            height: 34px !important;
+            width: 32px !important;
+            height: 32px !important;
           }
 
           .basita-cart-store-header > div > span svg {
-            width: 17px !important;
-            height: 17px !important;
+            width: 16px !important;
+            height: 16px !important;
+          }
+
+          .basita-cart-store-header h3 {
+            font-size: 13px !important;
+          }
+
+          .basita-cart-store-header
+            > div
+            > div
+            > span {
+            font-size: 10px !important;
           }
         }
 

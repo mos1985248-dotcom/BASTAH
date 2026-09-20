@@ -1,7 +1,7 @@
 // components/home/StoryBlogCTARow.tsx
 // روابط "قصتنا" و"المدونة" تشير لصفحات خارطة الطريق الحالية.
 
-import { ArrowLeft, BookOpen, Heart, Store, Sparkles } from "lucide-react";
+import { ArrowLeft, BookOpen, Heart, Store } from "lucide-react";
 import { t } from "@/theme";
 
 export default function StoryBlogCTARow({
@@ -42,10 +42,10 @@ export default function StoryBlogCTARow({
             justifyContent: "space-between",
             padding: t.spacing["5"],
             textDecoration: "none",
-            borderRadius: 20,
-            background: "#FFFDF8",
-            border: "1px solid rgba(91,70,45,0.11)",
-            boxShadow: "0 5px 16px rgba(67,48,29,0.045)",
+            borderRadius: t.radius.lg,
+            background: t.colors.cream.card,
+            border: `1px solid ${t.colors.cream.borderLight}`,
+            boxShadow: t.shadows.xs,
             boxSizing: "border-box",
             transition:
               `transform ${t.motion.base} ${t.motion.ease}, ` +
@@ -59,10 +59,10 @@ export default function StoryBlogCTARow({
               position: "absolute",
               width: 110,
               height: 110,
-              borderRadius: "50%",
+              borderRadius: t.radius.full,
               top: -62,
               left: -52,
-              border: "1px solid rgba(166,124,45,0.12)",
+              border: `1px solid rgba(201,151,58,0.12)`,
             }}
           />
 
@@ -72,7 +72,7 @@ export default function StoryBlogCTARow({
                 width: 44,
                 height: 44,
                 marginBottom: t.spacing["3"],
-                borderRadius: 13,
+                borderRadius: t.radius.md,
                 background: t.colors.gold[100],
                 display: "flex",
                 alignItems: "center",
@@ -144,10 +144,10 @@ export default function StoryBlogCTARow({
             justifyContent: "space-between",
             padding: t.spacing["5"],
             textDecoration: "none",
-            borderRadius: 20,
-            background: "#FFFDF8",
-            border: "1px solid rgba(91,70,45,0.11)",
-            boxShadow: "0 5px 16px rgba(67,48,29,0.045)",
+            borderRadius: t.radius.lg,
+            background: t.colors.cream.card,
+            border: `1px solid ${t.colors.cream.borderLight}`,
+            boxShadow: t.shadows.xs,
             boxSizing: "border-box",
             transition:
               `transform ${t.motion.base} ${t.motion.ease}, ` +
@@ -161,10 +161,10 @@ export default function StoryBlogCTARow({
               position: "absolute",
               width: 110,
               height: 110,
-              borderRadius: "50%",
+              borderRadius: t.radius.full,
               bottom: -68,
               right: -52,
-              border: "1px solid rgba(166,124,45,0.12)",
+              border: `1px solid rgba(201,151,58,0.12)`,
             }}
           />
 
@@ -174,7 +174,7 @@ export default function StoryBlogCTARow({
                 width: 44,
                 height: 44,
                 marginBottom: t.spacing["3"],
-                borderRadius: 13,
+                borderRadius: t.radius.md,
                 background: t.colors.gold[100],
                 display: "flex",
                 alignItems: "center",
@@ -246,9 +246,9 @@ export default function StoryBlogCTARow({
               justifyContent: "space-between",
               padding: t.spacing["5"],
               textDecoration: "none",
-              borderRadius: 20,
+              borderRadius: t.radius.lg,
               background: `linear-gradient(145deg, ${t.colors.primary[900]}, ${t.colors.primary[800]})`,
-              boxShadow: "0 8px 22px rgba(33,53,42,0.10)",
+              boxShadow: t.shadows.sm,
               boxSizing: "border-box",
               transition:
                 `transform ${t.motion.base} ${t.motion.ease}, ` +
@@ -261,7 +261,7 @@ export default function StoryBlogCTARow({
                 position: "absolute",
                 width: 180,
                 height: 180,
-                borderRadius: "50%",
+                borderRadius: t.radius.full,
                 top: -100,
                 left: -70,
                 border: "1px solid rgba(255,255,255,0.10)",
@@ -274,7 +274,7 @@ export default function StoryBlogCTARow({
                   width: 46,
                   height: 46,
                   marginBottom: t.spacing["3"],
-                  borderRadius: 14,
+                  borderRadius: t.radius.md,
                   background: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.12)",
                   display: "flex",
@@ -293,14 +293,12 @@ export default function StoryBlogCTARow({
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 6,
                   marginBottom: 8,
                   color: t.colors.gold[400],
                   fontSize: t.typography.fontSize.xs,
                   fontWeight: t.typography.fontWeight.semibold,
                 }}
               >
-                <Sparkles size={13} strokeWidth={1.8} />
                 فرصتك تبدأ هنا
               </div>
 
@@ -345,10 +343,10 @@ export default function StoryBlogCTARow({
                   padding: `0 ${t.spacing["5"]}`,
                   background: t.colors.gold[600],
                   color: t.colors.white,
-                  borderRadius: 12,
+                  borderRadius: t.radius.md,
                   fontSize: t.typography.fontSize.sm,
                   fontWeight: t.typography.fontWeight.bold,
-                  boxShadow: "0 5px 12px rgba(0,0,0,0.12)",
+                  boxShadow: t.shadows.gold,
                   transition:
                     `transform ${t.motion.fast} ${t.motion.ease}, ` +
                     `box-shadow ${t.motion.fast} ${t.motion.ease}`,
@@ -365,30 +363,6 @@ export default function StoryBlogCTARow({
           </a>
         )}
       </div>
-
-      <style>{`
-        .basita-story-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(166,124,45,0.24) !important;
-          box-shadow: 0 12px 26px rgba(67,48,29,0.08);
-        }
-
-        .basita-story-cta:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 14px 30px rgba(33,53,42,0.16);
-        }
-
-        .basita-story-cta:hover .basita-story-cta-button {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 16px rgba(0,0,0,0.16);
-        }
-
-        @media (max-width: 760px) {
-          .basita-story-row {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

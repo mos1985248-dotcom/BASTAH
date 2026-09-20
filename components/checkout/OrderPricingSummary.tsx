@@ -24,8 +24,8 @@ export default function OrderPricingSummary({
       dir="rtl"
       className="basita-order-pricing"
       style={{
-        marginTop: t.spacing["3"],
-        paddingTop: t.spacing["4"],
+        marginTop: t.spacing["2"],
+        paddingTop: t.spacing["3"],
         borderTop: `1px solid ${t.colors.cream.border}`,
       }}
     >
@@ -35,18 +35,18 @@ export default function OrderPricingSummary({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 8,
+            gap: 7,
             padding: `${t.spacing["2"]} 0`,
             color: t.colors.text.light,
-            fontSize: t.typography.fontSize.xs,
+            fontSize: 11,
           }}
         >
           <span
             aria-hidden="true"
             className="basita-pricing-loader"
             style={{
-              width: 14,
-              height: 14,
+              width: 13,
+              height: 13,
               flexShrink: 0,
               borderRadius: t.radius.full,
               border: `2px solid ${t.colors.cream.border}`,
@@ -72,16 +72,31 @@ export default function OrderPricingSummary({
               display: "flex",
               alignItems: "center",
               gap: 7,
-              marginBottom: t.spacing["2"],
+              marginBottom: t.spacing["1"],
               color: t.colors.text.dark,
               fontSize: t.typography.fontSize.sm,
               fontWeight: t.typography.fontWeight.bold,
             }}
           >
-            <Receipt
-              size={16}
-              strokeWidth={1.7}
-            />
+            <span
+              aria-hidden="true"
+              style={{
+                width: 28,
+                height: 28,
+                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: t.radius.md,
+                background: t.colors.cream.warm,
+                color: t.colors.primary[800],
+              }}
+            >
+              <Receipt
+                size={14}
+                strokeWidth={1.7}
+              />
+            </span>
 
             <span>ملخص التكلفة</span>
           </div>
@@ -102,7 +117,7 @@ export default function OrderPricingSummary({
               label="التوصيل"
               value={preview.shippingCost}
               freeLabel="مجاني"
-              icon={<Truck size={14} strokeWidth={1.7} />}
+              icon={<Truck size={13} strokeWidth={1.7} />}
             />
 
             {preview.codFee > 0 && (
@@ -134,9 +149,9 @@ export default function OrderPricingSummary({
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              gap: t.spacing["3"],
-              marginTop: t.spacing["3"],
-              paddingTop: t.spacing["3"],
+              gap: t.spacing["2"],
+              marginTop: t.spacing["2"],
+              paddingTop: t.spacing["2"],
               borderTop: `1px dashed ${t.colors.cream.border}`,
               color: t.colors.primary[800],
             }}
@@ -152,7 +167,7 @@ export default function OrderPricingSummary({
 
             <span
               style={{
-                fontSize: t.typography.fontSize.xl,
+                fontSize: t.typography.fontSize.lg,
                 fontWeight: t.typography.fontWeight.bold,
                 whiteSpace: "nowrap",
               }}
@@ -168,13 +183,13 @@ export default function OrderPricingSummary({
                 alignItems: "center",
                 justifyContent: "flex-start",
                 gap: 5,
-                marginTop: 6,
+                marginTop: 5,
                 color: t.colors.text.light,
-                fontSize: t.typography.fontSize.xs,
+                fontSize: 10,
               }}
             >
               <CheckCircle2
-                size={12}
+                size={11}
                 strokeWidth={1.7}
               />
 
@@ -195,9 +210,34 @@ export default function OrderPricingSummary({
           }
         }
 
-        @media (max-width: 420px) {
+        @media (max-width: 480px) {
+          .basita-order-pricing {
+            margin-top: ${t.spacing["2"]} !important;
+            padding-top: ${t.spacing["2"]} !important;
+          }
+
+          .basita-pricing-total span:first-child {
+            font-size: ${t.typography.fontSize.sm} !important;
+          }
+
           .basita-pricing-total span:last-child {
             font-size: ${t.typography.fontSize.lg} !important;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .basita-pricing-rows > div {
+            min-height: 28px !important;
+            padding-block: 3px !important;
+            font-size: 12px !important;
+          }
+
+          .basita-pricing-total span:first-child {
+            font-size: 13px !important;
+          }
+
+          .basita-pricing-total span:last-child {
+            font-size: 17px !important;
           }
         }
 
@@ -230,11 +270,11 @@ function Row({
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: t.spacing["3"],
-        minHeight: 30,
-        padding: "4px 0",
+        gap: t.spacing["2"],
+        minHeight: 28,
+        padding: "3px 0",
         color: t.colors.text.mid,
-        fontSize: t.typography.fontSize.sm,
+        fontSize: 12,
       }}
     >
       <span
@@ -250,6 +290,7 @@ function Row({
             aria-hidden="true"
             style={{
               display: "flex",
+              flexShrink: 0,
               color: t.colors.text.light,
             }}
           >
@@ -266,9 +307,7 @@ function Row({
           color: isDiscount
             ? t.colors.semantic.success
             : t.colors.text.dark,
-          fontWeight: isDiscount
-            ? t.typography.fontWeight.medium
-            : t.typography.fontWeight.medium,
+          fontWeight: t.typography.fontWeight.medium,
           whiteSpace: "nowrap",
         }}
       >

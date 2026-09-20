@@ -53,8 +53,8 @@ export default function ProductGallery({
       <div
         className="basita-product-main-image"
         style={{
-          height: 440,
-          minHeight: 320,
+          height: 400,
+          minHeight: 300,
           borderRadius: t.radius.xl,
           position: "relative",
           overflow: "hidden",
@@ -185,7 +185,7 @@ export default function ProductGallery({
               gap: 7,
               padding: "9px 14px",
               background: "rgba(255,255,255,0.94)",
-              border: `1px solid rgba(255,255,255,0.8)`,
+              border: "1px solid rgba(255,255,255,0.8)",
               borderRadius: t.radius.full,
               fontSize: t.typography.fontSize.xs,
               fontWeight: t.typography.fontWeight.semibold,
@@ -228,8 +228,8 @@ export default function ProductGallery({
                 onClick={() => setActive(i)}
                 className="basita-product-thumbnail"
                 style={{
-                  width: 72,
-                  height: 72,
+                  width: 64,
+                  height: 64,
                   flexShrink: 0,
                   position: "relative",
                   borderRadius: t.radius.md,
@@ -270,8 +270,8 @@ export default function ProductGallery({
               onClick={() => setActive("video")}
               className="basita-product-thumbnail basita-product-video-thumb"
               style={{
-                width: 72,
-                height: 72,
+                width: 64,
+                height: 64,
                 flexShrink: 0,
                 borderRadius: t.radius.md,
                 border: `2px solid ${
@@ -309,8 +309,8 @@ export default function ProductGallery({
 
               <span
                 style={{
-                  width: 34,
-                  height: 34,
+                  width: 32,
+                  height: 32,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -322,7 +322,7 @@ export default function ProductGallery({
                 }}
               >
                 <Play
-                  size={16}
+                  size={15}
                   strokeWidth={1.8}
                   fill={t.colors.white}
                 />
@@ -331,8 +331,8 @@ export default function ProductGallery({
               <span
                 style={{
                   position: "absolute",
-                  bottom: 5,
-                  insetInlineEnd: 7,
+                  bottom: 4,
+                  insetInlineEnd: 6,
                   fontSize: 9,
                   fontWeight: t.typography.fontWeight.bold,
                   color: "rgba(255,255,255,0.82)",
@@ -479,14 +479,14 @@ export default function ProductGallery({
 
         @media (max-width: 980px) {
           .basita-product-main-image {
-            height: min(520px, 68vw) !important;
+            height: min(440px, 68vw) !important;
           }
         }
 
         @media (max-width: 700px) {
           .basita-product-main-image {
-            height: min(460px, 82vw) !important;
-            min-height: 280px !important;
+            height: min(400px, 82vw) !important;
+            min-height: 270px !important;
             border-radius: ${t.radius.lg} !important;
           }
 
@@ -496,8 +496,8 @@ export default function ProductGallery({
 
           .basita-product-thumbnail,
           .basita-product-video-thumb {
-            width: 62px !important;
-            height: 62px !important;
+            width: 58px !important;
+            height: 58px !important;
           }
 
           .basita-gallery-zoom-button {
@@ -509,14 +509,14 @@ export default function ProductGallery({
 
         @media (max-width: 480px) {
           .basita-product-main-image {
-            height: min(390px, 88vw) !important;
-            min-height: 250px !important;
+            height: min(360px, 88vw) !important;
+            min-height: 240px !important;
           }
 
           .basita-product-thumbnail,
           .basita-product-video-thumb {
-            width: 58px !important;
-            height: 58px !important;
+            width: 54px !important;
+            height: 54px !important;
           }
 
           .basita-gallery-lightbox {

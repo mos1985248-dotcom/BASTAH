@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, X, ArrowLeft, Sparkles } from "lucide-react";
+import { Check, X, ArrowLeft, ArrowLeftCircle } from "lucide-react";
 import { t } from "@/theme";
 import type { PlanConfig } from "@/components/pricing/plan-types";
 
@@ -49,7 +49,6 @@ export default function PlansSection() {
             fontWeight: t.typography.fontWeight.semibold,
           }}
         >
-          <Sparkles size={14} strokeWidth={1.8} />
           باقات بسطة
         </div>
 
@@ -81,8 +80,7 @@ export default function PlansSection() {
         className="basita-plans-grid"
         style={{
           display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(240px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           gap: t.spacing["5"],
           alignItems: "stretch",
         }}
@@ -135,7 +133,6 @@ export default function PlansSection() {
                     boxShadow: "0 4px 10px rgba(0,0,0,0.12)",
                   }}
                 >
-                  <Sparkles size={12} strokeWidth={2} />
                   {plan.badgeAr}
                 </div>
               )}
@@ -292,6 +289,43 @@ export default function PlansSection() {
                     : "بدون دفاتري"}
                 </p>
               </div>
+
+              {/* زر الإجراء */}
+              <a
+                href="/pricing"
+                className="basita-plan-action"
+                aria-label={`اختيار باقة ${plan.nameAr}`}
+                style={{
+                  width: "100%",
+                  minHeight: 46,
+                  marginTop: t.spacing["6"],
+                  padding: "11px 16px",
+                  boxSizing: "border-box",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  borderRadius: 12,
+                  background: featured
+                    ? t.colors.primary[800]
+                    : "rgba(15,61,46,0.07)",
+                  border: featured
+                    ? `1px solid ${t.colors.primary[800]}`
+                    : "1px solid rgba(15,61,46,0.14)",
+                  color: featured ? t.colors.white : t.colors.primary[800],
+                  fontSize: t.typography.fontSize.sm,
+                  fontWeight: t.typography.fontWeight.bold,
+                  textDecoration: "none",
+                  transition:
+                    `background ${t.motion.fast} ${t.motion.ease}, ` +
+                    `color ${t.motion.fast} ${t.motion.ease}, ` +
+                    `border-color ${t.motion.fast} ${t.motion.ease}, ` +
+                    `transform ${t.motion.fast} ${t.motion.ease}`,
+                }}
+              >
+                {featured ? "ابدأ الآن" : "اختيار الباقة"}
+                <ArrowLeftCircle size={17} strokeWidth={1.9} />
+              </a>
             </div>
           );
         })}
@@ -336,6 +370,13 @@ export default function PlansSection() {
         .basita-plan-card-featured:hover {
           border-color: rgba(166,124,45,0.52) !important;
           box-shadow: 0 16px 34px rgba(67,48,29,0.12);
+        }
+
+        .basita-plan-action:hover {
+          background: #0F3D2E !important;
+          border-color: #0F3D2E !important;
+          color: #FFFFFF !important;
+          transform: translateY(-1px);
         }
 
         .basita-plans-link:hover {

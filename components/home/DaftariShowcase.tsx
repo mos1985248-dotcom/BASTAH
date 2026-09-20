@@ -37,10 +37,11 @@ export default function DaftariShowcase() {
           gap: t.spacing["6"],
           alignItems: "stretch",
           padding: t.spacing["6"],
-          borderRadius: 24,
-          background: "#F7F1E5",
-          border: "1px solid rgba(91, 70, 45, 0.12)",
-          boxShadow: "0 6px 20px rgba(67, 48, 29, 0.045)",
+          borderRadius: t.radius.xl,
+          background: t.colors.cream.warm,
+          border: `1px solid ${t.colors.cream.borderLight}`,
+          boxShadow: t.shadows.xs,
+          boxSizing: "border-box",
         }}
       >
         {/* المحتوى الرئيسي */}
@@ -61,12 +62,13 @@ export default function DaftariShowcase() {
               gap: 8,
               marginBottom: t.spacing["3"],
               padding: "6px 11px",
-              borderRadius: 999,
-              background: "#FFFDF7",
-              border: "1px solid rgba(166, 124, 45, 0.18)",
+              borderRadius: t.radius.full,
+              background: t.colors.cream.card,
+              border: `1px solid ${t.colors.gold[200]}`,
               color: t.colors.gold[700],
               fontSize: t.typography.fontSize.xs,
               fontWeight: t.typography.fontWeight.semibold,
+              boxSizing: "border-box",
             }}
           >
             <Wallet size={15} strokeWidth={1.8} />
@@ -76,7 +78,8 @@ export default function DaftariShowcase() {
           <h2
             style={{
               margin: `0 0 ${t.spacing["2"]}`,
-              fontSize: t.typography.fontSize["2xl"] ?? t.typography.fontSize.xl,
+              fontSize:
+                t.typography.fontSize["2xl"] ?? t.typography.fontSize.xl,
               fontWeight: t.typography.fontWeight.bold,
               color: t.colors.primary[800],
               lineHeight: 1.4,
@@ -114,9 +117,9 @@ export default function DaftariShowcase() {
                 style={{
                   minHeight: 116,
                   padding: t.spacing["3"],
-                  borderRadius: 16,
-                  background: "#FFFDF8",
-                  border: "1px solid rgba(91, 70, 45, 0.10)",
+                  borderRadius: t.radius.lg,
+                  background: t.colors.cream.card,
+                  border: `1px solid ${t.colors.cream.borderLight}`,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -133,7 +136,7 @@ export default function DaftariShowcase() {
                   style={{
                     width: 42,
                     height: 42,
-                    borderRadius: 13,
+                    borderRadius: t.radius.md,
                     background: t.colors.gold[100],
                     display: "flex",
                     alignItems: "center",
@@ -171,8 +174,8 @@ export default function DaftariShowcase() {
             overflow: "hidden",
             minHeight: 300,
             padding: t.spacing["6"],
-            borderRadius: 20,
-            background: `linear-gradient(145deg, ${t.colors.primary[900]}, ${t.colors.primary[800]})`,
+            borderRadius: t.radius.lg,
+            background: `linear-gradient(145deg, ${t.colors.primary[950]}, ${t.colors.primary[800]})`,
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
@@ -180,7 +183,7 @@ export default function DaftariShowcase() {
             boxSizing: "border-box",
           }}
         >
-          {/* لمسة زخرفية */}
+          {/* لمسة زخرفية بسيطة */}
           <div
             aria-hidden="true"
             style={{
@@ -190,7 +193,7 @@ export default function DaftariShowcase() {
               borderRadius: "50%",
               top: -85,
               left: -70,
-              border: "1px solid rgba(255,255,255,0.10)",
+              border: "1px solid rgba(255,255,255,0.08)",
             }}
           />
 
@@ -203,7 +206,7 @@ export default function DaftariShowcase() {
               borderRadius: "50%",
               bottom: -55,
               right: -35,
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.06)",
             }}
           />
 
@@ -218,7 +221,7 @@ export default function DaftariShowcase() {
                 width: 54,
                 height: 54,
                 margin: `0 auto ${t.spacing["3"]}`,
-                borderRadius: 16,
+                borderRadius: t.radius.lg,
                 background: "rgba(255,255,255,0.08)",
                 border: "1px solid rgba(255,255,255,0.12)",
                 display: "flex",
@@ -268,6 +271,7 @@ export default function DaftariShowcase() {
                 color: t.colors.gold[400],
                 fontSize: t.typography.fontSize.sm,
                 fontWeight: t.typography.fontWeight.semibold,
+                transition: `color ${t.motion.fast} ${t.motion.ease}`,
               }}
             >
               تعرّف على الباقات
@@ -280,51 +284,6 @@ export default function DaftariShowcase() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        .basita-daftari-feature:hover {
-          transform: translateY(-4px);
-          border-color: rgba(166, 124, 45, 0.24) !important;
-          box-shadow: 0 10px 22px rgba(67, 48, 29, 0.07);
-        }
-
-        .basita-daftari-link:hover {
-          text-decoration: underline !important;
-        }
-
-        @media (max-width: 1000px) {
-          .basita-daftari-shell {
-            grid-template-columns: 1fr !important;
-          }
-
-          .basita-daftari-benefit {
-            min-height: 240px !important;
-          }
-        }
-
-        @media (max-width: 700px) {
-          .basita-daftari-shell {
-            padding: 18px !important;
-            border-radius: 20px !important;
-          }
-
-          .basita-daftari-features {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          }
-        }
-
-        @media (max-width: 420px) {
-          .basita-daftari-features {
-            grid-template-columns: 1fr 1fr !important;
-            gap: 8px !important;
-          }
-
-          .basita-daftari-feature {
-            min-height: 105px !important;
-            padding: 10px !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

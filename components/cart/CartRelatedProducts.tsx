@@ -18,7 +18,9 @@ export default function CartRelatedProducts({
 }) {
   const { user } = useCurrentUser();
   const [items, setItems] = useState<MarketplaceProduct[]>([]);
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(
+    new Set()
+  );
 
   useEffect(() => {
     api
@@ -28,7 +30,9 @@ export default function CartRelatedProducts({
       .then((res) =>
         setItems(
           res.products
-            .filter((p) => !excludeProductIds.includes(p.id))
+            .filter(
+              (p) => !excludeProductIds.includes(p.id)
+            )
             .slice(0, 8)
         )
       )
@@ -44,10 +48,14 @@ export default function CartRelatedProducts({
     }
 
     api
-      .get<{ items: { product: { id: string } }[] }>("/api/wishlist")
+      .get<{ items: { product: { id: string } }[] }>(
+        "/api/wishlist"
+      )
       .then((d) =>
         setFavoriteIds(
-          new Set(d.items.map((i) => i.product.id))
+          new Set(
+            d.items.map((i) => i.product.id)
+          )
         )
       )
       .catch(() => {});
@@ -63,7 +71,9 @@ export default function CartRelatedProducts({
 
     setFavoriteIds((prev) => {
       const next = new Set(prev);
-      isFav ? next.delete(productId) : next.add(productId);
+      isFav
+        ? next.delete(productId)
+        : next.add(productId);
       return next;
     });
 
@@ -71,12 +81,16 @@ export default function CartRelatedProducts({
       if (isFav) {
         await api.delete(`/api/wishlist/${productId}`);
       } else {
-        await api.post("/api/wishlist", { productId });
+        await api.post("/api/wishlist", {
+          productId,
+        });
       }
     } catch {
       setFavoriteIds((prev) => {
         const next = new Set(prev);
-        isFav ? next.add(productId) : next.delete(productId);
+        isFav
+          ? next.add(productId)
+          : next.delete(productId);
         return next;
       });
     }
@@ -90,8 +104,8 @@ export default function CartRelatedProducts({
       className="basita-cart-related"
       aria-labelledby="cart-related-title"
       style={{
-        marginTop: t.spacing["8"],
-        paddingTop: t.spacing["6"],
+        marginTop: t.spacing["7"],
+        paddingTop: t.spacing["5"],
         borderTop: `1px solid ${t.colors.cream.border}`,
       }}
     >
@@ -103,22 +117,22 @@ export default function CartRelatedProducts({
           alignItems: "center",
           justifyContent: "space-between",
           gap: t.spacing["3"],
-          marginBottom: t.spacing["4"],
+          marginBottom: t.spacing["3"],
         }}
       >
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 9,
+            gap: 8,
             minWidth: 0,
           }}
         >
           <span
             aria-hidden="true"
             style={{
-              width: 38,
-              height: 38,
+              width: 34,
+              height: 34,
               flexShrink: 0,
               display: "flex",
               alignItems: "center",
@@ -129,7 +143,7 @@ export default function CartRelatedProducts({
             }}
           >
             <Sparkles
-              size={19}
+              size={17}
               strokeWidth={1.7}
             />
           </span>
@@ -139,7 +153,7 @@ export default function CartRelatedProducts({
               id="cart-related-title"
               style={{
                 margin: 0,
-                fontSize: t.typography.fontSize.xl,
+                fontSize: t.typography.fontSize.lg,
                 fontWeight: t.typography.fontWeight.bold,
                 color: t.colors.text.dark,
                 lineHeight: 1.4,
@@ -151,7 +165,7 @@ export default function CartRelatedProducts({
             <p
               style={{
                 margin: "2px 0 0",
-                fontSize: t.typography.fontSize.xs,
+                fontSize: 11,
                 color: t.colors.text.mid,
                 lineHeight: 1.5,
               }}
@@ -164,7 +178,7 @@ export default function CartRelatedProducts({
         <span
           aria-hidden="true"
           style={{
-            width: 44,
+            width: 34,
             height: 3,
             flexShrink: 0,
             borderRadius: t.radius.full,
@@ -180,7 +194,7 @@ export default function CartRelatedProducts({
           display: "grid",
           gridTemplateColumns:
             "repeat(auto-fill, minmax(170px, 1fr))",
-          gap: t.spacing["4"],
+          gap: t.spacing["3"],
         }}
       >
         {items.map((p) => (
@@ -209,7 +223,8 @@ export default function CartRelatedProducts({
 
         @media (max-width: 900px) {
           .basita-cart-related-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            grid-template-columns:
+              repeat(4, minmax(0, 1fr)) !important;
             gap: ${t.spacing["3"]} !important;
           }
         }
@@ -217,11 +232,12 @@ export default function CartRelatedProducts({
         @media (max-width: 700px) {
           .basita-cart-related {
             margin-top: ${t.spacing["6"]} !important;
-            padding-top: ${t.spacing["5"]} !important;
+            padding-top: ${t.spacing["4"]} !important;
           }
 
           .basita-cart-related-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr)) !important;
             gap: ${t.spacing["3"]} !important;
           }
 
@@ -236,17 +252,21 @@ export default function CartRelatedProducts({
           }
 
           .basita-cart-related-heading h2 {
-            font-size: ${t.typography.fontSize.lg} !important;
+            font-size: ${t.typography.fontSize.base} !important;
           }
 
           .basita-cart-related-heading > div > span {
-            width: 34px !important;
-            height: 34px !important;
+            width: 32px !important;
+            height: 32px !important;
           }
 
           .basita-cart-related-heading > div > span svg {
-            width: 17px !important;
-            height: 17px !important;
+            width: 16px !important;
+            height: 16px !important;
+          }
+
+          .basita-cart-related-heading p {
+            font-size: 10px !important;
           }
         }
 

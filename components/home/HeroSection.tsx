@@ -1,4 +1,5 @@
 // components/home/HeroSection.tsx
+
 import {
   Landmark,
   ArrowLeft,
@@ -33,26 +34,41 @@ export default function HeroSection({
           position: "relative",
           overflow: "hidden",
           display: "grid",
-          gridTemplateColumns: "1.03fr 0.97fr",
+          gridTemplateColumns: "1.02fr 0.98fr",
           alignItems: "stretch",
           minHeight: 440,
-          borderRadius: 26,
-          background: "#F7F1E5",
-          border: "1px solid rgba(91,70,45,0.12)",
-          boxShadow: "0 8px 24px rgba(67,48,29,0.055)",
+          borderRadius: t.radius.xl,
+          background: t.colors.cream.warm,
+          border: `1px solid ${t.colors.cream.border}`,
+          boxShadow: t.shadows.sm,
         }}
       >
-        {/* الزخرفة */}
+        {/* زخرفة خلفية خفيفة */}
         <div
           aria-hidden="true"
           style={{
             position: "absolute",
-            width: 220,
-            height: 220,
+            width: 260,
+            height: 260,
             borderRadius: "50%",
-            top: -125,
-            right: -95,
-            border: "1px solid rgba(166,124,45,0.12)",
+            top: -150,
+            right: -105,
+            border: "1px solid rgba(201,151,58,0.14)",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
+
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            width: 180,
+            height: 180,
+            borderRadius: "50%",
+            bottom: -125,
+            left: "42%",
+            background: "rgba(54,122,101,0.035)",
             pointerEvents: "none",
             zIndex: 1,
           }}
@@ -64,7 +80,7 @@ export default function HeroSection({
           style={{
             position: "relative",
             zIndex: 3,
-            padding: "clamp(28px, 4.5vw, 52px)",
+            padding: "clamp(32px, 5vw, 60px)",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
@@ -78,14 +94,14 @@ export default function HeroSection({
               alignItems: "center",
               gap: 8,
               marginBottom: t.spacing["4"],
-              padding: "7px 12px",
-              borderRadius: 999,
-              background: "#FFFDF8",
-              border: "1px solid rgba(166,124,45,0.18)",
+              padding: "7px 13px",
+              borderRadius: t.radius.full,
+              background: t.colors.cream.card,
+              border: `1px solid ${t.colors.gold[200]}`,
               color: t.colors.gold[700],
               fontSize: t.typography.fontSize.xs,
               fontWeight: t.typography.fontWeight.semibold,
-              boxShadow: "0 3px 10px rgba(67,48,29,0.035)",
+              boxShadow: t.shadows.xs,
             }}
           >
             <span
@@ -106,25 +122,62 @@ export default function HeroSection({
             style={{
               fontFamily: t.typography.fontFamily.heading,
               margin: `0 0 ${t.spacing["4"]}`,
-              maxWidth: 620,
-              fontSize: "clamp(28px, 3.2vw, 42px)",
+              maxWidth: 650,
               fontWeight: t.typography.fontWeight.bold,
-              lineHeight: 1.35,
-              color: t.colors.primary[900],
+              lineHeight: 1.3,
+              color: t.colors.primary[950],
               letterSpacing: "-0.025em",
             }}
           >
-            ادعم الأسر المنتجة
-            <br />
-            واكتشف منتجات سعودية
-            <span style={{ color: t.colors.gold[700] }}> أصيلة</span>
+            {/* السطر الأول */}
+            <span
+              style={{
+                display: "block",
+                fontSize: "clamp(28px, 3.1vw, 40px)",
+                marginBottom: 8,
+              }}
+            >
+              ادعم الأسر المنتجة
+            </span>
+
+            {/* السطر الثاني */}
+            <span
+              style={{
+                display: "block",
+                fontSize: "clamp(23px, 2.6vw, 32px)",
+                lineHeight: 1.3,
+                color: t.colors.primary[700],
+                marginBottom: 5,
+                fontWeight: t.typography.fontWeight.semibold,
+              }}
+            >
+              واكتشف
+            </span>
+
+            {/* السطر الثالث */}
+            <span
+              style={{
+                display: "block",
+                fontSize: "clamp(28px, 3.1vw, 40px)",
+                lineHeight: 1.3,
+              }}
+            >
+              منتجات سعودية{" "}
+              <span
+                style={{
+                  color: t.colors.gold[700],
+                }}
+              >
+                أصيلة
+              </span>
+            </span>
           </h1>
 
           {/* الوصف */}
           <p
             style={{
               margin: `0 0 ${t.spacing["6"]}`,
-              maxWidth: 580,
+              maxWidth: 600,
               fontSize: t.typography.fontSize.base,
               color: t.colors.text.body,
               lineHeight: t.typography.lineHeight.relaxed,
@@ -144,6 +197,7 @@ export default function HeroSection({
               flexWrap: "wrap",
             }}
           >
+            {/* تسوق الآن */}
             <a
               href="/marketplace"
               className="basita-hero-primary basita-btn-interactive"
@@ -152,21 +206,22 @@ export default function HeroSection({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 8,
-                minHeight: 46,
+                minHeight: 48,
                 padding: `0 ${t.spacing["6"]}`,
                 background: t.colors.primary[800],
                 color: t.colors.text.onDark,
-                borderRadius: 13,
+                borderRadius: t.radius.md,
                 fontWeight: t.typography.fontWeight.bold,
                 fontSize: t.typography.fontSize.sm,
                 textDecoration: "none",
-                boxShadow: "0 6px 14px rgba(33,53,42,0.14)",
+                boxShadow: t.shadows.sm,
               }}
             >
               <ShoppingBag size={17} strokeWidth={1.9} />
               تسوّق الآن
             </a>
 
+            {/* تصفح المتاجر */}
             <a
               href="/marketplace"
               className="basita-hero-secondary basita-btn-interactive"
@@ -175,37 +230,56 @@ export default function HeroSection({
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 8,
-                minHeight: 46,
+                minHeight: 48,
                 padding: `0 ${t.spacing["5"]}`,
-                background: "#FFFDF8",
-                border: "1px solid rgba(91,70,45,0.14)",
+                background: t.colors.cream.card,
+                border: `1px solid ${t.colors.cream.border}`,
                 color: t.colors.primary[800],
-                borderRadius: 13,
+                borderRadius: t.radius.md,
                 fontWeight: t.typography.fontWeight.semibold,
                 fontSize: t.typography.fontSize.sm,
                 textDecoration: "none",
+                boxShadow: t.shadows.xs,
               }}
             >
               <Store size={17} strokeWidth={1.9} />
               تصفح المتاجر
             </a>
 
+            {/* ابدأ متجرك مجانًا */}
             {showStartStore && (
               <a
                 href="/register"
-                className="basita-hero-link"
+                className="basita-hero-store-cta basita-btn-interactive"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 6,
-                  minHeight: 46,
-                  padding: `0 ${t.spacing["3"]}`,
+                  justifyContent: "center",
+                  gap: 7,
+                  minHeight: 48,
+                  padding: `0 ${t.spacing["4"]}`,
+                  background: t.colors.gold[50],
+                  border: `1px solid ${t.colors.gold[600]}`,
                   color: t.colors.gold[700],
+                  borderRadius: t.radius.md,
                   fontWeight: t.typography.fontWeight.bold,
                   fontSize: t.typography.fontSize.sm,
                   textDecoration: "none",
+                  boxShadow: t.shadows.xs,
+                  whiteSpace: "nowrap",
                 }}
               >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: t.colors.gold[600],
+                    flexShrink: 0,
+                  }}
+                />
+
                 ابدأ متجرك مجانًا
 
                 <ArrowLeft
@@ -218,6 +292,34 @@ export default function HeroSection({
               </a>
             )}
           </div>
+
+          {/* سطر الثقة */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              marginTop: t.spacing["5"],
+              padding: "7px 11px",
+              borderRadius: t.radius.full,
+              background: "rgba(54,122,101,0.055)",
+              color: t.colors.primary[800],
+              fontSize: t.typography.fontSize.xs,
+              fontWeight: t.typography.fontWeight.medium,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: t.colors.primary[500],
+                flexShrink: 0,
+              }}
+            />
+
+            منتجات محلية من أسر سعودية منتجة
+          </div>
         </div>
 
         {/* الصور */}
@@ -227,7 +329,10 @@ export default function HeroSection({
             position: "relative",
             minHeight: 440,
             overflow: "hidden",
-            background: t.colors.primary[800],
+            background: "transparent",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           {/* الصور الثلاث */}
@@ -237,6 +342,8 @@ export default function HeroSection({
             style={{
               position: "absolute",
               inset: 0,
+              overflow: "hidden",
+              borderRadius: t.radius.xl,
             }}
           >
             {HERO_IMAGES.map((src, index) => (
@@ -249,42 +356,31 @@ export default function HeroSection({
                   position: "absolute",
                   inset: 0,
                   backgroundImage: `url(${src})`,
-                  backgroundSize: "cover",
+                  backgroundSize: "contain",
                   backgroundPosition: "center",
                   backgroundRepeat: "no-repeat",
+                  backgroundColor: "transparent",
                 }}
               />
             ))}
           </div>
 
-          {/* تظليل الصورة */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(180deg, rgba(15,61,46,0.03) 0%, rgba(15,61,46,0.12) 55%, rgba(15,61,46,0.30) 100%)",
-              pointerEvents: "none",
-              zIndex: 1,
-            }}
-          />
-
           {/* بطاقة صنع في السعودية */}
           <div
             style={{
               position: "absolute",
-              top: 22,
-              left: 22,
+              top: 24,
+              left: 24,
               zIndex: 4,
-              minWidth: 106,
-              padding: "9px 11px",
-              borderRadius: 14,
-              background: "rgba(28,42,34,0.90)",
+              minWidth: 112,
+              padding: "10px 12px",
+              borderRadius: t.radius.md,
+              background: "rgba(15,61,46,0.88)",
               color: t.colors.text.onDark,
               textAlign: "center",
-              boxShadow: "0 8px 18px rgba(0,0,0,0.14)",
-              backdropFilter: "blur(4px)",
+              boxShadow: t.shadows.md,
+              backdropFilter: "blur(6px)",
+              border: "1px solid rgba(255,255,255,0.12)",
             }}
           >
             <div
@@ -303,7 +399,7 @@ export default function HeroSection({
                 justifyContent: "center",
                 alignItems: "center",
                 gap: 5,
-                color: "#F4D47C",
+                color: t.colors.gold[300],
                 fontSize: t.typography.fontSize.sm,
                 fontWeight: t.typography.fontWeight.bold,
               }}
@@ -313,25 +409,12 @@ export default function HeroSection({
             </div>
           </div>
 
-          {/* الإطار الداخلي */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 16,
-              border: "1px solid rgba(255,255,255,0.20)",
-              borderRadius: 21,
-              pointerEvents: "none",
-              zIndex: 3,
-            }}
-          />
-
           {/* مؤشرات الصور */}
           <div
             className="basita-hero-dots"
             style={{
               position: "absolute",
-              bottom: 20,
+              bottom: 24,
               left: "50%",
               transform: "translateX(-50%)",
               zIndex: 4,
@@ -345,8 +428,8 @@ export default function HeroSection({
               style={{
                 width: 22,
                 height: 6,
-                borderRadius: 999,
-                background: "#FFFDF8",
+                borderRadius: t.radius.full,
+                background: t.colors.cream.card,
                 opacity: 0.95,
               }}
             />
@@ -356,7 +439,7 @@ export default function HeroSection({
               style={{
                 width: 6,
                 height: 6,
-                borderRadius: 999,
+                borderRadius: t.radius.full,
                 background: "rgba(255,255,255,0.45)",
               }}
             />
@@ -366,7 +449,7 @@ export default function HeroSection({
               style={{
                 width: 6,
                 height: 6,
-                borderRadius: 999,
+                borderRadius: t.radius.full,
                 background: "rgba(255,255,255,0.45)",
               }}
             />

@@ -27,7 +27,7 @@ function StarRow({
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: 2,
+        gap: 1,
       }}
     >
       {Array.from({ length: 5 }).map((_, index) => (
@@ -108,9 +108,9 @@ export default function StoreReviewsSection({
       aria-label="تقييمات العملاء"
       style={{
         width: "100%",
-        maxWidth: 1200,
-        margin: `${t.spacing["8"]} auto 0`,
-        padding: `0 ${t.spacing["5"]}`,
+        maxWidth: 1180,
+        margin: `${t.spacing["5"]} auto 0`,
+        padding: `0 ${t.spacing["4"]}`,
         boxSizing: "border-box",
         direction: "rtl",
       }}
@@ -119,18 +119,18 @@ export default function StoreReviewsSection({
       <div
         style={{
           display: "flex",
-          alignItems: "flex-end",
+          alignItems: "center",
           justifyContent: "space-between",
-          gap: 16,
-          marginBottom: t.spacing["5"],
+          gap: 12,
+          marginBottom: t.spacing["3"],
         }}
       >
-        <div>
+        <div style={{ minWidth: 0 }}>
           <h2
             style={{
               margin: 0,
               color: t.colors.text.dark,
-              fontSize: t.typography.fontSize["2xl"],
+              fontSize: t.typography.fontSize.xl,
               fontWeight: t.typography.fontWeight.bold,
               lineHeight: 1.4,
             }}
@@ -140,10 +140,10 @@ export default function StoreReviewsSection({
 
           <p
             style={{
-              margin: "4px 0 0",
+              margin: "2px 0 0",
               color: t.colors.text.light,
-              fontSize: t.typography.fontSize.sm,
-              lineHeight: 1.7,
+              fontSize: "12px",
+              lineHeight: 1.5,
             }}
           >
             آراء عملاء حقيقيين بعد تجربة المتجر
@@ -154,11 +154,11 @@ export default function StoreReviewsSection({
           <span
             style={{
               flexShrink: 0,
-              padding: "5px 10px",
+              padding: "4px 9px",
               borderRadius: t.radius.full,
               background: t.colors.cream.warm,
               color: t.colors.text.mid,
-              fontSize: t.typography.fontSize.xs,
+              fontSize: "11px",
               fontWeight: t.typography.fontWeight.semibold,
             }}
           >
@@ -171,9 +171,9 @@ export default function StoreReviewsSection({
         style={{
           background: t.colors.white,
           border: `1px solid ${t.colors.cream.border}`,
-          borderRadius: t.radius.xl,
-          padding: t.spacing["6"],
-          boxShadow: t.shadows.sm,
+          borderRadius: t.radius.lg,
+          padding: t.spacing["4"],
+          boxShadow: t.shadows.xs,
         }}
       >
         {/* Summary */}
@@ -181,12 +181,12 @@ export default function StoreReviewsSection({
           style={{
             display: "grid",
             gridTemplateColumns: hasDistribution
-              ? "200px minmax(280px, 1fr)"
+              ? "170px minmax(240px, 1fr)"
               : "1fr",
-            gap: t.spacing["6"],
+            gap: t.spacing["4"],
             alignItems: "center",
-            paddingBottom: t.spacing["6"],
-            borderBottom: `1px solid ${t.colors.cream.border}`,
+            paddingBottom: t.spacing["4"],
+            borderBottom: `1px solid ${t.colors.cream.borderLight}`,
           }}
         >
           {/* Overall rating */}
@@ -197,13 +197,13 @@ export default function StoreReviewsSection({
               alignItems: "center",
               justifyContent: "center",
               textAlign: "center",
-              padding: t.spacing["3"],
+              padding: "4px 8px",
             }}
           >
             <div
               style={{
                 color: t.colors.gold[600],
-                fontSize: 38,
+                fontSize: 32,
                 fontWeight: t.typography.fontWeight.bold,
                 lineHeight: 1,
               }}
@@ -211,15 +211,15 @@ export default function StoreReviewsSection({
               {avg.toFixed(1)}
             </div>
 
-            <div style={{ marginTop: 9 }}>
-              <StarRow rating={Math.round(avg)} size={17} />
+            <div style={{ marginTop: 6 }}>
+              <StarRow rating={Math.round(avg)} size={15} />
             </div>
 
             <div
               style={{
-                marginTop: 7,
-                color: t.colors.text.mid,
-                fontSize: t.typography.fontSize.xs,
+                marginTop: 5,
+                color: t.colors.text.light,
+                fontSize: "10px",
               }}
             >
               من 5 · {total} مراجعة
@@ -232,7 +232,7 @@ export default function StoreReviewsSection({
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: 8,
+                gap: 5,
                 minWidth: 0,
               }}
             >
@@ -246,24 +246,23 @@ export default function StoreReviewsSection({
                     key={star}
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "38px minmax(80px, 1fr) 30px",
+                      gridTemplateColumns: "32px minmax(80px, 1fr) 26px",
                       alignItems: "center",
-                      gap: 8,
+                      gap: 7,
                     }}
                   >
                     <span
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
-                        justifyContent: "flex-start",
-                        gap: 3,
+                        gap: 2,
                         color: t.colors.text.mid,
-                        fontSize: t.typography.fontSize.xs,
+                        fontSize: "11px",
                       }}
                     >
                       {star}
                       <Star
-                        size={11}
+                        size={10}
                         strokeWidth={1.8}
                         color={t.colors.gold[600]}
                         fill={t.colors.gold[600]}
@@ -272,7 +271,7 @@ export default function StoreReviewsSection({
 
                     <div
                       style={{
-                        height: 7,
+                        height: 6,
                         borderRadius: t.radius.full,
                         background: t.colors.cream.border,
                         overflow: "hidden",
@@ -291,8 +290,8 @@ export default function StoreReviewsSection({
 
                     <span
                       style={{
-                        color: t.colors.text.mid,
-                        fontSize: t.typography.fontSize.xs,
+                        color: t.colors.text.light,
+                        fontSize: "10px",
                         textAlign: "left",
                       }}
                     >
@@ -306,13 +305,13 @@ export default function StoreReviewsSection({
         </div>
 
         {/* Reviews */}
-        <div style={{ paddingTop: t.spacing["6"] }}>
+        <div style={{ paddingTop: t.spacing["4"] }}>
           {loading && page === 1 && (
             <div
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: t.spacing["5"],
+                gap: t.spacing["4"],
               }}
             >
               {[1, 2, 3].map((item) => (
@@ -324,8 +323,8 @@ export default function StoreReviewsSection({
                   }}
                 >
                   <Skeleton
-                    width={42}
-                    height={42}
+                    width={38}
+                    height={38}
                     radius="50%"
                   />
 
@@ -334,12 +333,12 @@ export default function StoreReviewsSection({
                       flex: 1,
                       display: "flex",
                       flexDirection: "column",
-                      gap: 8,
+                      gap: 6,
                     }}
                   >
-                    <Skeleton width="34%" height={15} />
-                    <Skeleton width="92%" height={13} />
-                    <Skeleton width="66%" height={13} />
+                    <Skeleton width="30%" height={14} />
+                    <Skeleton width="90%" height={12} />
+                    <Skeleton width="60%" height={12} />
                   </div>
                 </div>
               ))}
@@ -349,38 +348,38 @@ export default function StoreReviewsSection({
           {!loading && !hasReviews && (
             <div
               style={{
-                minHeight: 150,
+                minHeight: 120,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: t.spacing["6"],
+                padding: t.spacing["4"],
                 textAlign: "center",
               }}
             >
               <div
                 style={{
-                  width: 44,
-                  height: 44,
+                  width: 38,
+                  height: 38,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: t.radius.full,
                   background: t.colors.primary[50],
                   color: t.colors.primary[700],
-                  marginBottom: 10,
+                  marginBottom: 8,
                 }}
               >
-                <Leaf size={20} strokeWidth={1.7} />
+                <Leaf size={18} strokeWidth={1.7} />
               </div>
 
               <p
                 style={{
-                  maxWidth: 520,
+                  maxWidth: 500,
                   margin: 0,
                   color: t.colors.text.mid,
-                  fontSize: t.typography.fontSize.sm,
-                  lineHeight: 1.8,
+                  fontSize: "12px",
+                  lineHeight: 1.7,
                 }}
               >
                 لا توجد مراجعات معتمدة بعد. يمكنك أن تكون أول من
@@ -402,8 +401,8 @@ export default function StoreReviewsSection({
                   style={{
                     display: "flex",
                     gap: t.spacing["3"],
-                    paddingBottom: t.spacing["5"],
-                    paddingTop: index === 0 ? 0 : t.spacing["5"],
+                    paddingBottom: t.spacing["4"],
+                    paddingTop: index === 0 ? 0 : t.spacing["4"],
                     borderBottom:
                       index === reviews.length - 1
                         ? "none"
@@ -415,11 +414,11 @@ export default function StoreReviewsSection({
                     <Image
                       src={review.user.avatar}
                       alt={review.user.name}
-                      width={42}
-                      height={42}
+                      width={38}
+                      height={38}
                       style={{
-                        width: 42,
-                        height: 42,
+                        width: 38,
+                        height: 38,
                         borderRadius: "50%",
                         flexShrink: 0,
                         objectFit: "cover",
@@ -429,8 +428,8 @@ export default function StoreReviewsSection({
                     <div
                       aria-hidden="true"
                       style={{
-                        width: 42,
-                        height: 42,
+                        width: 38,
+                        height: 38,
                         borderRadius: "50%",
                         flexShrink: 0,
                         display: "flex",
@@ -438,7 +437,7 @@ export default function StoreReviewsSection({
                         justifyContent: "center",
                         background: t.colors.primary[100],
                         color: t.colors.primary[800],
-                        fontSize: t.typography.fontSize.sm,
+                        fontSize: "12px",
                         fontWeight: t.typography.fontWeight.bold,
                       }}
                     >
@@ -458,14 +457,14 @@ export default function StoreReviewsSection({
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        gap: 12,
+                        gap: 10,
                         flexWrap: "wrap",
                       }}
                     >
                       <strong
                         style={{
                           color: t.colors.text.dark,
-                          fontSize: t.typography.fontSize.sm,
+                          fontSize: "13px",
                           fontWeight:
                             t.typography.fontWeight.semibold,
                         }}
@@ -476,7 +475,7 @@ export default function StoreReviewsSection({
                       <span
                         style={{
                           color: t.colors.text.light,
-                          fontSize: t.typography.fontSize.xs,
+                          fontSize: "10px",
                         }}
                       >
                         {timeAgoAr(review.createdAt)}
@@ -488,9 +487,9 @@ export default function StoreReviewsSection({
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: 7,
+                        gap: 6,
                         flexWrap: "wrap",
-                        marginTop: 5,
+                        marginTop: 4,
                       }}
                     >
                       <StarRow rating={review.rating} />
@@ -499,7 +498,7 @@ export default function StoreReviewsSection({
                         <span
                           style={{
                             color: t.colors.text.light,
-                            fontSize: t.typography.fontSize.xs,
+                            fontSize: "10px",
                           }}
                         >
                           · {review.product.nameAr}
@@ -511,10 +510,10 @@ export default function StoreReviewsSection({
                     {review.comment && (
                       <p
                         style={{
-                          margin: "8px 0 0",
+                          margin: "6px 0 0",
                           color: t.colors.text.body,
-                          fontSize: t.typography.fontSize.sm,
-                          lineHeight: 1.9,
+                          fontSize: "12px",
+                          lineHeight: 1.8,
                         }}
                       >
                         {review.comment}
@@ -525,8 +524,8 @@ export default function StoreReviewsSection({
                     {review.sellerReply && (
                       <div
                         style={{
-                          marginTop: 10,
-                          padding: "9px 12px",
+                          marginTop: 8,
+                          padding: "7px 10px",
                           borderRadius: t.radius.md,
                           background: t.colors.cream.warm,
                           borderInlineStart: `3px solid ${t.colors.primary[700]}`,
@@ -535,7 +534,7 @@ export default function StoreReviewsSection({
                         <span
                           style={{
                             color: t.colors.primary[800],
-                            fontSize: t.typography.fontSize.xs,
+                            fontSize: "10px",
                             fontWeight:
                               t.typography.fontWeight.bold,
                           }}
@@ -545,8 +544,8 @@ export default function StoreReviewsSection({
                         <span
                           style={{
                             color: t.colors.text.body,
-                            fontSize: t.typography.fontSize.xs,
-                            lineHeight: 1.8,
+                            fontSize: "10px",
+                            lineHeight: 1.7,
                           }}
                         >
                           {review.sellerReply}
@@ -565,7 +564,7 @@ export default function StoreReviewsSection({
               style={{
                 display: "flex",
                 justifyContent: "center",
-                marginTop: t.spacing["6"],
+                marginTop: t.spacing["4"],
               }}
             >
               <button
@@ -574,13 +573,13 @@ export default function StoreReviewsSection({
                 disabled={loading}
                 className="basita-btn-interactive"
                 style={{
-                  minHeight: 42,
-                  padding: "9px 24px",
-                  border: `1.5px solid ${t.colors.primary[800]}`,
+                  minHeight: 38,
+                  padding: "7px 20px",
+                  border: `1px solid ${t.colors.primary[800]}`,
                   borderRadius: t.radius.full,
                   background: t.colors.white,
                   color: t.colors.primary[800],
-                  fontSize: t.typography.fontSize.sm,
+                  fontSize: "12px",
                   fontWeight: t.typography.fontWeight.bold,
                   cursor: loading ? "wait" : "pointer",
                   opacity: loading ? 0.65 : 1,

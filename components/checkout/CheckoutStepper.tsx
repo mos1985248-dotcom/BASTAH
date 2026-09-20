@@ -65,27 +65,28 @@ export default function CheckoutStepper({
         width: "100%",
         display: "flex",
         justifyContent: "center",
-        padding: `${t.spacing["3"]} ${t.spacing["2"]}`,
+        padding: `${t.spacing["2"]} ${t.spacing["2"]}`,
       }}
     >
       <div
         className="basita-checkout-stepper-inner"
         style={{
           width: "100%",
-          maxWidth: 760,
+          maxWidth: 720,
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "center",
           gap: 0,
-          padding: `${t.spacing["3"]} ${t.spacing["4"]}`,
+          padding: `${t.spacing["2"]} ${t.spacing["3"]}`,
           background: t.colors.white,
           border: `1px solid ${t.colors.cream.border}`,
           borderRadius: t.radius.lg,
-          boxShadow: "0 4px 18px rgba(75, 56, 34, 0.04)",
+          boxShadow: "0 3px 14px rgba(75, 56, 34, 0.035)",
         }}
       >
         {[...STEPS].reverse().map((step, i, arr) => {
           const isActive = activeKeys.includes(step.key);
+
           const isDone =
             current === "confirm" &&
             step.key !== "confirm";
@@ -94,6 +95,7 @@ export default function CheckoutStepper({
             isDone || isActive;
 
           const nextStep = arr[i + 1];
+
           const nextIsCompletedOrActive =
             nextStep &&
             (activeKeys.includes(nextStep.key) ||
@@ -115,11 +117,11 @@ export default function CheckoutStepper({
               <div
                 style={{
                   flex: "0 0 auto",
-                  minWidth: 76,
+                  minWidth: 70,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  gap: 7,
+                  gap: 5,
                   textAlign: "center",
                 }}
               >
@@ -129,8 +131,8 @@ export default function CheckoutStepper({
                   } ${isDone ? "is-done" : ""}`}
                   style={{
                     position: "relative",
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     borderRadius: t.radius.full,
                     display: "flex",
                     alignItems: "center",
@@ -138,7 +140,7 @@ export default function CheckoutStepper({
                     background: isCompletedOrActive
                       ? t.colors.primary[800]
                       : t.colors.cream.bg,
-                    border: `2px solid ${
+                    border: `1.5px solid ${
                       isCompletedOrActive
                         ? t.colors.primary[800]
                         : t.colors.cream.border
@@ -147,7 +149,7 @@ export default function CheckoutStepper({
                       ? t.colors.white
                       : t.colors.text.light,
                     boxShadow: isActive
-                      ? "0 0 0 4px rgba(75, 56, 34, 0.07)"
+                      ? "0 0 0 3px rgba(75, 56, 34, 0.055)"
                       : "none",
                     transition:
                       "background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease",
@@ -155,12 +157,12 @@ export default function CheckoutStepper({
                 >
                   {isDone ? (
                     <Check
-                      size={17}
+                      size={15}
                       strokeWidth={2.3}
                     />
                   ) : (
                     <step.Icon
-                      size={17}
+                      size={15}
                       strokeWidth={1.8}
                     />
                   )}
@@ -168,17 +170,17 @@ export default function CheckoutStepper({
 
                 <span
                   style={{
-                    maxWidth: 88,
+                    maxWidth: 86,
                     color: isActive
                       ? t.colors.primary[800]
                       : isDone
                         ? t.colors.text.mid
                         : t.colors.text.light,
-                    fontSize: t.typography.fontSize.xs,
+                    fontSize: 11,
                     fontWeight: isActive
                       ? t.typography.fontWeight.bold
                       : t.typography.fontWeight.medium,
-                    lineHeight: 1.45,
+                    lineHeight: 1.4,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -193,17 +195,16 @@ export default function CheckoutStepper({
                   className="basita-checkout-step-connector"
                   style={{
                     flex: "1 1 auto",
-                    minWidth: 18,
+                    minWidth: 16,
                     height: 2,
-                    marginTop: 19,
-                    marginInline: 5,
+                    marginTop: 17,
+                    marginInline: 4,
                     borderRadius: t.radius.full,
                     background:
                       nextIsCompletedOrActive
                         ? t.colors.primary[800]
                         : t.colors.cream.border,
-                    transition:
-                      "background 180ms ease",
+                    transition: "background 180ms ease",
                   }}
                 />
               )}
@@ -214,7 +215,7 @@ export default function CheckoutStepper({
 
       <style>{`
         .basita-checkout-step-circle.is-active {
-          transform: scale(1.03);
+          transform: scale(1.04);
         }
 
         @media (max-width: 640px) {
@@ -223,7 +224,7 @@ export default function CheckoutStepper({
           }
 
           .basita-checkout-stepper-inner {
-            padding: ${t.spacing["3"]} ${t.spacing["2"]} !important;
+            padding: ${t.spacing["2"]} ${t.spacing["1"]} !important;
             border-radius: ${t.radius.md} !important;
           }
 
@@ -232,37 +233,7 @@ export default function CheckoutStepper({
           }
 
           .basita-checkout-step > div:first-child {
-            min-width: 62px !important;
-          }
-
-          .basita-checkout-step-circle {
-            width: 36px !important;
-            height: 36px !important;
-          }
-
-          .basita-checkout-step-circle svg {
-            width: 15px !important;
-            height: 15px !important;
-          }
-
-          .basita-checkout-step span {
-            max-width: 68px !important;
-            white-space: normal !important;
-          }
-
-          .basita-checkout-step-connector {
-            min-width: 8px !important;
-            margin-inline: 3px !important;
-          }
-        }
-
-        @media (max-width: 420px) {
-          .basita-checkout-stepper-inner {
-            padding: ${t.spacing["2"]} ${t.spacing["1"]} !important;
-          }
-
-          .basita-checkout-step > div:first-child {
-            min-width: 54px !important;
+            min-width: 58px !important;
           }
 
           .basita-checkout-step-circle {
@@ -270,13 +241,51 @@ export default function CheckoutStepper({
             height: 33px !important;
           }
 
+          .basita-checkout-step-circle svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
+
           .basita-checkout-step span {
+            max-width: 64px !important;
+            white-space: normal !important;
             font-size: 10px !important;
-            max-width: 58px !important;
           }
 
           .basita-checkout-step-connector {
-            min-width: 5px !important;
+            min-width: 7px !important;
+            margin-inline: 2px !important;
+            margin-top: 15px !important;
+          }
+        }
+
+        @media (max-width: 420px) {
+          .basita-checkout-stepper-inner {
+            padding: 7px 3px !important;
+          }
+
+          .basita-checkout-step > div:first-child {
+            min-width: 50px !important;
+          }
+
+          .basita-checkout-step-circle {
+            width: 30px !important;
+            height: 30px !important;
+          }
+
+          .basita-checkout-step-circle svg {
+            width: 13px !important;
+            height: 13px !important;
+          }
+
+          .basita-checkout-step span {
+            font-size: 9px !important;
+            max-width: 54px !important;
+          }
+
+          .basita-checkout-step-connector {
+            min-width: 4px !important;
+            margin-top: 14px !important;
           }
         }
 

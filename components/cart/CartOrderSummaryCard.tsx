@@ -52,37 +52,38 @@ export default function CartOrderSummaryCard({
         background: t.colors.white,
         border: `1px solid ${t.colors.cream.border}`,
         borderRadius: t.radius.xl,
-        padding: t.spacing["5"],
-        boxShadow: "0 8px 28px rgba(25, 45, 35, 0.055)",
+        padding: t.spacing["4"],
+        boxShadow: "0 7px 24px rgba(25, 45, 35, 0.045)",
       }}
     >
-      {/* Decorative top accent */}
+      {/* الشريط العلوي */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           top: 0,
           insetInlineStart: 0,
-          insetInlineEnd: 0,
+          width: 72,
           height: 3,
           background: t.colors.gold[600],
+          borderRadius: "0 0 5px 0",
         }}
       />
 
-      {/* Header */}
+      {/* العنوان */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 10,
-          marginBottom: t.spacing["4"],
+          gap: 9,
+          marginBottom: t.spacing["3"],
         }}
       >
         <span
           aria-hidden="true"
           style={{
-            width: 38,
-            height: 38,
+            width: 34,
+            height: 34,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
@@ -92,14 +93,14 @@ export default function CartOrderSummaryCard({
             color: t.colors.primary[800],
           }}
         >
-          <ShoppingBag size={19} strokeWidth={1.7} />
+          <ShoppingBag size={17} strokeWidth={1.7} />
         </span>
 
         <div>
           <h3
             style={{
               margin: 0,
-              fontSize: t.typography.fontSize.lg,
+              fontSize: t.typography.fontSize.base,
               fontWeight: t.typography.fontWeight.bold,
               color: t.colors.primary[800],
               lineHeight: 1.4,
@@ -111,8 +112,9 @@ export default function CartOrderSummaryCard({
           <p
             style={{
               margin: "2px 0 0",
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 11,
               color: t.colors.text.light,
+              lineHeight: 1.5,
             }}
           >
             راجع تفاصيل طلبك قبل إتمام الشراء
@@ -120,11 +122,11 @@ export default function CartOrderSummaryCard({
         </div>
       </div>
 
-      {/* Coupon */}
+      {/* كوبون الخصم */}
       <div
         style={{
-          marginBottom: t.spacing["4"],
-          padding: t.spacing["3"],
+          marginBottom: t.spacing["3"],
+          padding: t.spacing["2"],
           background: t.colors.cream.bg,
           border: `1px solid ${t.colors.cream.border}`,
           borderRadius: t.radius.lg,
@@ -136,36 +138,38 @@ export default function CartOrderSummaryCard({
             display: "flex",
             alignItems: "center",
             gap: 5,
-            fontSize: t.typography.fontSize.xs,
+            fontSize: 11,
             color: t.colors.text.mid,
-            marginBottom: 7,
+            marginBottom: 6,
             fontWeight: t.typography.fontWeight.semibold,
           }}
         >
-          <Tag size={13} strokeWidth={1.8} />
+          <Tag size={12} strokeWidth={1.8} />
           كود الخصم
         </label>
 
         <div
           style={{
             display: "flex",
-            gap: 7,
+            gap: 6,
           }}
         >
           <input
             id="cart-coupon"
             value={coupon}
-            onChange={(e) => setCoupon(e.target.value)}
+            onChange={(e) =>
+              setCoupon(e.target.value)
+            }
             placeholder="اكتب كود الخصم هنا"
             style={{
               flex: 1,
               minWidth: 0,
-              height: 42,
-              padding: "9px 11px",
+              height: 38,
+              padding: "8px 10px",
               background: t.colors.white,
               border: `1px solid ${t.colors.cream.border}`,
               borderRadius: t.radius.md,
-              fontSize: t.typography.fontSize.sm,
+              fontSize: 12,
               color: t.colors.text.dark,
               direction: "rtl",
               outline: "none",
@@ -179,14 +183,14 @@ export default function CartOrderSummaryCard({
             disabled
             style={{
               flexShrink: 0,
-              minWidth: 72,
-              height: 42,
-              padding: "0 13px",
+              minWidth: 64,
+              height: 38,
+              padding: "0 10px",
               background: t.colors.primary[800],
               color: t.colors.white,
               border: "none",
               borderRadius: t.radius.md,
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 11,
               fontWeight: t.typography.fontWeight.bold,
               cursor: "not-allowed",
               opacity: 0.5,
@@ -197,43 +201,50 @@ export default function CartOrderSummaryCard({
         </div>
       </div>
 
-      {/* Pricing */}
+      {/* الأسعار */}
       <div
         style={{
-          paddingTop: t.spacing["3"],
+          paddingTop: t.spacing["2"],
           borderTop: `1px solid ${t.colors.cream.border}`,
         }}
       >
-        <Row label="المجموع الفرعي" value={subtotal} />
+        <Row
+          label="المجموع الفرعي"
+          value={subtotal}
+        />
 
         {!hasAddress && (
           <div
             style={{
               display: "flex",
               alignItems: "flex-start",
-              gap: 7,
+              gap: 6,
               margin: `${t.spacing["2"]} 0`,
-              padding: "9px 10px",
+              padding: "8px 9px",
               background: t.colors.cream.bg,
               borderRadius: t.radius.md,
             }}
           >
             <Truck
-              size={14}
+              size={13}
               strokeWidth={1.7}
               color={t.colors.text.light}
-              style={{ flexShrink: 0, marginTop: 1 }}
+              style={{
+                flexShrink: 0,
+                marginTop: 1,
+              }}
             />
 
             <p
               style={{
-                fontSize: t.typography.fontSize.xs,
+                fontSize: 11,
                 color: t.colors.text.light,
                 lineHeight: 1.6,
                 margin: 0,
               }}
             >
-              سيُحتسَب الشحن والضريبة عند اختيار عنوان الشحن بصفحة الدفع
+              سيُحتسَب الشحن والضريبة عند اختيار عنوان
+              الشحن بصفحة الدفع
             </p>
           </div>
         )}
@@ -274,8 +285,9 @@ export default function CartOrderSummaryCard({
           </div>
         )}
 
-        {/* Total */}
+        {/* الإجمالي */}
         <div
+          className="basita-cart-total"
           style={{
             display: "flex",
             alignItems: "center",
@@ -288,7 +300,7 @@ export default function CartOrderSummaryCard({
         >
           <span
             style={{
-              fontSize: t.typography.fontSize.base,
+              fontSize: t.typography.fontSize.sm,
               fontWeight: t.typography.fontWeight.bold,
               color: t.colors.text.dark,
             }}
@@ -298,51 +310,69 @@ export default function CartOrderSummaryCard({
 
           <span
             style={{
-              fontSize: t.typography.fontSize.xl,
+              fontSize: "clamp(21px, 2.2vw, 25px)",
               fontWeight: t.typography.fontWeight.bold,
               color: t.colors.primary[800],
               whiteSpace: "nowrap",
+              lineHeight: 1.2,
             }}
           >
-            {hasAddress && preview ? preview.total : subtotal} ر.س
+            {hasAddress && preview
+              ? preview.total
+              : subtotal}{" "}
+            <small
+              style={{
+                fontSize: 11,
+                fontWeight: t.typography.fontWeight.medium,
+                color: t.colors.text.mid,
+              }}
+            >
+              ر.س
+            </small>
           </span>
         </div>
 
-        {hasAddress && preview && preview.taxAmount > 0 && (
-          <p
-            style={{
-              margin: "5px 0 0",
-              textAlign: "end",
-              fontSize: t.typography.fontSize.xs,
-              color: t.colors.text.light,
-            }}
-          >
-            شامل ضريبة القيمة المضافة
-          </p>
-        )}
+        {hasAddress &&
+          preview &&
+          preview.taxAmount > 0 && (
+            <p
+              style={{
+                margin: "4px 0 0",
+                textAlign: "end",
+                fontSize: 11,
+                color: t.colors.text.light,
+              }}
+            >
+              شامل ضريبة القيمة المضافة
+            </p>
+          )}
       </div>
 
-      {/* Actions */}
+      {/* الأزرار */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: t.spacing["2"],
-          marginTop: t.spacing["5"],
+          gap: 6,
+          marginTop: t.spacing["4"],
         }}
       >
         <a
-          href={disabled ? undefined : `/checkout?store=${storeId}`}
+          href={
+            disabled
+              ? undefined
+              : `/checkout?store=${storeId}`
+          }
           aria-disabled={disabled}
           className="basita-cart-checkout-button"
           style={{
-            minHeight: 50,
+            minHeight: 46,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 8,
+            gap: 7,
             textAlign: "center",
-            padding: "12px 15px",
+            padding: "10px 13px",
             background: disabled
               ? t.colors.cream.border
               : t.colors.primary[800],
@@ -354,19 +384,24 @@ export default function CartOrderSummaryCard({
                 ? t.colors.cream.border
                 : t.colors.primary[800]
             }`,
-            borderRadius: t.radius.lg,
+            borderRadius: t.radius.md,
             textDecoration: "none",
-            fontSize: t.typography.fontSize.base,
+            fontSize: t.typography.fontSize.sm,
             fontWeight: t.typography.fontWeight.bold,
-            pointerEvents: disabled ? "none" : "auto",
+            pointerEvents: disabled
+              ? "none"
+              : "auto",
             boxShadow: disabled
               ? "none"
-              : "0 6px 16px rgba(15, 61, 46, 0.14)",
+              : "0 5px 14px rgba(15, 61, 46, 0.13)",
             transition:
               "transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease",
           }}
         >
-          <ShoppingBag size={17} strokeWidth={1.8} />
+          <ShoppingBag
+            size={15}
+            strokeWidth={1.8}
+          />
           إتمام الطلب
         </a>
 
@@ -374,33 +409,36 @@ export default function CartOrderSummaryCard({
           href="/marketplace"
           className="basita-cart-continue-button"
           style={{
-            minHeight: 46,
+            minHeight: 40,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 6,
+            gap: 5,
             textAlign: "center",
-            padding: "11px 14px",
+            padding: "9px 12px",
             background: t.colors.white,
             color: t.colors.primary[800],
             border: `1.5px solid ${t.colors.primary[800]}`,
-            borderRadius: t.radius.lg,
+            borderRadius: t.radius.md,
             textDecoration: "none",
-            fontSize: t.typography.fontSize.sm,
+            fontSize: 12,
             fontWeight: t.typography.fontWeight.bold,
             transition:
               "transform 160ms ease, background-color 160ms ease",
           }}
         >
-          <ArrowLeft size={14} strokeWidth={2} />
+          <ArrowLeft
+            size={13}
+            strokeWidth={2}
+          />
           متابعة التسوّق
         </a>
       </div>
 
-      {/* Payment trust */}
+      {/* وسائل الدفع */}
       <div
         style={{
-          marginTop: t.spacing["4"],
+          marginTop: t.spacing["3"],
           paddingTop: t.spacing["3"],
           borderTop: `1px solid ${t.colors.cream.border}`,
           textAlign: "center",
@@ -412,15 +450,18 @@ export default function CartOrderSummaryCard({
             alignItems: "center",
             justifyContent: "center",
             gap: 5,
-            marginBottom: 7,
+            marginBottom: 6,
             color: t.colors.text.light,
           }}
         >
-          <Lock size={12} strokeWidth={1.7} />
+          <Lock
+            size={11}
+            strokeWidth={1.7}
+          />
 
           <p
             style={{
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 11,
               color: t.colors.text.light,
               margin: 0,
             }}
@@ -432,7 +473,7 @@ export default function CartOrderSummaryCard({
         <div
           style={{
             display: "flex",
-            gap: 5,
+            gap: 4,
             flexWrap: "wrap",
             justifyContent: "center",
           }}
@@ -441,12 +482,13 @@ export default function CartOrderSummaryCard({
             <span
               key={b}
               style={{
-                fontSize: 10,
-                fontWeight: t.typography.fontWeight.semibold,
+                fontSize: 9,
+                fontWeight:
+                  t.typography.fontWeight.semibold,
                 border: `1px solid ${t.colors.cream.border}`,
                 background: t.colors.cream.bg,
                 borderRadius: t.radius.sm,
-                padding: "4px 8px",
+                padding: "3px 7px",
                 color: t.colors.text.mid,
                 whiteSpace: "nowrap",
               }}
@@ -461,7 +503,7 @@ export default function CartOrderSummaryCard({
         .basita-cart-checkout-button:hover:not([aria-disabled="true"]) {
           transform: translateY(-1px);
           background: ${t.colors.primary[700]} !important;
-          box-shadow: 0 8px 20px rgba(15, 61, 46, 0.19) !important;
+          box-shadow: 0 7px 18px rgba(15, 61, 46, 0.18) !important;
         }
 
         .basita-cart-continue-button:hover {
@@ -484,12 +526,16 @@ export default function CartOrderSummaryCard({
 
         @media (max-width: 480px) {
           .basita-cart-summary {
-            padding: ${t.spacing["4"]} !important;
+            padding: ${t.spacing["3"]} !important;
             border-radius: ${t.radius.lg} !important;
           }
 
           .basita-cart-summary h3 {
             font-size: ${t.typography.fontSize.base} !important;
+          }
+
+          .basita-cart-total {
+            margin-top: ${t.spacing["2"]} !important;
           }
         }
 
@@ -520,9 +566,9 @@ function Row({
         alignItems: "center",
         justifyContent: "space-between",
         gap: t.spacing["3"],
-        fontSize: t.typography.fontSize.sm,
+        fontSize: 12,
         color: t.colors.text.mid,
-        padding: "5px 0",
+        padding: "4px 0",
         lineHeight: 1.5,
       }}
     >

@@ -43,11 +43,14 @@ export default function Navbar() {
         style={{
           maxWidth: t.layout.containerMaxWidth,
           margin: "0 auto",
-          padding: `${t.spacing["4"]} ${t.spacing["4"]}`,
+          minHeight: 72,
+          padding: `8px ${t.spacing["4"]}`,
           display: "grid",
-          gridTemplateColumns: "auto minmax(280px, 1fr) auto",
+          gridTemplateColumns:
+            "auto minmax(0, 1fr) minmax(220px, 300px) auto",
           alignItems: "center",
-          gap: t.spacing["6"],
+          gap: t.spacing["4"],
+          boxSizing: "border-box",
           borderBottom: "1px solid rgba(91,70,45,0.08)",
         }}
       >
@@ -58,17 +61,16 @@ export default function Navbar() {
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: t.spacing["3"],
+            gap: 10,
             textDecoration: "none",
             flexShrink: 0,
           }}
         >
-          {/* أيقونة الشعار */}
           <div
             style={{
-              width: 44,
-              height: 44,
-              borderRadius: 13,
+              width: 42,
+              height: 42,
+              borderRadius: 12,
               background: "#FFFFFF",
               border: "1px solid rgba(91,70,45,0.12)",
               display: "flex",
@@ -92,7 +94,6 @@ export default function Navbar() {
             />
           </div>
 
-          {/* اسم المنصة */}
           <span
             style={{
               display: "flex",
@@ -100,30 +101,28 @@ export default function Navbar() {
               justifyContent: "center",
             }}
           >
-            {/* بسطة */}
             <span
               style={{
                 display: "block",
                 fontFamily: t.typography.fontFamily.heading,
-                fontSize: "22px",
+                fontSize: "21px",
                 fontWeight: t.typography.fontWeight.bold,
                 color: t.colors.primary[800],
-                lineHeight: 1.15,
+                lineHeight: 1.1,
               }}
             >
               بسطة
             </span>
 
-            {/* النص أسفل الشعار */}
             <span
               style={{
                 display: "block",
-                marginTop: 3,
+                marginTop: 2,
                 fontFamily: t.typography.fontFamily.heading,
-                fontSize: "10px",
+                fontSize: "9px",
                 fontWeight: t.typography.fontWeight.medium,
                 color: t.colors.text.mid,
-                lineHeight: 1.3,
+                lineHeight: 1.25,
                 whiteSpace: "nowrap",
               }}
             >
@@ -131,6 +130,17 @@ export default function Navbar() {
             </span>
           </span>
         </a>
+
+        {/* روابط التنقل */}
+        <div
+          className="basita-navbar-navigation"
+          style={{
+            minWidth: 0,
+            overflow: "hidden",
+          }}
+        >
+          <NavLinks />
+        </div>
 
         {/* البحث */}
         <div
@@ -154,7 +164,7 @@ export default function Navbar() {
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
-            gap: t.spacing["3"],
+            gap: 8,
             flexShrink: 0,
           }}
         >
@@ -165,99 +175,6 @@ export default function Navbar() {
           <NavAuthArea user={user} loading={loading} />
         </div>
       </div>
-
-      {/* روابط التنقل */}
-      <div
-        className="basita-navbar-links"
-        style={{
-          maxWidth: t.layout.containerMaxWidth,
-          margin: "0 auto",
-          padding: `0 ${t.spacing["4"]}`,
-        }}
-      >
-        <div
-          style={{
-            minHeight: 48,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <NavLinks />
-        </div>
-      </div>
-
-            <style>{`
-        @media (max-width: 768px) {
-          .basita-navbar-main {
-            padding: 10px 12px !important;
-            display: grid !important;
-            grid-template-columns: 1fr auto !important;
-            grid-template-areas:
-              "logo actions"
-              "search search" !important;
-            gap: 10px !important;
-            align-items: center !important;
-          }
-
-          .basita-navbar-logo {
-            grid-area: logo;
-            min-width: 0;
-          }
-
-          .basita-navbar-logo > div:first-child {
-            width: 38px !important;
-            height: 38px !important;
-            border-radius: 11px !important;
-          }
-
-          .basita-navbar-logo img {
-            width: 30px !important;
-            height: 30px !important;
-          }
-
-          .basita-navbar-logo > span {
-            min-width: 0;
-          }
-
-          .basita-navbar-logo > span > span:first-child {
-            font-size: 19px !important;
-          }
-
-          .basita-navbar-logo > span > span:last-child {
-            font-size: 8px !important;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-
-          .basita-navbar-search {
-            grid-area: search;
-            width: 100% !important;
-          }
-
-          .basita-navbar-actions {
-            grid-area: actions;
-            gap: 6px !important;
-          }
-
-          .basita-navbar-links {
-            overflow-x: auto;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-          }
-
-          .basita-navbar-links::-webkit-scrollbar {
-            display: none;
-          }
-
-          .basita-navbar-links > div {
-            justify-content: flex-start !important;
-            width: max-content;
-            min-width: 100%;
-            padding: 0 4px;
-          }
-        }
-      `}</style>
     </header>
   );
 }

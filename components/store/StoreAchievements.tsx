@@ -36,17 +36,17 @@ export default function StoreAchievements({
     {
       Icon: Timer,
       value: info?.prepTimeDays ?? "—",
-      label: "متوسط تجهيز الطلب",
+      label: "متوسط التجهيز",
     },
     {
       Icon: Headset,
       value: info?.responseSpeed ?? "—",
-      label: "متوسط سرعة الرد",
+      label: "سرعة الرد",
     },
     {
       Icon: ShoppingBag,
       value: String(store.totalProducts),
-      label: "عدد المنتجات",
+      label: "المنتجات",
     },
   ];
 
@@ -55,44 +55,50 @@ export default function StoreAchievements({
       aria-label="إحصائيات المتجر"
       style={{
         width: "100%",
-        maxWidth: 1200,
-        margin: `${t.spacing["8"]} auto 0`,
-        padding: `0 ${t.spacing["5"]}`,
+        maxWidth: 1180,
+        margin: `${t.spacing["3"]} auto 0`,
+        padding: `0 ${t.spacing["4"]}`,
         boxSizing: "border-box",
+        direction: "rtl",
       }}
     >
       <div
         style={{
-          background: `linear-gradient(135deg, ${t.colors.primary[950]}, ${t.colors.primary[900]})`,
-          borderRadius: t.radius.xl,
-          padding: `${t.spacing["6"]} ${t.spacing["5"]}`,
+          width: "100%",
+          padding: "8px 6px",
+          boxSizing: "border-box",
           display: "grid",
           gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-          gap: t.spacing["4"],
-          direction: "rtl",
-          textAlign: "center",
-          boxShadow: t.shadows.md,
+          background: `linear-gradient(135deg, ${t.colors.primary[950]}, ${t.colors.primary[900]})`,
+          borderRadius: t.radius.lg,
+          boxShadow: t.shadows.xs,
           overflow: "hidden",
+          textAlign: "center",
         }}
       >
-        {items.map(({ Icon, value, label }) => (
+        {items.map(({ Icon, value, label }, index) => (
           <div
             key={label}
             style={{
               minWidth: 0,
-              padding: `${t.spacing["2"]} ${t.spacing["3"]}`,
+              height: 52,
+              padding: "2px 6px",
+              boxSizing: "border-box",
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              borderRadius: t.radius.lg,
+              gap: 7,
+              borderLeft:
+                index !== items.length - 1
+                  ? "1px solid rgba(255,255,255,0.08)"
+                  : undefined,
             }}
           >
             <span
               style={{
-                width: 40,
-                height: 40,
-                marginBottom: 8,
+                width: 25,
+                height: 25,
+                flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -101,7 +107,7 @@ export default function StoreAchievements({
               }}
             >
               <Icon
-                size={20}
+                size={13}
                 strokeWidth={1.8}
                 color={t.colors.gold[400]}
               />
@@ -109,45 +115,44 @@ export default function StoreAchievements({
 
             <div
               style={{
-                color: t.colors.gold[400],
-                fontSize: t.typography.fontSize["2xl"],
-                fontWeight: t.typography.fontWeight.bold,
-                lineHeight: 1.2,
-                whiteSpace: "nowrap",
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                justifyContent: "center",
+                textAlign: "right",
               }}
             >
-              {value}
-            </div>
+              <div
+                style={{
+                  color: t.colors.gold[400],
+                  fontSize: "16px",
+                  fontWeight: t.typography.fontWeight.bold,
+                  lineHeight: 1.15,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {value}
+              </div>
 
-            <div
-              style={{
-                marginTop: 5,
-                color: t.colors.text.onDarkMuted,
-                fontSize: t.typography.fontSize.xs,
-                lineHeight: 1.6,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {label}
+              <div
+                style={{
+                  marginTop: 2,
+                  maxWidth: "100%",
+                  color: t.colors.text.onDarkMuted,
+                  fontSize: "9px",
+                  lineHeight: 1.25,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {label}
+              </div>
             </div>
           </div>
         ))}
       </div>
-
-      <style jsx>{`
-        @media (max-width: 900px) {
-          div[style*="grid-template-columns"] {
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-          }
-        }
-
-        @media (max-width: 600px) {
-          div[style*="grid-template-columns"] {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            padding: 18px 12px !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

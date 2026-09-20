@@ -6,7 +6,6 @@ import {
   MessageCircle,
   PenLine,
   Tag,
-  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import { t } from "@/theme";
@@ -213,7 +212,6 @@ export default function MuniraShowcase() {
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 7,
             minHeight: 48,
             padding: `0 ${t.spacing["5"]}`,
             background: t.colors.primary[800],
@@ -226,7 +224,6 @@ export default function MuniraShowcase() {
             boxShadow: "0 5px 14px rgba(33,53,42,0.14)",
           }}
         >
-          <Sparkles size={16} strokeWidth={1.8} />
           اسأل منيرة
         </a>
       </div>

@@ -1,0 +1,153 @@
+
+.container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.storyBlock,
+.heritageBlock {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: center;
+}
+
+.heritageBlock {
+  margin-top: 112px;
+}
+
+.storyImage,
+.heritageImage {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #f7f3ea;
+  border: 1px solid rgba(91, 70, 45, 0.1);
+}
+
+.storyContent,
+.heritageContent {
+  max-width: 590px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: #c9973a;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 28px;
+  color: #374151;
+  font-size: 16px;
+  line-height: 2;
+}
+
+.text p {
+  margin: 0;
+}
+
+.strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.highlight,
+.highlightGold {
+  padding: 18px 22px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.9;
+}
+
+.highlight {
+  color: #254d3a;
+  background: #f7f3ea;
+  border-inline-start: 4px solid #254d3a;
+}
+
+.highlightGold {
+  color: #254d3a;
+  background: #ffffff;
+  border-inline-start: 4px solid #c9973a;
+  box-shadow: 0 8px 28px rgba(91, 70, 45, 0.06);
+}
+
+.finalStatement {
+  color: #254d3a;
+  font-weight: 700;
+}
+
+/* الصورة الثانية تكون في الجهة المقابلة بصريًا */
+.heritageImage {
+  order: 2;
+}
+
+.heritageContent {
+  order: 1;
+}
+
+@media (max-width: 900px) {
+  .storyBlock,
+  .heritageBlock {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .heritageBlock {
+    margin-top: 72px;
+  }
+
+  .storyContent,
+  .heritageContent {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .storyImage,
+  .heritageImage {
+    height: 400px;
+  }
+
+  .heritageImage {
+    order: 2;
+  }
+
+  .heritageContent {
+    order: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .heritageBlock {
+    margin-top: 56px;
+  }
+
+  .storyImage,
+  .heritageImage {
+    height: 300px;
+    border-radius: 20px;
+  }
+
+  .text {
+    gap: 15px;
+    margin-top: 22px;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .highlight,
+  .highlightGold {
+    padding: 16px 18px;
+    font-size: 16px;
+  }
+}

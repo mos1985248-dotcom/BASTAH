@@ -1,0 +1,469 @@
+.grid {
+  width: 100%;
+  margin: 0 auto;
+
+  padding: 64px 32px 58px;
+
+  display: grid;
+  grid-template-columns:
+    minmax(330px, 1.7fr)
+    repeat(4, minmax(150px, 1fr));
+
+  gap: 48px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.brandSection {
+  min-width: 0;
+  padding-left: 24px;
+}
+
+.brandHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logoBox {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.14);
+
+  overflow: hidden;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+
+  display: block;
+  object-fit: contain;
+}
+
+.brandName {
+  min-width: 0;
+}
+
+.brandTitle {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-family:
+    var(--font-kufi-arabic),
+    "Noto Kufi Arabic",
+    sans-serif;
+
+  font-size: 26px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.brandSubtitle {
+  margin-top: 5px;
+
+  color: #d8e4df;
+
+  font-size: 14px;
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+.brandAccent {
+  width: 52px;
+  height: 4px;
+
+  margin: 22px 0 18px;
+
+  border-radius: 999px;
+
+  background: #c9973a;
+}
+
+.description {
+  max-width: 430px;
+
+  margin: 0;
+
+  color: #d5dfdb;
+
+  font-size: 15px;
+  line-height: 2;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   SOCIAL
+   ========================================================= */
+
+.socialSection {
+  margin-top: 30px;
+}
+
+.socialTitle {
+  margin: 0 0 13px;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+.socialList {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.social {
+  width: 42px;
+  height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #e6eee9;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+
+  border-radius: 12px;
+
+  text-decoration: none;
+
+  box-sizing: border-box;
+
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.social:hover {
+  color: #ffffff;
+
+  background: #215b49;
+
+  border-color: #c9973a;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+.xIcon {
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   COLUMNS
+   ========================================================= */
+
+.column {
+  min-width: 0;
+}
+
+.columnHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 20px;
+}
+
+.columnMarker {
+  width: 4px;
+  height: 21px;
+
+  flex: 0 0 4px;
+
+  border-radius: 999px;
+
+  background: #c9973a;
+}
+
+.columnTitle {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-family:
+    var(--font-kufi-arabic),
+    "Noto Kufi Arabic",
+    sans-serif;
+
+  font-size: 17px;
+  line-height: 1.55;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+.links {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  gap: 4px;
+}
+
+.link {
+  min-height: 39px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 6px 0;
+
+  color: #cbd8d3;
+
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 400;
+
+  text-decoration: none;
+
+  border-radius: 8px;
+
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    padding 200ms ease;
+}
+
+.linkArrow {
+  opacity: 0;
+
+  color: #d2a34a;
+
+  font-size: 15px;
+  line-height: 1;
+
+  transform: translateX(6px);
+
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.link:hover {
+  padding-right: 9px;
+
+  color: #ffffff;
+
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.link:hover .linkArrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1150px) {
+  .grid {
+    grid-template-columns:
+      minmax(290px, 1.45fr)
+      repeat(4, minmax(125px, 1fr));
+
+    gap: 30px;
+
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .brandSection {
+    padding-left: 8px;
+  }
+
+  .columnTitle {
+    font-size: 16px;
+  }
+
+  .link {
+    font-size: 14px;
+  }
+}
+
+
+/* =========================================================
+   SMALL DESKTOP / TABLET
+   ========================================================= */
+
+@media (max-width: 950px) {
+  .grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 40px 30px;
+  }
+
+  .brandSection {
+    grid-column: 1 / -1;
+
+    padding-left: 0;
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+  .description {
+    max-width: 700px;
+  }
+
+  .columnTitle {
+    font-size: 16px;
+  }
+
+  .link {
+    font-size: 14px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 34px 22px;
+
+    padding:
+      46px
+      20px
+      42px;
+  }
+
+  .brandSection {
+    grid-column: 1 / -1;
+  }
+
+  .brandTitle {
+    font-size: 23px;
+  }
+
+  .brandSubtitle {
+    font-size: 13px;
+  }
+
+  .description {
+    font-size: 14px;
+    line-height: 1.95;
+  }
+
+  .columnTitle {
+    font-size: 15px;
+  }
+
+  .link {
+    min-height: 37px;
+    font-size: 13.5px;
+  }
+
+  .social {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 430px) {
+  .grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 30px 18px;
+
+    padding:
+      40px
+      16px
+      36px;
+  }
+
+  .logoBox {
+    width: 56px;
+    height: 56px;
+
+    flex-basis: 56px;
+
+    border-radius: 15px;
+  }
+
+  .logo {
+    width: 43px;
+    height: 43px;
+  }
+
+  .brandTitle {
+    font-size: 21px;
+  }
+
+  .brandSubtitle {
+    font-size: 12px;
+  }
+
+  .description {
+    font-size: 13.5px;
+  }
+
+  .columnTitle {
+    font-size: 14px;
+  }
+
+  .link {
+    min-height: 35px;
+    font-size: 13px;
+  }
+
+  .social {
+    width: 38px;
+    height: 38px;
+  }
+}

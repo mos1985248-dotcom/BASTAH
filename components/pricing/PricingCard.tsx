@@ -1,3 +1,4 @@
+
 // components/pricing/PricingCard.tsx
 "use client";
 
@@ -37,7 +38,9 @@ export default function PricingCard({
     try {
       const res = await fetch("/api/subscription/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           plan: plan.plan,
           billingCycle: billing,
@@ -47,16 +50,21 @@ export default function PricingCard({
       const body = await res.json();
 
       if (!res.ok) {
-        throw new Error(body?.error ?? "تعذّر تنفيذ العملية");
+        throw new Error(
+          body?.error ?? "تعذّر تنفيذ العملية"
+        );
       }
 
       if (body.requiresPayment) {
         window.location.href = body.paymentUrl;
       } else {
-        window.location.href = "/dashboard?planChanged=1";
+        window.location.href =
+          "/dashboard?planChanged=1";
       }
     } catch (err: any) {
-      setError(err.message ?? "تعذّر تنفيذ العملية");
+      setError(
+        err.message ?? "تعذّر تنفيذ العملية"
+      );
       setLoading(false);
     }
   };
@@ -65,13 +73,18 @@ export default function PricingCard({
     <article
       dir="rtl"
       className={`basita-pricing-card ${
-        highlighted ? "basita-pricing-card-highlighted" : ""
+        highlighted
+          ? "basita-pricing-card-highlighted"
+          : ""
       }`}
       style={{
         position: "relative",
         display: "flex",
         flexDirection: "column",
+        width: "100%",
+        minWidth: 0,
         height: "100%",
+        boxSizing: "border-box",
         overflow: "hidden",
         background: t.colors.white,
         borderRadius: t.radius.xl,
@@ -80,7 +93,7 @@ export default function PricingCard({
             ? t.colors.gold[600]
             : t.colors.cream.border
         }`,
-        padding: t.spacing["6"],
+        padding: t.spacing["5"],
         textAlign: "right",
         boxShadow: highlighted
           ? t.shadows.gold
@@ -95,8 +108,8 @@ export default function PricingCard({
             position: "absolute",
             insetInlineStart: -55,
             top: -65,
-            width: 150,
-            height: 150,
+            width: 145,
+            height: 145,
             borderRadius: "50%",
             background:
               "radial-gradient(circle, rgba(217,179,108,0.18), transparent 70%)",
@@ -105,51 +118,60 @@ export default function PricingCard({
         />
       )}
 
-      {/* شارة الباقة */}
-      {plan.badgeAr && (
-        <span
-          style={{
-            position: "absolute",
-            top: 16,
-            right: 18,
-            zIndex: 2,
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-            background: t.colors.gold[600],
-            color: t.colors.text.onDark,
-            fontSize: t.typography.fontSize.xs,
-            fontWeight: t.typography.fontWeight.bold,
-            padding: "6px 11px",
-            borderRadius: t.radius.full,
-            boxShadow: t.shadows.sm,
-            whiteSpace: "nowrap",
-          }}
-        >
-          <Sparkles
-            size={13}
-            strokeWidth={2}
-            aria-hidden="true"
-          />
-          {plan.badgeAr}
-        </span>
-      )}
+      {/* مساحة ثابتة للشارة في جميع الباقات */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          height: 32,
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "flex-start",
+        }}
+      >
+        {plan.badgeAr && (
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              background: t.colors.gold[600],
+              color: t.colors.text.onDark,
+              fontSize: t.typography.fontSize.xs,
+              fontWeight:
+                t.typography.fontWeight.bold,
+              padding: "5px 9px",
+              borderRadius: t.radius.full,
+              boxShadow: t.shadows.sm,
+              whiteSpace: "nowrap",
+            }}
+          >
+            <Sparkles
+              size={12}
+              strokeWidth={2}
+              aria-hidden="true"
+            />
+
+            {plan.badgeAr}
+          </span>
+        )}
+      </div>
 
       {/* رأس البطاقة */}
       <div
         style={{
           position: "relative",
           zIndex: 1,
-          paddingTop: plan.badgeAr ? 36 : 0,
         }}
       >
         <h3
           style={{
             margin: `0 0 ${t.spacing["1"]}`,
-            fontSize: t.typography.fontSize.xl,
-            fontWeight: t.typography.fontWeight.bold,
+            fontSize: t.typography.fontSize.lg,
+            fontWeight:
+              t.typography.fontWeight.bold,
             color: t.colors.primary[800],
-            lineHeight: 1.35,
+            lineHeight: 1.4,
           }}
         >
           {plan.nameAr}
@@ -157,15 +179,16 @@ export default function PricingCard({
 
         <div
           style={{
-            minHeight: 42,
-            marginBottom: t.spacing["5"],
+            minHeight: 48,
+            marginBottom: t.spacing["4"],
           }}
         >
           {plan.taglineAr && (
             <p
               style={{
                 margin: 0,
-                fontSize: t.typography.fontSize.sm,
+                fontSize:
+                  t.typography.fontSize.xs,
                 color: t.colors.text.mid,
                 fontWeight:
                   t.typography.fontWeight.medium,
@@ -184,8 +207,8 @@ export default function PricingCard({
         style={{
           position: "relative",
           zIndex: 1,
-          margin: `0 0 ${t.spacing["5"]}`,
-          padding: `${t.spacing["4"]} ${t.spacing["4"]}`,
+          margin: `0 0 ${t.spacing["4"]}`,
+          padding: `${t.spacing["3"]} ${t.spacing["3"]}`,
           borderRadius: t.radius.lg,
           background: highlighted
             ? "rgba(217,179,108,0.09)"
@@ -201,14 +224,16 @@ export default function PricingCard({
           style={{
             display: "flex",
             alignItems: "baseline",
-            gap: 6,
+            gap: 5,
             flexWrap: "wrap",
           }}
         >
           <span
             style={{
-              fontSize: "clamp(32px, 4vw, 42px)",
-              fontWeight: t.typography.fontWeight.bold,
+              fontSize:
+                "clamp(28px, 3vw, 36px)",
+              fontWeight:
+                t.typography.fontWeight.bold,
               color: t.colors.text.dark,
               lineHeight: 1,
               letterSpacing: "-0.02em",
@@ -219,7 +244,8 @@ export default function PricingCard({
 
           <span
             style={{
-              fontSize: t.typography.fontSize.sm,
+              fontSize:
+                t.typography.fontSize.xs,
               color: t.colors.text.mid,
               fontWeight:
                 t.typography.fontWeight.medium,
@@ -232,8 +258,9 @@ export default function PricingCard({
         {billing === "yearly" && (
           <p
             style={{
-              margin: "8px 0 0",
-              fontSize: t.typography.fontSize.xs,
+              margin: "7px 0 0",
+              fontSize:
+                t.typography.fontSize.xs,
               color: t.colors.semantic.success,
               fontWeight:
                 t.typography.fontWeight.semibold,
@@ -249,7 +276,7 @@ export default function PricingCard({
         style={{
           position: "relative",
           zIndex: 1,
-          marginBottom: t.spacing["5"],
+          marginBottom: t.spacing["4"],
         }}
       >
         {hasOwnStore ? (
@@ -263,9 +290,10 @@ export default function PricingCard({
               alignItems: "center",
               justifyContent: "center",
               width: "100%",
-              minHeight: 48,
+              minHeight: 46,
+              boxSizing: "border-box",
               textAlign: "center",
-              padding: "12px 16px",
+              padding: "10px 12px",
               borderRadius: t.radius.md,
               border: "none",
               background: highlighted
@@ -276,7 +304,8 @@ export default function PricingCard({
                 : t.colors.primary[800],
               fontWeight:
                 t.typography.fontWeight.bold,
-              fontSize: t.typography.fontSize.sm,
+              fontSize:
+                t.typography.fontSize.xs,
               cursor: loading
                 ? "not-allowed"
                 : "pointer",
@@ -303,10 +332,10 @@ export default function PricingCard({
               alignItems: "center",
               justifyContent: "center",
               width: "100%",
-              minHeight: 48,
+              minHeight: 46,
               boxSizing: "border-box",
               textAlign: "center",
-              padding: "12px 16px",
+              padding: "10px 12px",
               borderRadius: t.radius.md,
               background: highlighted
                 ? t.colors.primary[800]
@@ -316,7 +345,8 @@ export default function PricingCard({
                 : t.colors.primary[800],
               fontWeight:
                 t.typography.fontWeight.bold,
-              fontSize: t.typography.fontSize.sm,
+              fontSize:
+                t.typography.fontSize.xs,
               textDecoration: "none",
               boxShadow: highlighted
                 ? t.shadows.md
@@ -339,21 +369,23 @@ export default function PricingCard({
           style={{
             display: "flex",
             alignItems: "flex-start",
-            gap: 8,
-            margin: `0 0 ${t.spacing["4"]}`,
-            padding: "10px 12px",
+            gap: 7,
+            margin: `0 0 ${t.spacing["3"]}`,
+            padding: "9px 10px",
             borderRadius: t.radius.md,
-            background: t.colors.semantic.dangerBg,
+            background:
+              t.colors.semantic.dangerBg,
             border: `1px solid ${t.colors.semantic.danger}22`,
             color: t.colors.semantic.danger,
-            fontSize: t.typography.fontSize.xs,
+            fontSize:
+              t.typography.fontSize.xs,
             fontWeight:
               t.typography.fontWeight.bold,
             lineHeight: 1.6,
           }}
         >
           <AlertTriangle
-            size={15}
+            size={14}
             strokeWidth={1.9}
             style={{
               flexShrink: 0,
@@ -371,7 +403,7 @@ export default function PricingCard({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: t.spacing["3"],
+          gap: t.spacing["2"],
           flex: 1,
           justifyContent: "flex-start",
           paddingTop: t.spacing["1"],
@@ -385,7 +417,8 @@ export default function PricingCard({
               display: "flex",
               alignItems: "flex-start",
               gap: t.spacing["2"],
-              fontSize: t.typography.fontSize.sm,
+              fontSize:
+                t.typography.fontSize.xs,
               color: t.colors.text.body,
               fontWeight:
                 t.typography.fontWeight.medium,
@@ -394,8 +427,8 @@ export default function PricingCard({
           >
             <span
               style={{
-                width: 22,
-                height: 22,
+                width: 20,
+                height: 20,
                 borderRadius: t.radius.full,
                 display: "inline-flex",
                 alignItems: "center",
@@ -407,9 +440,11 @@ export default function PricingCard({
               }}
             >
               <Check
-                size={14}
+                size={13}
                 strokeWidth={2.4}
-                color={t.colors.semantic.success}
+                color={
+                  t.colors.semantic.success
+                }
                 aria-hidden="true"
               />
             </span>

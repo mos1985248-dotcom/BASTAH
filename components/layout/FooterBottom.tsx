@@ -1,7 +1,10 @@
+
 // components/layout/FooterBottom.tsx
+
 import { t } from "@/theme";
 import { SOCIAL_LINKS, SocialLinks } from "@/lib/social-links";
 import SocialIcon, { SocialPlatform } from "./SocialIcon";
+import styles from "./FooterBottom.module.css";
 
 const SOCIAL_META: {
   key: keyof SocialLinks;
@@ -19,67 +22,42 @@ const ACTIVE_SOCIALS = SOCIAL_META.filter((s) =>
   Boolean(SOCIAL_LINKS[s.key]),
 );
 
-const PAYMENT_METHODS = ["Visa", "Mastercard", "مدى", "Apple Pay", "STC Pay"];
+const PAYMENT_METHODS = [
+  "Visa",
+  "Mastercard",
+  "مدى",
+  "Apple Pay",
+  "STC Pay",
+];
 
 export default function FooterBottom() {
   return (
-    <div
-      style={{
-        borderTop: "1px solid rgba(255,255,255,0.12)",
-      }}
-    >
+    <div className={styles.wrapper}>
       <div
-        className="basita-footer-bottom-inner"
+        className={styles.inner}
         style={{
           maxWidth: t.layout.containerMaxWidth,
-          margin: "0 auto",
-          padding: `${t.spacing["6"]} ${t.spacing["4"]}`,
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: t.spacing["4"],
         }}
       >
-        <span
-          style={{
-            color: t.colors.text.onDarkMuted,
-            fontSize: t.typography.fontSize.sm,
-          }}
-        >
+        {/* حقوق النشر */}
+        <span className={styles.copyright}>
           بسطة © 2026 — جميع الحقوق محفوظة
         </span>
 
-        <div
-          style={{
-            display: "flex",
-            gap: t.spacing["2"],
-            flexWrap: "wrap",
-          }}
-        >
-          {PAYMENT_METHODS.map((m) => (
-            <span
-              key={m}
-              style={{
-                fontSize: t.typography.fontSize.xs,
-                color: t.colors.text.onDarkMuted,
-                border: "1px solid rgba(255,255,255,0.2)",
-                borderRadius: t.radius.sm,
-                padding: `${t.spacing["1"]} ${t.spacing["3"]}`,
-              }}
-            >
-              {m}
+        {/* وسائل الدفع */}
+        <div className={styles.payments} aria-label="وسائل الدفع المتاحة">
+          {PAYMENT_METHODS.map((method) => (
+            <span key={method} className={styles.payment}>
+              {method}
             </span>
           ))}
         </div>
 
+        {/* وسائل التواصل الرسمية */}
         {ACTIVE_SOCIALS.length > 0 && (
           <div
-            className="basita-footer-socials"
-            style={{
-              display: "flex",
-              gap: t.spacing["3"],
-            }}
+            className={styles.socials}
+            aria-label="حسابات بسطة على وسائل التواصل"
           >
             {ACTIVE_SOCIALS.map((s) => (
               <a
@@ -88,20 +66,8 @@ export default function FooterBottom() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="basita-social-icon"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 38,
-                  height: 38,
-                  borderRadius: t.radius.full,
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  color: t.colors.text.onDarkMuted,
-                  transition:
-                    `color ${t.motion.fast} ${t.motion.ease}, ` +
-                    `border-color ${t.motion.fast} ${t.motion.ease}`,
-                }}
+                title={s.label}
+                className={styles.social}
               >
                 <SocialIcon platform={s.platform} size={18} />
               </a>

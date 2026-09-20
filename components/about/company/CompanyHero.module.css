@@ -1,0 +1,44 @@
+.companyHeroGrid {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.textContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.imagePanel {
+  position: relative;
+  min-height: 500px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .companyHeroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .imagePanel {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 600px) {
+  .textContent {
+    padding: 30px 24px !important;
+  }
+
+  .imagePanel {
+    min-height: 300px;
+  }
+}

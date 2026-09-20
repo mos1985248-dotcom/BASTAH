@@ -1,0 +1,195 @@
+
+.wrapper {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.inner {
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 20px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
+/* =========================
+   حقوق النشر
+   ========================= */
+
+.copyright {
+  color: #d1d5db;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: nowrap;
+}
+
+/* =========================
+   وسائل الدفع
+   ========================= */
+
+.payments {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.payment {
+  min-height: 32px;
+  padding: 5px 11px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.045);
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.payment:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* =========================
+   وسائل التواصل
+   ========================= */
+
+.socials {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.social {
+  width: 38px;
+  height: 38px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 999px;
+
+  color: #d1d5db;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.17);
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.social:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.28);
+
+  transform: translateY(-2px);
+}
+
+.social:focus-visible {
+  outline: 2px solid #d9b36c;
+  outline-offset: 4px;
+}
+
+/* =========================
+   Tablet
+   ========================= */
+
+@media (max-width: 900px) {
+  .inner {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .copyright {
+    width: 100%;
+  }
+
+  .payments {
+    width: 100%;
+  }
+
+  .socials {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* =========================
+   Mobile
+   ========================= */
+
+@media (max-width: 600px) {
+  .inner {
+    padding: 22px 16px;
+    gap: 18px;
+  }
+
+  .copyright {
+    font-size: 13px;
+    white-space: normal;
+  }
+
+  .payments {
+    gap: 7px;
+  }
+
+  .payment {
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .social {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* =========================
+   Reduced Motion
+   ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .payment,
+  .social {
+    transition: none;
+  }
+
+  .social:hover {
+    transform: none;
+  }
+}

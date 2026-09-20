@@ -26,13 +26,13 @@ export default function AddEntryForm({
 }) {
   const inputStyle: React.CSSProperties = {
     width: "100%",
-    minHeight: 44,
-    padding: "10px 12px",
+    minHeight: 40,
+    padding: "8px 11px",
     border: `1px solid ${t.colors.cream.border}`,
     borderRadius: t.radius.md,
     background: t.colors.white,
     color: t.colors.text.dark,
-    fontSize: t.typography.fontSize.sm,
+    fontSize: 13,
     lineHeight: 1.5,
     direction: "rtl",
     boxSizing: "border-box",
@@ -51,7 +51,7 @@ export default function AddEntryForm({
         border: `1px solid ${t.colors.cream.border}`,
         borderRadius: t.radius.lg,
         overflow: "hidden",
-        boxShadow: "0 5px 18px rgba(75, 56, 34, 0.05)",
+        boxShadow: "0 3px 13px rgba(75, 56, 34, 0.035)",
       }}
     >
       {/* Header */}
@@ -60,8 +60,8 @@ export default function AddEntryForm({
           position: "relative",
           display: "flex",
           alignItems: "center",
-          gap: 10,
-          padding: `${t.spacing["4"]} ${t.spacing["5"]}`,
+          gap: 9,
+          padding: `${t.spacing["3"]} ${t.spacing["4"]}`,
           background: t.colors.cream.bg,
           borderBottom: `1px solid ${t.colors.cream.border}`,
         }}
@@ -72,7 +72,7 @@ export default function AddEntryForm({
             position: "absolute",
             insetInlineStart: 0,
             top: 0,
-            width: 4,
+            width: 3,
             height: "100%",
             background: t.colors.gold[600],
           }}
@@ -81,8 +81,8 @@ export default function AddEntryForm({
         <span
           aria-hidden="true"
           style={{
-            width: 38,
-            height: 38,
+            width: 34,
+            height: 34,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
@@ -91,19 +91,22 @@ export default function AddEntryForm({
             background: t.colors.white,
             border: `1px solid ${t.colors.cream.border}`,
             color: t.colors.primary[800],
-            boxShadow: "0 2px 8px rgba(75, 56, 34, 0.05)",
+            boxShadow: "0 2px 6px rgba(75, 56, 34, 0.035)",
           }}
         >
-          <BookOpen size={19} strokeWidth={1.7} />
+          <BookOpen
+            size={17}
+            strokeWidth={1.7}
+          />
         </span>
 
-        <div>
+        <div style={{ minWidth: 0 }}>
           <h3
             id="add-entry-title"
             style={{
               margin: 0,
               color: t.colors.primary[800],
-              fontSize: t.typography.fontSize.base,
+              fontSize: t.typography.fontSize.sm,
               fontWeight: t.typography.fontWeight.bold,
               lineHeight: 1.45,
             }}
@@ -115,8 +118,8 @@ export default function AddEntryForm({
             style={{
               margin: "2px 0 0",
               color: t.colors.text.light,
-              fontSize: t.typography.fontSize.xs,
-              lineHeight: 1.5,
+              fontSize: 11,
+              lineHeight: 1.45,
             }}
           >
             أضف حركة مالية إلى دفاترك
@@ -130,8 +133,8 @@ export default function AddEntryForm({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: t.spacing["3"],
-          padding: t.spacing["5"],
+          gap: t.spacing["2"],
+          padding: t.spacing["4"],
         }}
       >
         {/* Entry type */}
@@ -140,9 +143,9 @@ export default function AddEntryForm({
             htmlFor="entry-type"
             style={{
               display: "block",
-              marginBottom: 6,
+              marginBottom: 5,
               color: t.colors.text.dark,
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 12,
               fontWeight: t.typography.fontWeight.bold,
             }}
           >
@@ -172,9 +175,9 @@ export default function AddEntryForm({
             htmlFor="entry-amount"
             style={{
               display: "block",
-              marginBottom: 6,
+              marginBottom: 5,
               color: t.colors.text.dark,
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 12,
               fontWeight: t.typography.fontWeight.bold,
             }}
           >
@@ -188,12 +191,12 @@ export default function AddEntryForm({
           >
             <Wallet
               aria-hidden="true"
-              size={17}
+              size={15}
               strokeWidth={1.7}
               color={t.colors.text.light}
               style={{
                 position: "absolute",
-                insetInlineStart: 12,
+                insetInlineStart: 11,
                 top: "50%",
                 transform: "translateY(-50%)",
                 pointerEvents: "none",
@@ -212,7 +215,7 @@ export default function AddEntryForm({
               placeholder="المبلغ (ر.س)"
               style={{
                 ...inputStyle,
-                paddingInlineStart: 40,
+                paddingInlineStart: 36,
                 direction: "ltr",
                 textAlign: "right",
               }}
@@ -228,9 +231,9 @@ export default function AddEntryForm({
               htmlFor="entry-expense-category"
               style={{
                 display: "block",
-                marginBottom: 6,
+                marginBottom: 5,
                 color: t.colors.text.dark,
-                fontSize: t.typography.fontSize.xs,
+                fontSize: 12,
                 fontWeight: t.typography.fontWeight.bold,
               }}
             >
@@ -269,9 +272,9 @@ export default function AddEntryForm({
             htmlFor="entry-description"
             style={{
               display: "block",
-              marginBottom: 6,
+              marginBottom: 5,
               color: t.colors.text.dark,
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 12,
               fontWeight: t.typography.fontWeight.bold,
             }}
           >
@@ -299,18 +302,18 @@ export default function AddEntryForm({
             style={{
               display: "flex",
               alignItems: "flex-start",
-              gap: 8,
-              padding: `${t.spacing["3"]} ${t.spacing["3"]}`,
+              gap: 7,
+              padding: "8px 10px",
               borderRadius: t.radius.md,
               border: `1px solid ${t.colors.semantic.danger}22`,
               background: t.colors.semantic.dangerBg,
               color: t.colors.semantic.danger,
-              fontSize: t.typography.fontSize.xs,
-              lineHeight: 1.7,
+              fontSize: 11,
+              lineHeight: 1.65,
             }}
           >
             <AlertTriangle
-              size={16}
+              size={15}
               strokeWidth={1.8}
               style={{
                 flexShrink: 0,
@@ -330,12 +333,12 @@ export default function AddEntryForm({
           className="basita-add-entry-button"
           style={{
             width: "100%",
-            minHeight: 46,
+            minHeight: 43,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 7,
-            padding: "10px 16px",
+            gap: 6,
+            padding: "9px 14px",
             marginTop: 2,
             background: submitting
               ? t.colors.primary[600]
@@ -343,7 +346,7 @@ export default function AddEntryForm({
             color: t.colors.white,
             border: "none",
             borderRadius: t.radius.md,
-            fontSize: t.typography.fontSize.sm,
+            fontSize: 13,
             fontWeight: t.typography.fontWeight.bold,
             cursor: submitting
               ? "not-allowed"
@@ -351,14 +354,14 @@ export default function AddEntryForm({
             opacity: submitting ? 0.78 : 1,
             boxShadow: submitting
               ? "none"
-              : "0 5px 14px rgba(75, 56, 34, 0.12)",
+              : "0 4px 12px rgba(75, 56, 34, 0.10)",
             transition:
               "transform 160ms ease, box-shadow 160ms ease, background 160ms ease",
           }}
         >
           {!submitting && (
             <Plus
-              size={17}
+              size={16}
               strokeWidth={2.2}
             />
           )}
@@ -376,12 +379,12 @@ export default function AddEntryForm({
 
         .basita-entry-input:focus {
           border-color: ${t.colors.primary[800]} !important;
-          box-shadow: 0 0 0 3px rgba(75, 56, 34, 0.08);
+          box-shadow: 0 0 0 3px rgba(75, 56, 34, 0.07);
         }
 
         .basita-add-entry-button:not(:disabled):hover {
           transform: translateY(-1px);
-          box-shadow: 0 7px 18px rgba(75, 56, 34, 0.16);
+          box-shadow: 0 6px 15px rgba(75, 56, 34, 0.14);
         }
 
         .basita-add-entry-button:not(:disabled):active {
@@ -395,11 +398,40 @@ export default function AddEntryForm({
 
         @media (max-width: 480px) {
           .basita-add-entry-fields {
-            padding: ${t.spacing["4"]} !important;
+            padding: ${t.spacing["3"]} !important;
+            gap: ${t.spacing["2"]} !important;
           }
 
           .basita-add-entry-form > div:first-child {
-            padding: ${t.spacing["3"]} ${t.spacing["4"]} !important;
+            padding: ${t.spacing["3"]} !important;
+          }
+
+          .basita-entry-input {
+            min-height: 40px !important;
+          }
+
+          .basita-add-entry-button {
+            min-height: 42px !important;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .basita-add-entry-fields {
+            padding: 10px !important;
+          }
+
+          .basita-add-entry-form > div:first-child {
+            padding: 10px !important;
+          }
+
+          .basita-entry-input {
+            min-height: 39px !important;
+            font-size: 12px !important;
+          }
+
+          .basita-add-entry-button {
+            min-height: 41px !important;
+            font-size: 12px !important;
           }
         }
 

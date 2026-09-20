@@ -12,24 +12,54 @@ import StoryBlogCTARow from "@/components/home/StoryBlogCTARow";
 import CategoryNav from "@/components/home/CategoryNav";
 import FeaturedStores from "@/components/home/FeaturedStores";
 import WhyBasita from "@/components/home/WhyBasita";
+import SectionBand from "@/components/home/SectionBand";
 
 export default function HomeClient() {
   const { user, loading } = useCurrentUser();
 
-  // زر "ابدأ متجرك" يظهر فقط للزائر أو المشتري بدون متجر — التاجر عنده متجر أصلاً
-  const showStartStore = !loading && (!user || (user.role !== "SELLER" && !user.store));
+  // زر "ابدأ متجرك" يظهر فقط للزائر أو المشتري بدون متجر —
+  // التاجر عنده متجر أصلاً
+  const showStartStore =
+    !loading && (!user || (user.role !== "SELLER" && !user.store));
 
   return (
     <SiteShell>
+      {/* رحلة المتسوّق أولاً */}
       <HeroSection showStartStore={showStartStore} />
-      <TrustBadgeBar />
-      <MuniraShowcase />
-      <PlansSection />
-      <DaftariShowcase />
-      <StoryBlogCTARow showStartStore={showStartStore} />
-      <CategoryNav />
-      <FeaturedStores />
-      <WhyBasita />
+
+      {/* شريط الثقة + الأقسام — منطقة واحدة مضغوطة */}
+      <SectionBand tone="white" divider={false}>
+        <div className="basita-home-discovery-bar">
+          <TrustBadgeBar />
+          <CategoryNav />
+        </div>
+      </SectionBand>
+
+      {/* المتاجر المميزة */}
+      <SectionBand tone="white">
+        <FeaturedStores />
+      </SectionBand>
+
+      {/* لماذا بسطة */}
+      <SectionBand tone="transparent" divider={false}>
+        <WhyBasita />
+      </SectionBand>
+
+      {/* أدوات التاجر */}
+      <SectionBand tone="white">
+        <MuniraShowcase />
+        <DaftariShowcase />
+      </SectionBand>
+
+      {/* الخطط والاشتراك */}
+      <SectionBand tone="transparent" divider={false}>
+        <PlansSection />
+      </SectionBand>
+
+      {/* الإقفال النهائي */}
+      <SectionBand tone="tint">
+        <StoryBlogCTARow showStartStore={showStartStore} />
+      </SectionBand>
     </SiteShell>
   );
 }

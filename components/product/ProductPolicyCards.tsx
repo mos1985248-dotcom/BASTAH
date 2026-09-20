@@ -58,9 +58,9 @@ export default function ProductPolicyCards({
       className="basita-product-policy-cards"
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-        gap: t.spacing["3"],
-        marginTop: t.spacing["5"],
+        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+        gap: t.spacing["2"],
+        marginTop: t.spacing["4"],
       }}
     >
       {cards.map((c) => (
@@ -73,9 +73,9 @@ export default function ProductPolicyCards({
             background: t.colors.white,
             border: `1px solid ${t.colors.cream.border}`,
             borderRadius: t.radius.lg,
-            padding: t.spacing["4"],
-            minHeight: 126,
-            boxShadow: "0 4px 15px rgba(25, 45, 35, 0.035)",
+            padding: t.spacing["3"],
+            minHeight: 108,
+            boxShadow: "0 3px 12px rgba(25, 45, 35, 0.03)",
             transition:
               "transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease",
           }}
@@ -87,7 +87,7 @@ export default function ProductPolicyCards({
               position: "absolute",
               top: 0,
               insetInlineStart: 0,
-              width: 42,
+              width: 36,
               height: 3,
               borderRadius: "0 0 4px 0",
               background: t.colors.gold[600],
@@ -97,15 +97,15 @@ export default function ProductPolicyCards({
           <div
             style={{
               display: "flex",
-              alignItems: "flex-start",
+              alignItems: "center",
               gap: t.spacing["2"],
               marginBottom: t.spacing["2"],
             }}
           >
             <span
               style={{
-                width: 34,
-                height: 34,
+                width: 32,
+                height: 32,
                 flexShrink: 0,
                 display: "flex",
                 alignItems: "center",
@@ -115,14 +115,13 @@ export default function ProductPolicyCards({
                 color: t.colors.primary[800],
               }}
             >
-              <c.Icon size={16} strokeWidth={1.8} />
+              <c.Icon size={15} strokeWidth={1.8} />
             </span>
 
             <p
               style={{
                 margin: 0,
-                paddingTop: 5,
-                fontSize: t.typography.fontSize.sm,
+                fontSize: t.typography.fontSize.xs,
                 fontWeight: t.typography.fontWeight.bold,
                 color: t.colors.primary[800],
                 lineHeight: 1.4,
@@ -135,10 +134,10 @@ export default function ProductPolicyCards({
           <p
             style={{
               margin: 0,
-              paddingInlineStart: 42,
-              fontSize: t.typography.fontSize.xs,
+              paddingInlineStart: 40,
+              fontSize: 12,
               color: t.colors.text.mid,
-              lineHeight: 1.8,
+              lineHeight: 1.75,
             }}
           >
             {c.body}
@@ -150,7 +149,7 @@ export default function ProductPolicyCards({
         .basita-product-policy-card:hover {
           transform: translateY(-2px);
           border-color: rgba(15, 61, 46, 0.14);
-          box-shadow: 0 9px 24px rgba(25, 45, 35, 0.07);
+          box-shadow: 0 8px 20px rgba(25, 45, 35, 0.065);
         }
 
         @media (max-width: 700px) {

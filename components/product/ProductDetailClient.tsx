@@ -12,7 +12,6 @@ import ProductGallery from "@/components/product/ProductGallery";
 import ProductInfo from "@/components/product/ProductInfo";
 import ProductPurchasePanel from "@/components/product/ProductPurchasePanel";
 import ProductStoreCard from "@/components/product/ProductStoreCard";
-import ProductMuniraCTA from "@/components/product/ProductMuniraCTA";
 import ProductReviewsSection from "@/components/product/ProductReviewsSection";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import AddressSelector from "@/components/shared/AddressSelector";
@@ -333,13 +332,6 @@ export default function ProductDetailClient() {
                 redirectPath={`/products/${id}`}
               />
             </section>
-
-            <section
-              className="basita-product-section"
-              aria-label="مساعد منيرة"
-            >
-              <ProductMuniraCTA product={product} />
-            </section>
           </div>
         </div>
 
@@ -411,6 +403,7 @@ export default function ProductDetailClient() {
           flex-direction: column;
           gap: ${t.spacing["6"]};
           margin-top: ${t.spacing["6"]};
+        }
 
         .basita-product-address-section,
         .basita-product-reviews-section,

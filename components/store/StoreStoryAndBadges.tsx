@@ -24,7 +24,7 @@ const PLATFORM_BADGES: {
     label: "منتج سعودي",
     Icon: (
       <Landmark
-        size={20}
+        size={17}
         strokeWidth={1.6}
         color={t.colors.primary[800]}
       />
@@ -34,7 +34,7 @@ const PLATFORM_BADGES: {
     label: "دفع آمن",
     Icon: (
       <Lock
-        size={20}
+        size={17}
         strokeWidth={1.6}
         color={t.colors.primary[800]}
       />
@@ -44,7 +44,7 @@ const PLATFORM_BADGES: {
     label: "شحن لكل المملكة",
     Icon: (
       <Truck
-        size={20}
+        size={17}
         strokeWidth={1.6}
         color={t.colors.primary[800]}
       />
@@ -54,7 +54,7 @@ const PLATFORM_BADGES: {
     label: "استجابة سريعة",
     Icon: (
       <Zap
-        size={20}
+        size={17}
         strokeWidth={1.6}
         color={t.colors.primary[800]}
       />
@@ -79,7 +79,7 @@ export default function StoreStoryAndBadges({
             label: "متجر موثّق",
             Icon: (
               <BadgeCheck
-                size={20}
+                size={17}
                 strokeWidth={1.6}
                 color={t.colors.primary[800]}
               />
@@ -92,7 +92,7 @@ export default function StoreStoryAndBadges({
       label: tag,
       Icon: (
         <Sparkles
-          size={20}
+          size={17}
           strokeWidth={1.6}
           color={t.colors.gold[600]}
         />
@@ -117,7 +117,7 @@ export default function StoreStoryAndBadges({
             }`,
             Icon: (
               <RotateCcw
-                size={20}
+                size={17}
                 strokeWidth={1.6}
                 color={t.colors.primary[800]}
               />
@@ -132,14 +132,13 @@ export default function StoreStoryAndBadges({
       aria-label="قصة المتجر ومزاياه"
       style={{
         width: "100%",
-        maxWidth: 1200,
+        maxWidth: 1180,
         margin: "0 auto",
-        padding: `${t.spacing["8"]} ${t.spacing["5"]} 0`,
+        padding: `${t.spacing["5"]} ${t.spacing["4"]} 0`,
         boxSizing: "border-box",
         display: "grid",
-        gridTemplateColumns:
-          "repeat(auto-fit, minmax(320px, 1fr))",
-        gap: t.spacing["6"],
+        gridTemplateColumns: "minmax(0, 1.05fr) minmax(0, 1fr)",
+        gap: t.spacing["4"],
         direction: "rtl",
       }}
     >
@@ -148,10 +147,10 @@ export default function StoreStoryAndBadges({
         style={{
           minWidth: 0,
           background: t.colors.white,
-          borderRadius: t.radius.xl,
+          borderRadius: t.radius.lg,
           border: `1px solid ${t.colors.cream.border}`,
           overflow: "hidden",
-          boxShadow: t.shadows.sm,
+          boxShadow: t.shadows.xs,
         }}
       >
         {storyImage ? (
@@ -159,7 +158,7 @@ export default function StoreStoryAndBadges({
             role="img"
             aria-label={`صورة من ${store.nameAr}`}
             style={{
-              height: 190,
+              height: 135,
               backgroundImage: `url(${storyImage})`,
               backgroundPosition: "center",
               backgroundSize: "cover",
@@ -170,7 +169,7 @@ export default function StoreStoryAndBadges({
           <div
             aria-hidden="true"
             style={{
-              height: 190,
+              height: 135,
               background: `linear-gradient(135deg, ${t.colors.gold[200]}, ${t.colors.cream.warm})`,
               display: "flex",
               alignItems: "center",
@@ -178,26 +177,26 @@ export default function StoreStoryAndBadges({
             }}
           >
             <Leaf
-              size={42}
+              size={34}
               strokeWidth={1.5}
               color={t.colors.gold[700]}
             />
           </div>
         )}
 
-        <div style={{ padding: t.spacing["6"] }}>
+        <div style={{ padding: t.spacing["4"] }}>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              marginBottom: t.spacing["3"],
+              gap: 7,
+              marginBottom: t.spacing["2"],
             }}
           >
             <span
               style={{
-                width: 32,
-                height: 32,
+                width: 28,
+                height: 28,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -206,15 +205,16 @@ export default function StoreStoryAndBadges({
                 color: t.colors.primary[800],
               }}
             >
-              <Leaf size={16} strokeWidth={1.7} />
+              <Leaf size={14} strokeWidth={1.7} />
             </span>
 
             <h2
               style={{
                 margin: 0,
                 color: t.colors.text.dark,
-                fontSize: t.typography.fontSize.lg,
+                fontSize: t.typography.fontSize.base,
                 fontWeight: t.typography.fontWeight.bold,
+                lineHeight: 1.4,
               }}
             >
               قصة الأسرة
@@ -225,8 +225,8 @@ export default function StoreStoryAndBadges({
             style={{
               margin: 0,
               color: t.colors.text.body,
-              fontSize: t.typography.fontSize.sm,
-              lineHeight: 2,
+              fontSize: t.typography.fontSize.xs,
+              lineHeight: 1.8,
             }}
           >
             {store.publicInfo?.storyAr ||
@@ -241,19 +241,24 @@ export default function StoreStoryAndBadges({
         style={{
           minWidth: 0,
           background: t.colors.cream.warm,
-          borderRadius: t.radius.xl,
-          padding: t.spacing["6"],
+          borderRadius: t.radius.lg,
+          padding: t.spacing["4"],
           border: `1px solid ${t.colors.cream.border}`,
-          boxShadow: t.shadows.sm,
+          boxShadow: t.shadows.xs,
         }}
       >
-        <div style={{ marginBottom: t.spacing["5"] }}>
+        <div
+          style={{
+            marginBottom: t.spacing["3"],
+          }}
+        >
           <h3
             style={{
               margin: 0,
               color: t.colors.text.dark,
-              fontSize: t.typography.fontSize.lg,
+              fontSize: t.typography.fontSize.base,
               fontWeight: t.typography.fontWeight.bold,
+              lineHeight: 1.4,
             }}
           >
             لماذا يثق العملاء بنا؟
@@ -261,13 +266,13 @@ export default function StoreStoryAndBadges({
 
           <p
             style={{
-              margin: "4px 0 0",
+              margin: "3px 0 0",
               color: t.colors.text.light,
-              fontSize: t.typography.fontSize.xs,
-              lineHeight: 1.7,
+              fontSize: "11px",
+              lineHeight: 1.5,
             }}
           >
-            مزايا وتجارب تساعدك على التسوق بثقة
+            مزايا تساعدك على التسوق بثقة
           </p>
         </div>
 
@@ -275,8 +280,8 @@ export default function StoreStoryAndBadges({
           style={{
             display: "grid",
             gridTemplateColumns:
-              "repeat(auto-fit, minmax(130px, 1fr))",
-            gap: 10,
+              "repeat(auto-fit, minmax(105px, 1fr))",
+            gap: 7,
           }}
         >
           {badges.map((badge) => (
@@ -284,29 +289,27 @@ export default function StoreStoryAndBadges({
               key={badge.label}
               style={{
                 minWidth: 0,
-                minHeight: 108,
-                padding: "14px 10px",
+                minHeight: 72,
+                padding: "8px 7px",
                 boxSizing: "border-box",
                 background: t.colors.white,
-                border: `1px solid ${t.colors.cream.border}`,
-                borderRadius: t.radius.lg,
+                border: `1px solid ${t.colors.cream.borderLight}`,
+                borderRadius: t.radius.md,
                 display: "flex",
-                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                textAlign: "center",
+                gap: 7,
               }}
             >
               <div
                 style={{
-                  width: 40,
-                  height: 40,
+                  width: 30,
+                  height: 30,
+                  flexShrink: 0,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: t.radius.full,
                   background: t.colors.primary[50],
-                  marginBottom: 8,
                 }}
               >
                 {badge.Icon}
@@ -314,10 +317,11 @@ export default function StoreStoryAndBadges({
 
               <div
                 style={{
+                  minWidth: 0,
                   color: t.colors.text.body,
-                  fontSize: t.typography.fontSize.xs,
+                  fontSize: "11px",
                   fontWeight: t.typography.fontWeight.semibold,
-                  lineHeight: 1.7,
+                  lineHeight: 1.45,
                 }}
               >
                 {badge.label}

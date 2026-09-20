@@ -1,4 +1,4 @@
- // components/product/RelatedProducts.tsx
+// components/product/RelatedProducts.tsx
 
 "use client";
 
@@ -18,11 +18,15 @@ export default function RelatedProducts({
 }) {
   const { user } = useCurrentUser();
   const [items, setItems] = useState<MarketplaceProduct[]>([]);
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(
+    new Set()
+  );
 
   useEffect(() => {
     const qs = product.category?.slug
-      ? `category=${encodeURIComponent(product.category.slug)}`
+      ? `category=${encodeURIComponent(
+          product.category.slug
+        )}`
       : `storeId=${product.store.id}`;
 
     api
@@ -37,7 +41,11 @@ export default function RelatedProducts({
         )
       )
       .catch(() => setItems([]));
-  }, [product.id, product.category?.slug, product.store.id]);
+  }, [
+    product.id,
+    product.category?.slug,
+    product.store.id,
+  ]);
 
   useEffect(() => {
     if (!user) {
@@ -46,12 +54,15 @@ export default function RelatedProducts({
     }
 
     api
-      .get<{ items: { product: { id: string } }[] }>("/api/wishlist")
-      .then(
-        (d) =>
-          setFavoriteIds(
-            new Set(d.items.map((i) => i.product.id))
+      .get<{ items: { product: { id: string } }[] }>(
+        "/api/wishlist"
+      )
+      .then((d) =>
+        setFavoriteIds(
+          new Set(
+            d.items.map((i) => i.product.id)
           )
+        )
       )
       .catch(() => {});
   }, [user]);
@@ -66,7 +77,9 @@ export default function RelatedProducts({
 
     setFavoriteIds((prev) => {
       const next = new Set(prev);
-      isFav ? next.delete(productId) : next.add(productId);
+      isFav
+        ? next.delete(productId)
+        : next.add(productId);
       return next;
     });
 
@@ -74,12 +87,16 @@ export default function RelatedProducts({
       if (isFav) {
         await api.delete(`/api/wishlist/${productId}`);
       } else {
-        await api.post("/api/wishlist", { productId });
+        await api.post("/api/wishlist", {
+          productId,
+        });
       }
     } catch {
       setFavoriteIds((prev) => {
         const next = new Set(prev);
-        isFav ? next.add(productId) : next.delete(productId);
+        isFav
+          ? next.add(productId)
+          : next.delete(productId);
         return next;
       });
     }
@@ -93,12 +110,12 @@ export default function RelatedProducts({
       className="basita-related-products"
       aria-labelledby="related-products-title"
       style={{
-        marginTop: t.spacing["8"],
-        paddingTop: t.spacing["6"],
+        marginTop: t.spacing["7"],
+        paddingTop: t.spacing["5"],
         borderTop: `1px solid ${t.colors.cream.border}`,
       }}
     >
-      {/* Section heading */}
+      {/* عنوان القسم */}
       <div
         className="basita-related-heading"
         style={{
@@ -106,7 +123,7 @@ export default function RelatedProducts({
           alignItems: "flex-end",
           justifyContent: "space-between",
           gap: t.spacing["3"],
-          marginBottom: t.spacing["4"],
+          marginBottom: t.spacing["3"],
         }}
       >
         <div>
@@ -114,15 +131,15 @@ export default function RelatedProducts({
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              marginBottom: 5,
+              gap: 7,
+              marginBottom: 4,
             }}
           >
             <span
               aria-hidden="true"
               style={{
-                width: 4,
-                height: 23,
+                width: 3,
+                height: 21,
                 borderRadius: t.radius.full,
                 background: t.colors.gold[600],
                 flexShrink: 0,
@@ -133,8 +150,9 @@ export default function RelatedProducts({
               id="related-products-title"
               style={{
                 margin: 0,
-                fontSize: t.typography.fontSize.xl,
-                fontWeight: t.typography.fontWeight.bold,
+                fontSize: t.typography.fontSize.lg,
+                fontWeight:
+                  t.typography.fontWeight.bold,
                 color: t.colors.text.dark,
                 lineHeight: 1.35,
               }}
@@ -145,10 +163,10 @@ export default function RelatedProducts({
 
           <p
             style={{
-              margin: "0 0 0 12px",
-              fontSize: t.typography.fontSize.xs,
+              margin: "0 0 0 10px",
+              fontSize: 12,
               color: t.colors.text.mid,
-              lineHeight: 1.6,
+              lineHeight: 1.55,
             }}
           >
             خيارات أخرى نعتقد أنها قد تناسبك
@@ -158,9 +176,9 @@ export default function RelatedProducts({
         <span
           aria-hidden="true"
           style={{
-            width: 42,
+            width: 36,
             height: 3,
-            marginBottom: 5,
+            marginBottom: 4,
             borderRadius: t.radius.full,
             background: t.colors.cream.border,
             flexShrink: 0,
@@ -168,14 +186,14 @@ export default function RelatedProducts({
         />
       </div>
 
-      {/* Products */}
+      {/* المنتجات */}
       <div
         className="basita-related-grid"
         style={{
           display: "grid",
           gridTemplateColumns:
             "repeat(auto-fill, minmax(170px, 1fr))",
-          gap: t.spacing["4"],
+          gap: t.spacing["3"],
         }}
       >
         {items.map((p) => (
@@ -204,7 +222,8 @@ export default function RelatedProducts({
 
         @media (max-width: 900px) {
           .basita-related-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            grid-template-columns:
+              repeat(4, minmax(0, 1fr)) !important;
             gap: ${t.spacing["3"]} !important;
           }
         }
@@ -212,11 +231,12 @@ export default function RelatedProducts({
         @media (max-width: 700px) {
           .basita-related-products {
             margin-top: ${t.spacing["6"]} !important;
-            padding-top: ${t.spacing["5"]} !important;
+            padding-top: ${t.spacing["4"]} !important;
           }
 
           .basita-related-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr)) !important;
             gap: ${t.spacing["3"]} !important;
           }
 
@@ -239,7 +259,7 @@ export default function RelatedProducts({
           }
 
           .basita-related-heading p {
-            margin-inline-start: 12px !important;
+            margin-inline-start: 10px !important;
           }
         }
 

@@ -1,4 +1,4 @@
-// components/checkout/OrderSummary.tsx
+ // components/checkout/OrderSummary.tsx
 
 import { ClipboardList, Package } from "lucide-react";
 import { t } from "@/theme";
@@ -28,7 +28,7 @@ export default function OrderSummary({
         border: `1px solid ${t.colors.cream.border}`,
         borderRadius: t.radius.lg,
         overflow: "hidden",
-        boxShadow: "0 5px 20px rgba(75, 56, 34, 0.05)",
+        boxShadow: "0 3px 14px rgba(75, 56, 34, 0.035)",
       }}
     >
       {/* Header */}
@@ -37,8 +37,8 @@ export default function OrderSummary({
           position: "relative",
           display: "flex",
           alignItems: "center",
-          gap: 10,
-          padding: `${t.spacing["4"]} ${t.spacing["5"]}`,
+          gap: 9,
+          padding: `${t.spacing["3"]} ${t.spacing["4"]}`,
           background: t.colors.cream.bg,
           borderBottom: `1px solid ${t.colors.cream.border}`,
         }}
@@ -49,7 +49,7 @@ export default function OrderSummary({
             position: "absolute",
             insetInlineStart: 0,
             top: 0,
-            width: 4,
+            width: 3,
             height: "100%",
             background: t.colors.gold[600],
           }}
@@ -58,8 +58,8 @@ export default function OrderSummary({
         <span
           aria-hidden="true"
           style={{
-            width: 38,
-            height: 38,
+            width: 34,
+            height: 34,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
@@ -68,11 +68,11 @@ export default function OrderSummary({
             background: t.colors.white,
             border: `1px solid ${t.colors.cream.border}`,
             color: t.colors.primary[800],
-            boxShadow: "0 2px 8px rgba(75, 56, 34, 0.05)",
+            boxShadow: "0 2px 6px rgba(75, 56, 34, 0.035)",
           }}
         >
           <ClipboardList
-            size={19}
+            size={17}
             strokeWidth={1.7}
           />
         </span>
@@ -82,7 +82,7 @@ export default function OrderSummary({
             id="checkout-order-summary-title"
             style={{
               margin: 0,
-              fontSize: t.typography.fontSize.base,
+              fontSize: t.typography.fontSize.sm,
               fontWeight: t.typography.fontWeight.bold,
               color: t.colors.primary[800],
               lineHeight: 1.45,
@@ -94,7 +94,7 @@ export default function OrderSummary({
           <p
             style={{
               margin: "2px 0 0",
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 11,
               color: t.colors.text.light,
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -110,10 +110,9 @@ export default function OrderSummary({
       <div
         className="basita-checkout-summary-items"
         style={{
-          padding: t.spacing["4"],
+          padding: `${t.spacing["2"]} ${t.spacing["3"]}`,
           display: "flex",
           flexDirection: "column",
-          gap: t.spacing["2"],
         }}
       >
         {items.map((i) => (
@@ -123,9 +122,9 @@ export default function OrderSummary({
             style={{
               display: "flex",
               alignItems: "center",
-              gap: t.spacing["3"],
+              gap: t.spacing["2"],
               minWidth: 0,
-              padding: `${t.spacing["2"]} 0`,
+              padding: "9px 0",
             }}
           >
             {/* Product image */}
@@ -133,8 +132,8 @@ export default function OrderSummary({
               aria-hidden="true"
               style={{
                 position: "relative",
-                width: 52,
-                height: 52,
+                width: 48,
+                height: 48,
                 flexShrink: 0,
                 borderRadius: t.radius.md,
                 overflow: "hidden",
@@ -142,12 +141,12 @@ export default function OrderSummary({
                   ? `url(${i.product.mainImage}) center/cover`
                   : t.colors.gold[100],
                 border: `1px solid ${t.colors.cream.border}`,
-                boxShadow: "0 2px 8px rgba(75, 56, 34, 0.05)",
+                boxShadow: "0 2px 6px rgba(75, 56, 34, 0.04)",
               }}
             >
               {!i.product.mainImage && (
                 <Package
-                  size={19}
+                  size={17}
                   strokeWidth={1.5}
                   color={t.colors.primary[800]}
                   style={{
@@ -169,7 +168,7 @@ export default function OrderSummary({
               <p
                 style={{
                   margin: 0,
-                  fontSize: t.typography.fontSize.sm,
+                  fontSize: 13,
                   fontWeight: t.typography.fontWeight.medium,
                   color: t.colors.text.dark,
                   lineHeight: 1.5,
@@ -186,13 +185,13 @@ export default function OrderSummary({
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  marginTop: 4,
-                  padding: "2px 7px",
+                  marginTop: 3,
+                  padding: "2px 6px",
                   borderRadius: t.radius.full,
                   background: t.colors.cream.warm,
                   color: t.colors.text.light,
-                  fontSize: t.typography.fontSize.xs,
-                  lineHeight: 1.5,
+                  fontSize: 10,
+                  lineHeight: 1.45,
                 }}
               >
                 الكمية: {i.quantity}
@@ -204,7 +203,7 @@ export default function OrderSummary({
               style={{
                 flexShrink: 0,
                 color: t.colors.text.body,
-                fontSize: t.typography.fontSize.sm,
+                fontSize: 12,
                 fontWeight: t.typography.fontWeight.semibold,
                 whiteSpace: "nowrap",
               }}
@@ -218,7 +217,7 @@ export default function OrderSummary({
       {/* Pricing */}
       <div
         style={{
-          padding: `0 ${t.spacing["4"]} ${t.spacing["4"]}`,
+          padding: `0 ${t.spacing["3"]} ${t.spacing["3"]}`,
         }}
       >
         <OrderPricingSummary
@@ -234,24 +233,45 @@ export default function OrderSummary({
 
         @media (max-width: 480px) {
           .basita-checkout-summary-items {
-            padding: ${t.spacing["3"]} !important;
+            padding: ${t.spacing["2"]} ${t.spacing["3"]} !important;
           }
 
           .basita-checkout-summary-item {
-            gap: ${t.spacing["2"]} !important;
+            gap: 7px !important;
+            padding-block: 8px !important;
           }
 
           .basita-checkout-summary-item > div:first-child {
-            width: 46px !important;
-            height: 46px !important;
+            width: 44px !important;
+            height: 44px !important;
+          }
+
+          .basita-checkout-summary-item > div:first-child svg {
+            width: 16px !important;
+            height: 16px !important;
           }
 
           .basita-checkout-summary-item > span:last-child {
-            font-size: ${t.typography.fontSize.xs} !important;
+            font-size: 11px !important;
           }
 
           .basita-checkout-order-summary > div:last-child {
             padding-inline: ${t.spacing["3"]} !important;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .basita-checkout-summary-item > div:first-child {
+            width: 40px !important;
+            height: 40px !important;
+          }
+
+          .basita-checkout-summary-item > div:nth-child(2) p {
+            font-size: 12px !important;
+          }
+
+          .basita-checkout-summary-item > span:last-child {
+            font-size: 10px !important;
           }
         }
 

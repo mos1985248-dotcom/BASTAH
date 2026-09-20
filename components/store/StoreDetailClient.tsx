@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { AlertTriangle, Store as StoreIcon } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import { t } from "@/theme";
 import SiteShell from "@/components/layout/SiteShell";
@@ -12,7 +12,6 @@ import StoreHero from "@/components/store/StoreHero";
 import StoreStoryAndBadges from "@/components/store/StoreStoryAndBadges";
 import StoreAchievements from "@/components/store/StoreAchievements";
 import StoreInfoGrid from "@/components/store/StoreInfoGrid";
-import MuniraAdviceCard from "@/components/store/MuniraAdviceCard";
 import StoreReviewsSection from "@/components/store/StoreReviewsSection";
 import StoreProductsSection from "@/components/store/StoreProductsSection";
 import StoreClosingBanner from "@/components/store/StoreClosingBanner";
@@ -73,28 +72,28 @@ export default function StoreDetailClient() {
             width: "100%",
             maxWidth: 1200,
             margin: "0 auto",
-            padding: `${t.spacing["8"]} ${t.spacing["5"]}`,
+            padding: `${t.spacing["6"]} ${t.spacing["4"]}`,
             boxSizing: "border-box",
             direction: "rtl",
           }}
         >
           <Skeleton
-            height={280}
-            radius={t.radius.xl}
-            style={{ marginBottom: t.spacing["6"] }}
+            height={220}
+            radius={t.radius.lg}
+            style={{ marginBottom: t.spacing["4"] }}
           />
 
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: t.spacing["4"],
-              marginBottom: t.spacing["8"],
+              gap: t.spacing["3"],
+              marginBottom: t.spacing["4"],
             }}
           >
             <Skeleton
-              width={84}
-              height={84}
+              width={72}
+              height={72}
               radius={t.radius.full}
             />
 
@@ -106,20 +105,20 @@ export default function StoreDetailClient() {
                 gap: t.spacing["2"],
               }}
             >
-              <Skeleton width="36%" height={24} />
-              <Skeleton width="62%" height={16} />
+              <Skeleton width="32%" height={22} />
+              <Skeleton width="55%" height={14} />
             </div>
           </div>
 
           <Skeleton
-            height={110}
-            radius={t.radius.xl}
-            style={{ marginBottom: t.spacing["6"] }}
+            height={90}
+            radius={t.radius.lg}
+            style={{ marginBottom: t.spacing["4"] }}
           />
 
           <Skeleton
-            height={320}
-            radius={t.radius.xl}
+            height={280}
+            radius={t.radius.lg}
           />
         </main>
       </SiteShell>
@@ -193,7 +192,8 @@ export default function StoreDetailClient() {
                 lineHeight: 1.8,
               }}
             >
-              {error || "قد يكون الرابط غير صحيح أو أن المتجر لم يعد متاحًا."}
+              {error ||
+                "قد يكون الرابط غير صحيح أو أن المتجر لم يعد متاحًا."}
             </p>
           </div>
         </main>
@@ -213,20 +213,25 @@ export default function StoreDetailClient() {
           direction: "rtl",
         }}
       >
+        {/* رأس المتجر */}
         <StoreHero store={store} />
 
-        <StoreStoryAndBadges store={store} />
-
-        <StoreAchievements store={store} />
-
-        <MuniraAdviceCard store={store} />
-
+        {/* معلومات المتجر — في الأعلى وبحجم مختصر */}
         <StoreInfoGrid store={store} />
 
+        {/* قصة المتجر والشارات */}
+        <StoreStoryAndBadges store={store} />
+
+        {/* إنجازات المتجر */}
+        <StoreAchievements store={store} />
+
+        {/* المنتجات */}
         <StoreProductsSection storeId={store.id} />
 
+        {/* التقييمات */}
         <StoreReviewsSection store={store} />
 
+        {/* ختام الصفحة */}
         <StoreClosingBanner store={store} />
       </main>
     </SiteShell>

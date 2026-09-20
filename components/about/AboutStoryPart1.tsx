@@ -1,122 +1,136 @@
+
 // components/about/AboutStoryPart1.tsx
 
+import Image from "next/image";
 import { t } from "@/theme";
-import StorySection from "./StorySection";
+import styles from "./AboutStoryPart1.module.css";
 
 export default function AboutStoryPart1() {
   return (
-    <>
-      <StorySection title='لماذا "بسطة"؟' alt>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: t.spacing["4"],
-            color: t.colors.text.body,
-            fontSize: t.typography.fontSize.base,
-            lineHeight: 2,
-          }}
-        >
-          <p style={{ margin: 0 }}>
-            اسم بسطة يحمل شيئًا من ذاكرتنا.
-          </p>
+    <section
+      style={{
+        background: t.colors.cream.bg,
+        padding: `${t.spacing["16"]} ${t.spacing["5"]}`,
+        direction: "rtl",
+      }}
+    >
+      <div className={styles.container}>
+        {/* البداية */}
+        <div className={styles.storyBlock}>
+          <div className={styles.storyImage}>
+            <Image
+              src="/images/story/story-part-1.jpg.jpg"
+              alt="بسطة وسوق محلي يعكس روح المنتجات المحلية"
+              fill
+              sizes="(max-width: 900px) 100vw, 48vw"
+              style={{
+                objectFit: "cover",
+              }}
+            />
+          </div>
 
-          <p
-            style={{
-              margin: 0,
-              color: t.colors.text.dark,
-              fontWeight: t.typography.fontWeight.semibold,
-            }}
-          >
-            البسطة كانت بسيطة، قريبة، ومفتوحة للناس.
-          </p>
+          <div className={styles.storyContent}>
+            <p className={styles.eyebrow}>البداية</p>
 
-          <p style={{ margin: 0 }}>
-            كانت الأم تعرض ما تصنعه، والأسرة تبيع ما تنتجه، والناس يعرفون
-            المنتج وصاحبه، ويتحدثون معه، ويعودون إليه لأنهم وثقوا به.
-          </p>
+            <h2
+              style={{
+                color: t.colors.primary[900],
+                fontSize: t.typography.fontSize["3xl"],
+                fontWeight: t.typography.fontWeight.bold,
+                lineHeight: 1.5,
+              }}
+            >
+              لماذا &quot;بسطة&quot;؟
+            </h2>
 
-          <p style={{ margin: 0 }}>
-            أردنا أن نأخذ هذه الروح ونمنحها مكانًا جديدًا في العالم الرقمي.
-          </p>
+            <div className={styles.text}>
+              <p>
+                اسم بسطة يحمل شيئًا من ذاكرتنا.
+              </p>
 
-          <p
-            style={{
-              margin: `${t.spacing["1"]} 0 0`,
-              padding: `${t.spacing["4"]} ${t.spacing["5"]}`,
-              background: t.colors.primary[50],
-              borderRadius: t.radius.lg,
-              borderInlineStart: `3px solid ${t.colors.primary[700]}`,
-              color: t.colors.primary[800],
-              fontWeight: t.typography.fontWeight.semibold,
-              lineHeight: 1.9,
-            }}
-          >
-            لذلك جاءت بسطة كسوق رقمي للمنتجات الشعبية ومنتجات الأسر المنتجة،
-            لكن بروح مختلفة.
-          </p>
+              <p className={styles.strong}>
+                البسطة كانت بسيطة، قريبة، ومفتوحة للناس.
+              </p>
+
+              <p>
+                كانت الأم تعرض ما تصنعه، والأسرة تبيع ما تنتجه، والناس يعرفون
+                المنتج وصاحبه، ويتحدثون معه، ويعودون إليه لأنهم وثقوا به.
+              </p>
+
+              <p>
+                أردنا أن نأخذ هذه الروح ونمنحها مكانًا جديدًا في العالم الرقمي.
+              </p>
+
+              <p className={styles.highlight}>
+                لذلك جاءت بسطة كسوق رقمي للمنتجات الشعبية ومنتجات الأسر
+                المنتجة، لكن بروح مختلفة.
+              </p>
+            </div>
+          </div>
         </div>
-      </StorySection>
 
-      <StorySection title="نحن لا نبيع المنتج فقط">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: t.spacing["4"],
-            color: t.colors.text.body,
-            fontSize: t.typography.fontSize.base,
-            lineHeight: 2,
-          }}
-        >
-          <p style={{ margin: 0 }}>
-            نؤمن أن المنتج الشعبي لا يُقاس بسعره فقط.
-          </p>
+        {/* أكثر من منتج */}
+        <div className={styles.storyBlockReverse}>
+          <div className={styles.storyContent}>
+            <p className={styles.eyebrow}>أكثر من منتج</p>
 
-          <p style={{ margin: 0 }}>
-            وراء قطعة يدوية قد تكون هناك سنوات من التعلم.
-          </p>
+            <h2
+              style={{
+                color: t.colors.primary[900],
+                fontSize: t.typography.fontSize["3xl"],
+                fontWeight: t.typography.fontWeight.bold,
+                lineHeight: 1.5,
+              }}
+            >
+              نحن لا نبيع المنتج فقط
+            </h2>
 
-          <p style={{ margin: 0 }}>
-            وراء وصفة منزلية قد تكون ذاكرة أم أو جدة.
-          </p>
+            <div className={styles.text}>
+              <p>
+                نؤمن أن المنتج الشعبي لا يُقاس بسعره فقط.
+              </p>
 
-          <p style={{ margin: 0 }}>
-            وراء منتج شعبي قد يكون جزء من تاريخ عائلة أو منطقة.
-          </p>
+              <p>
+                وراء قطعة يدوية قد تكون هناك سنوات من التعلم.
+              </p>
 
-          <p
-            style={{
-              margin: `${t.spacing["1"]} 0`,
-              color: t.colors.text.dark,
-              fontWeight: t.typography.fontWeight.semibold,
-            }}
-          >
-            ولهذا نمنح المتجر في بسطة مساحة أكبر من مجرد قائمة منتجات.
-          </p>
+              <p>
+                وراء وصفة منزلية قد تكون ذاكرة أم أو جدة.
+              </p>
 
-          <p style={{ margin: 0 }}>
-            يمكن أن يكون للمتجر قصة وصور وفيديو ومحتوى يحكي للعميل من هم
-            أصحاب المتجر، وكيف بدأوا، وما الذي يجعل منتجاتهم مختلفة.
-          </p>
+              <p>
+                وراء منتج شعبي قد يكون جزء من تاريخ عائلة أو منطقة.
+              </p>
 
-          <p
-            style={{
-              margin: `${t.spacing["1"]} 0 0`,
-              padding: `${t.spacing["4"]} ${t.spacing["5"]}`,
-              background: t.colors.cream.warm,
-              borderRadius: t.radius.lg,
-              borderInlineStart: `3px solid ${t.colors.gold[600]}`,
-              color: t.colors.primary[800],
-              fontSize: t.typography.fontSize.lg,
-              fontWeight: t.typography.fontWeight.bold,
-              lineHeight: 1.9,
-            }}
-          >
-            فالعميل لا يرى المنتج فقط؛ بل يستطيع أن يعرف الحكاية التي وراءه.
-          </p>
+              <p className={styles.strong}>
+                ولهذا نمنح المتجر في بسطة مساحة أكبر من مجرد قائمة منتجات.
+              </p>
+
+              <p>
+                يمكن أن يكون للمتجر قصة وصور وفيديو ومحتوى يحكي للعميل من هم
+                أصحاب المتجر، وكيف بدأوا، وما الذي يجعل منتجاتهم مختلفة.
+              </p>
+
+              <p className={styles.highlightGold}>
+                فالعميل لا يرى المنتج فقط؛ بل يستطيع أن يعرف الحكاية التي وراءه.
+              </p>
+            </div>
+          </div>
+
+          {/* الصورة */}
+          <div className={styles.productImage}>
+            <Image
+              src="/images/story/story-more-than-product.jpg.jpg"
+              alt="منتجات متنوعة من الأسر المنتجة تحمل قصصًا وذكريات"
+              fill
+              sizes="(max-width: 900px) 100vw, 48vw"
+              style={{
+                objectFit: "cover",
+              }}
+            />
+          </div>
         </div>
-      </StorySection>
-    </>
+      </div>
+    </section>
   );
 }

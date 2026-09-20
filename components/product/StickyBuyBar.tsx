@@ -32,16 +32,16 @@ export default function StickyBuyBar({
           style={{
             position: "fixed",
             zIndex: 60,
-            bottom: 91,
+            bottom: 82,
             insetInlineStart: 0,
             insetInlineEnd: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 7,
-            padding: "8px 14px",
+            gap: 6,
+            padding: "7px 12px",
             color: t.colors.semantic.danger,
-            fontSize: t.typography.fontSize.xs,
+            fontSize: 12,
             fontWeight: t.typography.fontWeight.semibold,
             background: t.colors.semantic.dangerBg,
             borderTop: `1px solid ${t.colors.semantic.danger}22`,
@@ -50,8 +50,8 @@ export default function StickyBuyBar({
         >
           <span
             style={{
-              width: 24,
-              height: 24,
+              width: 22,
+              height: 22,
               flexShrink: 0,
               display: "flex",
               alignItems: "center",
@@ -60,10 +60,20 @@ export default function StickyBuyBar({
               background: t.colors.white,
             }}
           >
-            <AlertTriangle size={13} strokeWidth={1.9} />
+            <AlertTriangle
+              size={12}
+              strokeWidth={1.9}
+            />
           </span>
 
-          <span style={{ textAlign: "center" }}>{error}</span>
+          <span
+            style={{
+              textAlign: "center",
+              lineHeight: 1.5,
+            }}
+          >
+            {error}
+          </span>
         </div>
       )}
 
@@ -78,25 +88,27 @@ export default function StickyBuyBar({
           insetInlineEnd: 0,
           display: "flex",
           alignItems: "center",
-          gap: t.spacing["3"],
-          padding: "10px max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left))",
-          background: "rgba(255, 255, 255, 0.96)",
+          gap: t.spacing["2"],
+          padding:
+            "8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left))",
+          background: "rgba(255, 255, 255, 0.97)",
           borderTop: `1px solid ${t.colors.cream.border}`,
-          boxShadow: "0 -8px 28px rgba(25, 45, 35, 0.08)",
+          boxShadow:
+            "0 -7px 24px rgba(25, 45, 35, 0.075)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
         }}
       >
-        {/* Quantity */}
+        {/* الكمية */}
         <div
           className="basita-sticky-quantity"
           style={{
             flexShrink: 0,
-            height: 46,
+            height: 42,
             display: "flex",
             alignItems: "center",
-            gap: 5,
-            padding: "0 5px",
+            gap: 4,
+            padding: "0 4px",
             background: t.colors.cream.bg,
             border: `1px solid ${t.colors.cream.border}`,
             borderRadius: t.radius.full,
@@ -106,12 +118,14 @@ export default function StickyBuyBar({
           <button
             type="button"
             aria-label="تقليل الكمية"
-            onClick={() => onQtyChange(Math.max(1, qty - 1))}
+            onClick={() =>
+              onQtyChange(Math.max(1, qty - 1))
+            }
             disabled={qty <= 1}
             className="basita-sticky-qty-button"
             style={{
-              width: 34,
-              height: 34,
+              width: 31,
+              height: 31,
               flexShrink: 0,
               display: "flex",
               alignItems: "center",
@@ -120,18 +134,21 @@ export default function StickyBuyBar({
               border: `1px solid ${t.colors.cream.border}`,
               background: t.colors.white,
               color: t.colors.text.dark,
-              cursor: qty <= 1 ? "not-allowed" : "pointer",
+              cursor:
+                qty <= 1 ? "not-allowed" : "pointer",
               opacity: qty <= 1 ? 0.45 : 1,
+              transition:
+                "transform 140ms ease, box-shadow 140ms ease",
             }}
           >
-            <Minus size={14} strokeWidth={2} />
+            <Minus size={13} strokeWidth={2} />
           </button>
 
           <span
             style={{
-              minWidth: 26,
+              minWidth: 23,
               textAlign: "center",
-              fontSize: t.typography.fontSize.sm,
+              fontSize: t.typography.fontSize.xs,
               fontWeight: t.typography.fontWeight.bold,
               color: t.colors.text.dark,
             }}
@@ -142,12 +159,14 @@ export default function StickyBuyBar({
           <button
             type="button"
             aria-label="زيادة الكمية"
-            onClick={() => onQtyChange(Math.min(maxQty, qty + 1))}
+            onClick={() =>
+              onQtyChange(Math.min(maxQty, qty + 1))
+            }
             disabled={qty >= maxQty}
             className="basita-sticky-qty-button basita-sticky-qty-plus"
             style={{
-              width: 34,
-              height: 34,
+              width: 31,
+              height: 31,
               flexShrink: 0,
               display: "flex",
               alignItems: "center",
@@ -156,15 +175,20 @@ export default function StickyBuyBar({
               border: `1px solid ${t.colors.primary[800]}`,
               background: t.colors.primary[800],
               color: t.colors.text.onDark,
-              cursor: qty >= maxQty ? "not-allowed" : "pointer",
+              cursor:
+                qty >= maxQty
+                  ? "not-allowed"
+                  : "pointer",
               opacity: qty >= maxQty ? 0.45 : 1,
+              transition:
+                "transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease",
             }}
           >
-            <Plus size={14} strokeWidth={2} />
+            <Plus size={13} strokeWidth={2} />
           </button>
         </div>
 
-        {/* Buy button */}
+        {/* زر الشراء */}
         <button
           type="button"
           onClick={onBuyNow}
@@ -173,12 +197,12 @@ export default function StickyBuyBar({
           style={{
             flex: 1,
             minWidth: 0,
-            minHeight: 46,
+            minHeight: 42,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 7,
-            padding: "10px 16px",
+            gap: 6,
+            padding: "9px 14px",
             background: checkingOut
               ? t.colors.primary[600]
               : t.colors.primary[800],
@@ -188,21 +212,23 @@ export default function StickyBuyBar({
                 ? t.colors.primary[600]
                 : t.colors.primary[800]
             }`,
-            borderRadius: t.radius.lg,
+            borderRadius: t.radius.md,
             fontSize: t.typography.fontSize.sm,
             fontWeight: t.typography.fontWeight.bold,
-            cursor: disabled ? "not-allowed" : "pointer",
+            cursor: disabled
+              ? "not-allowed"
+              : "pointer",
             opacity: disabled ? 0.62 : 1,
             boxShadow: disabled
               ? "none"
-              : "0 5px 15px rgba(15, 61, 46, 0.15)",
+              : "0 4px 13px rgba(15, 61, 46, 0.14)",
             transition:
               "transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, opacity 160ms ease",
           }}
         >
           {!checkingOut && (
             <Lock
-              size={14}
+              size={13}
               strokeWidth={1.8}
               aria-hidden="true"
             />
@@ -228,9 +254,13 @@ export default function StickyBuyBar({
           box-shadow: 0 3px 9px rgba(25, 45, 35, 0.08);
         }
 
+        .basita-sticky-qty-plus:not(:disabled):hover {
+          background: ${t.colors.primary[700]} !important;
+        }
+
         .basita-sticky-buy-button:not(:disabled):hover {
           transform: translateY(-1px);
-          box-shadow: 0 7px 18px rgba(15, 61, 46, 0.2) !important;
+          box-shadow: 0 6px 16px rgba(15, 61, 46, 0.18) !important;
           background: ${t.colors.primary[700]} !important;
         }
 
@@ -242,25 +272,26 @@ export default function StickyBuyBar({
 
         @media (max-width: 560px) {
           .basita-sticky-buy-bar {
-            gap: 8px !important;
-            padding-top: 8px !important;
-            padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+            gap: 7px !important;
+            padding-top: 7px !important;
+            padding-bottom:
+              calc(7px + env(safe-area-inset-bottom)) !important;
           }
 
           .basita-sticky-quantity {
-            height: 44px !important;
+            height: 40px !important;
           }
 
           .basita-sticky-buy-button {
-            min-height: 44px !important;
-            padding-inline: 12px !important;
+            min-height: 40px !important;
+            padding-inline: 11px !important;
           }
         }
 
         @media (max-width: 400px) {
           .basita-sticky-buy-bar {
-            gap: 6px !important;
-            padding-inline: 8px !important;
+            gap: 5px !important;
+            padding-inline: 7px !important;
           }
 
           .basita-sticky-quantity {
@@ -268,13 +299,13 @@ export default function StickyBuyBar({
           }
 
           .basita-sticky-qty-button {
-            width: 31px !important;
-            height: 31px !important;
+            width: 29px !important;
+            height: 29px !important;
           }
 
           .basita-sticky-buy-button {
             font-size: ${t.typography.fontSize.xs} !important;
-            padding-inline: 9px !important;
+            padding-inline: 8px !important;
           }
 
           .basita-sticky-buy-button svg {

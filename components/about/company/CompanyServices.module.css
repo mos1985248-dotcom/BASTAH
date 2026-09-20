@@ -1,0 +1,40 @@
+
+.serviceRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.serviceImage {
+  order: 1;
+}
+
+.serviceContent {
+  order: 2;
+}
+
+.serviceItems {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .serviceRow {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .serviceImage,
+  .serviceContent {
+    order: initial;
+  }
+}
+
+@media (max-width: 600px) {
+  .serviceItems {
+    grid-template-columns: 1fr;
+  }
+}
+

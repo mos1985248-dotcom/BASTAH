@@ -1,0 +1,143 @@
+
+.heroContainer {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.heroLayout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 64px;
+  align-items: center;
+  min-height: 560px;
+}
+
+.heroContent {
+  max-width: 620px;
+}
+
+.heroDescription {
+  max-width: 580px;
+  margin: 0;
+}
+
+.heroImage {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(91, 70, 45, 0.1);
+}
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 64px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.pillar {
+  min-width: 0;
+  min-height: 128px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.pillar + .pillar {
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.pillarIcon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 900px) {
+  .heroLayout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    min-height: auto;
+  }
+
+  .heroContent {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .heroDescription {
+    margin: 0 auto;
+  }
+
+  .heroImage {
+    height: 420px;
+  }
+
+  .pillars {
+    margin-top: 48px;
+  }
+}
+
+@media (max-width: 700px) {
+  .heroLayout {
+    gap: 32px;
+  }
+
+  .heroImage {
+    height: 340px;
+    border-radius: 20px;
+  }
+
+  .pillars {
+    grid-template-columns: repeat(2, 1fr);
+    border-radius: 20px;
+  }
+
+  .pillar {
+    min-height: 112px;
+    padding: 20px 14px;
+  }
+
+  .pillar:nth-child(3) {
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .pillar:nth-child(4) {
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .pillar:nth-child(2) {
+    border-right: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .pillar:nth-child(4) {
+    border-right: 1px solid rgba(255, 255, 255, 0.14);
+  }
+}
+
+@media (max-width: 600px) {
+  .heroImage {
+    height: 280px;
+  }
+
+  .pillars {
+    margin-top: 40px;
+  }
+}
+

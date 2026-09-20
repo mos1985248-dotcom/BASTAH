@@ -44,7 +44,6 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
   };
 
   const yearsActive = yearsActiveFrom(store.createdAt);
-
   const mutedBorder = `1px solid ${t.colors.cream.border}`;
 
   return (
@@ -58,7 +57,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
       <div
         style={{
           position: "relative",
-          height: 290,
+          height: 220,
           overflow: "hidden",
           background: store.coverImage
             ? `url(${store.coverImage}) center/cover`
@@ -71,7 +70,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(180deg, rgba(15,61,46,0.02) 0%, rgba(15,61,46,0.12) 42%, rgba(15,61,46,0.72) 100%)",
+              "linear-gradient(180deg, rgba(15,61,46,0.02) 0%, rgba(15,61,46,0.10) 45%, rgba(15,61,46,0.62) 100%)",
           }}
         />
 
@@ -81,7 +80,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(90deg, rgba(0,0,0,0.08), transparent 38%, transparent 62%, rgba(0,0,0,0.08))",
+              "linear-gradient(90deg, rgba(0,0,0,0.06), transparent 38%, transparent 62%, rgba(0,0,0,0.06))",
           }}
         />
       </div>
@@ -90,10 +89,10 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
       <div
         style={{
           width: "100%",
-          maxWidth: 1200,
+          maxWidth: 1180,
           boxSizing: "border-box",
-          margin: "-78px auto 0",
-          padding: `0 ${t.spacing["5"]}`,
+          margin: "-52px auto 0",
+          padding: `0 ${t.spacing["4"]}`,
           position: "relative",
           zIndex: 2,
         }}
@@ -101,10 +100,10 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
         <div
           style={{
             background: t.colors.white,
-            borderRadius: t.radius.xl,
-            boxShadow: t.shadows.lg,
+            borderRadius: t.radius.lg,
+            boxShadow: t.shadows.md,
             border: mutedBorder,
-            padding: t.spacing["6"],
+            padding: t.spacing["4"],
           }}
         >
           {/* Identity */}
@@ -112,7 +111,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
             style={{
               display: "flex",
               alignItems: "flex-start",
-              gap: t.spacing["5"],
+              gap: t.spacing["4"],
               flexWrap: "wrap",
             }}
           >
@@ -121,19 +120,19 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
               style={{
                 position: "relative",
                 flexShrink: 0,
-                marginTop: -56,
+                marginTop: -42,
               }}
             >
               <div
                 style={{
-                  width: 112,
-                  height: 112,
+                  width: 88,
+                  height: 88,
                   borderRadius: t.radius.full,
-                  border: `5px solid ${t.colors.white}`,
+                  border: `4px solid ${t.colors.white}`,
                   background: store.logo
                     ? `url(${store.logo}) center/cover`
                     : t.colors.gold[100],
-                  boxShadow: t.shadows.lg,
+                  boxShadow: t.shadows.md,
                 }}
               />
 
@@ -142,13 +141,13 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                   title="متجر موثّق"
                   style={{
                     position: "absolute",
-                    right: 4,
-                    bottom: 4,
-                    width: 28,
-                    height: 28,
+                    right: 2,
+                    bottom: 2,
+                    width: 24,
+                    height: 24,
                     borderRadius: t.radius.full,
                     background: t.colors.primary[800],
-                    border: `3px solid ${t.colors.white}`,
+                    border: `2px solid ${t.colors.white}`,
                     color: t.colors.white,
                     display: "flex",
                     alignItems: "center",
@@ -156,7 +155,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                     boxShadow: t.shadows.sm,
                   }}
                 >
-                  <BadgeCheck size={15} strokeWidth={2.2} />
+                  <BadgeCheck size={13} strokeWidth={2.2} />
                 </span>
               )}
             </div>
@@ -165,15 +164,15 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
             <div
               style={{
                 flex: "1 1 360px",
-                minWidth: 250,
-                paddingTop: 2,
+                minWidth: 240,
+                paddingTop: 0,
               }}
             >
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 8,
+                  gap: 7,
                   flexWrap: "wrap",
                 }}
               >
@@ -181,9 +180,9 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                   style={{
                     margin: 0,
                     color: t.colors.text.dark,
-                    fontSize: t.typography.fontSize["3xl"],
+                    fontSize: t.typography.fontSize["2xl"],
                     fontWeight: t.typography.fontWeight.bold,
-                    lineHeight: 1.35,
+                    lineHeight: 1.3,
                   }}
                 >
                   {store.nameAr}
@@ -195,7 +194,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 4,
-                      padding: "4px 10px",
+                      padding: "3px 8px",
                       borderRadius: t.radius.full,
                       background: t.colors.primary[100],
                       color: t.colors.primary[800],
@@ -204,8 +203,8 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    <BadgeCheck size={13} strokeWidth={2} />
-                    متجر موثّق
+                    <BadgeCheck size={12} strokeWidth={2} />
+                    موثّق
                   </span>
                 )}
               </div>
@@ -214,12 +213,12 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 7,
+                  gap: 6,
                   flexWrap: "wrap",
-                  marginTop: 7,
+                  marginTop: 5,
                   color: t.colors.text.mid,
-                  fontSize: t.typography.fontSize.sm,
-                  lineHeight: 1.7,
+                  fontSize: t.typography.fontSize.xs,
+                  lineHeight: 1.6,
                 }}
               >
                 <span
@@ -229,7 +228,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                     gap: 4,
                   }}
                 >
-                  <MapPin size={14} strokeWidth={1.8} />
+                  <MapPin size={13} strokeWidth={1.8} />
                   {store.city ?? "المملكة العربية السعودية"}
                   {store.region ? `، ${store.region}` : ""}
                 </span>
@@ -248,11 +247,11 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
               {store.shortDesc && (
                 <p
                   style={{
-                    maxWidth: 760,
-                    margin: `${t.spacing["3"]} 0 0`,
+                    maxWidth: 700,
+                    margin: `${t.spacing["2"]} 0 0`,
                     color: t.colors.text.body,
-                    fontSize: t.typography.fontSize.base,
-                    lineHeight: 1.9,
+                    fontSize: t.typography.fontSize.sm,
+                    lineHeight: 1.7,
                   }}
                 >
                   {store.shortDesc}
@@ -270,19 +269,19 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: 9,
-                  padding: "9px 12px",
+                  gap: 7,
+                  padding: "7px 10px",
                   background: t.colors.primary[900],
-                  borderRadius: t.radius.lg,
+                  borderRadius: t.radius.md,
                   textDecoration: "none",
                   flexShrink: 0,
-                  marginTop: 2,
+                  marginTop: 0,
                 }}
               >
                 <span
                   style={{
-                    width: 34,
-                    height: 34,
+                    width: 28,
+                    height: 28,
                     borderRadius: t.radius.full,
                     background: t.colors.gold[600],
                     color: t.colors.white,
@@ -293,7 +292,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                   }}
                 >
                   <Play
-                    size={14}
+                    size={12}
                     strokeWidth={1.8}
                     fill={t.colors.white}
                   />
@@ -302,7 +301,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                 <span
                   style={{
                     color: t.colors.text.onDark,
-                    fontSize: t.typography.fontSize.sm,
+                    fontSize: t.typography.fontSize.xs,
                     fontWeight: t.typography.fontWeight.semibold,
                   }}
                 >
@@ -316,11 +315,11 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
           <div
             style={{
               display: "flex",
-              alignItems: "stretch",
+              alignItems: "center",
               justifyContent: "space-around",
-              gap: t.spacing["3"],
-              marginTop: t.spacing["6"],
-              padding: `${t.spacing["5"]} 0`,
+              gap: t.spacing["2"],
+              marginTop: t.spacing["4"],
+              padding: `${t.spacing["3"]} 0`,
               borderTop: `1px solid ${t.colors.cream.border}`,
               borderBottom: `1px solid ${t.colors.cream.border}`,
               flexWrap: "wrap",
@@ -342,11 +341,11 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: 4,
+                      gap: 3,
                     }}
                   >
                     <Star
-                      size={16}
+                      size={14}
                       strokeWidth={2}
                       fill={t.colors.gold[600]}
                       color={t.colors.gold[600]}
@@ -364,154 +363,175 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
             />
           </div>
 
-          {/* Shipping */}
+          {/* Bottom information + actions */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 7,
-              marginTop: t.spacing["4"],
-              color: t.colors.primary[800],
-              fontSize: t.typography.fontSize.sm,
-              lineHeight: 1.7,
-            }}
-          >
-            <Truck size={15} strokeWidth={1.8} />
-
-            <span>
-              يشحن إلى{" "}
-              <strong style={{ fontWeight: t.typography.fontWeight.bold }}>
-                {store.publicInfo?.shippingCoverage ?? "كل مناطق المملكة"}
-              </strong>
-            </span>
-          </div>
-
-          {/* Actions */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: t.spacing["2"],
+              gap: t.spacing["3"],
               flexWrap: "wrap",
-              marginTop: t.spacing["4"],
+              marginTop: t.spacing["3"],
             }}
           >
-            <button
-              type="button"
-              onClick={toggle}
-              disabled={busy}
-              className="basita-btn-interactive"
+            {/* Shipping */}
+            <div
               style={{
-                minHeight: 42,
                 display: "inline-flex",
                 alignItems: "center",
-                justifyContent: "center",
                 gap: 6,
-                padding: "9px 16px",
-                background: following
-                  ? t.colors.primary[100]
-                  : t.colors.white,
-                color: following
-                  ? t.colors.primary[800]
-                  : t.colors.text.body,
-                border: `1.5px solid ${
-                  following
-                    ? t.colors.primary[800]
-                    : t.colors.cream.border
-                }`,
-                borderRadius: t.radius.full,
-                fontSize: t.typography.fontSize.sm,
-                fontWeight: t.typography.fontWeight.bold,
-                cursor: busy ? "wait" : "pointer",
-                opacity: busy ? 0.7 : 1,
+                color: t.colors.primary[800],
+                fontSize: t.typography.fontSize.xs,
+                lineHeight: 1.6,
               }}
             >
-              <Heart
-                size={15}
-                strokeWidth={1.8}
-                fill={following ? t.colors.primary[800] : "none"}
-              />
-              {following ? "بالمفضلة" : "إضافة للمفضلة"}
-            </button>
+              <Truck size={14} strokeWidth={1.8} />
 
-            <button
-              type="button"
-              onClick={handleShare}
-              className="basita-btn-interactive"
+              <span>
+                يشحن إلى{" "}
+                <strong
+                  style={{
+                    fontWeight: t.typography.fontWeight.bold,
+                  }}
+                >
+                  {store.publicInfo?.shippingCoverage ??
+                    "كل مناطق المملكة"}
+                </strong>
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div
               style={{
-                minHeight: 42,
-                display: "inline-flex",
+                display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                padding: "9px 16px",
-                background: t.colors.white,
-                color: t.colors.text.body,
-                border: `1.5px solid ${t.colors.cream.border}`,
-                borderRadius: t.radius.full,
-                fontSize: t.typography.fontSize.sm,
-                fontWeight: t.typography.fontWeight.bold,
+                gap: t.spacing["2"],
+                flexWrap: "wrap",
+                marginInlineStart: "auto",
               }}
             >
-              {shared ? (
-                <>
-                  <Check size={15} strokeWidth={2} />
-                  تم النسخ
-                </>
-              ) : (
-                <>
-                  <Share2 size={15} strokeWidth={1.8} />
-                  مشاركة
-                </>
-              )}
-            </button>
-
-            {store.whatsapp && (
-              <a
-                href={`https://wa.me/${store.whatsapp.replace("+", "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={toggle}
+                disabled={busy}
                 className="basita-btn-interactive"
                 style={{
-                  minHeight: 42,
+                  minHeight: 36,
                   display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "9px 16px",
-                  background: t.colors.brand.whatsapp,
-                  color: t.colors.white,
+                  gap: 5,
+                  padding: "7px 12px",
+                  background: following
+                    ? t.colors.primary[100]
+                    : t.colors.white,
+                  color: following
+                    ? t.colors.primary[800]
+                    : t.colors.text.body,
+                  border: `1.5px solid ${
+                    following
+                      ? t.colors.primary[800]
+                      : t.colors.cream.border
+                  }`,
                   borderRadius: t.radius.full,
-                  textDecoration: "none",
-                  fontSize: t.typography.fontSize.sm,
+                  fontSize: t.typography.fontSize.xs,
+                  fontWeight: t.typography.fontWeight.bold,
+                  cursor: busy ? "wait" : "pointer",
+                  opacity: busy ? 0.7 : 1,
+                }}
+              >
+                <Heart
+                  size={14}
+                  strokeWidth={1.8}
+                  fill={
+                    following
+                      ? t.colors.primary[800]
+                      : "none"
+                  }
+                />
+                {following ? "بالمفضلة" : "متابعة"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShare}
+                className="basita-btn-interactive"
+                style={{
+                  minHeight: 36,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 5,
+                  padding: "7px 12px",
+                  background: t.colors.white,
+                  color: t.colors.text.body,
+                  border: `1.5px solid ${t.colors.cream.border}`,
+                  borderRadius: t.radius.full,
+                  fontSize: t.typography.fontSize.xs,
                   fontWeight: t.typography.fontWeight.bold,
                 }}
               >
-                واتساب
-              </a>
-            )}
+                {shared ? (
+                  <>
+                    <Check size={14} strokeWidth={2} />
+                    تم النسخ
+                  </>
+                ) : (
+                  <>
+                    <Share2 size={14} strokeWidth={1.8} />
+                    مشاركة
+                  </>
+                )}
+              </button>
 
-            <a
-              href="#products"
-              className="basita-btn-interactive"
-              style={{
-                minHeight: 44,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 7,
-                marginInlineStart: "auto",
-                padding: "10px 22px",
-                background: t.colors.primary[800],
-                color: t.colors.text.onDark,
-                borderRadius: t.radius.full,
-                textDecoration: "none",
-                fontSize: t.typography.fontSize.sm,
-                fontWeight: t.typography.fontWeight.bold,
-              }}
-            >
-              <ShoppingBag size={15} strokeWidth={1.8} />
-              تصفّح المنتجات
-            </a>
+              {store.whatsapp && (
+                <a
+                  href={`https://wa.me/${store.whatsapp.replace(
+                    "+",
+                    ""
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="basita-btn-interactive"
+                  style={{
+                    minHeight: 36,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "7px 12px",
+                    background: t.colors.brand.whatsapp,
+                    color: t.colors.white,
+                    borderRadius: t.radius.full,
+                    textDecoration: "none",
+                    fontSize: t.typography.fontSize.xs,
+                    fontWeight: t.typography.fontWeight.bold,
+                  }}
+                >
+                  واتساب
+                </a>
+              )}
+
+              <a
+                href="#products"
+                className="basita-btn-interactive"
+                style={{
+                  minHeight: 38,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                  padding: "8px 16px",
+                  background: t.colors.primary[800],
+                  color: t.colors.text.onDark,
+                  borderRadius: t.radius.full,
+                  textDecoration: "none",
+                  fontSize: t.typography.fontSize.xs,
+                  fontWeight: t.typography.fontWeight.bold,
+                }}
+              >
+                <ShoppingBag size={14} strokeWidth={1.8} />
+                تصفّح المنتجات
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -529,9 +549,9 @@ function Stat({
   return (
     <div
       style={{
-        minWidth: 105,
-        flex: "1 1 105px",
-        padding: `0 ${t.spacing["3"]}`,
+        minWidth: 85,
+        flex: "1 1 85px",
+        padding: `0 ${t.spacing["2"]}`,
       }}
     >
       <div
@@ -539,11 +559,11 @@ function Stat({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: 28,
+          minHeight: 24,
           color: t.colors.primary[800],
-          fontSize: t.typography.fontSize.xl,
+          fontSize: t.typography.fontSize.lg,
           fontWeight: t.typography.fontWeight.bold,
-          lineHeight: 1.25,
+          lineHeight: 1.2,
         }}
       >
         {value}
@@ -551,10 +571,10 @@ function Stat({
 
       <div
         style={{
-          marginTop: 4,
+          marginTop: 2,
           color: t.colors.text.mid,
-          fontSize: t.typography.fontSize.xs,
-          lineHeight: 1.6,
+          fontSize: "12px",
+          lineHeight: 1.5,
           whiteSpace: "nowrap",
         }}
       >

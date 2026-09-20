@@ -47,7 +47,9 @@ export default function ProductPurchasePanel({
 }: Props) {
   const discount = product.comparePrice
     ? Math.round(
-        ((product.comparePrice - effectivePrice) / product.comparePrice) * 100
+        ((product.comparePrice - effectivePrice) /
+          product.comparePrice) *
+          100
       )
     : 0;
 
@@ -63,20 +65,20 @@ export default function ProductPurchasePanel({
         background: t.colors.white,
         border: `1px solid ${t.colors.cream.border}`,
         borderRadius: t.radius.xl,
-        padding: t.spacing["5"],
-        boxShadow: "0 10px 30px rgba(25, 45, 35, 0.055)",
+        padding: t.spacing["4"],
+        boxShadow: "0 8px 26px rgba(25, 45, 35, 0.05)",
       }}
     >
-      {/* لمسة بصرية خفيفة أعلى لوحة الشراء */}
+      {/* لمسة بصرية أعلى لوحة الشراء */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           top: 0,
           insetInlineStart: 0,
-          width: 90,
-          height: 4,
-          borderRadius: "0 0 6px 0",
+          width: 72,
+          height: 3,
+          borderRadius: "0 0 5px 0",
           background: t.colors.gold[600],
         }}
       />
@@ -88,13 +90,13 @@ export default function ProductPurchasePanel({
           display: "flex",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: t.spacing["2"],
+          gap: 7,
           marginBottom: t.spacing["2"],
         }}
       >
         <span
           style={{
-            fontSize: "clamp(28px, 3vw, 36px)",
+            fontSize: "clamp(27px, 2.8vw, 34px)",
             fontWeight: t.typography.fontWeight.bold,
             color: t.colors.primary[800],
             letterSpacing: "-0.5px",
@@ -104,7 +106,7 @@ export default function ProductPurchasePanel({
           {effectivePrice}{" "}
           <small
             style={{
-              fontSize: t.typography.fontSize.sm,
+              fontSize: t.typography.fontSize.xs,
               fontWeight: t.typography.fontWeight.medium,
               color: t.colors.text.mid,
             }}
@@ -113,34 +115,35 @@ export default function ProductPurchasePanel({
           </small>
         </span>
 
-        {product.comparePrice && product.comparePrice > effectivePrice && (
-          <>
-            <span
-              style={{
-                fontSize: t.typography.fontSize.sm,
-                color: t.colors.text.light,
-                textDecoration: "line-through",
-              }}
-            >
-              {product.comparePrice} ر.س
-            </span>
+        {product.comparePrice &&
+          product.comparePrice > effectivePrice && (
+            <>
+              <span
+                style={{
+                  fontSize: t.typography.fontSize.xs,
+                  color: t.colors.text.light,
+                  textDecoration: "line-through",
+                }}
+              >
+                {product.comparePrice} ر.س
+              </span>
 
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "4px 9px",
-                background: t.colors.semantic.dangerBg,
-                color: t.colors.semantic.danger,
-                borderRadius: t.radius.full,
-                fontSize: t.typography.fontSize.xs,
-                fontWeight: t.typography.fontWeight.bold,
-              }}
-            >
-              خصم {discount}٪
-            </span>
-          </>
-        )}
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "3px 8px",
+                  background: t.colors.semantic.dangerBg,
+                  color: t.colors.semantic.danger,
+                  borderRadius: t.radius.full,
+                  fontSize: 11,
+                  fontWeight: t.typography.fontWeight.bold,
+                }}
+              >
+                خصم {discount}٪
+              </span>
+            </>
+          )}
       </div>
 
       {/* حالة المخزون */}
@@ -148,9 +151,9 @@ export default function ProductPurchasePanel({
         style={{
           display: "inline-flex",
           alignItems: "center",
-          gap: 7,
-          padding: "6px 10px",
-          marginBottom: t.spacing["4"],
+          gap: 6,
+          padding: "5px 9px",
+          marginBottom: t.spacing["3"],
           borderRadius: t.radius.full,
           background: outOfStock
             ? t.colors.semantic.dangerBg
@@ -158,24 +161,26 @@ export default function ProductPurchasePanel({
           color: outOfStock
             ? t.colors.semantic.danger
             : t.colors.semantic.success,
-          fontSize: t.typography.fontSize.xs,
+          fontSize: 12,
           fontWeight: t.typography.fontWeight.bold,
         }}
       >
         {outOfStock ? (
-          <XCircle size={14} strokeWidth={2} />
+          <XCircle size={13} strokeWidth={2} />
         ) : (
-          <CheckCircle2 size={14} strokeWidth={2} />
+          <CheckCircle2 size={13} strokeWidth={2} />
         )}
 
-        {outOfStock ? "نفدت الكمية" : `${maxQty} قطعة متوفرة`}
+        {outOfStock
+          ? "نفدت الكمية"
+          : `${maxQty} قطعة متوفرة`}
       </div>
 
       {/* المتغيرات */}
       <div
         style={{
-          marginBottom: t.spacing["4"],
-          paddingBottom: t.spacing["4"],
+          marginBottom: t.spacing["3"],
+          paddingBottom: t.spacing["3"],
           borderBottom: `1px solid ${t.colors.cream.border}`,
         }}
       >
@@ -188,11 +193,11 @@ export default function ProductPurchasePanel({
       </div>
 
       {/* الكمية */}
-      <div style={{ marginBottom: t.spacing["4"] }}>
+      <div style={{ marginBottom: t.spacing["3"] }}>
         <p
           style={{
             margin: `0 0 ${t.spacing["2"]}`,
-            fontSize: t.typography.fontSize.sm,
+            fontSize: t.typography.fontSize.xs,
             fontWeight: t.typography.fontWeight.bold,
             color: t.colors.text.dark,
           }}
@@ -205,8 +210,8 @@ export default function ProductPurchasePanel({
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: t.spacing["3"],
-            padding: "5px 6px",
+            gap: t.spacing["2"],
+            padding: "4px 5px",
             background: t.colors.cream.bg,
             border: `1px solid ${t.colors.cream.border}`,
             borderRadius: t.radius.full,
@@ -214,19 +219,23 @@ export default function ProductPurchasePanel({
         >
           <button
             type="button"
-            onClick={() => onQtyChange(Math.max(1, qty - 1))}
+            onClick={() =>
+              onQtyChange(Math.max(1, qty - 1))
+            }
             disabled={outOfStock}
             aria-label="تقليل الكمية"
             className="basita-quantity-button"
             style={{
-              width: 34,
-              height: 34,
+              width: 32,
+              height: 32,
               borderRadius: t.radius.full,
               border: `1px solid ${t.colors.cream.border}`,
               background: t.colors.white,
               color: t.colors.text.dark,
-              cursor: outOfStock ? "not-allowed" : "pointer",
-              fontSize: 18,
+              cursor: outOfStock
+                ? "not-allowed"
+                : "pointer",
+              fontSize: 17,
               lineHeight: 1,
               display: "flex",
               alignItems: "center",
@@ -239,9 +248,9 @@ export default function ProductPurchasePanel({
 
           <span
             style={{
-              minWidth: 26,
+              minWidth: 24,
               textAlign: "center",
-              fontSize: t.typography.fontSize.base,
+              fontSize: t.typography.fontSize.sm,
               fontWeight: t.typography.fontWeight.bold,
               color: t.colors.text.dark,
             }}
@@ -251,25 +260,30 @@ export default function ProductPurchasePanel({
 
           <button
             type="button"
-            onClick={() => onQtyChange(Math.min(maxQty, qty + 1))}
+            onClick={() =>
+              onQtyChange(Math.min(maxQty, qty + 1))
+            }
             disabled={outOfStock || qty >= maxQty}
             aria-label="زيادة الكمية"
             className="basita-quantity-button basita-quantity-plus"
             style={{
-              width: 34,
-              height: 34,
+              width: 32,
+              height: 32,
               borderRadius: t.radius.full,
               border: "none",
               background: t.colors.primary[800],
               color: t.colors.white,
               cursor:
-                outOfStock || qty >= maxQty ? "not-allowed" : "pointer",
-              fontSize: 18,
+                outOfStock || qty >= maxQty
+                  ? "not-allowed"
+                  : "pointer",
+              fontSize: 17,
               lineHeight: 1,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              opacity: outOfStock || qty >= maxQty ? 0.5 : 1,
+              opacity:
+                outOfStock || qty >= maxQty ? 0.5 : 1,
             }}
           >
             +
@@ -286,9 +300,9 @@ export default function ProductPurchasePanel({
             alignItems: "flex-start",
             gap: 8,
             marginBottom: t.spacing["3"],
-            padding: "10px 12px",
+            padding: "9px 11px",
             background: t.colors.semantic.dangerBg,
-            border: `1px solid rgba(180, 50, 50, 0.12)`,
+            border: "1px solid rgba(180, 50, 50, 0.12)",
             borderRadius: t.radius.md,
             color: t.colors.semantic.danger,
             fontSize: t.typography.fontSize.xs,
@@ -298,8 +312,12 @@ export default function ProductPurchasePanel({
           <AlertTriangle
             size={14}
             strokeWidth={1.8}
-            style={{ flexShrink: 0, marginTop: 2 }}
+            style={{
+              flexShrink: 0,
+              marginTop: 2,
+            }}
           />
+
           <span>{error}</span>
         </div>
       )}
@@ -309,7 +327,7 @@ export default function ProductPurchasePanel({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: t.spacing["2"],
+          gap: 7,
         }}
       >
         <button
@@ -319,12 +337,12 @@ export default function ProductPurchasePanel({
           className="basita-purchase-button basita-cart-button"
           style={{
             width: "100%",
-            minHeight: 50,
-            padding: "13px 16px",
+            minHeight: 48,
+            padding: "11px 15px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 9,
+            gap: 8,
             background: addedToCart
               ? t.colors.semantic.success
               : t.colors.cream.warm,
@@ -340,20 +358,23 @@ export default function ProductPurchasePanel({
             fontSize: t.typography.fontSize.sm,
             fontWeight: t.typography.fontWeight.bold,
             cursor:
-              addingToCart || outOfStock ? "not-allowed" : "pointer",
-            opacity: addingToCart || outOfStock ? 0.65 : 1,
+              addingToCart || outOfStock
+                ? "not-allowed"
+                : "pointer",
+            opacity:
+              addingToCart || outOfStock ? 0.65 : 1,
           }}
         >
           {addedToCart ? (
             <>
-              <CheckCircle2 size={17} strokeWidth={2} />
+              <CheckCircle2 size={16} strokeWidth={2} />
               أُضيف للسلة
             </>
           ) : addingToCart ? (
             "جاري الإضافة..."
           ) : (
             <>
-              <ShoppingCart size={17} strokeWidth={1.8} />
+              <ShoppingCart size={16} strokeWidth={1.8} />
               أضف إلى السلة
             </>
           )}
@@ -366,12 +387,12 @@ export default function ProductPurchasePanel({
           className="basita-purchase-button basita-buy-button"
           style={{
             width: "100%",
-            minHeight: 52,
-            padding: "13px 16px",
+            minHeight: 50,
+            padding: "11px 15px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 9,
+            gap: 8,
             background: checkingOut
               ? t.colors.primary[600]
               : t.colors.primary[800],
@@ -385,8 +406,11 @@ export default function ProductPurchasePanel({
             fontSize: t.typography.fontSize.sm,
             fontWeight: t.typography.fontWeight.bold,
             cursor:
-              checkingOut || outOfStock ? "not-allowed" : "pointer",
-            opacity: checkingOut || outOfStock ? 0.72 : 1,
+              checkingOut || outOfStock
+                ? "not-allowed"
+                : "pointer",
+            opacity:
+              checkingOut || outOfStock ? 0.72 : 1,
           }}
         >
           {checkingOut ? (
@@ -394,7 +418,7 @@ export default function ProductPurchasePanel({
           ) : (
             <>
               <Zap
-                size={17}
+                size={16}
                 strokeWidth={1.8}
                 fill={t.colors.text.onDark}
               />
@@ -409,12 +433,12 @@ export default function ProductPurchasePanel({
             alignItems: "center",
             justifyContent: "center",
             gap: 6,
-            marginTop: 2,
+            marginTop: 1,
             color: t.colors.text.light,
-            fontSize: t.typography.fontSize.xs,
+            fontSize: 11,
           }}
         >
-          <Lock size={12} strokeWidth={1.8} />
+          <Lock size={11} strokeWidth={1.8} />
           <span>تسوقي بثقة وأمان</span>
         </div>
       </div>
@@ -422,12 +446,13 @@ export default function ProductPurchasePanel({
       {/* عناصر الثقة والسياسات */}
       <div
         style={{
-          marginTop: t.spacing["5"],
-          paddingTop: t.spacing["4"],
+          marginTop: t.spacing["4"],
+          paddingTop: t.spacing["3"],
           borderTop: `1px solid ${t.colors.cream.border}`,
         }}
       >
         <ProductTrustBar />
+
         <ProductPolicyCards product={product} />
       </div>
 
@@ -440,7 +465,7 @@ export default function ProductPurchasePanel({
 
         .basita-purchase-panel:hover {
           border-color: rgba(15, 61, 46, 0.13);
-          box-shadow: 0 14px 36px rgba(25, 45, 35, 0.075);
+          box-shadow: 0 12px 30px rgba(25, 45, 35, 0.07);
         }
 
         .basita-purchase-button {
@@ -454,12 +479,12 @@ export default function ProductPurchasePanel({
 
         .basita-cart-button:not(:disabled):hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(25, 45, 35, 0.08);
+          box-shadow: 0 5px 14px rgba(25, 45, 35, 0.07);
         }
 
         .basita-buy-button:not(:disabled):hover {
           transform: translateY(-1px);
-          box-shadow: 0 8px 20px rgba(15, 61, 46, 0.18);
+          box-shadow: 0 7px 18px rgba(15, 61, 46, 0.17);
         }
 
         .basita-purchase-button:not(:disabled):active {
@@ -495,7 +520,7 @@ export default function ProductPurchasePanel({
           }
 
           .basita-price-row {
-            margin-bottom: ${t.spacing["3"]} !important;
+            margin-bottom: ${t.spacing["2"]} !important;
           }
         }
 
@@ -505,7 +530,12 @@ export default function ProductPurchasePanel({
           }
 
           .basita-purchase-button {
-            min-height: 50px !important;
+            min-height: 48px !important;
+          }
+
+          .basita-quantity-button {
+            width: 31px !important;
+            height: 31px !important;
           }
         }
 

@@ -16,9 +16,9 @@ export default function StoreClosingBanner({
       aria-label="رسالة ختامية للمتجر"
       style={{
         width: "100%",
-        maxWidth: 1200,
+        maxWidth: 1180,
         margin: "0 auto",
-        padding: `${t.spacing["10"]} ${t.spacing["5"]} ${t.spacing["12"]}`,
+        padding: `${t.spacing["5"]} ${t.spacing["4"]} ${t.spacing["7"]}`,
         boxSizing: "border-box",
         direction: "rtl",
       }}
@@ -31,8 +31,8 @@ export default function StoreClosingBanner({
               bannerImages.length,
               5
             )}, minmax(0, 1fr))`,
-            gap: t.spacing["2"],
-            marginBottom: t.spacing["6"],
+            gap: 6,
+            marginBottom: t.spacing["4"],
           }}
         >
           {bannerImages.map((src, index) => (
@@ -40,13 +40,13 @@ export default function StoreClosingBanner({
               key={`${src}-${index}`}
               aria-hidden="true"
               style={{
-                height: 96,
-                borderRadius: t.radius.lg,
+                height: 68,
+                borderRadius: t.radius.md,
                 backgroundImage: `url(${src})`,
                 backgroundPosition: "center",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
-                boxShadow: t.shadows.sm,
+                boxShadow: t.shadows.xs,
               }}
             />
           ))}
@@ -58,21 +58,20 @@ export default function StoreClosingBanner({
           position: "relative",
           overflow: "hidden",
           background: `linear-gradient(135deg, ${t.colors.primary[950]}, ${t.colors.primary[900]})`,
-          borderRadius: t.radius.xl,
-          padding: `${t.spacing["8"]} ${t.spacing["6"]}`,
+          borderRadius: t.radius.lg,
+          padding: "22px 20px",
           textAlign: "center",
-          boxShadow: t.shadows.md,
+          boxShadow: t.shadows.sm,
         }}
       >
-        {/* زخرفة بسيطة */}
         <div
           aria-hidden="true"
           style={{
             position: "absolute",
-            top: -45,
-            left: -45,
-            width: 130,
-            height: 130,
+            top: -55,
+            left: -55,
+            width: 120,
+            height: 120,
             borderRadius: t.radius.full,
             background: "rgba(255,255,255,0.035)",
           }}
@@ -82,12 +81,12 @@ export default function StoreClosingBanner({
           aria-hidden="true"
           style={{
             position: "absolute",
-            bottom: -55,
-            right: -35,
-            width: 150,
-            height: 150,
+            bottom: -65,
+            right: -45,
+            width: 140,
+            height: 140,
             borderRadius: t.radius.full,
-            background: "rgba(221,179,95,0.06)",
+            background: "rgba(221,179,95,0.055)",
           }}
         />
 
@@ -95,15 +94,15 @@ export default function StoreClosingBanner({
           style={{
             position: "relative",
             zIndex: 1,
-            maxWidth: 720,
+            maxWidth: 650,
             margin: "0 auto",
           }}
         >
           <div
             style={{
-              width: 44,
-              height: 44,
-              margin: "0 auto 14px",
+              width: 36,
+              height: 36,
+              margin: "0 auto 9px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -112,7 +111,7 @@ export default function StoreClosingBanner({
             }}
           >
             <Heart
-              size={21}
+              size={17}
               strokeWidth={1.8}
               fill={t.colors.gold[400]}
               color={t.colors.gold[400]}
@@ -123,9 +122,9 @@ export default function StoreClosingBanner({
             style={{
               margin: 0,
               color: t.colors.text.onDark,
-              fontSize: t.typography.fontSize.xl,
+              fontSize: t.typography.fontSize.lg,
               fontWeight: t.typography.fontWeight.bold,
-              lineHeight: 1.7,
+              lineHeight: 1.5,
             }}
           >
             شكراً لدعمك للأسر المنتجة السعودية
@@ -133,11 +132,11 @@ export default function StoreClosingBanner({
 
           <p
             style={{
-              maxWidth: 600,
-              margin: `${t.spacing["2"]} auto ${t.spacing["6"]}`,
+              maxWidth: 560,
+              margin: "5px auto 14px",
               color: t.colors.text.onDarkMuted,
-              fontSize: t.typography.fontSize.base,
-              lineHeight: 1.9,
+              fontSize: t.typography.fontSize.sm,
+              lineHeight: 1.7,
             }}
           >
             كل عملية شراء منك تدعم أسرة سعودية وتصنع فرقاً حقيقياً في حياتهم.
@@ -150,19 +149,19 @@ export default function StoreClosingBanner({
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: 8,
-              minHeight: 46,
-              padding: "11px 28px",
+              gap: 7,
+              minHeight: 40,
+              padding: "8px 20px",
               background: t.colors.gold[600],
               color: t.colors.primary[950],
               borderRadius: t.radius.full,
               textDecoration: "none",
               fontSize: t.typography.fontSize.sm,
               fontWeight: t.typography.fontWeight.bold,
-              boxShadow: t.shadows.sm,
+              boxShadow: t.shadows.xs,
             }}
           >
-            <ShoppingBag size={18} strokeWidth={2} />
+            <ShoppingBag size={16} strokeWidth={2} />
             تصفّح جميع المنتجات
           </a>
         </div>

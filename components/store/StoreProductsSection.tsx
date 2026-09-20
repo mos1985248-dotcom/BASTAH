@@ -120,48 +120,40 @@ export default function StoreProductsSection({
       aria-label="منتجات المتجر"
       style={{
         width: "100%",
-        maxWidth: 1200,
+        maxWidth: 1180,
         margin: "0 auto",
-        padding: `${t.spacing["10"]} ${t.spacing["5"]}`,
+        padding: `${t.spacing["6"]} ${t.spacing["4"]}`,
         boxSizing: "border-box",
         direction: "rtl",
       }}
     >
       {loading && (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: t.spacing["8"],
-          }}
-        >
-          <div>
-            <div
-              style={{
-                width: 170,
-                height: 24,
-                marginBottom: t.spacing["4"],
-              }}
-            >
-              <Skeleton width="100%" height={24} />
-            </div>
+        <div>
+          <div
+            style={{
+              width: 145,
+              height: 22,
+              marginBottom: t.spacing["3"],
+            }}
+          >
+            <Skeleton width="100%" height={22} />
+          </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "repeat(auto-fill, minmax(205px, 1fr))",
-                gap: t.spacing["5"],
-              }}
-            >
-              {[1, 2, 3, 4].map((n) => (
-                <Skeleton
-                  key={n}
-                  height={285}
-                  radius={t.radius.lg}
-                />
-              ))}
-            </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fill, minmax(195px, 1fr))",
+              gap: t.spacing["4"],
+            }}
+          >
+            {[1, 2, 3, 4].map((n) => (
+              <Skeleton
+                key={n}
+                height={270}
+                radius={t.radius.lg}
+              />
+            ))}
           </div>
         </div>
       )}
@@ -171,13 +163,13 @@ export default function StoreProductsSection({
         newest.length === 0 && (
           <div
             style={{
-              padding: `${t.spacing["12"]} ${t.spacing["6"]}`,
+              padding: `${t.spacing["7"]} ${t.spacing["5"]}`,
               textAlign: "center",
               border: `1px solid ${t.colors.cream.border}`,
-              borderRadius: t.radius.xl,
+              borderRadius: t.radius.lg,
               background: t.colors.white,
               color: t.colors.text.mid,
-              fontSize: t.typography.fontSize.base,
+              fontSize: t.typography.fontSize.sm,
             }}
           >
             لا توجد منتجات بعد في هذا المتجر
@@ -198,8 +190,7 @@ export default function StoreProductsSection({
       {newest.length > 0 && (
         <div
           style={{
-            marginTop:
-              bestSellers.length > 0 ? t.spacing["12"] : 0,
+            marginTop: bestSellers.length > 0 ? t.spacing["8"] : 0,
           }}
         >
           <ProductRow
@@ -235,18 +226,18 @@ function ProductRow({
       <div
         style={{
           display: "flex",
-          alignItems: "flex-end",
+          alignItems: "center",
           justifyContent: "space-between",
-          gap: 16,
-          marginBottom: t.spacing["5"],
+          gap: 12,
+          marginBottom: t.spacing["4"],
         }}
       >
-        <div>
+        <div style={{ minWidth: 0 }}>
           <h2
             style={{
               margin: 0,
               color: t.colors.text.dark,
-              fontSize: t.typography.fontSize["2xl"],
+              fontSize: t.typography.fontSize.xl,
               fontWeight: t.typography.fontWeight.bold,
               lineHeight: 1.4,
             }}
@@ -256,10 +247,10 @@ function ProductRow({
 
           <p
             style={{
-              margin: "4px 0 0",
+              margin: "2px 0 0",
               color: t.colors.text.light,
-              fontSize: t.typography.fontSize.sm,
-              lineHeight: 1.7,
+              fontSize: "12px",
+              lineHeight: 1.5,
             }}
           >
             {subtitle}
@@ -269,11 +260,11 @@ function ProductRow({
         <span
           style={{
             flexShrink: 0,
-            padding: "5px 10px",
+            padding: "4px 9px",
             borderRadius: t.radius.full,
             background: t.colors.cream.warm,
             color: t.colors.text.mid,
-            fontSize: t.typography.fontSize.xs,
+            fontSize: "11px",
             fontWeight: t.typography.fontWeight.semibold,
           }}
         >
@@ -285,8 +276,8 @@ function ProductRow({
         style={{
           display: "grid",
           gridTemplateColumns:
-            "repeat(auto-fill, minmax(205px, 1fr))",
-          gap: t.spacing["5"],
+            "repeat(auto-fill, minmax(195px, 1fr))",
+          gap: t.spacing["4"],
           direction: "rtl",
         }}
       >

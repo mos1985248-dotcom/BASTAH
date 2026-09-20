@@ -29,7 +29,7 @@ export default function ProductVariantSelector({
       dir="rtl"
       className="basita-variant-selector"
       style={{
-        marginBottom: t.spacing["4"],
+        marginBottom: t.spacing["3"],
       }}
     >
       <div
@@ -38,13 +38,13 @@ export default function ProductVariantSelector({
           alignItems: "center",
           justifyContent: "space-between",
           gap: t.spacing["2"],
-          marginBottom: t.spacing["3"],
+          marginBottom: t.spacing["2"],
         }}
       >
         <p
           style={{
             margin: 0,
-            fontSize: t.typography.fontSize.sm,
+            fontSize: t.typography.fontSize.xs,
             fontWeight: t.typography.fontWeight.bold,
             color: t.colors.text.dark,
           }}
@@ -57,14 +57,14 @@ export default function ProductVariantSelector({
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 4,
-              fontSize: t.typography.fontSize.xs,
+              gap: 3,
+              fontSize: 11,
               color: t.colors.primary[800],
               fontWeight: t.typography.fontWeight.semibold,
               whiteSpace: "nowrap",
             }}
           >
-            <Check size={13} strokeWidth={2.2} />
+            <Check size={12} strokeWidth={2.2} />
             تم الاختيار
           </span>
         )}
@@ -74,8 +74,9 @@ export default function ProductVariantSelector({
         className="basita-variant-options"
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(105px, 1fr))",
-          gap: t.spacing["2"],
+          gridTemplateColumns:
+            "repeat(auto-fill, minmax(100px, 1fr))",
+          gap: 7,
         }}
       >
         {variants.map((v) => {
@@ -83,7 +84,8 @@ export default function ProductVariantSelector({
           const outOfStock = v.quantity <= 0;
 
           const label =
-            Array.isArray(v.options) && v.options[0]?.value
+            Array.isArray(v.options) &&
+            v.options[0]?.value
               ? v.options[0].value
               : v.nameAr;
 
@@ -93,20 +95,22 @@ export default function ProductVariantSelector({
             <button
               key={v.id}
               type="button"
-              onClick={() => !outOfStock && onSelect(v.id)}
+              onClick={() =>
+                !outOfStock && onSelect(v.id)
+              }
               disabled={outOfStock}
               aria-pressed={isSelected}
               className="basita-variant-option"
               style={{
                 position: "relative",
                 minWidth: 0,
-                minHeight: 68,
+                minHeight: 62,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 3,
-                padding: "9px 10px",
+                gap: 2,
+                padding: "7px 8px",
                 textAlign: "center",
                 borderRadius: t.radius.md,
                 border: `1.5px solid ${
@@ -122,11 +126,13 @@ export default function ProductVariantSelector({
                   : isSelected
                     ? t.colors.white
                     : t.colors.text.dark,
-                cursor: outOfStock ? "not-allowed" : "pointer",
+                cursor: outOfStock
+                  ? "not-allowed"
+                  : "pointer",
                 opacity: outOfStock ? 0.58 : 1,
                 boxShadow: isSelected
-                  ? "0 5px 14px rgba(15, 61, 46, 0.13)"
-                  : "0 2px 7px rgba(25, 45, 35, 0.035)",
+                  ? "0 4px 12px rgba(15, 61, 46, 0.11)"
+                  : "0 2px 6px rgba(25, 45, 35, 0.03)",
                 transition:
                   "transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease",
               }}
@@ -136,10 +142,10 @@ export default function ProductVariantSelector({
                   aria-hidden="true"
                   style={{
                     position: "absolute",
-                    top: 6,
-                    insetInlineStart: 6,
-                    width: 18,
-                    height: 18,
+                    top: 5,
+                    insetInlineStart: 5,
+                    width: 17,
+                    height: 17,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -148,7 +154,10 @@ export default function ProductVariantSelector({
                     color: t.colors.primary[800],
                   }}
                 >
-                  <Check size={11} strokeWidth={2.5} />
+                  <Check
+                    size={10}
+                    strokeWidth={2.5}
+                  />
                 </span>
               )}
 
@@ -156,8 +165,8 @@ export default function ProductVariantSelector({
                 <span
                   aria-hidden="true"
                   style={{
-                    width: 22,
-                    height: 22,
+                    width: 20,
+                    height: 20,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -167,7 +176,10 @@ export default function ProductVariantSelector({
                     color: t.colors.text.light,
                   }}
                 >
-                  <PackageX size={13} strokeWidth={1.7} />
+                  <PackageX
+                    size={12}
+                    strokeWidth={1.7}
+                  />
                 </span>
               )}
 
@@ -178,8 +190,9 @@ export default function ProductVariantSelector({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  fontSize: t.typography.fontSize.sm,
-                  fontWeight: t.typography.fontWeight.bold,
+                  fontSize: 12,
+                  fontWeight:
+                    t.typography.fontWeight.bold,
                   lineHeight: 1.4,
                 }}
               >
@@ -193,13 +206,15 @@ export default function ProductVariantSelector({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  fontSize: t.typography.fontSize.xs,
+                  fontSize: 11,
                   marginTop: 1,
-                  lineHeight: 1.4,
+                  lineHeight: 1.35,
                   opacity: isSelected ? 0.88 : 0.78,
                 }}
               >
-                {outOfStock ? "نفدت الكمية" : `${price} ر.س`}
+                {outOfStock
+                  ? "نفدت الكمية"
+                  : `${price} ر.س`}
               </span>
             </button>
           );
@@ -210,7 +225,7 @@ export default function ProductVariantSelector({
         .basita-variant-option:not(:disabled):hover {
           transform: translateY(-1px);
           border-color: ${t.colors.primary[800]} !important;
-          box-shadow: 0 5px 14px rgba(25, 45, 35, 0.08) !important;
+          box-shadow: 0 5px 13px rgba(25, 45, 35, 0.075) !important;
         }
 
         .basita-variant-option:not(:disabled):focus-visible {
@@ -224,14 +239,19 @@ export default function ProductVariantSelector({
 
         @media (max-width: 560px) {
           .basita-variant-options {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            grid-template-columns:
+              repeat(2, minmax(0, 1fr)) !important;
           }
         }
 
         @media (max-width: 360px) {
           .basita-variant-option {
-            min-height: 64px !important;
-            padding-inline: 7px !important;
+            min-height: 60px !important;
+            padding-inline: 6px !important;
+          }
+
+          .basita-variant-option > span:last-child {
+            font-size: 10px !important;
           }
         }
 

@@ -34,10 +34,10 @@ export default function StoreCard({ store }: { store: HomeStore }) {
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          background: "#FFFDF8",
-          border: "1px solid rgba(91, 70, 45, 0.14)",
-          borderRadius: 20,
-          boxShadow: "0 4px 14px rgba(67, 48, 29, 0.055)",
+          background: t.colors.cream.card,
+          border: `1px solid ${t.colors.cream.borderLight}`,
+          borderRadius: t.radius.lg,
+          boxShadow: t.shadows.xs,
           transition:
             `transform ${t.motion.base} ${t.motion.ease}, ` +
             `box-shadow ${t.motion.base} ${t.motion.ease}, ` +
@@ -56,13 +56,13 @@ export default function StoreCard({ store }: { store: HomeStore }) {
               : `linear-gradient(135deg, ${t.colors.primary[700]}, ${t.colors.primary[900]})`,
           }}
         >
-          {/* طبقة خفيفة لزيادة وضوح المحتوى */}
+          {/* طبقة خفيفة لتحسين وضوح الغلاف */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to bottom, rgba(35,25,16,0.02), rgba(35,25,16,0.18))",
+                "linear-gradient(to bottom, rgba(15,61,46,0.02), rgba(15,61,46,0.18))",
             }}
           />
 
@@ -77,9 +77,9 @@ export default function StoreCard({ store }: { store: HomeStore }) {
                 alignItems: "center",
                 gap: 5,
                 padding: "5px 9px",
-                borderRadius: 999,
-                background: "rgba(255,253,248,0.94)",
-                border: "1px solid rgba(255,255,255,0.65)",
+                borderRadius: t.radius.full,
+                background: "rgba(255,255,255,0.94)",
+                border: `1px solid ${t.colors.cream.borderLight}`,
                 color: t.colors.primary[800],
                 fontSize: t.typography.fontSize.xs,
                 fontWeight: t.typography.fontWeight.semibold,
@@ -110,12 +110,12 @@ export default function StoreCard({ store }: { store: HomeStore }) {
               right: 16,
               width: 60,
               height: 60,
-              borderRadius: 16,
+              borderRadius: t.radius.md,
               background: store.logo
                 ? `url(${store.logo}) center/cover no-repeat`
                 : t.colors.gold[100],
-              border: "3px solid #FFFDF8",
-              boxShadow: "0 4px 12px rgba(49, 34, 20, 0.14)",
+              border: `3px solid ${t.colors.cream.card}`,
+              boxShadow: t.shadows.sm,
               overflow: "hidden",
             }}
           />
@@ -151,7 +151,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
               <BadgeCheck
                 size={17}
                 strokeWidth={2.2}
-                color={t.colors.primary[700]}
+                color={t.colors.primary[600]}
                 style={{ flexShrink: 0 }}
               />
             )}
@@ -186,7 +186,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
                   style={{
                     width: 3,
                     height: 3,
-                    borderRadius: "50%",
+                    borderRadius: t.radius.full,
                     background: t.colors.cream.border,
                   }}
                 />
@@ -243,7 +243,7 @@ export default function StoreCard({ store }: { store: HomeStore }) {
               alignItems: "center",
               justifyContent: "space-between",
               gap: 8,
-              borderTop: "1px solid rgba(91, 70, 45, 0.08)",
+              borderTop: `1px solid ${t.colors.cream.borderLight}`,
             }}
           >
             <span
@@ -258,10 +258,11 @@ export default function StoreCard({ store }: { store: HomeStore }) {
 
             <span
               aria-hidden="true"
+              className="basita-store-arrow"
               style={{
                 width: 28,
                 height: 28,
-                borderRadius: "50%",
+                borderRadius: t.radius.full,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -270,25 +271,12 @@ export default function StoreCard({ store }: { store: HomeStore }) {
                 fontSize: 15,
                 transition: `transform ${t.motion.fast} ${t.motion.ease}`,
               }}
-              className="basita-store-arrow"
             >
               ←
             </span>
           </div>
         </div>
       </article>
-
-      <style>{`
-        .basita-store-card:hover {
-          transform: translateY(-5px);
-          border-color: rgba(166, 124, 45, 0.28);
-          box-shadow: 0 14px 30px rgba(67, 48, 29, 0.11);
-        }
-
-        .basita-store-card:hover .basita-store-arrow {
-          transform: translateX(-3px);
-        }
-      `}</style>
     </a>
   );
 }

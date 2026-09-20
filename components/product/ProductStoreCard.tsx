@@ -35,12 +35,12 @@ export default function ProductStoreCard({
         background: t.colors.white,
         border: `1px solid ${t.colors.cream.border}`,
         borderRadius: t.radius.xl,
-        padding: t.spacing["4"],
+        padding: t.spacing["3"],
         display: "flex",
         alignItems: "center",
         gap: t.spacing["3"],
         flexWrap: "wrap",
-        boxShadow: "0 6px 20px rgba(25, 45, 35, 0.04)",
+        boxShadow: "0 5px 18px rgba(25, 45, 35, 0.035)",
         transition:
           "border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease",
       }}
@@ -52,7 +52,7 @@ export default function ProductStoreCard({
           position: "absolute",
           top: 0,
           insetInlineStart: 0,
-          width: 58,
+          width: 52,
           height: 3,
           background: t.colors.gold[600],
           borderRadius: "0 0 5px 0",
@@ -62,14 +62,14 @@ export default function ProductStoreCard({
       {/* شعار المتجر */}
       <div
         style={{
-          width: 58,
-          height: 58,
+          width: 54,
+          height: 54,
           flexShrink: 0,
           borderRadius: t.radius.md,
           padding: 3,
           background: t.colors.cream.warm,
           border: `1px solid ${t.colors.cream.border}`,
-          boxShadow: "0 3px 10px rgba(25, 45, 35, 0.06)",
+          boxShadow: "0 2px 8px rgba(25, 45, 35, 0.05)",
         }}
       >
         <div
@@ -85,10 +85,16 @@ export default function ProductStoreCard({
             justifyContent: "center",
             color: t.colors.gold[600],
           }}
-          aria-label={store.logo ? store.nameAr : "شعار المتجر"}
+          aria-label={
+            store.logo ? store.nameAr : "شعار المتجر"
+          }
         >
           {!store.logo && (
-            <Store size={22} strokeWidth={1.6} aria-hidden="true" />
+            <Store
+              size={20}
+              strokeWidth={1.6}
+              aria-hidden="true"
+            />
           )}
         </div>
       </div>
@@ -112,9 +118,9 @@ export default function ProductStoreCard({
             gap: 5,
             color: t.colors.text.dark,
             textDecoration: "none",
-            fontSize: t.typography.fontSize.base,
+            fontSize: t.typography.fontSize.sm,
             fontWeight: t.typography.fontWeight.bold,
-            lineHeight: 1.5,
+            lineHeight: 1.45,
           }}
         >
           <span
@@ -129,7 +135,7 @@ export default function ProductStoreCard({
 
           {store.isVerified && (
             <BadgeCheck
-              size={15}
+              size={14}
               strokeWidth={1.8}
               color={t.colors.primary[800]}
               aria-label="متجر موثّق"
@@ -142,9 +148,9 @@ export default function ProductStoreCard({
             display: "flex",
             alignItems: "center",
             flexWrap: "wrap",
-            gap: 7,
-            marginTop: 4,
-            fontSize: t.typography.fontSize.xs,
+            gap: 6,
+            marginTop: 3,
+            fontSize: 12,
           }}
         >
           {store.totalReviews > 0 && (
@@ -154,20 +160,24 @@ export default function ProductStoreCard({
                 alignItems: "center",
                 gap: 4,
                 color: t.colors.gold[600],
-                fontWeight: t.typography.fontWeight.semibold,
+                fontWeight:
+                  t.typography.fontWeight.semibold,
               }}
             >
               <Star
-                size={11}
+                size={10}
                 strokeWidth={1.8}
                 color={t.colors.gold[600]}
                 fill={t.colors.gold[600]}
               />
+
               {store.avgRating.toFixed(1)}
+
               <span
                 style={{
                   color: t.colors.text.light,
-                  fontWeight: t.typography.fontWeight.regular,
+                  fontWeight:
+                    t.typography.fontWeight.regular,
                 }}
               >
                 ({store.totalReviews})
@@ -203,7 +213,7 @@ export default function ProductStoreCard({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: t.spacing["2"],
+          gap: 6,
         }}
       >
         <button
@@ -211,32 +221,44 @@ export default function ProductStoreCard({
           onClick={toggle}
           disabled={busy}
           className="basita-store-follow-button"
-          aria-label={following ? "إلغاء متابعة المتجر" : "متابعة المتجر"}
+          aria-label={
+            following
+              ? "إلغاء متابعة المتجر"
+              : "متابعة المتجر"
+          }
           style={{
-            minHeight: 38,
+            minHeight: 36,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 6,
-            padding: "8px 14px",
+            gap: 5,
+            padding: "7px 12px",
             background: following
               ? t.colors.primary[100]
               : t.colors.white,
             color: t.colors.primary[800],
             border: `1.5px solid ${t.colors.primary[800]}`,
             borderRadius: t.radius.full,
-            fontSize: t.typography.fontSize.xs,
-            fontWeight: t.typography.fontWeight.bold,
-            cursor: busy ? "not-allowed" : "pointer",
+            fontSize: 12,
+            fontWeight:
+              t.typography.fontWeight.bold,
+            cursor: busy
+              ? "not-allowed"
+              : "pointer",
             opacity: busy ? 0.65 : 1,
             whiteSpace: "nowrap",
           }}
         >
           <Heart
-            size={14}
+            size={13}
             strokeWidth={1.8}
-            fill={following ? t.colors.primary[800] : "none"}
+            fill={
+              following
+                ? t.colors.primary[800]
+                : "none"
+            }
           />
+
           {following ? "بالمتابعة" : "متابعة"}
         </button>
 
@@ -244,32 +266,41 @@ export default function ProductStoreCard({
           href={`/store/${store.slug}`}
           className="basita-store-view-button"
           style={{
-            minHeight: 38,
+            minHeight: 36,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 6,
-            padding: "8px 15px",
+            gap: 5,
+            padding: "7px 13px",
             background: t.colors.primary[800],
             color: t.colors.white,
             border: `1px solid ${t.colors.primary[800]}`,
             borderRadius: t.radius.full,
             textDecoration: "none",
-            fontSize: t.typography.fontSize.xs,
-            fontWeight: t.typography.fontWeight.bold,
+            fontSize: 12,
+            fontWeight:
+              t.typography.fontWeight.bold,
             whiteSpace: "nowrap",
           }}
         >
           عرض المتجر
-          <ArrowLeft size={13} strokeWidth={2} />
+
+          <ArrowLeft
+            size={12}
+            strokeWidth={2}
+          />
         </a>
       </div>
 
       <style>{`
         .basita-product-store-card:hover {
           transform: translateY(-1px);
-          border-color: rgba(15, 61, 46, 0.13);
-          box-shadow: 0 10px 27px rgba(25, 45, 35, 0.07);
+          border-color: rgba(15, 61, 46, 0.12);
+          box-shadow: 0 9px 23px rgba(25, 45, 35, 0.06);
+        }
+
+        .basita-store-name-link {
+          transition: color 160ms ease;
         }
 
         .basita-store-name-link:hover {
@@ -288,13 +319,13 @@ export default function ProductStoreCard({
         .basita-store-follow-button:not(:disabled):hover {
           transform: translateY(-1px);
           background: ${t.colors.primary[100]} !important;
-          box-shadow: 0 4px 12px rgba(15, 61, 46, 0.08);
+          box-shadow: 0 4px 11px rgba(15, 61, 46, 0.07);
         }
 
         .basita-store-view-button:hover {
           transform: translateY(-1px);
           background: ${t.colors.primary[700]} !important;
-          box-shadow: 0 6px 15px rgba(15, 61, 46, 0.14);
+          box-shadow: 0 5px 13px rgba(15, 61, 46, 0.12);
         }
 
         .basita-store-follow-button:focus-visible,
@@ -325,22 +356,24 @@ export default function ProductStoreCard({
           }
 
           .basita-product-store-card > div:first-of-type {
-            width: 50px !important;
-            height: 50px !important;
+            width: 48px !important;
+            height: 48px !important;
           }
 
           .basita-store-actions {
-            gap: 6px !important;
+            gap: 5px !important;
           }
 
           .basita-store-follow-button,
           .basita-store-view-button {
-            padding-inline: 10px !important;
+            min-height: 35px !important;
+            padding-inline: 9px !important;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
           .basita-product-store-card,
+          .basita-store-name-link,
           .basita-store-follow-button,
           .basita-store-view-button {
             transition: none !important;

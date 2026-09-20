@@ -1,7 +1,9 @@
+
 // components/about/AboutExperience.tsx
 // يجسّد فكرة "المتجر ليس مجرد قائمة منتجات" — بلا أرقام أو ادعاءات، فقط
 // وصف لما تتيحه بسطة فعلياً بصفحة كل متجر (قصة، صور/فيديو، هوية، ذاكرة).
 
+import Image from "next/image";
 import {
   BookOpen,
   Film,
@@ -10,6 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { t } from "@/theme";
+import styles from "./AboutExperience.module.css";
 
 const PILLARS: {
   Icon: LucideIcon;
@@ -42,89 +45,58 @@ export default function AboutExperience() {
   return (
     <section
       style={{
-        background: t.colors.cream.warm,
+        background: t.colors.white,
         padding: `${t.spacing["16"]} ${t.spacing["5"]}`,
         direction: "rtl",
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 1120,
-          margin: "0 auto",
-          textAlign: "center",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 760,
-            margin: "0 auto",
-          }}
-        >
-          <h2
-            style={{
-              margin: `0 0 ${t.spacing["3"]}`,
-              color: t.colors.text.dark,
-              fontSize: t.typography.fontSize["3xl"],
-              fontWeight: t.typography.fontWeight.bold,
-              lineHeight: 1.5,
-            }}
-          >
-            المتجر ليس مجرد قائمة منتجات
-          </h2>
-
-          <p
-            style={{
-              maxWidth: 640,
-              margin: `0 auto ${t.spacing["10"]}`,
-              color: t.colors.text.mid,
-              fontSize: t.typography.fontSize.base,
-              lineHeight: 2,
-            }}
-          >
-            كل متجر على بسطة مساحة كاملة — قصة وصور وذاكرة وهوية، لا صفحة
-            سعر واحدة.
-          </p>
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(230px, 1fr))",
-            gap: t.spacing["5"],
-            alignItems: "stretch",
-          }}
-        >
-          {PILLARS.map(({ Icon, title, desc }) => (
-            <div
-              key={title}
+      <div className={styles.container}>
+        <div className={styles.intro}>
+          <div className={styles.image}>
+            <Image
+              src="/images/story/story-experience.jpg.jpg"
+              alt="تفاصيل من تجربة متجر محلي ومنتجاته"
+              fill
+              sizes="(max-width: 900px) 100vw, 40vw"
               style={{
-                minWidth: 0,
-                padding: `${t.spacing["6"]} ${t.spacing["5"]}`,
-                background: t.colors.white,
-                border: `1px solid ${t.colors.cream.border}`,
-                borderRadius: t.radius.xl,
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                boxShadow: t.shadows.sm,
+                objectFit: "cover",
+              }}
+            />
+          </div>
+
+          <div className={styles.heading}>
+            <p className={styles.eyebrow}>تجربة المتجر</p>
+
+            <h2
+              style={{
+                margin: `0 0 ${t.spacing["3"]}`,
+                color: t.colors.text.dark,
+                fontSize: t.typography.fontSize["3xl"],
+                fontWeight: t.typography.fontWeight.bold,
+                lineHeight: 1.5,
               }}
             >
-              <div
-                style={{
-                  width: 54,
-                  height: 54,
-                  marginBottom: t.spacing["4"],
-                  borderRadius: t.radius.full,
-                  background: t.colors.primary[50],
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: t.colors.primary[800],
-                }}
-              >
+              المتجر ليس مجرد قائمة منتجات
+            </h2>
+
+            <p
+              style={{
+                margin: 0,
+                color: t.colors.text.mid,
+                fontSize: t.typography.fontSize.base,
+                lineHeight: 2,
+              }}
+            >
+              كل متجر على بسطة مساحة كاملة — قصة وصور وذاكرة وهوية، لا صفحة
+              سعر واحدة.
+            </p>
+          </div>
+        </div>
+
+        <div className={styles.pillars}>
+          {PILLARS.map(({ Icon, title, desc }) => (
+            <div key={title} className={styles.pillar}>
+              <div className={styles.icon}>
                 <Icon
                   size={25}
                   strokeWidth={1.7}
@@ -162,3 +134,4 @@ export default function AboutExperience() {
     </section>
   );
 }
+

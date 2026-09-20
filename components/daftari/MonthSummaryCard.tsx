@@ -56,9 +56,9 @@ export default function MonthSummaryCard({
         position: "relative",
         overflow: "hidden",
         background: `linear-gradient(135deg, ${t.colors.primary[900]}, ${t.colors.primary[800]})`,
-        borderRadius: t.radius.xl,
-        padding: t.spacing["5"],
-        boxShadow: "0 10px 28px rgba(35, 27, 18, 0.14)",
+        borderRadius: t.radius.lg,
+        padding: t.spacing["4"],
+        boxShadow: "0 6px 18px rgba(35, 27, 18, 0.10)",
       }}
     >
       {/* Decorative elements */}
@@ -66,10 +66,10 @@ export default function MonthSummaryCard({
         aria-hidden="true"
         style={{
           position: "absolute",
-          width: 180,
-          height: 180,
-          top: -115,
-          insetInlineStart: -60,
+          width: 140,
+          height: 140,
+          top: -90,
+          insetInlineStart: -45,
           borderRadius: t.radius.full,
           background: "rgba(255, 255, 255, 0.035)",
         }}
@@ -79,10 +79,10 @@ export default function MonthSummaryCard({
         aria-hidden="true"
         style={{
           position: "absolute",
-          width: 120,
-          height: 120,
-          bottom: -75,
-          insetInlineEnd: -35,
+          width: 90,
+          height: 90,
+          bottom: -55,
+          insetInlineEnd: -28,
           borderRadius: t.radius.full,
           background: "rgba(255, 255, 255, 0.025)",
         }}
@@ -96,29 +96,31 @@ export default function MonthSummaryCard({
       >
         {/* Main profit */}
         <div
+          className="basita-month-summary-main"
           style={{
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "space-between",
-            gap: t.spacing["4"],
-            marginBottom: t.spacing["5"],
+            gap: t.spacing["3"],
+            marginBottom: t.spacing["4"],
           }}
         >
-          <div>
+          <div style={{ minWidth: 0 }}>
             <p
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 7,
+                gap: 6,
                 margin: `0 0 ${t.spacing["1"]}`,
                 color: t.colors.text.onDarkMuted,
-                fontSize: t.typography.fontSize.sm,
-                fontWeight: t.typography.fontWeight.medium,
-                lineHeight: 1.5,
+                fontSize: 12,
+                fontWeight:
+                  t.typography.fontWeight.medium,
+                lineHeight: 1.45,
               }}
             >
               <WalletCards
-                size={16}
+                size={14}
                 strokeWidth={1.7}
               />
               صافي الربح هذا الشهر
@@ -128,7 +130,7 @@ export default function MonthSummaryCard({
               style={{
                 margin: 0,
                 color: t.colors.gold[400],
-                fontSize: t.typography.fontSize["3xl"],
+                fontSize: t.typography.fontSize["2xl"],
                 fontWeight: t.typography.fontWeight.bold,
                 lineHeight: 1.2,
                 letterSpacing: "-0.02em",
@@ -142,8 +144,8 @@ export default function MonthSummaryCard({
           <span
             aria-hidden="true"
             style={{
-              width: 42,
-              height: 42,
+              width: 36,
+              height: 36,
               flexShrink: 0,
               display: "flex",
               alignItems: "center",
@@ -155,7 +157,7 @@ export default function MonthSummaryCard({
             }}
           >
             <WalletCards
-              size={20}
+              size={17}
               strokeWidth={1.6}
             />
           </span>
@@ -180,7 +182,7 @@ export default function MonthSummaryCard({
                 className="basita-month-summary-item"
                 style={{
                   minWidth: 0,
-                  padding: `${t.spacing["3"]} ${t.spacing["3"]}`,
+                  padding: `${t.spacing["2"]} ${t.spacing["3"]}`,
                   borderRadius: t.radius.md,
                   background: "rgba(255, 255, 255, 0.065)",
                   border:
@@ -194,14 +196,14 @@ export default function MonthSummaryCard({
                     display: "flex",
                     alignItems: "center",
                     gap: 6,
-                    marginBottom: 5,
+                    marginBottom: 4,
                   }}
                 >
                   <span
                     aria-hidden="true"
                     style={{
-                      width: 25,
-                      height: 25,
+                      width: 23,
+                      height: 23,
                       flexShrink: 0,
                       display: "flex",
                       alignItems: "center",
@@ -212,7 +214,7 @@ export default function MonthSummaryCard({
                     }}
                   >
                     <Icon
-                      size={13}
+                      size={12}
                       strokeWidth={2}
                     />
                   </span>
@@ -221,8 +223,8 @@ export default function MonthSummaryCard({
                     style={{
                       margin: 0,
                       color: t.colors.text.onDarkMuted,
-                      fontSize: t.typography.fontSize.xs,
-                      lineHeight: 1.4,
+                      fontSize: 11,
+                      lineHeight: 1.35,
                     }}
                   >
                     {it.label}
@@ -233,10 +235,10 @@ export default function MonthSummaryCard({
                   style={{
                     margin: 0,
                     color: t.colors.white,
-                    fontSize: t.typography.fontSize.lg,
+                    fontSize: t.typography.fontSize.base,
                     fontWeight:
                       t.typography.fontWeight.bold,
-                    lineHeight: 1.35,
+                    lineHeight: 1.3,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -256,7 +258,7 @@ export default function MonthSummaryCard({
 
         @media (max-width: 600px) {
           .basita-month-summary {
-            padding: ${t.spacing["4"]} !important;
+            padding: ${t.spacing["3"]} !important;
           }
 
           .basita-month-summary-items {
@@ -267,7 +269,8 @@ export default function MonthSummaryCard({
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: ${t.spacing["3"]};
+            gap: ${t.spacing["2"]};
+            padding: 8px 10px !important;
           }
 
           .basita-month-summary-item > div {
@@ -278,23 +281,48 @@ export default function MonthSummaryCard({
         @media (max-width: 400px) {
           .basita-month-summary {
             border-radius: ${t.radius.lg} !important;
+            padding: 10px !important;
           }
 
-          .basita-month-summary > div > div:first-child {
-            margin-bottom: ${t.spacing["4"]} !important;
+          .basita-month-summary-main {
+            margin-bottom: ${t.spacing["3"]} !important;
           }
 
-          .basita-month-summary > div > div:first-child > span {
-            width: 36px !important;
-            height: 36px !important;
+          .basita-month-summary-main > span {
+            width: 33px !important;
+            height: 33px !important;
           }
 
-          .basita-month-summary > div > div:first-child > div > p:last-child {
-            font-size: ${t.typography.fontSize["2xl"]} !important;
+          .basita-month-summary-main > span svg {
+            width: 16px !important;
+            height: 16px !important;
+          }
+
+          .basita-month-summary-main > div > p:last-child {
+            font-size: 22px !important;
           }
 
           .basita-month-summary-item {
-            padding: ${t.spacing["2"]} !important;
+            padding: 7px 9px !important;
+          }
+        }
+
+        @media (max-width: 340px) {
+          .basita-month-summary-main > div > p:first-child {
+            font-size: 11px !important;
+          }
+
+          .basita-month-summary-main > div > p:last-child {
+            font-size: 20px !important;
+          }
+
+          .basita-month-summary-item > div > span {
+            width: 21px !important;
+            height: 21px !important;
+          }
+
+          .basita-month-summary-item > p {
+            font-size: 13px !important;
           }
         }
 

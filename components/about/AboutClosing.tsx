@@ -1,31 +1,37 @@
+
 // components/about/AboutClosing.tsx
 
+import Image from "next/image";
 import { t } from "@/theme";
+import styles from "./AboutClosing.module.css";
 
 export default function AboutClosing() {
   return (
     <section
       style={{
         background: t.colors.cream.warm,
-        padding: `${t.spacing["12"]} ${t.spacing["4"]} ${t.spacing["10"]}`,
-        textAlign: "center",
+        padding: `${t.spacing["16"]} ${t.spacing["5"]}`,
         direction: "rtl",
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 760,
-          margin: "0 auto",
-        }}
-      >
-        {/* العنوان */}
-        <div
-          style={{
-            maxWidth: 680,
-            margin: "0 auto",
-          }}
-        >
+      <div className={styles.container}>
+        {/* الصورة */}
+        <div className={styles.image}>
+          <Image
+            src="/images/story/story-closing.jpg.jpg"
+            alt="مشهد ختامي يعكس روح بسطة والأسواق المحلية"
+            fill
+            sizes="(max-width: 900px) 100vw, 1180px"
+            style={{
+              objectFit: "cover",
+            }}
+          />
+        </div>
+
+        {/* النص */}
+        <div className={styles.intro}>
+          <p className={styles.eyebrow}>هذه هي بسطة</p>
+
           <h2
             style={{
               margin: `0 0 ${t.spacing["5"]}`,
@@ -38,117 +44,44 @@ export default function AboutClosing() {
             هذه هي بسطة
           </h2>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: t.spacing["2"],
-              marginBottom: t.spacing["6"],
-              color: t.colors.text.body,
-              fontSize: t.typography.fontSize.base,
-              lineHeight: 2,
-            }}
-          >
-            <p style={{ margin: 0 }}>
-              بسطة ليست مجرد مكان لبيع المنتجات.
+          <div className={styles.text}>
+            <p>
+              بسطة ليست مجرد مكان لبيع المنتجات، بل مساحة رقمية تحمل شيئًا من
+              روح الأسواق القديمة، حيث القرب، والحكاية، والثقة.
             </p>
 
-            <p style={{ margin: 0 }}>
-              هي محاولة لبناء سوق رقمي يحتفظ بشيء من روح الأسواق القديمة.
+            <p>
+              مكان تستطيع فيه الأسرة أن تعرض ما تصنعه، ويكتشف فيه العميل
+              منتجات جديدة، وتجد فيه الحكايات القديمة طريقها إلى جيل جديد.
             </p>
 
-            <p style={{ margin: 0 }}>
-              مكان تستطيع فيه الأسرة أن تعرض ما تصنعه.
+            <p>
+              نؤمن أن دعم الأسرة المنتجة هو جوهر ما بدأنا من أجله، وأن المنتج
+              الشعبي لا يقتصر على كونه سلعة، بل يحمل خلفه قصة وذاكرة وحرفة
+              وهوية تستحق أن تصل إلى الناس.
             </p>
 
-            <p style={{ margin: 0 }}>
-              ويستطيع فيه العميل أن يكتشف منتجًا جديدًا.
-            </p>
-
-            <p style={{ margin: 0 }}>
-              وتستطيع فيه قصة قديمة أن تجد جمهورًا جديدًا.
-            </p>
-
-            <p style={{ margin: 0 }}>
-              نحن نؤمن أن دعم الأسرة المنتجة ليس مجرد شعار.
-            </p>
-
-            <p style={{ margin: 0 }}>
-              إنه السبب الذي بدأنا من أجله.
-            </p>
-
-            <p style={{ margin: 0 }}>
-              وأن المنتج الشعبي ليس مجرد سلعة.
-            </p>
-
-            <p
-              style={{
-                margin: `${t.spacing["2"]} 0 0`,
-                color: t.colors.primary[800],
-                fontSize: t.typography.fontSize.lg,
-                fontWeight: t.typography.fontWeight.bold,
-                lineHeight: 1.9,
-              }}
-            >
-              إنه جزء من قصة، وذاكرة، وحرفة، وهوية تستحق أن تُرى.
+            <p className={styles.highlight}>
+              المنتج الشعبي ليس مجرد سلعة؛ بل قصة وذاكرة وحرفة وهوية تستحق أن
+              تُرى.
             </p>
           </div>
         </div>
 
         {/* الخاتمة المختصرة */}
-        <div
-          style={{
-            background: `linear-gradient(135deg, ${t.colors.primary[950]}, ${t.colors.primary[800]})`,
-            borderRadius: t.radius.xl,
-            padding: `${t.spacing["6"]} ${t.spacing["5"]}`,
-            boxShadow: t.shadows.md,
-          }}
-        >
-          <p
-            style={{
-              margin: `0 0 ${t.spacing["1"]}`,
-              color: t.colors.gold[400],
-              fontSize: t.typography.fontSize["2xl"],
-              fontWeight: t.typography.fontWeight.bold,
-              lineHeight: 1.4,
-            }}
-          >
-            بسطة
-          </p>
+        <div className={styles.finalCard}>
+          <p className={styles.brand}>بسطة</p>
 
-          <p
-            style={{
-              margin: 0,
-              color: t.colors.text.onDark,
-              fontSize: t.typography.fontSize.base,
-              fontWeight: t.typography.fontWeight.semibold,
-            }}
-          >
+          <p className={styles.subtitle}>
             دعم الأسرة المنتجة.
           </p>
 
-          <p
-            style={{
-              maxWidth: 560,
-              margin: `${t.spacing["2"]} auto ${t.spacing["5"]}`,
-              color: t.colors.text.onDarkMuted,
-              fontSize: t.typography.fontSize.sm,
-              lineHeight: 1.8,
-            }}
-          >
+          <p className={styles.description}>
             نأخذ روح البسطة القديمة، ونمنحها مكانًا جديدًا في العالم الرقمي.
           </p>
 
           {/* الأزرار */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: t.spacing["3"],
-              flexWrap: "wrap",
-            }}
-          >
+          <div className={styles.actions}>
             <a
               href="/marketplace"
               className="basita-btn-interactive"

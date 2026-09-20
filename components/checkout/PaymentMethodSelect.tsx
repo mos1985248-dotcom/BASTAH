@@ -81,7 +81,7 @@ export default function PaymentMethodSelect({
         border: `1px solid ${t.colors.cream.border}`,
         borderRadius: t.radius.lg,
         overflow: "hidden",
-        boxShadow: "0 5px 20px rgba(75, 56, 34, 0.05)",
+        boxShadow: "0 3px 14px rgba(75, 56, 34, 0.035)",
       }}
     >
       {/* Header */}
@@ -90,8 +90,8 @@ export default function PaymentMethodSelect({
           position: "relative",
           display: "flex",
           alignItems: "center",
-          gap: 10,
-          padding: `${t.spacing["4"]} ${t.spacing["5"]}`,
+          gap: 9,
+          padding: `${t.spacing["3"]} ${t.spacing["4"]}`,
           background: t.colors.cream.bg,
           borderBottom: `1px solid ${t.colors.cream.border}`,
         }}
@@ -102,7 +102,7 @@ export default function PaymentMethodSelect({
             position: "absolute",
             insetInlineStart: 0,
             top: 0,
-            width: 4,
+            width: 3,
             height: "100%",
             background: t.colors.gold[600],
           }}
@@ -111,8 +111,8 @@ export default function PaymentMethodSelect({
         <span
           aria-hidden="true"
           style={{
-            width: 38,
-            height: 38,
+            width: 34,
+            height: 34,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
@@ -121,21 +121,21 @@ export default function PaymentMethodSelect({
             background: t.colors.white,
             border: `1px solid ${t.colors.cream.border}`,
             color: t.colors.primary[800],
-            boxShadow: "0 2px 8px rgba(75, 56, 34, 0.05)",
+            boxShadow: "0 2px 6px rgba(75, 56, 34, 0.035)",
           }}
         >
           <CreditCard
-            size={19}
+            size={17}
             strokeWidth={1.7}
           />
         </span>
 
-        <div>
+        <div style={{ minWidth: 0 }}>
           <h3
             id="payment-method-title"
             style={{
               margin: 0,
-              fontSize: t.typography.fontSize.base,
+              fontSize: t.typography.fontSize.sm,
               fontWeight: t.typography.fontWeight.bold,
               color: t.colors.primary[800],
               lineHeight: 1.45,
@@ -147,8 +147,9 @@ export default function PaymentMethodSelect({
           <p
             style={{
               margin: "2px 0 0",
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 11,
               color: t.colors.text.light,
+              lineHeight: 1.5,
             }}
           >
             اختر الطريقة المناسبة لإتمام طلبك
@@ -162,8 +163,8 @@ export default function PaymentMethodSelect({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: t.spacing["2"],
-          padding: t.spacing["4"],
+          gap: 7,
+          padding: t.spacing["3"],
         }}
       >
         {methods.map((m) => {
@@ -180,9 +181,10 @@ export default function PaymentMethodSelect({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                gap: t.spacing["3"],
+                gap: t.spacing["2"],
                 minWidth: 0,
-                padding: `${t.spacing["3"]} ${t.spacing["3"]}`,
+                minHeight: 48,
+                padding: "8px 10px",
                 borderRadius: t.radius.md,
                 border: `1.5px solid ${
                   active
@@ -201,7 +203,7 @@ export default function PaymentMethodSelect({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: t.spacing["3"],
+                  gap: 9,
                   minWidth: 0,
                 }}
               >
@@ -210,14 +212,14 @@ export default function PaymentMethodSelect({
                   className="basita-payment-radio"
                   style={{
                     position: "relative",
-                    width: 20,
-                    height: 20,
+                    width: 19,
+                    height: 19,
                     flexShrink: 0,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: t.radius.full,
-                    border: `2px solid ${
+                    border: `1.7px solid ${
                       active
                         ? t.colors.primary[800]
                         : t.colors.cream.border
@@ -225,11 +227,13 @@ export default function PaymentMethodSelect({
                     background: active
                       ? t.colors.primary[800]
                       : t.colors.white,
+                    transition:
+                      "background 160ms ease, border-color 160ms ease",
                   }}
                 >
                   {active && (
                     <Check
-                      size={12}
+                      size={11}
                       strokeWidth={2.8}
                       color={t.colors.white}
                     />
@@ -263,7 +267,7 @@ export default function PaymentMethodSelect({
                   style={{
                     minWidth: 0,
                     color: t.colors.text.dark,
-                    fontSize: t.typography.fontSize.sm,
+                    fontSize: 13,
                     fontWeight:
                       t.typography.fontWeight.semibold,
                     lineHeight: 1.5,
@@ -274,11 +278,12 @@ export default function PaymentMethodSelect({
               </div>
 
               <div
+                className="basita-payment-badges"
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-end",
-                  gap: 5,
+                  gap: 4,
                   flexWrap: "wrap",
                   flexShrink: 0,
                 }}
@@ -289,13 +294,13 @@ export default function PaymentMethodSelect({
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
-                      minHeight: 24,
-                      padding: "2px 8px",
+                      minHeight: 21,
+                      padding: "2px 6px",
                       borderRadius: t.radius.sm,
                       border: `1px solid ${t.colors.cream.border}`,
                       background: t.colors.cream.warm,
                       color: t.colors.text.mid,
-                      fontSize: t.typography.fontSize.xs,
+                      fontSize: 10,
                       fontWeight:
                         t.typography.fontWeight.medium,
                       whiteSpace: "nowrap",
@@ -314,8 +319,8 @@ export default function PaymentMethodSelect({
       {value === "BANK_TRANSFER" && pickupAvailable && (
         <div
           style={{
-            margin: `0 ${t.spacing["4"]} ${t.spacing["4"]}`,
-            paddingTop: t.spacing["4"],
+            margin: `0 ${t.spacing["3"]} ${t.spacing["3"]}`,
+            paddingTop: t.spacing["3"],
             borderTop: `1px solid ${t.colors.cream.border}`,
           }}
         >
@@ -323,7 +328,7 @@ export default function PaymentMethodSelect({
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 7,
+              gap: 6,
               margin: `0 0 ${t.spacing["2"]}`,
               color: t.colors.text.dark,
               fontSize: t.typography.fontSize.sm,
@@ -331,7 +336,7 @@ export default function PaymentMethodSelect({
             }}
           >
             <MapPin
-              size={15}
+              size={14}
               strokeWidth={1.8}
               color={t.colors.primary[800]}
             />
@@ -342,8 +347,9 @@ export default function PaymentMethodSelect({
             className="basita-fulfillment-options"
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: t.spacing["2"],
+              gridTemplateColumns:
+                "repeat(2, minmax(0, 1fr))",
+              gap: 7,
             }}
           >
             <FulfillmentOption
@@ -371,19 +377,19 @@ export default function PaymentMethodSelect({
           style={{
             display: "flex",
             alignItems: "flex-start",
-            gap: 8,
-            margin: `0 ${t.spacing["4"]} ${t.spacing["4"]}`,
-            padding: `${t.spacing["3"]} ${t.spacing["3"]}`,
+            gap: 7,
+            margin: `0 ${t.spacing["3"]} ${t.spacing["3"]}`,
+            padding: "9px 10px",
             borderRadius: t.radius.md,
             background: t.colors.cream.warm,
             border: `1px solid ${t.colors.cream.border}`,
             color: t.colors.text.mid,
-            fontSize: t.typography.fontSize.xs,
+            fontSize: 11,
             lineHeight: 1.7,
           }}
         >
           <Landmark
-            size={15}
+            size={14}
             strokeWidth={1.8}
             color={t.colors.primary[800]}
             style={{
@@ -402,15 +408,24 @@ export default function PaymentMethodSelect({
       <style>{`
         .basita-payment-option:hover {
           border-color: ${t.colors.primary[800]} !important;
-          box-shadow: 0 4px 12px rgba(75, 56, 34, 0.05);
+          box-shadow: 0 3px 10px rgba(75, 56, 34, 0.045);
           transform: translateY(-1px);
         }
 
         .basita-payment-option.is-active {
-          box-shadow: 0 4px 14px rgba(75, 56, 34, 0.06);
+          box-shadow: 0 3px 11px rgba(75, 56, 34, 0.05);
         }
 
         .basita-payment-option:has(input:focus-visible) {
+          outline: 3px solid ${t.colors.gold[600]};
+          outline-offset: 2px;
+        }
+
+        .basita-fulfillment-option:hover {
+          border-color: ${t.colors.primary[800]} !important;
+        }
+
+        .basita-fulfillment-option:focus-visible {
           outline: 3px solid ${t.colors.gold[600]};
           outline-offset: 2px;
         }
@@ -421,17 +436,18 @@ export default function PaymentMethodSelect({
           }
 
           .basita-payment-option {
-            align-items: flex-start !important;
+            align-items: center !important;
           }
 
           .basita-payment-option > div:last-child {
-            max-width: 42%;
+            max-width: 44%;
           }
         }
 
         @media (max-width: 480px) {
           .basita-payment-option {
-            padding: ${t.spacing["3"]} !important;
+            min-height: 46px !important;
+            padding: 8px !important;
           }
 
           .basita-payment-option > div:last-child {
@@ -443,9 +459,29 @@ export default function PaymentMethodSelect({
           }
         }
 
+        @media (max-width: 360px) {
+          .basita-payment-option {
+            min-height: 44px !important;
+          }
+
+          .basita-payment-option > div:first-child {
+            gap: 8px !important;
+          }
+
+          .basita-payment-option > div:first-child > span:first-child {
+            width: 18px !important;
+            height: 18px !important;
+          }
+
+          .basita-payment-option > div:first-child > span:last-child {
+            font-size: 12px !important;
+          }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .basita-payment-option,
-          .basita-payment-radio {
+          .basita-payment-radio,
+          .basita-fulfillment-option {
             transition: none !important;
           }
         }
@@ -472,10 +508,10 @@ function FulfillmentOption({
         active ? "is-active" : ""
       }`}
       style={{
-        minHeight: 44,
-        padding: "9px 10px",
+        minHeight: 40,
+        padding: "8px 9px",
         borderRadius: t.radius.md,
-        fontSize: t.typography.fontSize.xs,
+        fontSize: 11,
         fontWeight: t.typography.fontWeight.bold,
         border: `1.5px solid ${
           active

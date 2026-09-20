@@ -6,9 +6,8 @@ import {
   FileBadge,
   Truck,
   CreditCard,
-  Clock,
-  RotateCcw,
   MapPin,
+  RotateCcw,
   type LucideIcon,
 } from "lucide-react";
 import { yearsActiveFrom } from "@/lib/store-helpers";
@@ -55,9 +54,9 @@ export default function StoreInfoGrid({
         : "غير محددة",
     },
     {
-      Icon: Clock,
-      label: "ساعات العمل",
-      value: info?.workingHours || "غير محددة",
+      Icon: MapPin,
+      label: "المدينة",
+      value: store.city || "غير محددة",
     },
     {
       Icon: RotateCcw,
@@ -79,130 +78,101 @@ export default function StoreInfoGrid({
 
   return (
     <section
-      aria-label="معلومات المتجر"
+      aria-label="بيانات المتجر"
       style={{
         width: "100%",
-        maxWidth: 1200,
-        margin: `${t.spacing["8"]} auto 0`,
-        padding: `0 ${t.spacing["5"]}`,
+        maxWidth: 1180,
+        margin: `${t.spacing["3"]} auto 0`,
+        padding: `0 ${t.spacing["4"]}`,
         boxSizing: "border-box",
         direction: "rtl",
       }}
     >
       <div
         style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))`,
+          width: "100%",
+          minHeight: 60,
           background: t.colors.white,
           border: `1px solid ${t.colors.cream.border}`,
-          borderRadius: t.radius.xl,
-          padding: t.spacing["6"],
-          boxShadow: t.shadows.sm,
+          borderRadius: t.radius.lg,
+          boxShadow: t.shadows.xs,
+          overflow: "hidden",
         }}
       >
-        {/* العنوان */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-            marginBottom: t.spacing["5"],
-          }}
-        >
-          <div>
-            <h3
+        {items.map(({ Icon, label, value }, index) => (
+          <div
+            key={label}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              minWidth: 0,
+              padding: "8px 10px",
+              background:
+                index % 2 === 0
+                  ? t.colors.white
+                  : t.colors.cream.bg,
+              borderLeft:
+                index !== items.length - 1
+                  ? `1px solid ${t.colors.cream.borderLight}`
+                  : undefined,
+            }}
+          >
+            <span
               style={{
-                margin: 0,
-                color: t.colors.text.dark,
-                fontSize: t.typography.fontSize.lg,
-                fontWeight: t.typography.fontWeight.bold,
-              }}
-            >
-              معلومات المتجر
-            </h3>
-
-            <p
-              style={{
-                margin: "4px 0 0",
-                color: t.colors.text.light,
-                fontSize: t.typography.fontSize.xs,
-              }}
-            >
-              تفاصيل تساعدك على معرفة المتجر قبل الطلب
-            </p>
-          </div>
-        </div>
-
-        {/* المعلومات */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(210px, 1fr))",
-            gap: 12,
-          }}
-        >
-          {items.map(({ Icon, label, value }) => (
-            <div
-              key={label}
-              style={{
+                width: 30,
+                height: 30,
+                flexShrink: 0,
                 display: "flex",
-                alignItems: "flex-start",
-                gap: 12,
-                minWidth: 0,
-                padding: "14px 15px",
-                background: t.colors.cream.bg,
-                border: `1px solid ${t.colors.cream.borderLight}`,
-                borderRadius: t.radius.lg,
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: t.radius.sm,
+                background: t.colors.primary[50],
+                color: t.colors.primary[700],
               }}
             >
-              <span
-                style={{
-                  width: 38,
-                  height: 38,
-                  flexShrink: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: t.radius.md,
-                  background: t.colors.primary[100],
-                  color: t.colors.primary[800],
-                }}
-              >
-                <Icon size={18} strokeWidth={1.7} />
-              </span>
+              <Icon size={15} strokeWidth={1.7} />
+            </span>
 
+            <div
+              style={{
+                minWidth: 0,
+                flex: 1,
+              }}
+            >
               <div
                 style={{
-                  minWidth: 0,
-                  paddingTop: 1,
+                  color: t.colors.text.light,
+                  fontSize: "10px",
+                  lineHeight: 1.3,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
               >
-                <div
-                  style={{
-                    color: t.colors.text.light,
-                    fontSize: t.typography.fontSize.xs,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {label}
-                </div>
+                {label}
+              </div>
 
-                <div
-                  style={{
-                    marginTop: 3,
-                    color: t.colors.text.dark,
-                    fontSize: t.typography.fontSize.sm,
-                    fontWeight: t.typography.fontWeight.semibold,
-                    lineHeight: 1.7,
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {value}
-                </div>
+              <div
+                title={value}
+                style={{
+                  marginTop: 2,
+                  color: t.colors.text.dark,
+                  fontSize: "12px",
+                  fontWeight: t.typography.fontWeight.semibold,
+                  lineHeight: 1.4,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {value}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </section>
   );

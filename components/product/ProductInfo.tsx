@@ -1,5 +1,6 @@
-import { t } from "@/theme";
-import { shareContent } from "@/lib/share";
+// components/product/ProductInfo.tsx
+"use client";
+
 import { useState } from "react";
 import {
   Store,
@@ -10,6 +11,8 @@ import {
   Hand,
   Leaf,
 } from "lucide-react";
+import { t } from "@/theme";
+import { shareContent } from "@/lib/share";
 import { ProductDetail } from "./types";
 
 export default function ProductInfo({
@@ -51,7 +54,7 @@ export default function ProductInfo({
           alignItems: "center",
           justifyContent: "space-between",
           gap: t.spacing["3"],
-          marginBottom: t.spacing["3"],
+          marginBottom: t.spacing["2"],
         }}
       >
         <a
@@ -59,14 +62,15 @@ export default function ProductInfo({
           className="basita-product-store-link"
           style={{
             minWidth: 0,
+            maxWidth: "calc(100% - 90px)",
             display: "inline-flex",
             alignItems: "center",
             gap: 7,
-            padding: "6px 10px",
+            padding: "5px 9px",
             borderRadius: t.radius.full,
             background: t.colors.primary[100],
             color: t.colors.primary[800],
-            fontSize: t.typography.fontSize.sm,
+            fontSize: t.typography.fontSize.xs,
             fontWeight: t.typography.fontWeight.semibold,
             textDecoration: "none",
             transition: "background 160ms ease, transform 160ms ease",
@@ -74,8 +78,8 @@ export default function ProductInfo({
         >
           <span
             style={{
-              width: 25,
-              height: 25,
+              width: 24,
+              height: 24,
               flexShrink: 0,
               display: "flex",
               alignItems: "center",
@@ -84,12 +88,14 @@ export default function ProductInfo({
               background: t.colors.white,
             }}
           >
-            <Store size={13} strokeWidth={1.9} />
+            <Store size={12} strokeWidth={1.9} />
           </span>
 
           <span
+            className="basita-product-store-name"
             style={{
-              maxWidth: 220,
+              minWidth: 0,
+              maxWidth: 210,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
@@ -100,7 +106,7 @@ export default function ProductInfo({
 
           {product.store.isVerified && (
             <BadgeCheck
-              size={15}
+              size={14}
               strokeWidth={1.9}
               color={t.colors.primary[800]}
               aria-label="متجر موثّق"
@@ -122,8 +128,8 @@ export default function ProductInfo({
             aria-label="مشاركة"
             className="basita-product-action-button"
             style={{
-              width: 38,
-              height: 38,
+              width: 36,
+              height: 36,
               border: `1px solid ${t.colors.cream.border}`,
               background: t.colors.white,
               borderRadius: t.radius.full,
@@ -134,13 +140,13 @@ export default function ProductInfo({
               color: copied
                 ? t.colors.primary[800]
                 : t.colors.text.mid,
-              boxShadow: "0 2px 8px rgba(25,45,35,0.04)",
+              boxShadow: "0 2px 7px rgba(25,45,35,0.04)",
               transition:
                 "transform 160ms ease, border-color 160ms ease, background 160ms ease",
             }}
             title={copied ? "تم نسخ الرابط" : "مشاركة"}
           >
-            <Share2 size={17} strokeWidth={1.8} />
+            <Share2 size={16} strokeWidth={1.8} />
           </button>
 
           {onToggleFavorite && (
@@ -152,8 +158,8 @@ export default function ProductInfo({
               }
               className="basita-product-action-button"
               style={{
-                width: 38,
-                height: 38,
+                width: 36,
+                height: 36,
                 border: `1px solid ${
                   isFavorite
                     ? "rgba(190, 55, 55, 0.18)"
@@ -170,13 +176,13 @@ export default function ProductInfo({
                 color: isFavorite
                   ? t.colors.semantic.danger
                   : t.colors.text.light,
-                boxShadow: "0 2px 8px rgba(25,45,35,0.04)",
+                boxShadow: "0 2px 7px rgba(25,45,35,0.04)",
                 transition:
                   "transform 160ms ease, border-color 160ms ease, background 160ms ease",
               }}
             >
               <Heart
-                size={18}
+                size={17}
                 strokeWidth={1.8}
                 fill={
                   isFavorite
@@ -192,9 +198,9 @@ export default function ProductInfo({
       {/* اسم المنتج */}
       <h1
         style={{
-          margin: `0 0 ${t.spacing["3"]}`,
-          fontSize: "clamp(24px, 3vw, 31px)",
-          lineHeight: 1.35,
+          margin: `0 0 ${t.spacing["2"]}`,
+          fontSize: "clamp(23px, 2.7vw, 29px)",
+          lineHeight: 1.38,
           fontWeight: t.typography.fontWeight.bold,
           letterSpacing: "-0.02em",
           color: t.colors.text.dark,
@@ -208,8 +214,8 @@ export default function ProductInfo({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: t.spacing["2"],
-          marginBottom: t.spacing["4"],
+          gap: 6,
+          marginBottom: t.spacing["3"],
           flexWrap: "wrap",
         }}
       >
@@ -219,21 +225,23 @@ export default function ProductInfo({
               display: "inline-flex",
               alignItems: "center",
               gap: 5,
-              minHeight: 30,
-              padding: "4px 10px",
+              minHeight: 28,
+              padding: "3px 9px",
               borderRadius: t.radius.full,
               background: t.colors.gold[100],
               color: t.colors.gold[600],
-              fontSize: t.typography.fontSize.sm,
+              fontSize: t.typography.fontSize.xs,
               fontWeight: t.typography.fontWeight.semibold,
             }}
           >
             <Star
-              size={14}
+              size={13}
               strokeWidth={2}
               fill={t.colors.gold[600]}
             />
+
             {product.avgRating.toFixed(1)}
+
             <span
               style={{
                 fontWeight: t.typography.fontWeight.regular,
@@ -250,12 +258,12 @@ export default function ProductInfo({
             style={{
               display: "inline-flex",
               alignItems: "center",
-              minHeight: 30,
-              padding: "4px 10px",
+              minHeight: 28,
+              padding: "3px 9px",
               borderRadius: t.radius.full,
               background: t.colors.cream.warm,
               color: t.colors.text.mid,
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 12,
             }}
           >
             تم بيع {product.totalSold} قطعة
@@ -268,12 +276,12 @@ export default function ProductInfo({
               display: "inline-flex",
               alignItems: "center",
               gap: 5,
-              minHeight: 30,
-              padding: "4px 11px",
+              minHeight: 28,
+              padding: "3px 10px",
               borderRadius: t.radius.full,
               background: t.colors.primary[100],
               color: t.colors.primary[800],
-              fontSize: t.typography.fontSize.xs,
+              fontSize: 12,
               fontWeight: t.typography.fontWeight.semibold,
             }}
           >
@@ -288,9 +296,9 @@ export default function ProductInfo({
         <div
           style={{
             position: "relative",
-            marginBottom: t.spacing["4"],
+            marginBottom: t.spacing["3"],
             paddingInlineStart: t.spacing["3"],
-            borderInlineStart: `3px solid ${t.colors.gold[600]}`,
+            borderInlineStart: `2px solid ${t.colors.gold[600]}`,
           }}
         >
           <p
@@ -298,7 +306,7 @@ export default function ProductInfo({
               margin: 0,
               fontSize: t.typography.fontSize.sm,
               color: t.colors.text.body,
-              lineHeight: 1.9,
+              lineHeight: 1.85,
             }}
           >
             {product.descAr}
@@ -312,7 +320,7 @@ export default function ProductInfo({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 7,
+            gap: 6,
             flexWrap: "wrap",
             marginTop: t.spacing["1"],
           }}
@@ -324,22 +332,23 @@ export default function ProductInfo({
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 5,
-                fontSize: t.typography.fontSize.xs,
+                gap: 4,
+                fontSize: 12,
                 color: t.colors.text.body,
                 background: t.colors.cream.warm,
                 border: `1px solid ${t.colors.cream.border}`,
-                padding: "5px 11px",
+                padding: "4px 9px",
                 borderRadius: t.radius.full,
                 transition:
                   "border-color 160ms ease, background 160ms ease",
               }}
             >
               <Leaf
-                size={12}
+                size={11}
                 strokeWidth={1.8}
                 color={t.colors.primary[700]}
               />
+
               {tag}
             </span>
           ))}
@@ -371,18 +380,18 @@ export default function ProductInfo({
 
         @media (max-width: 700px) {
           .basita-product-store-link {
-            max-width: calc(100% - 90px);
+            max-width: calc(100% - 84px) !important;
           }
 
-          .basita-product-store-link span {
+          .basita-product-store-name {
             max-width: 150px !important;
           }
         }
 
         @media (max-width: 420px) {
           .basita-product-action-button {
-            width: 36px !important;
-            height: 36px !important;
+            width: 35px !important;
+            height: 35px !important;
           }
 
           .basita-product-store-link {
@@ -390,8 +399,18 @@ export default function ProductInfo({
             font-size: 11px !important;
           }
 
-          .basita-product-store-link span {
-            max-width: 120px !important;
+          .basita-product-store-link > span:first-child {
+            width: 22px !important;
+            height: 22px !important;
+          }
+
+          .basita-product-store-name {
+            max-width: 115px !important;
+          }
+
+          .basita-product-store-link svg {
+            width: 12px !important;
+            height: 12px !important;
           }
         }
 

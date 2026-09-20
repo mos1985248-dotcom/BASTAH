@@ -1,0 +1,53 @@
+.closingLayout {
+width: 100%;
+max-width: 1080px;
+margin: 0 auto;
+display: grid;
+grid-template-columns: 0.9fr 1.1fr;
+overflow: hidden;
+border-radius: 24px;
+}
+
+.closingImage {
+position: relative;
+min-height: 400px;
+order: 1;
+}
+
+.closingContent {
+display: flex;
+flex-direction: column;
+justify-content: center;
+padding: 48px 44px;
+order: 2;
+}
+
+@media (max-width: 900px) {
+.closingLayout {
+grid-template-columns: 1fr;
+}
+
+.closingImage {
+min-height: 340px;
+order: 1;
+}
+
+.closingContent {
+order: 2;
+padding: 44px 32px;
+}
+}
+
+@media (max-width: 600px) {
+.closingImage {
+min-height: 280px;
+}
+
+.closingContent {
+padding: 36px 24px;
+}
+
+.closingContent a {
+width: 100%;
+}
+}

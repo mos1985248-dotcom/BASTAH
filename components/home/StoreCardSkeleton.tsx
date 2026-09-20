@@ -1,5 +1,6 @@
 // components/home/StoreCardSkeleton.tsx
 import Skeleton from "@/components/ui/Skeleton";
+import { t } from "@/theme";
 
 export default function StoreCardSkeleton() {
   return (
@@ -10,17 +11,14 @@ export default function StoreCardSkeleton() {
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        background: "#FFFDF8",
-        border: "1px solid rgba(91,70,45,0.12)",
-        borderRadius: 20,
-        boxShadow: "0 4px 14px rgba(67,48,29,0.045)",
+        background: t.colors.cream.card,
+        border: `1px solid ${t.colors.cream.borderLight}`,
+        borderRadius: t.radius.lg,
+        boxShadow: t.shadows.xs,
       }}
     >
       {/* صورة الغلاف */}
-      <Skeleton
-        height={124}
-        radius="0"
-      />
+      <Skeleton height={124} radius="0" />
 
       {/* المحتوى */}
       <div
@@ -36,12 +34,12 @@ export default function StoreCardSkeleton() {
         <Skeleton
           width={60}
           height={60}
-          radius="16px"
+          radius={`${t.radius.md}px`}
           style={{
             position: "absolute",
             top: -30,
             right: 16,
-            border: "3px solid #FFFDF8",
+            border: `3px solid ${t.colors.cream.card}`,
             boxSizing: "border-box",
           }}
         />
@@ -83,7 +81,7 @@ export default function StoreCardSkeleton() {
           style={{
             marginTop: "auto",
             paddingTop: 12,
-            borderTop: "1px solid rgba(91,70,45,0.08)",
+            borderTop: `1px solid ${t.colors.cream.borderLight}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -94,7 +92,7 @@ export default function StoreCardSkeleton() {
           <Skeleton
             width={28}
             height={28}
-            radius="999px"
+            radius={t.radius.full}
           />
         </div>
       </div>
