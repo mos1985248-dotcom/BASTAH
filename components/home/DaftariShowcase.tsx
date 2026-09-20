@@ -111,6 +111,8 @@ export default function DaftariShowcase() {
               display: "grid",
               gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
               gap: t.spacing["3"],
+              width: "100%",
+              minWidth: 0,
             }}
           >
             {FEATURES.map((f) => (
@@ -129,10 +131,7 @@ export default function DaftariShowcase() {
                   justifyContent: "center",
                   textAlign: "center",
                   boxSizing: "border-box",
-                  transition:
-                    `transform ${t.motion.base} ${t.motion.ease}, ` +
-                    `box-shadow ${t.motion.base} ${t.motion.ease}, ` +
-                    `border-color ${t.motion.base} ${t.motion.ease}`,
+                  minWidth: 0,
                 }}
               >
                 <div
@@ -187,7 +186,7 @@ export default function DaftariShowcase() {
             boxSizing: "border-box",
           }}
         >
-          {/* لمسة زخرفية بسيطة */}
+          {/* زخرفة */}
           <div
             aria-hidden="true"
             style={{
@@ -277,7 +276,6 @@ export default function DaftariShowcase() {
                 color: t.colors.gold[400],
                 fontSize: t.typography.fontSize.sm,
                 fontWeight: t.typography.fontWeight.semibold,
-                transition: `color ${t.motion.fast} ${t.motion.ease}`,
               }}
             >
               تعرّف على الباقات
@@ -291,13 +289,11 @@ export default function DaftariShowcase() {
         </div>
       </div>
 
-      <style>{`
-        /* =========================
-           Daftari - Tablet
-           ========================= */
+      <style jsx>{`
+        /* Tablet */
         @media (max-width: 980px) {
           .basita-daftari-shell {
-            grid-template-columns: minmax(0, 1fr) minmax(260px, 0.72fr) !important;
+            grid-template-columns: minmax(0, 1fr) minmax(250px, 0.72fr) !important;
             gap: 16px !important;
             padding: 20px !important;
           }
@@ -316,9 +312,7 @@ export default function DaftariShowcase() {
           }
         }
 
-        /* =========================
-           Daftari - Mobile
-           ========================= */
+        /* Mobile */
         @media (max-width: 767px) {
           .basita-daftari-section {
             padding: 28px 10px 0 !important;
@@ -336,37 +330,18 @@ export default function DaftariShowcase() {
             width: 100% !important;
           }
 
-          .basita-daftari-main > div:first-child {
-            margin-bottom: 9px !important;
-            padding: 5px 9px !important;
-            gap: 6px !important;
-            font-size: 11px !important;
-          }
-
-          .basita-daftari-main > div:first-child svg {
-            width: 14px !important;
-            height: 14px !important;
-          }
-
-          .basita-daftari-main h2 {
-            margin-bottom: 6px !important;
-            font-size: 20px !important;
-            line-height: 1.45 !important;
-          }
-
-          .basita-daftari-main > p {
-            margin-bottom: 13px !important;
-            font-size: 12.5px !important;
-            line-height: 1.8 !important;
-          }
-
           .basita-daftari-features {
-            width: 100% !important;
+            display: grid !important;
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            grid-template-rows: repeat(2, auto) !important;
+            grid-auto-flow: row !important;
+            width: 100% !important;
             gap: 7px !important;
           }
 
           .basita-daftari-feature {
+            width: 100% !important;
+            min-width: 0 !important;
             min-height: 82px !important;
             padding: 9px 6px !important;
             border-radius: 12px !important;
@@ -424,9 +399,7 @@ export default function DaftariShowcase() {
           }
         }
 
-        /* =========================
-           Daftari - Small phones
-           ========================= */
+        /* Small phones */
         @media (max-width: 420px) {
           .basita-daftari-section {
             padding-left: 8px !important;
@@ -448,6 +421,8 @@ export default function DaftariShowcase() {
           }
 
           .basita-daftari-features {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            grid-template-rows: repeat(2, auto) !important;
             gap: 6px !important;
           }
 

@@ -163,7 +163,7 @@ export default function Navbar() {
           />
         </div>
 
-        {/* الحساب والإشعارات */}
+        {/* الحساب والإشعارات والأيقونات */}
         <div
           className="basita-navbar-actions"
           style={{
@@ -182,34 +182,52 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* تحسينات الجوال */}
       <style jsx>{`
+        /* =========================================
+           Tablet
+           ========================================= */
+        @media (max-width: 980px) and (min-width: 768px) {
+          .basita-navbar-main {
+            grid-template-columns: auto minmax(0, 1fr) auto !important;
+            gap: 12px !important;
+          }
+
+          .basita-navbar-search {
+            display: none !important;
+          }
+        }
+
+        /* =========================================
+           Mobile
+           ========================================= */
         @media (max-width: 767px) {
           .basita-navbar-main {
             min-height: 58px !important;
             height: 58px;
-            padding: 6px 12px !important;
+            padding: 6px 10px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            gap: 8px !important;
+            gap: 6px !important;
             overflow: hidden;
           }
 
+          /* الشعار */
           .basita-navbar-logo {
-            gap: 7px !important;
+            gap: 6px !important;
             flex: 0 0 auto;
+            min-width: 0;
           }
 
           .basita-navbar-logo > div {
-            width: 38px !important;
-            height: 38px !important;
-            border-radius: 11px !important;
+            width: 37px !important;
+            height: 37px !important;
+            border-radius: 10px !important;
           }
 
           .basita-navbar-logo img {
-            width: 31px !important;
-            height: 31px !important;
+            width: 30px !important;
+            height: 30px !important;
           }
 
           .basita-navbar-brand-text {
@@ -224,45 +242,59 @@ export default function Navbar() {
             display: none !important;
           }
 
-          .basita-navbar-navigation {
-            display: none !important;
-          }
-
+          /* إخفاء روابط سطح المكتب والبحث */
+          .basita-navbar-navigation,
           .basita-navbar-search {
             display: none !important;
           }
 
+          /* منطقة الإجراءات */
           .basita-navbar-actions {
-            flex: 1 1 auto !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            flex: 0 1 auto !important;
             min-width: 0;
             gap: 4px !important;
-            overflow: hidden;
+            overflow: visible !important;
           }
 
           .basita-navbar-actions > * {
             flex-shrink: 0;
           }
+
+          /*
+           * نخلي منطقة الدخول والأيقونات متقاربة
+           * لكن بدون ضغطها على بعضها.
+           */
+          .basita-navbar-actions :global(a),
+          .basita-navbar-actions :global(button) {
+            min-width: 34px;
+          }
         }
 
+        /* =========================================
+           Small phones
+           ========================================= */
         @media (max-width: 420px) {
           .basita-navbar-main {
-            padding-left: 10px !important;
-            padding-right: 10px !important;
+            padding-left: 8px !important;
+            padding-right: 8px !important;
           }
 
           .basita-navbar-logo {
-            gap: 6px !important;
+            gap: 5px !important;
           }
 
           .basita-navbar-logo > div {
-            width: 36px !important;
-            height: 36px !important;
-            border-radius: 10px !important;
+            width: 35px !important;
+            height: 35px !important;
+            border-radius: 9px !important;
           }
 
           .basita-navbar-logo img {
-            width: 29px !important;
-            height: 29px !important;
+            width: 28px !important;
+            height: 28px !important;
           }
 
           .basita-navbar-brand-text > span:first-child {
@@ -271,6 +303,11 @@ export default function Navbar() {
 
           .basita-navbar-actions {
             gap: 2px !important;
+          }
+
+          .basita-navbar-actions :global(a),
+          .basita-navbar-actions :global(button) {
+            min-width: 32px;
           }
         }
       `}</style>

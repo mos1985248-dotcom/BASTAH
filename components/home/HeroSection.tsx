@@ -1,11 +1,6 @@
 // components/home/HeroSection.tsx
 
-import {
-  Landmark,
-  ArrowLeft,
-  ShoppingBag,
-  Store,
-} from "lucide-react";
+import { Landmark, ShoppingBag, Store } from "lucide-react";
 import { t } from "@/theme";
 
 const HERO_IMAGES = [
@@ -15,7 +10,7 @@ const HERO_IMAGES = [
 ];
 
 export default function HeroSection({
-  showStartStore,
+  showStartStore: _showStartStore,
 }: {
   showStartStore: boolean;
 }) {
@@ -209,7 +204,8 @@ export default function HeroSection({
                 justifyContent: "center",
                 gap: 8,
                 minHeight: 48,
-                padding: `0 ${t.spacing["6"]}`,
+                minWidth: 154,
+                padding: `0 ${t.spacing["5"]}`,
                 background: t.colors.primary[800],
                 color: t.colors.text.onDark,
                 borderRadius: t.radius.md,
@@ -217,6 +213,7 @@ export default function HeroSection({
                 fontSize: t.typography.fontSize.sm,
                 textDecoration: "none",
                 boxShadow: t.shadows.sm,
+                boxSizing: "border-box",
               }}
             >
               <ShoppingBag size={17} strokeWidth={1.9} />
@@ -233,6 +230,7 @@ export default function HeroSection({
                 justifyContent: "center",
                 gap: 8,
                 minHeight: 48,
+                minWidth: 154,
                 padding: `0 ${t.spacing["5"]}`,
                 background: t.colors.cream.card,
                 border: `1px solid ${t.colors.cream.border}`,
@@ -242,57 +240,12 @@ export default function HeroSection({
                 fontSize: t.typography.fontSize.sm,
                 textDecoration: "none",
                 boxShadow: t.shadows.xs,
+                boxSizing: "border-box",
               }}
             >
               <Store size={17} strokeWidth={1.9} />
               تصفح المتاجر
             </a>
-
-            {/* ابدأ متجرك مجانًا */}
-            {showStartStore && (
-              <a
-                href="/register"
-                className="basita-hero-store-cta basita-btn-interactive"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 7,
-                  minHeight: 48,
-                  padding: `0 ${t.spacing["4"]}`,
-                  background: t.colors.gold[50],
-                  border: `1px solid ${t.colors.gold[600]}`,
-                  color: t.colors.gold[700],
-                  borderRadius: t.radius.md,
-                  fontWeight: t.typography.fontWeight.bold,
-                  fontSize: t.typography.fontSize.sm,
-                  textDecoration: "none",
-                  boxShadow: t.shadows.xs,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: t.colors.gold[600],
-                    flexShrink: 0,
-                  }}
-                />
-
-                ابدأ متجرك مجانًا
-
-                <ArrowLeft
-                  size={16}
-                  strokeWidth={2}
-                  style={{
-                    transform: "rotate(180deg)",
-                  }}
-                />
-              </a>
-            )}
           </div>
 
           {/* سطر الثقة */}
@@ -579,27 +532,27 @@ export default function HeroSection({
             line-height: 1.8 !important;
           }
 
+          /* الزران بنفس الحجم */
           .basita-hero-actions {
             width: 100%;
             display: grid !important;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px !important;
           }
 
           .basita-hero-actions a {
-            min-height: 43px !important;
-            padding-left: 10px !important;
-            padding-right: 10px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            min-height: 46px !important;
+            padding: 0 8px !important;
             font-size: 13px !important;
             gap: 6px !important;
+            box-sizing: border-box !important;
           }
 
-          .basita-hero-primary {
-            grid-column: 1 / -1;
-          }
-
-          .basita-hero-store-cta {
-            grid-column: 1 / -1;
+          .basita-hero-primary,
+          .basita-hero-secondary {
+            grid-column: auto !important;
           }
 
           .basita-hero-trust {
@@ -651,7 +604,12 @@ export default function HeroSection({
             line-height: 1.75 !important;
           }
 
+          .basita-hero-actions {
+            gap: 7px !important;
+          }
+
           .basita-hero-actions a {
+            min-height: 44px !important;
             font-size: 12px !important;
           }
 
