@@ -104,7 +104,7 @@ export default function CartRelatedProducts({
       className="basita-cart-related"
       aria-labelledby="cart-related-title"
       style={{
-        marginTop: t.spacing["7"],
+        marginTop: t.spacing["6"],
         paddingTop: t.spacing["5"],
         borderTop: `1px solid ${t.colors.cream.border}`,
       }}

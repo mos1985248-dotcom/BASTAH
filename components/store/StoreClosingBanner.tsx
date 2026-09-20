@@ -18,7 +18,7 @@ export default function StoreClosingBanner({
         width: "100%",
         maxWidth: 1180,
         margin: "0 auto",
-        padding: `${t.spacing["5"]} ${t.spacing["4"]} ${t.spacing["7"]}`,
+        padding: `${t.spacing["5"]} ${t.spacing["4"]} ${t.spacing["6"]}`,
         boxSizing: "border-box",
         direction: "rtl",
       }}

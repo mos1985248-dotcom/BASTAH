@@ -110,7 +110,7 @@ export default function RelatedProducts({
       className="basita-related-products"
       aria-labelledby="related-products-title"
       style={{
-        marginTop: t.spacing["7"],
+        marginTop: t.spacing["6"],
         paddingTop: t.spacing["5"],
         borderTop: `1px solid ${t.colors.cream.border}`,
       }}

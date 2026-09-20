@@ -84,7 +84,7 @@ export default function ProductReviewsSection({
       dir="rtl"
       className="basita-product-reviews"
       style={{
-        marginTop: t.spacing["7"],
+        marginTop: t.spacing["6"],
       }}
       aria-labelledby="product-reviews-title"
     >

@@ -163,7 +163,7 @@ export default function StoreProductsSection({
         newest.length === 0 && (
           <div
             style={{
-              padding: `${t.spacing["7"]} ${t.spacing["5"]}`,
+              padding: `${t.spacing["6"]} ${t.spacing["5"]}`,
               textAlign: "center",
               border: `1px solid ${t.colors.cream.border}`,
               borderRadius: t.radius.lg,
