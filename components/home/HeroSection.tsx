@@ -1,5 +1,4 @@
 // components/home/HeroSection.tsx
-
 import { Landmark, ShoppingBag, Store } from "lucide-react";
 import { t } from "@/theme";
 
@@ -194,6 +193,31 @@ export default function HeroSection({
               flexWrap: "wrap",
             }}
           >
+            {/* ابدأ مجانًا */}
+            <a
+              href="/register"
+              className="basita-hero-register basita-btn-interactive"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                minHeight: 48,
+                minWidth: 154,
+                padding: `0 ${t.spacing["5"]}`,
+                background: t.colors.gold[600],
+                color: t.colors.white,
+                borderRadius: t.radius.md,
+                fontWeight: t.typography.fontWeight.bold,
+                fontSize: t.typography.fontSize.sm,
+                textDecoration: "none",
+                boxShadow: t.shadows.sm,
+                boxSizing: "border-box",
+              }}
+            >
+              ابدأ مجانًا
+            </a>
+
             {/* تسوق الآن */}
             <a
               href="/marketplace"
@@ -532,7 +556,11 @@ export default function HeroSection({
             line-height: 1.8 !important;
           }
 
-          /* الزران بنفس الحجم */
+          /*
+           * الجوال:
+           * ابدأ مجانًا في صف كامل
+           * ثم تسوق الآن + تصفح المتاجر
+           */
           .basita-hero-actions {
             width: 100%;
             display: grid !important;
@@ -548,6 +576,10 @@ export default function HeroSection({
             font-size: 13px !important;
             gap: 6px !important;
             box-sizing: border-box !important;
+          }
+
+          .basita-hero-register {
+            grid-column: 1 / -1 !important;
           }
 
           .basita-hero-primary,

@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { t } from "@/theme";
 import { useCurrentUser } from "@/app/providers";
@@ -163,6 +164,28 @@ export default function Navbar() {
           />
         </div>
 
+        {/* بحث الجوال */}
+        <a
+          href="/marketplace"
+          className="basita-navbar-mobile-search"
+          aria-label="البحث"
+          style={{
+            display: "none",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 36,
+            height: 36,
+            borderRadius: 11,
+            color: t.colors.primary[800],
+            background: "#FFFDF8",
+            border: "1px solid rgba(91,70,45,0.11)",
+            textDecoration: "none",
+            flexShrink: 0,
+          }}
+        >
+          <Search size={18} strokeWidth={1.9} />
+        </a>
+
         {/* الحساب والإشعارات والأيقونات */}
         <div
           className="basita-navbar-actions"
@@ -183,9 +206,6 @@ export default function Navbar() {
       </div>
 
       <style jsx>{`
-        /* =========================================
-           Tablet
-           ========================================= */
         @media (max-width: 980px) and (min-width: 768px) {
           .basita-navbar-main {
             grid-template-columns: auto minmax(0, 1fr) auto !important;
@@ -197,22 +217,18 @@ export default function Navbar() {
           }
         }
 
-        /* =========================================
-           Mobile
-           ========================================= */
         @media (max-width: 767px) {
           .basita-navbar-main {
             min-height: 58px !important;
             height: 58px;
-            padding: 6px 10px !important;
+            padding: 6px 9px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            gap: 6px !important;
-            overflow: hidden;
+            gap: 5px !important;
+            overflow: visible !important;
           }
 
-          /* الشعار */
           .basita-navbar-logo {
             gap: 6px !important;
             flex: 0 0 auto;
@@ -220,14 +236,14 @@ export default function Navbar() {
           }
 
           .basita-navbar-logo > div {
-            width: 37px !important;
-            height: 37px !important;
+            width: 36px !important;
+            height: 36px !important;
             border-radius: 10px !important;
           }
 
           .basita-navbar-logo img {
-            width: 30px !important;
-            height: 30px !important;
+            width: 29px !important;
+            height: 29px !important;
           }
 
           .basita-navbar-brand-text {
@@ -242,18 +258,21 @@ export default function Navbar() {
             display: none !important;
           }
 
-          /* إخفاء روابط سطح المكتب والبحث */
           .basita-navbar-navigation,
           .basita-navbar-search {
             display: none !important;
           }
 
-          /* منطقة الإجراءات */
+          .basita-navbar-mobile-search {
+            display: inline-flex !important;
+            margin-inline-start: auto;
+          }
+
           .basita-navbar-actions {
             display: flex !important;
             align-items: center !important;
             justify-content: flex-end !important;
-            flex: 0 1 auto !important;
+            flex: 0 0 auto !important;
             min-width: 0;
             gap: 4px !important;
             overflow: visible !important;
@@ -263,51 +282,100 @@ export default function Navbar() {
             flex-shrink: 0;
           }
 
-          /*
-           * نخلي منطقة الدخول والأيقونات متقاربة
-           * لكن بدون ضغطها على بعضها.
-           */
           .basita-navbar-actions :global(a),
           .basita-navbar-actions :global(button) {
             min-width: 34px;
           }
+
+          /*
+           * الجوال:
+           * تسجيل الدخول يظهر.
+           * زر "ابدأ مجانًا" في شريط التنقل يختفي،
+           * لأنه أصبح داخل الهيرو.
+           */
+          .basita-navbar-actions :global(.basita-nav-register) {
+            display: none !important;
+          }
+
+          .basita-navbar-actions :global(.basita-nav-login) {
+            min-height: 36px !important;
+            padding: 0 7px !important;
+            border-radius: 10px !important;
+            font-size: 11px !important;
+            gap: 4px !important;
+            white-space: nowrap !important;
+          }
+
+          .basita-navbar-actions :global(.basita-nav-login svg) {
+            width: 14px !important;
+            height: 14px !important;
+          }
+
+          .basita-navbar-actions :global(.basita-nav-icon) {
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+          }
+
+          .basita-navbar-actions :global(.basita-nav-icon svg) {
+            width: 17px !important;
+            height: 17px !important;
+          }
+
+          /*
+           * الإشعارات ليست جزءًا من ترتيب المستخدم المطلوب على الجوال.
+           */
+          .basita-navbar-actions :global(
+              [aria-label*="الإشعارات"]
+            ) {
+            display: none !important;
+          }
         }
 
-        /* =========================================
-           Small phones
-           ========================================= */
         @media (max-width: 420px) {
           .basita-navbar-main {
-            padding-left: 8px !important;
-            padding-right: 8px !important;
+            padding-left: 6px !important;
+            padding-right: 6px !important;
+            gap: 3px !important;
           }
 
           .basita-navbar-logo {
-            gap: 5px !important;
+            gap: 4px !important;
           }
 
           .basita-navbar-logo > div {
-            width: 35px !important;
-            height: 35px !important;
+            width: 34px !important;
+            height: 34px !important;
             border-radius: 9px !important;
           }
 
           .basita-navbar-logo img {
-            width: 28px !important;
-            height: 28px !important;
+            width: 27px !important;
+            height: 27px !important;
           }
 
           .basita-navbar-brand-text > span:first-child {
             font-size: 17px !important;
           }
 
+          .basita-navbar-mobile-search {
+            width: 34px !important;
+            height: 34px !important;
+          }
+
           .basita-navbar-actions {
             gap: 2px !important;
           }
 
-          .basita-navbar-actions :global(a),
-          .basita-navbar-actions :global(button) {
-            min-width: 32px;
+          .basita-navbar-actions :global(.basita-nav-icon) {
+            width: 33px !important;
+            height: 33px !important;
+          }
+
+          .basita-navbar-actions :global(.basita-nav-login) {
+            min-height: 34px !important;
+            padding: 0 5px !important;
+            font-size: 10px !important;
           }
         }
       `}</style>

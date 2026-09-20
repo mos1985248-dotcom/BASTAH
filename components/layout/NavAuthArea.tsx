@@ -41,6 +41,7 @@ export default function NavAuthArea({
   if (loading) {
     return (
       <div
+        className="basita-auth-loading"
         style={{
           width: 150,
           height: 44,
@@ -54,12 +55,14 @@ export default function NavAuthArea({
   if (!user) {
     return (
       <div
+        className="basita-nav-auth"
         style={{
           display: "flex",
           alignItems: "center",
           gap: t.spacing["2"],
         }}
       >
+        {/* تسجيل الدخول */}
         <a
           href="/login"
           className="basita-nav-login"
@@ -75,12 +78,15 @@ export default function NavAuthArea({
             alignItems: "center",
             justifyContent: "center",
             gap: 7,
+            whiteSpace: "nowrap",
+            boxSizing: "border-box",
           }}
         >
           <LogIn size={16} strokeWidth={1.9} />
           تسجيل الدخول
         </a>
 
+        {/* ابدأ مجانًا — يظهر على الكمبيوتر فقط */}
         <a
           href="/register"
           className="basita-nav-register basita-btn-interactive"
@@ -96,6 +102,8 @@ export default function NavAuthArea({
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
+            whiteSpace: "nowrap",
+            boxSizing: "border-box",
           }}
         >
           ابدأ مجانًا
@@ -112,6 +120,7 @@ export default function NavAuthArea({
   return (
     <div
       ref={ref}
+      className="basita-nav-auth"
       style={{
         position: "relative",
       }}
@@ -230,7 +239,7 @@ export default function NavAuthArea({
         </div>
       )}
 
-      <style>{`
+      <style jsx>{`
         .basita-nav-login,
         .basita-nav-register,
         .basita-account-menu-item {
@@ -243,21 +252,112 @@ export default function NavAuthArea({
         }
 
         .basita-nav-login:hover {
-          background: #F7F1E5;
+          background: #f7f1e5;
         }
 
         .basita-nav-register:hover {
           transform: translateY(-2px);
-          box-shadow: 0 8px 16px rgba(33,53,42,0.15);
+          box-shadow: 0 8px 16px rgba(33, 53, 42, 0.15);
         }
 
         .basita-account-menu-item:hover {
-          background: #F7F1E5 !important;
+          background: #f7f1e5 !important;
           color: ${t.colors.primary[800]} !important;
         }
 
         .basita-account-logout:hover {
           color: ${t.colors.semantic.danger} !important;
+        }
+
+        /* =========================================
+           Mobile
+           ========================================= */
+        @media (max-width: 767px) {
+          .basita-nav-auth {
+            display: flex !important;
+            align-items: center !important;
+            gap: 3px !important;
+          }
+
+          /* تسجيل الدخول */
+          .basita-nav-login {
+            min-height: 36px !important;
+            height: 36px !important;
+            padding: 0 7px !important;
+            border-radius: 10px !important;
+            font-size: 11px !important;
+            gap: 4px !important;
+          }
+
+          .basita-nav-login svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
+
+          /*
+           * ابدأ مجانًا ينتقل إلى الهيرو
+           * ولا يظهر في النافبار على الجوال.
+           */
+          .basita-nav-register {
+            display: none !important;
+          }
+
+          /*
+           * حساب المستخدم بعد تسجيل الدخول
+           */
+          .basita-nav-auth > button {
+            min-height: 36px !important;
+            height: 36px !important;
+            padding: 0 7px !important;
+            border-radius: 10px !important;
+            gap: 4px !important;
+          }
+
+          .basita-nav-auth > button > span:first-child {
+            width: 26px !important;
+            height: 26px !important;
+          }
+
+          .basita-nav-auth > button > span:first-child svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
+
+          .basita-nav-auth > button > span:nth-child(2) {
+            max-width: 65px !important;
+            font-size: 11px !important;
+          }
+
+          .basita-nav-auth > button > svg {
+            width: 13px !important;
+            height: 13px !important;
+          }
+
+          .basita-auth-loading {
+            width: 80px !important;
+            height: 36px !important;
+          }
+        }
+
+        /* =========================================
+           Small phones
+           ========================================= */
+        @media (max-width: 420px) {
+          .basita-nav-auth {
+            gap: 2px !important;
+          }
+
+          .basita-nav-login {
+            min-height: 34px !important;
+            height: 34px !important;
+            padding: 0 5px !important;
+            font-size: 10px !important;
+          }
+
+          .basita-nav-login svg {
+            width: 13px !important;
+            height: 13px !important;
+          }
         }
       `}</style>
     </div>

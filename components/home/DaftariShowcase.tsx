@@ -279,6 +279,7 @@ export default function DaftariShowcase() {
               }}
             >
               تعرّف على الباقات
+
               <ArrowLeft
                 size={15}
                 strokeWidth={2}
@@ -290,10 +291,14 @@ export default function DaftariShowcase() {
       </div>
 
       <style jsx>{`
-        /* Tablet */
+        /* =========================================
+           Tablet
+           ========================================= */
         @media (max-width: 980px) {
           .basita-daftari-shell {
-            grid-template-columns: minmax(0, 1fr) minmax(250px, 0.72fr) !important;
+            grid-template-columns:
+              minmax(0, 1fr)
+              minmax(250px, 0.72fr) !important;
             gap: 16px !important;
             padding: 20px !important;
           }
@@ -312,7 +317,9 @@ export default function DaftariShowcase() {
           }
         }
 
-        /* Mobile */
+        /* =========================================
+           Mobile
+           ========================================= */
         @media (max-width: 767px) {
           .basita-daftari-section {
             padding: 28px 10px 0 !important;
@@ -328,40 +335,53 @@ export default function DaftariShowcase() {
 
           .basita-daftari-main {
             width: 100% !important;
+            min-width: 0 !important;
           }
 
+          /*
+           * المميزات على الجوال:
+           * بطاقة واحدة في كل صف
+           */
           .basita-daftari-features {
-            display: grid !important;
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            grid-template-rows: repeat(2, auto) !important;
-            grid-auto-flow: row !important;
+            display: flex !important;
+            flex-direction: column !important;
             width: 100% !important;
-            gap: 7px !important;
+            gap: 8px !important;
           }
 
           .basita-daftari-feature {
             width: 100% !important;
             min-width: 0 !important;
-            min-height: 82px !important;
-            padding: 9px 6px !important;
+            min-height: 68px !important;
+            padding: 10px 12px !important;
             border-radius: 12px !important;
+
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+
+            text-align: right !important;
+            box-sizing: border-box !important;
           }
 
           .basita-daftari-feature > div:first-child {
-            width: 34px !important;
-            height: 34px !important;
-            margin-bottom: 5px !important;
-            border-radius: 9px !important;
+            width: 38px !important;
+            height: 38px !important;
+            margin: 0 !important;
+            border-radius: 10px !important;
+            flex-shrink: 0 !important;
           }
 
           .basita-daftari-feature > div:first-child svg {
-            width: 18px !important;
-            height: 18px !important;
+            width: 19px !important;
+            height: 19px !important;
           }
 
           .basita-daftari-feature > div:last-child {
-            font-size: 10.5px !important;
-            line-height: 1.45 !important;
+            font-size: 12px !important;
+            line-height: 1.5 !important;
+            text-align: right !important;
           }
 
           .basita-daftari-benefit {
@@ -399,7 +419,9 @@ export default function DaftariShowcase() {
           }
         }
 
-        /* Small phones */
+        /* =========================================
+           Small phones
+           ========================================= */
         @media (max-width: 420px) {
           .basita-daftari-section {
             padding-left: 8px !important;
@@ -421,29 +443,34 @@ export default function DaftariShowcase() {
           }
 
           .basita-daftari-features {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            grid-template-rows: repeat(2, auto) !important;
-            gap: 6px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 7px !important;
           }
 
           .basita-daftari-feature {
-            min-height: 76px !important;
-            padding: 8px 5px !important;
+            width: 100% !important;
+            min-height: 64px !important;
+            padding: 9px 10px !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
           }
 
           .basita-daftari-feature > div:first-child {
-            width: 31px !important;
-            height: 31px !important;
-            margin-bottom: 4px !important;
+            width: 35px !important;
+            height: 35px !important;
+            margin: 0 !important;
+            border-radius: 9px !important;
           }
 
           .basita-daftari-feature > div:first-child svg {
-            width: 16px !important;
-            height: 16px !important;
+            width: 17px !important;
+            height: 17px !important;
           }
 
           .basita-daftari-feature > div:last-child {
-            font-size: 10px !important;
+            font-size: 11px !important;
           }
 
           .basita-daftari-benefit {
