@@ -19,12 +19,14 @@ import ShippingZoneRow, { ShippingZone } from "@/components/dashboard/shipping/S
 
 interface ConnectedCarrier {
   id: string; carrier: string; isActive: boolean; connectedAt: string;
-  lastTestedAt: string | null; lastTestOk: boolean | null;
+  lastTestedAt: string | null; lastTestOk: boolean | null; customProviderId: string | null;
 }
 interface SupportedCarrier { carrier: string; displayNameAr: string }
+interface CustomProvider { id: string; carrierKey: string; displayNameAr: string }
 interface ShippingData {
   connected: ConnectedCarrier[];
   supported: SupportedCarrier[];
+  customProviders: CustomProvider[];
   platformFees: { basitaShippingFee: number; codFee: number };
 }
 
@@ -57,8 +59,14 @@ export default function SellerShippingPage() {
   if (!data || !zones) return <LoadingState label="جاري تحميل إعدادات الشحن..." />;
 
   const connectedCarrierCodes = new Set(data.connected.map((c) => c.carrier));
+  const connectedCustomProviderIds = new Set(data.connected.map((c) => c.customProviderId).filter(Boolean));
   const availableToConnect = data.supported.filter((s) => !connectedCarrierCodes.has(s.carrier));
-  const nameFor = (carrier: string) => data.supported.find((s) => s.carrier === carrier)?.displayNameAr ?? carrier;
+  // ⚠️ شركة مخصَّصة (CUSTOM) تُميَّز بـcustomProviderId لا بكود carrier وحده
+  const availableCustomToConnect = data.customProviders.filter((p) => !connectedCustomProviderIds.has(p.id));
+  const nameFor = (c: ConnectedCarrier) =>
+    c.customProviderId
+      ? data.customProviders.find((p) => p.id === c.customProviderId)?.displayNameAr ?? "شركة مخصَّصة"
+      : data.supported.find((s) => s.carrier === c.carrier)?.displayNameAr ?? c.carrier;
 
   return (
     <div style={{ padding: t.spacing["4"] }}>
@@ -71,24 +79,27 @@ export default function SellerShippingPage() {
         <section>
           <h2 style={{ fontSize: t.typography.fontSize.base, color: t.colors.text.dark, margin: `0 0 ${t.spacing["2"]}` }}>شركات الشحن</h2>
           <p style={{ margin: `0 0 ${t.spacing["3"]}`, fontSize: 12, color: t.colors.text.mid }}>
-            اربطي حساب متجرك عند شركة الشحن مباشرة — سنستخدمه لحساب سعر
-            الشحن الحقيقي عند العميل بصفحة الدفع.
+            فعّلي أي شركة شحن متاحة لمتجرك بضغطة واحدة — سنستخدمها لحساب
+            سعر الشحن الحقيقي عند العميل بصفحة الدفع.
           </p>
 
           {data.connected.length === 0 ? (
             <EmptyState icon={Truck} message="لا توجد شركة شحن مربوطة بعد" />
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"], marginBottom: availableToConnect.length > 0 ? t.spacing["3"] : 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"], marginBottom: (availableToConnect.length > 0 || availableCustomToConnect.length > 0) ? t.spacing["3"] : 0 }}>
               {data.connected.map((c) => (
-                <ConnectedCarrierRow key={c.id} link={c} displayNameAr={nameFor(c.carrier)} onChange={loadCarriers} />
+                <ConnectedCarrierRow key={c.id} link={c} displayNameAr={nameFor(c)} onChange={loadCarriers} />
               ))}
             </div>
           )}
 
-          {availableToConnect.length > 0 && (
+          {(availableToConnect.length > 0 || availableCustomToConnect.length > 0) && (
             <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"] }}>
               {availableToConnect.map((s) => (
                 <CarrierConnectCard key={s.carrier} carrier={s.carrier} displayNameAr={s.displayNameAr} onConnected={loadCarriers} />
+              ))}
+              {availableCustomToConnect.map((p) => (
+                <CarrierConnectCard key={p.id} carrier="CUSTOM" customProviderId={p.id} displayNameAr={p.displayNameAr} onConnected={loadCarriers} />
               ))}
             </div>
           )}

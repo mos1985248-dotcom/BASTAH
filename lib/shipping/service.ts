@@ -16,7 +16,6 @@
 import { prisma } from "../prisma";
 import type { ShippingStatus, ShippingCarrier } from "@prisma/client";
 import { getShippingProvider } from "./registry";
-import { decryptShippingCredentials } from "./credentials";
 import { decryptSecret } from "../crypto";
 import { withRetry, normalizeShippingError } from "./reliability";
 import { RateRequest, RateResult, ShipmentRequest, ShippingProviderError } from "./types";
@@ -69,7 +68,15 @@ export async function resolveStoreShipping(
     };
   }
 
-  return { carrier: link.carrier, credentials: decryptShippingCredentials(link.credentialsEnc) };
+  // ⚠️ ARAMEX/SPL — تحكّم مركزي (تغيير معماري): بيانات الاعتماد صارت
+  // مشتركة على مستوى المنصة (PlatformCarrierCredential، تدخلها الإدارة
+  // مرة وحدة)، بدل StoreShipping.credentialsEnc الخاص بكل تاجر سابقاً.
+  // التاجر الآن بس يفعّل/يلغي — لا يدخل أي بيانات اعتماد إطلاقاً.
+  const platformCred = await prisma.platformCarrierCredential.findUnique({ where: { carrier: link.carrier } });
+  if (!platformCred || !platformCred.isActive) {
+    throw new ShippingProviderError("شركة الشحن هذي غير مفعّلة حالياً من الإدارة", link.carrier, "invalid_request");
+  }
+  return { carrier: link.carrier, credentials: JSON.parse(decryptSecret(platformCred.credentialsEnc)) };
 }
 
 export const ShippingService = {

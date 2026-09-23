@@ -114,7 +114,7 @@ export default function ConnectedCarrierRow({
       <ConfirmDialog
         open={confirmOpen}
         title={`فصل ${displayNameAr}؟`}
-        body="سيتم حذف بيانات الاعتماد المحفوظة لهذه الشركة نهائياً من متجرك. يمكنك ربطها مجدداً لاحقاً بإدخال البيانات من جديد."
+        body="سيتوقف حساب سعر الشحن عبر هذي الشركة لمتجرك فورًا. تقدرين تفعّلينها مجدداً بضغطة واحدة أي وقت."
         confirmLabel="فصل نهائياً"
         danger
         onConfirm={disconnect}

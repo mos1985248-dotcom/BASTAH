@@ -4,12 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { requireActiveStore, AuthError } from "@/lib/auth";
 import { connectShippingSchema, formatZodError } from "@/lib/validation";
 import { encryptShippingCredentials } from "@/lib/shipping/credentials";
-import { getShippingProvider, listSupportedCarriers } from "@/lib/shipping/registry";
 import { SHIPPING_PROVIDER_METADATA } from "@/lib/shipping/metadata";
 import { getBasitaShippingFee, getCodFee } from "@/lib/platform-settings";
-import { ShippingService } from "@/lib/shipping/service";
 import { ShippingProviderError } from "@/lib/shipping/types";
-import { decryptSecret } from "@/lib/crypto";
 
 // GET — قائمة شركات الشحن المربوطة بالمتجر + المتاحة للربط + رسوم المنصة
 // الحقيقية (مصدر واحد للتاجر — بدل endpoint منفصل، بطلب أحمد صراحة)
@@ -20,10 +17,21 @@ export async function GET() {
       where: { storeId },
       select: { id: true, carrier: true, isActive: true, connectedAt: true, lastTestedAt: true, lastTestOk: true, customProviderId: true },
     });
-    const supported = listSupportedCarriers();
     const [basitaShippingFee, codFee] = await Promise.all([getBasitaShippingFee(), getCodFee("CASH_ON_DELIVERY")]);
-    // ⚠️ الأسماء الحقيقية لشركات "بدون كود" (CUSTOM) — بعكس ARAMEX/SPL
-    // الثابتتين بالميتاداتا، هذي تُضاف/تُعطَّل من لوحة الأدمن فتُجلَب حياً
+
+    // ⚠️ ARAMEX/SPL تظهر للتاجر فقط لو الإدارة فعّلتها فعليًا (بيانات
+    // اعتماد مشتركة نشطة) — مو كل شركة مسجَّلة بالكود بغض النظر عن التفعيل
+    const activePlatformCreds: { carrier: string }[] = await prisma.platformCarrierCredential.findMany({
+      where: { isActive: true },
+      select: { carrier: true },
+    });
+    const supported = activePlatformCreds.map(({ carrier }) => ({
+      carrier,
+      displayNameAr: SHIPPING_PROVIDER_METADATA[carrier]?.displayNameAr ?? carrier,
+    }));
+
+    // الأسماء الحقيقية لشركات "بدون كود" (CUSTOM) — تُضاف/تُعطَّل من لوحة
+    // الأدمن فتُجلَب حياً
     const customProviders = await prisma.shippingProviderConfig.findMany({
       where: { isActive: true },
       select: { id: true, carrierKey: true, displayNameAr: true },
@@ -31,10 +39,7 @@ export async function GET() {
 
     return NextResponse.json({
       connected,
-      supported: supported.map((carrier) => ({
-        carrier,
-        displayNameAr: SHIPPING_PROVIDER_METADATA[carrier]?.displayNameAr ?? carrier,
-      })),
+      supported,
       customProviders,
       platformFees: { basitaShippingFee, codFee },
     });
@@ -44,7 +49,8 @@ export async function GET() {
   }
 }
 
-// POST — ربط شركة شحن جديدة أو تحديث بيانات اعتمادها
+// POST — تفعيل/ربط شركة شحن لمتجر التاجر (بدون أي بيانات اعتماد منه —
+// كل الشركات (ARAMEX/SPL/CUSTOM) صار مصدر بياناتها إداري مشترك)
 export async function POST(req: NextRequest) {
   try {
     const { storeId } = await requireActiveStore();
@@ -54,8 +60,8 @@ export async function POST(req: NextRequest) {
 
     const { carrier, customProviderId } = parsed.data;
 
-    // ⚠️ فرع كامل منفصل لـCUSTOM — بيانات الاعتماد الحقيقية من
-    // ShippingProviderConfig (مشتركة، أدخلها الأدمن)، لا من التاجر إطلاقاً
+    // ⚠️ تحكّم مركزي (تغيير معماري): التاجر هنا فقط يتحقق إن الشركة
+    // مفعّلة من الإدارة، ثم يفعّل/يلغي ربط متجره بها. لا بيانات اعتماد منه إطلاقاً.
     if (carrier === "CUSTOM") {
       if (!customProviderId) {
         return NextResponse.json({ error: "لازم تحددي أي شركة شحن مخصَّصة تبين تربطيها" }, { status: 400 });
@@ -64,57 +70,23 @@ export async function POST(req: NextRequest) {
       if (!config || !config.isActive) {
         return NextResponse.json({ error: "شركة الشحن هذي غير متاحة حالياً" }, { status: 404 });
       }
-
-      // ⚠️ نفس تفرّع resolveStoreShipping بـlib/shipping/service.ts —
-      // REST يحتاج baseUrl/ratePath/apiKey، MANUAL يحتاج flatFee/perKgFee فقط
-      const credentials: Record<string, string> =
-        config.providerType === "MANUAL"
-          ? { flatFee: String(config.flatFee ?? 0), perKgFee: String(config.perKgFee ?? 0) }
-          : { baseUrl: config.baseUrl ?? "", ratePath: config.ratePath ?? "", apiKey: config.apiKeyEnc ? decryptSecret(config.apiKeyEnc) : "" };
-      const isValid = await ShippingService.testConnection("CUSTOM" as any, credentials);
-      if (!isValid) {
-        return NextResponse.json({ error: "تعذّر الاتصال بشركة الشحن هذي حالياً — حاولي لاحقاً أو تواصلي مع الدعم" }, { status: 502 });
+    } else {
+      const platformCred = await prisma.platformCarrierCredential.findUnique({ where: { carrier: carrier as any } });
+      if (!platformCred || !platformCred.isActive) {
+        return NextResponse.json({ error: "هذي الشركة غير مفعّلة حالياً من الإدارة — تواصلي مع الدعم" }, { status: 422 });
       }
-
-      const record = await prisma.storeShipping.upsert({
-        where: { storeId_carrier: { storeId, carrier: "CUSTOM" } },
-        update: { customProviderId, isActive: true, lastTestedAt: new Date(), lastTestOk: true },
-        create: {
-          storeId,
-          carrier: "CUSTOM",
-          customProviderId,
-          credentialsEnc: encryptShippingCredentials({}), // placeholder غير مستخدَم فعلياً — راجع service.ts
-          lastTestedAt: new Date(),
-          lastTestOk: true,
-        },
-        select: { id: true, carrier: true, isActive: true, connectedAt: true, customProviderId: true },
-      });
-
-      return NextResponse.json({ record }, { status: 201 });
     }
-
-    const { credentials } = parsed.data;
-    const provider = getShippingProvider(carrier as any);
-
-    // تحقق من الحقول المطلوبة لهذه الشركة بالتحديد
-    const missing = provider.requiredCredentialFields.filter((f) => !credentials[f]);
-    if (missing.length > 0) {
-      return NextResponse.json({ error: `بيانات ناقصة: ${missing.join(", ")}` }, { status: 400 });
-    }
-
-    // اختبار حقيقي لبيانات الاعتماد عند الشركة قبل حفظها — عبر ShippingService (retry + timeout موحّدان)
-    const isValid = await ShippingService.testConnection(carrier as any, credentials);
-    if (!isValid) {
-      return NextResponse.json({ error: "بيانات الاعتماد غير صحيحة أو منتهية الصلاحية" }, { status: 422 });
-    }
-
-    const credentialsEnc = encryptShippingCredentials(credentials);
 
     const record = await prisma.storeShipping.upsert({
       where: { storeId_carrier: { storeId, carrier: carrier as any } },
-      update: { credentialsEnc, isActive: true, lastTestedAt: new Date(), lastTestOk: true },
-      create: { storeId, carrier: carrier as any, credentialsEnc, lastTestedAt: new Date(), lastTestOk: true },
-      select: { id: true, carrier: true, isActive: true, connectedAt: true },
+      update: { customProviderId: customProviderId ?? null, isActive: true },
+      create: {
+        storeId,
+        carrier: carrier as any,
+        customProviderId: customProviderId ?? null,
+        credentialsEnc: encryptShippingCredentials({}), // placeholder غير مستخدَم فعلياً بعد الآن — راجع service.ts
+      },
+      select: { id: true, carrier: true, isActive: true, connectedAt: true, customProviderId: true },
     });
 
     return NextResponse.json({ record }, { status: 201 });

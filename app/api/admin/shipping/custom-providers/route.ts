@@ -34,10 +34,17 @@ export async function POST(req: NextRequest) {
     if (parsed.data.providerType === "MANUAL") {
       // ⚠️ شركة بدون أي نظام تقني — صفر اتصال شبكي، فقط تحقق الأرقام
       // (getRate بنفسه يرمي خطأ واضح لو flatFee/perKgFee غير صالحة)
-      const { flatFee, perKgFee } = parsed.data;
+      const { flatFee, perKgFee, agentName, agentPhone, vehicleType, vehiclePlate, licenseNumber, serviceCity } = parsed.data;
       const config = await prisma.shippingProviderConfig.create({
-        data: { carrierKey, displayNameAr, providerType: "MANUAL", flatFee, perKgFee },
-        select: { id: true, carrierKey: true, displayNameAr: true, providerType: true, flatFee: true, perKgFee: true, isActive: true, createdAt: true },
+        data: {
+          carrierKey, displayNameAr, providerType: "MANUAL", flatFee, perKgFee,
+          agentName, agentPhone, vehicleType, vehiclePlate, licenseNumber, serviceCity,
+        },
+        select: {
+          id: true, carrierKey: true, displayNameAr: true, providerType: true, flatFee: true, perKgFee: true,
+          agentName: true, agentPhone: true, vehicleType: true, vehiclePlate: true, licenseNumber: true, serviceCity: true,
+          isActive: true, createdAt: true,
+        },
       });
 
       await logAudit({
@@ -88,6 +95,7 @@ export async function GET() {
       select: {
         id: true, carrierKey: true, displayNameAr: true, providerType: true,
         baseUrl: true, ratePath: true, flatFee: true, perKgFee: true,
+        agentName: true, agentPhone: true, vehicleType: true, vehiclePlate: true, licenseNumber: true, serviceCity: true,
         isActive: true, createdAt: true,
         _count: { select: { storeLinks: true } },
       },
@@ -97,6 +105,8 @@ export async function GET() {
     interface ProviderRow {
       id: string; carrierKey: string; displayNameAr: string; providerType: string;
       baseUrl: string | null; ratePath: string | null; flatFee: number | null; perKgFee: number | null;
+      agentName: string | null; agentPhone: string | null; vehicleType: string | null; vehiclePlate: string | null;
+      licenseNumber: string | null; serviceCity: string | null;
       isActive: boolean; createdAt: Date; _count: { storeLinks: number };
     }
 
@@ -106,6 +116,35 @@ export async function GET() {
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
     console.error("[GET /api/admin/shipping/custom-providers]", err);
+    return NextResponse.json({ error: "حدث خطأ غير متوقع" }, { status: 500 });
+  }
+}
+
+// ── PATCH — تفعيل/تعطيل شركة مخصَّصة (كل المتاجر المربوطة بها تتوقف/تعود فورًا) ──
+export async function PATCH(req: NextRequest) {
+  try {
+    const admin = await requireRole("ADMIN", "SUPER_ADMIN");
+    const { id, isActive } = await req.json();
+    if (typeof isActive !== "boolean" || !id) {
+      return NextResponse.json({ error: "id وisActive مطلوبان" }, { status: 400 });
+    }
+
+    const record = await prisma.shippingProviderConfig.update({
+      where: { id },
+      data: { isActive },
+      select: { id: true, carrierKey: true, isActive: true },
+    });
+
+    await logAudit({
+      actorId: admin.id, action: "SHIPPING_PROVIDER_ADDED", targetType: "ShippingProviderConfig", targetId: record.id,
+      metadata: { event: isActive ? "custom_provider_enabled" : "custom_provider_disabled", carrierKey: record.carrierKey },
+      ipAddress: getClientIp(req.headers),
+    });
+
+    return NextResponse.json({ record });
+  } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    console.error("[PATCH /api/admin/shipping/custom-providers]", err);
     return NextResponse.json({ error: "حدث خطأ غير متوقع" }, { status: 500 });
   }
 }

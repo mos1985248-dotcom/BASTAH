@@ -1639,6 +1639,15 @@ model ShippingProviderConfig {
   // ── MANUAL فقط — فاضية دائماً لـREST ──
   flatFee       Float?
   perKgFee      Float?
+  // ⚠️ بيانات وصفية اختيارية لمندوب/شركة محلية (تُعرض للإدارة والتاجر
+  // للتعريف فقط — لا تؤثر على حساب السعر نفسه، الحساب يعتمد دائماً على
+  // flatFee/perKgFee أعلاه)
+  agentName      String?
+  agentPhone     String?
+  vehicleType    String?
+  vehiclePlate   String?
+  licenseNumber  String?
+  serviceCity    String? // المدينة اللي يغطّيها هذا المندوب (لو محدَّد بمدينة وحدة)
 
   isActive      Boolean               @default(true)
   createdAt     DateTime              @default(now())
@@ -1647,4 +1656,24 @@ model ShippingProviderConfig {
   storeLinks    StoreShipping[]
 
   @@map("shipping_provider_configs")
+}
+
+// ⚠️ تحكّم مركزي بالشحن (تغيير معماري): أرامكس وSPL كانا يتطلبان من كل
+// تاجر إدخال حسابه الخاص (StoreShipping.credentialsEnc). الآن الإدارة
+// تدخل بيانات اعتماد مشتركة مرة وحدة لكل شركة هنا، والتاجر بس يفعّل/يلغي
+// (نفس فلسفة ShippingProviderConfig لـCUSTOM بالضبط، لكن للشركات
+// المسجَّلة بالكود). راجع lib/shipping/service.ts:resolveStoreShipping.
+model PlatformCarrierCredential {
+  id             String          @id @default(cuid())
+  carrier        ShippingCarrier @unique
+  // JSON مشفّر بـ AES-256-GCM يحوي كل الحقول اللي يطلبها provider.ts لهذي
+  // الشركة (accountNumber/accountPin/.. لأرامكس، apiKey/accountId/.. لـSPL)
+  credentialsEnc String
+  isActive       Boolean         @default(true)
+  lastTestedAt   DateTime?
+  lastTestOk     Boolean?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@map("platform_carrier_credentials")
 }

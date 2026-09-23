@@ -315,5 +315,12 @@ export const createShippingProviderConfigSchema = z.discriminatedUnion("provider
     // ⚠️ لشركة بدون أي نظام تقني (مندوب/مكتب شحن صغير) — سعر ثابت
     flatFee: z.coerce.number().min(0, "الرسوم الأساسية يجب أن تكون صفر أو أكبر").max(1000),
     perKgFee: z.coerce.number().min(0, "الرسوم لكل كيلو يجب أن تكون صفر أو أكبر").max(500),
+    // بيانات وصفية اختيارية (تعريف فقط، لا تؤثر على حساب السعر)
+    agentName: z.string().trim().max(100).optional(),
+    agentPhone: z.string().trim().max(20).optional(),
+    vehicleType: z.string().trim().max(50).optional(),
+    vehiclePlate: z.string().trim().max(20).optional(),
+    licenseNumber: z.string().trim().max(50).optional(),
+    serviceCity: z.string().trim().max(50).optional(),
   }),
 ]);
