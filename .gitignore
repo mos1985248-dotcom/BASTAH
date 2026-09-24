@@ -4,4 +4,5 @@ out/
 dist/
 .env
 .env.local
-.DS_Storetsconfig.tsbuildinfo
+.DS_Store
+tsconfig.tsbuildinfo
