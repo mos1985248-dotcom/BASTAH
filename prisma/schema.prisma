@@ -877,8 +877,12 @@ model Shipment {
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   events             ShipmentEvent[]
+  // مندوب المدينة الذي أُسندت له الشحنة (شحن بسطة) — فاضي لباقي أنواع الشحن
+  courierId          String?
+  courier            CityCourier?    @relation(fields: [courierId], references: [id], onDelete: SetNull)
   @@index([orderId])
   @@index([externalShipmentId])
+  @@index([courierId])
 
   @@map("shipments")
 }
@@ -1676,4 +1680,24 @@ model PlatformCarrierCredential {
   updatedAt      DateTime        @updatedAt
 
   @@map("platform_carrier_credentials")
+}
+
+// ======================================================
+// CITY COURIERS (بسطة للشحن)
+// ======================================================
+// مناديب توصيل (Outsource) لكل مدينة، تديرهم الإدارة. التاجر يختار مندوباً
+// من مدينة المشتري فيُنشأ Shipment ويُفتح واتساب برسالة جاهزة للمندوب.
+// لا يحمل أي سعر — التسعير يبقى بـShippingProviderConfig كما هو.
+model CityCourier {
+  id        String     @id @default(cuid())
+  city      String
+  name      String
+  phone     String     // رقم واتساب المندوب
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  shipments Shipment[]
+
+  @@index([city, isActive])
+  @@map("city_couriers")
 }

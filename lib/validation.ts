@@ -324,3 +324,14 @@ export const createShippingProviderConfigSchema = z.discriminatedUnion("provider
     serviceCity: z.string().trim().max(50).optional(),
   }),
 ]);
+
+// ── مناديب المدن (بسطة للشحن) ──
+export const createCityCourierSchema = z.object({
+  city: z.string().trim().min(2, "المدينة مطلوبة").max(50),
+  name: z.string().trim().min(2, "اسم المندوب مطلوب").max(100),
+  phone: z.string().trim().regex(/^[0-9+\s-]{9,16}$/, "رقم الواتساب غير صحيح"),
+});
+
+export const updateCityCourierSchema = z.object({ isActive: z.boolean() });
+
+export const dispatchCourierSchema = z.object({ courierId: z.string().min(1, "المندوب مطلوب") });

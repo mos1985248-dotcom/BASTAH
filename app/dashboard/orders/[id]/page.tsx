@@ -7,9 +7,10 @@ import { AlertTriangle, Landmark } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import { t } from "@/theme";
 import { ORDER_STATUS_LABEL, ORDER_STATUS_COLOR } from "@/lib/order-status";
+import CourierDispatchCard from "@/components/dashboard/CourierDispatchCard";
 
 interface OrderDetail {
-  id: string; orderNumber: string; status: string; paymentStatus: string; paymentMethod: string; total: number;
+  id: string; orderNumber: string; status: string; paymentStatus: string; paymentMethod: string; total: number; fulfillmentMethod?: string;
   shippingName: string; shippingPhone: string; shippingCity: string; shippingAddress: string;
   buyerNotes: string | null;
   items: { nameAr: string; price: number; quantity: number; total: number }[];
@@ -125,6 +126,10 @@ export default function SellerOrderDetailPage() {
           <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid }}>{order.shippingName} — {order.shippingPhone}</p>
           <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid }}>{order.shippingCity}، {order.shippingAddress}</p>
         </div>
+
+        {(order.status === "CONFIRMED" || order.status === "PROCESSING") && order.fulfillmentMethod !== "PICKUP" && (
+          <CourierDispatchCard orderId={order.id} onDone={load} />
+        )}
 
         {isBankTransfer && (
           <div style={cardStyle}>
