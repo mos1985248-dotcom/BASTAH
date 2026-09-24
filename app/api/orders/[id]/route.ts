@@ -185,7 +185,26 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         select: { id: true, status: true, paymentStatus: true },
       });
 
-      if (status === "SHIPPED" && (trackingNumber || carrier)) {
+      // ⚠️ شحنة مندوب بسطة (courierId): نزامن حالتها مع الطلب بدل إنشاء شحنة يدوية مكرَّرة
+      const courierShipment =
+        status === "SHIPPED" || status === "DELIVERED"
+          ? await tx.shipment.findFirst({
+              where: { orderId: order.id, courierId: { not: null }, status: { notIn: ["FAILED", "RETURNED", "DELIVERED"] } },
+              orderBy: { createdAt: "desc" },
+            })
+          : null;
+
+      if (courierShipment) {
+        const isShipped = status === "SHIPPED";
+        const nextShipmentStatus = isShipped ? "IN_TRANSIT" : "DELIVERED";
+        await tx.shipment.update({
+          where: { id: courierShipment.id },
+          data: { status: nextShipmentStatus, ...(isShipped ? { pickedUpAt: new Date() } : { deliveredAt: new Date() }) },
+        });
+        await tx.shipmentEvent.create({
+          data: { shipmentId: courierShipment.id, status: nextShipmentStatus, note: isShipped ? "أكّد التاجر خروج الشحنة" : "أكّد التاجر التسليم" },
+        });
+      } else if (status === "SHIPPED" && (trackingNumber || carrier)) {
         await tx.shipment.create({
           data: { orderId: order.id, carrier: carrier ?? null, trackingNumber: trackingNumber ?? null, status: "IN_TRANSIT" },
         });

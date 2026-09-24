@@ -13,6 +13,8 @@ import ErrorState from "@/components/admin/ui/ErrorState";
 import PlatformCarrierCard, { PlatformCarrier } from "@/components/admin/shipping/PlatformCarrierCard";
 import CustomProviderCard, { CustomProvider } from "@/components/admin/shipping/CustomProviderCard";
 import AddCustomProviderForm from "@/components/admin/shipping/AddCustomProviderForm";
+import CouriersManager from "@/components/admin/shipping/CouriersManager";
+import CourierShipmentsList from "@/components/admin/shipping/CourierShipmentsList";
 
 export default function ShippingProvidersSection() {
   const [platformCarriers, setPlatformCarriers] = useState<PlatformCarrier[] | null>(null);
@@ -68,6 +70,23 @@ export default function ShippingProvidersSection() {
           ))}
         </div>
         <AddCustomProviderForm onAdded={load} />
+      </section>
+
+      <section>
+        <h3 style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.base, color: t.colors.text.dark }}>
+          مناديب بسطة للشحن (لكل مدينة)
+        </h3>
+        <p style={{ margin: `0 0 ${t.spacing["3"]}`, fontSize: 12, color: t.colors.text.mid, maxWidth: 640 }}>
+          التاجر يختار مندوب مدينة المشتري من صفحة الطلب ويرسله له عبر واتساب برسالة جاهزة.
+        </p>
+        <CouriersManager />
+      </section>
+
+      <section>
+        <h3 style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.base, color: t.colors.text.dark }}>
+          شحنات المناديب
+        </h3>
+        <CourierShipmentsList />
       </section>
     </div>
   );
