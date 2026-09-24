@@ -13,6 +13,7 @@ export default function DetailsFormCard({
   translating,
   onSave,
   saving,
+  quantityLocked = false,
 }: {
   form: FormState;
   onChange: (k: keyof FormState, v: string) => void;
@@ -20,6 +21,7 @@ export default function DetailsFormCard({
   translating: boolean;
   onSave: () => void;
   saving: boolean;
+  quantityLocked?: boolean;
 }) {
   const inputStyle = { padding: 10, border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, fontSize: t.typography.fontSize.sm, boxSizing: "border-box" as const };
 
@@ -31,7 +33,7 @@ export default function DetailsFormCard({
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: t.spacing["2"] }}>
           <input type="number" value={form.price} onChange={(e) => onChange("price", e.target.value)} placeholder="السعر" style={inputStyle} />
-          <input type="number" value={form.quantity} onChange={(e) => onChange("quantity", e.target.value)} placeholder="الكمية" style={inputStyle} />
+          <input type="number" value={form.quantity} onChange={(e) => onChange("quantity", e.target.value)} placeholder="الكمية" disabled={quantityLocked} title={quantityLocked ? "تُحسب من كميات المتغيرات" : undefined} style={{ ...inputStyle, ...(quantityLocked ? { opacity: 0.6 } : {}) }} />
         </div>
 
         <textarea value={form.shortDescAr} onChange={(e) => onChange("shortDescAr", e.target.value)} placeholder="وصف مختصر (عربي)" rows={3} style={{ ...inputStyle, direction: "rtl", resize: "none" }} />

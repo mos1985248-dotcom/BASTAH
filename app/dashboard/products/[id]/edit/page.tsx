@@ -8,11 +8,13 @@ import { api, ApiError } from "@/lib/api-client";
 import { t } from "@/theme";
 import ImageManagerCard from "@/components/dashboard/product-edit/ImageManagerCard";
 import DetailsFormCard from "@/components/dashboard/product-edit/DetailsFormCard";
+import VariantsCard, { EditVariant } from "@/components/dashboard/product-edit/VariantsCard";
+import { useProductTranslate } from "@/hooks/useProductTranslate";
 import { EditProductImage } from "@/components/dashboard/product-edit/ProductImageTile";
 
 interface ProductDetail {
   id: string; nameAr: string; price: number; quantity: number; shortDescAr: string | null;
-  status: string; productImages: EditProductImage[];
+  status: string; productImages: EditProductImage[]; variants?: EditVariant[];
 }
 
 export default function EditProductPage() {
@@ -26,27 +28,12 @@ export default function EditProductPage() {
   const [savingDetails, setSavingDetails] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [busyImageId, setBusyImageId] = useState<string | null>(null);
-  const [translating, setTranslating] = useState(false);
 
-  const translateToEnglish = async () => {
-    if (!form.nameAr) return;
-    setTranslating(true);
-    setError("");
-    try {
-      const res = await fetch("/api/ai/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: form.nameAr, description: form.shortDescAr, from: "ar", to: "en" }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "فشل الترجمة");
-      setForm((p) => ({ ...p, nameEn: data.title ?? "", shortDescEn: data.description ?? "" }));
-    } catch (err: any) {
-      setError(err.message ?? "تعذّر الترجمة");
-    } finally {
-      setTranslating(false);
-    }
-  };
+  const { translating, translateToEnglish } = useProductTranslate(
+    form,
+    (r) => setForm((p) => ({ ...p, ...r })),
+    setError
+  );
 
   const load = () => {
     api
@@ -71,6 +58,8 @@ export default function EditProductPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  const hasVariants = (product?.variants?.length ?? 0) > 0;
+
   const saveDetails = async () => {
     setSavingDetails(true);
     setError("");
@@ -79,7 +68,7 @@ export default function EditProductPage() {
         nameAr: form.nameAr,
         nameEn: form.nameEn || undefined,
         price: Number(form.price),
-        quantity: Number(form.quantity),
+        quantity: hasVariants ? undefined : Number(form.quantity),
         shortDescAr: form.shortDescAr || undefined,
         shortDescEn: form.shortDescEn || undefined,
       });
@@ -182,7 +171,10 @@ export default function EditProductPage() {
           translating={translating}
           onSave={saveDetails}
           saving={savingDetails}
+          quantityLocked={hasVariants}
         />
+
+        <VariantsCard productId={id} variants={product.variants ?? []} basePrice={product.price} onSaved={load} />
 
         {error && (
           <p style={{ display: "flex", alignItems: "center", gap: 6, color: t.colors.semantic.danger, fontSize: t.typography.fontSize.xs }}>

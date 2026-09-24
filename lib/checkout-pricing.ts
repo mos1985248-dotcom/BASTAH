@@ -55,6 +55,11 @@ export async function resolveCheckoutItems(
     let availableQty = product.quantity;
     let nameAr = product.nameAr;
 
+    // ⚠️ منتج له متغيرات يُطلب فقط بمتغيّر محدّد — يمنع تجاوز سعر/مخزون المتغيّر بحذف variantId
+    if (!item.variantId && product.variants.length > 0) {
+      throw new CheckoutItemError(`اختاري الخيار المطلوب لمنتج "${product.nameAr}" قبل إتمام الطلب`, 400);
+    }
+
     if (item.variantId) {
       const variant = product.variants.find((v) => v.id === item.variantId);
       if (!variant) {
