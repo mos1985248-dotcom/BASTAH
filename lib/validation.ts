@@ -335,3 +335,31 @@ export const createCityCourierSchema = z.object({
 export const updateCityCourierSchema = z.object({ isActive: z.boolean() });
 
 export const dispatchCourierSchema = z.object({ courierId: z.string().min(1, "المندوب مطلوب") });
+
+// ── متغيرات المنتج (مقاس/وزن/لون...) — اسم الخاصية نص حر من التاجر، لا قائمة مقفلة ──
+export const productVariantsSchema = z
+  .object({
+    optionName: z.string().trim().max(30, "اسم الخاصية طويل").default(""),
+    variants: z
+      .array(
+        z.object({
+          id: z.string().cuid().optional(),
+          value: z.string().trim().min(1, "قيمة المتغيّر مطلوبة").max(40, "قيمة المتغيّر طويلة"),
+          price: z.number().positive("السعر يجب أن يكون أكبر من صفر").nullable().optional(),
+          quantity: z.number().int("الكمية يجب أن تكون رقماً صحيحاً").min(0, "الكمية لا تقل عن صفر").max(100000),
+          sku: z.string().trim().max(60).nullable().optional(),
+        })
+      )
+      .max(30, "الحد الأقصى 30 متغيّراً للمنتج"),
+  })
+  .superRefine((d, ctx) => {
+    if (d.variants.length > 0 && d.optionName.length === 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "اسم الخاصية مطلوب (مثل: المقاس)", path: ["optionName"] });
+    }
+    const seen = new Set<string>();
+    d.variants.forEach((v, i) => {
+      const key = v.value.toLowerCase();
+      if (seen.has(key)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: `القيمة «${v.value}» مكرّرة`, path: ["variants", i, "value"] });
+      seen.add(key);
+    });
+  });

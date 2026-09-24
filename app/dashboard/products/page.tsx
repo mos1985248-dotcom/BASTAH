@@ -10,6 +10,7 @@ import ProductStatusBadge from "@/components/dashboard/ProductStatusBadge";
 interface ProductRow {
   id: string; nameAr: string; mainImage: string | null; price: number;
   quantity: number; status: string; totalSold: number;
+  variants: { id: string; nameAr: string; quantity: number }[];
 }
 
 export default function SellerProductsPage() {
@@ -71,7 +72,25 @@ export default function SellerProductsPage() {
                 />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ margin: "0 0 3px", fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>{p.nameAr}</p>
-                  <p style={{ margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.text.mid }}>{p.price} ر.س · الكمية: {p.quantity}</p>
+                  <p style={{ margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.text.mid }}>
+                    {p.price} ر.س · {p.variants.length > 0 ? `الكمية الكلية: ${p.quantity}` : `الكمية: ${p.quantity}`}
+                  </p>
+                  {p.variants.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 5 }}>
+                      {p.variants.map((v) => (
+                        <span
+                          key={v.id}
+                          style={{
+                            padding: "2px 8px", borderRadius: t.radius.full, fontSize: 11,
+                            background: v.quantity > 0 ? t.colors.cream.bg : t.colors.semantic.dangerBg,
+                            color: v.quantity > 0 ? t.colors.text.mid : t.colors.semantic.danger,
+                          }}
+                        >
+                          {v.nameAr}: {v.quantity}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <ProductStatusBadge status={p.status} />
               </div>

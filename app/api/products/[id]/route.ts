@@ -29,7 +29,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
           },
         },
         category: { select: { nameAr: true, slug: true } },
-        variants: true,
+        variants: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
         productImages: { orderBy: { position: "asc" } },
       },
     });
@@ -111,9 +111,15 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     }
 
+    // ⚠️ منتج له متغيرات: كميته = مجموع كميات متغيراته ويُديرها /variants فقط — نتجاهل quantity هنا
+    const data = { ...parsed.data };
+    if (data.quantity !== undefined && (await prisma.productVariant.count({ where: { productId: params.id } })) > 0) {
+      delete data.quantity;
+    }
+
     const updated = await prisma.product.update({
       where: { id: params.id },
-      data: parsed.data,
+      data,
       select: { id: true, nameAr: true, slug: true, status: true, price: true, quantity: true },
     });
 

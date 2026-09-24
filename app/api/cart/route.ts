@@ -51,15 +51,25 @@ export async function POST(req: NextRequest) {
     const { productId, quantity } = parsed.data;
     const variantId = parsed.data.variantId ?? null;
 
-    const product = await prisma.product.findUnique({ where: { id: productId }, select: { id: true, status: true } });
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      select: { id: true, status: true, variants: { select: { id: true, quantity: true } } },
+    });
     if (!product || product.status !== "ACTIVE") {
       return NextResponse.json({ error: "هذا المنتج غير متاح حالياً" }, { status: 404 });
     }
 
+    // ⚠️ منتج له متغيرات لا يُضاف بدون اختيار أحدها (وإلا يُشترى بسعر ومخزون المنتج الأساسي)
+    if (product.variants.length > 0 && !variantId) {
+      return NextResponse.json({ error: "اختاري الخيار المطلوب قبل الإضافة للسلة" }, { status: 400 });
+    }
     if (variantId) {
-      const variant = await prisma.productVariant.findUnique({ where: { id: variantId }, select: { productId: true } });
-      if (!variant || variant.productId !== productId) {
+      const variant = product.variants.find((v) => v.id === variantId);
+      if (!variant) {
         return NextResponse.json({ error: "الخيار المحدَّد غير صالح لهذا المنتج" }, { status: 400 });
+      }
+      if (variant.quantity < 1) {
+        return NextResponse.json({ error: "هذا الخيار غير متوفر حالياً" }, { status: 409 });
       }
     }
 

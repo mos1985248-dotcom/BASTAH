@@ -73,6 +73,10 @@ export function useProductPurchase(product: ProductDetail | null, id: string) {
       window.location.href = `/login?redirect=/products/${id}`;
       return;
     }
+    if (product && product.variants.length > 0 && !selectedVariant) {
+      setCheckoutError("اختاري الخيار المطلوب أولاً");
+      return;
+    }
     setAddingToCart(true);
     try {
       await api.post("/api/cart", { productId: id, quantity: qty, variantId: selectedVariant?.id });
@@ -89,6 +93,10 @@ export function useProductPurchase(product: ProductDetail | null, id: string) {
     if (!product) return;
     if (!user) {
       window.location.href = `/login?redirect=/products/${id}`;
+      return;
+    }
+    if (product && product.variants.length > 0 && !selectedVariant) {
+      setCheckoutError("اختاري الخيار المطلوب أولاً");
       return;
     }
     if (!selectedAddressId) {

@@ -172,7 +172,9 @@ export default function ProductPurchasePanel({
         )}
 
         {outOfStock
-          ? "نفدت الكمية"
+          ? selectedVariant
+            ? "غير متوفر بهذا الخيار"
+            : "نفدت الكمية"
           : `${maxQty} قطعة متوفرة`}
       </div>
 
