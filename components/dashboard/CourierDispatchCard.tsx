@@ -3,7 +3,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MessageCircle, AlertTriangle } from "lucide-react";
+import { MessageCircle, AlertTriangle, Printer } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import { t } from "@/theme";
 
@@ -54,9 +54,21 @@ export default function CourierDispatchCard({ orderId, onDone }: { orderId: stri
     <div style={card}>
       <h3 style={h3}>الشحن عبر مندوب بسطة</h3>
       {info.current && (
-        <p style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: 12, color: t.colors.text.mid }}>
-          أُسند إلى: <strong style={{ color: t.colors.text.dark }}>{info.current.courierName ?? "—"}</strong>
-        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: t.spacing["2"], flexWrap: "wrap", gap: 8 }}>
+          <p style={{ margin: 0, fontSize: 12, color: t.colors.text.mid }}>
+            أُسند إلى: <strong style={{ color: t.colors.text.dark }}>{info.current.courierName ?? "—"}</strong>
+          </p>
+          {/* بوليصة الشحن متاحة فقط لطلب له شحنة مندوب فعلية (بسطة للشحن) */}
+          <a
+            href={`/api/orders/${orderId}/shipping-label`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: t.colors.primary[800], textDecoration: "none", fontWeight: t.typography.fontWeight.bold }}
+          >
+            <Printer size={14} strokeWidth={1.8} />
+            طباعة بوليصة الشحن
+          </a>
+        </div>
       )}
       {info.couriers.length === 0 ? (
         <p style={{ display: "flex", alignItems: "center", gap: 6, margin: 0, fontSize: 12, color: t.colors.semantic.warning }}>

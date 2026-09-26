@@ -1,8 +1,9 @@
 // app/providers.tsx
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { api, ApiError } from "@/lib/api-client";
+import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 interface CurrentUser {
   id: string;
@@ -47,6 +48,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refresh();
+  }, [refresh]);
+
+  // ⚠️ إصلاح خلل تسجيل خروج معروف: أزرار الخروج (Navbar/AccountSidebar/
+  // AdminSidebar) تستدعي supabase.auth.signOut() ثم router.push + refresh()،
+  // لكن router.refresh() من Next.js يعيد تحميل بيانات Server Components فقط
+  // ولا يُعيد تشغيل حالة هذا الـContext (client state)، فتبقى القائمة
+  // الجانبية/اسم المستخدم ظاهرة كأن الدخول لا يزال قائماً حتى يُحدَّث
+  // المتصفح يدوياً. الاشتراك هنا في onAuthStateChange نقطة مركزية واحدة
+  // تُصلح كل أزرار الدخول/الخروج الحالية والمستقبلية دون تعديل كل واحد منها.
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    const { data: subscription } = supabase.auth.onAuthStateChange(() => {
+      refresh();
+    });
+    return () => subscription.subscription.unsubscribe();
   }, [refresh]);
 
   return <UserContext.Provider value={{ user, loading, refresh }}>{children}</UserContext.Provider>;
