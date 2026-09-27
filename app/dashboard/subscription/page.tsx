@@ -8,6 +8,7 @@ import { t } from "@/theme";
 import LoadingState from "@/components/admin/ui/LoadingState";
 import ErrorState from "@/components/admin/ui/ErrorState";
 import StatusBadge from "@/components/admin/ui/StatusBadge";
+import CustomDomainCard from "@/components/dashboard/CustomDomainCard";
 
 interface SubscriptionData {
   subscription: {
@@ -32,6 +33,7 @@ interface SubscriptionData {
     paidAt: string | null;
     createdAt: string;
   }[];
+  store: { customDomain: string | null; customDomainEnabled: boolean };
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -156,6 +158,12 @@ export default function SubscriptionPage() {
             })}
           </div>
         )}
+
+        <CustomDomainCard
+          enabled={data.store.customDomainEnabled}
+          currentDomain={data.store.customDomain}
+          onSaved={(domain) => setData((d) => (d ? { ...d, store: { ...d.store, customDomain: domain } } : d))}
+        />
       </div>
     </div>
   );

@@ -115,6 +115,8 @@ enum AuditAction {
   INVOICE_MARKED_PAID
   REFUND_ISSUED
   USER_ROLE_CHANGED
+  USER_SUSPENDED
+  USER_REACTIVATED
   PRODUCT_REMOVED
   PAYOUT_PROCESSED
   SHIPPING_PROVIDER_ADDED
@@ -221,6 +223,10 @@ model Store {
   nameEn          String?
   slug            String      @unique // basita.sa/متجر/slug
   customDomain    String?     @unique // custom.com
+  // ⚠️ بوابة يدوية من الإدارة فقط — لا تُفتح تلقائياً من الباقة (99/199)،
+  // لأن أحمد يريد التحقق شخصياً من الاشتراك قبل التفعيل. المرحلة الآلية
+  // (ربط تلقائي عبر Vercel Domains API) مؤجَّلة، هذا الحقل هو المرحلة اليدوية.
+  customDomainEnabled Boolean  @default(false)
   description     String?
   shortDesc       String?
   logo            String?
@@ -1694,6 +1700,10 @@ model CityCourier {
   name      String
   phone     String     // رقم واتساب المندوب
   isActive  Boolean    @default(true)
+  // ⚠️ مبلغ ثابت بالريال يُحتسب للمندوب عن كل شحنة "تم تسليمها" فعلاً (لا
+  // المُسنَدة فقط) — فاضي يعني لم تُحدَّد عمولته بعد. مُعَدّ ليتوسّع لاحقاً
+  // لنظام راتب شهري دون كسر البيانات الحالية.
+  commissionPerShipment Float?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   shipments Shipment[]

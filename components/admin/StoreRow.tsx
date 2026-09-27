@@ -5,6 +5,7 @@ import {
   XCircle,
   PauseCircle,
   PlayCircle,
+  Globe,
 } from "lucide-react";
 import { t } from "@/theme";
 
@@ -272,6 +273,29 @@ export default function StoreRow({
             تفعيل
           </button>
         )}
+
+        {/* الدومين المخصص — بوابة يدوية من الإدارة، بلا فحص باقة تلقائي؛
+            الباقة معروضة أعلاه (subscription.plan) ليقرر عليها الإدمن */}
+        <button
+          type="button"
+          onClick={() =>
+            onAction(`/api/admin/stores/${store.id}/domain`, {
+              customDomainEnabled: !store.customDomainEnabled,
+            })
+          }
+          disabled={busy}
+          aria-label={store.customDomainEnabled ? "إلغاء تفعيل الدومين المخصص" : "تفعيل الدومين المخصص"}
+          style={{
+            ...actionBtn(
+              store.customDomainEnabled ? t.colors.text.mid : t.colors.primary[800],
+              store.customDomainEnabled ? t.colors.cream.bg : t.colors.primary[100]
+            ),
+            opacity: busy ? 0.55 : 1,
+          }}
+        >
+          <Globe size={13} strokeWidth={2} />
+          {store.customDomainEnabled ? `الدومين مفعّل${store.customDomain ? `: ${store.customDomain}` : ""}` : "تفعيل الدومين المخصص"}
+        </button>
       </div>
 
       <style>{`

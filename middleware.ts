@@ -1,11 +1,13 @@
 // middleware.ts
-// يعمل على كل طلب قبل الوصول لأي route. ثلاث مسؤوليات فقط حالياً:
+// يعمل على كل طلب قبل الوصول لأي route. أربع مسؤوليات حالياً:
+// 0) توجيه الدومينات المخصصة (مرحلة يدوية) إلى صفحة المتجر الصحيحة
 // 1) تحديث جلسة Supabase (مطلوب من مكتبة @supabase/ssr نفسها)
 // 2) حماية المسارات الخاصة (/dashboard, /admin) من غير المسجّلين
 // 3) Rate limiting على كل /api/* + هيدرز أمان أساسية على كل استجابة
 //
-// مؤجّل لمرحلة لاحقة (مذكور بوضوح حتى لا يُفهم أنه نُسي):
-// توجيه الدومينات المخصصة لكل متجر، ودعم next-intl للترجمة.
+// مؤجّل لمرحلة لاحقة: الربط الآلي بالدومين عبر Vercel Domains API
+// (إضافة الدومين للمشروع وإصدار SSL تلقائياً) — الآن يدوي بالكامل.
+// كذلك دعم next-intl للترجمة.
 
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
@@ -13,6 +15,22 @@ import { apiRateLimit, checkRateLimit, rateLimitHeaders } from "@/lib/rate-limit
 
 const PROTECTED_PREFIXES = ["/dashboard", "/admin"];
 const ADMIN_ONLY_PREFIXES = ["/admin"];
+
+// المضيفات "الأصلية" للمنصة نفسها — أي طلب عليها يمر بشكل طبيعي بلا توجيه دومين
+const PLATFORM_HOSTS = new Set(
+  [
+    "localhost:3000",
+    "basita.sa",
+    "www.basita.sa",
+    process.env.NEXT_PUBLIC_APP_HOST,
+    process.env.VERCEL_URL,
+  ].filter(Boolean) as string[]
+);
+
+// ⚠️ نستدعي الـAPI الداخلي عبر دومين المنصة الثابت (NEXT_PUBLIC_APP_URL)
+// لا عبر دومين الزائر المخصص نفسه — الاعتماد على DNS/SSL دومين خارجي
+// (قد لا يكون مضبوطاً بعد) فقط لحل اسمه غير آمن ويُبطئ كل طلب بلا داعٍ.
+const INTERNAL_API_BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 function withSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set("X-Content-Type-Options", "nosniff");
@@ -30,6 +48,33 @@ function getClientIp(request: NextRequest): string {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // ── 0) توجيه الدومين المخصص ─────────────────────────────
+  // ⚠️ نتجاهل _next وapi وأي مسار به امتداد ملف (صور/خطوط) — لا داعي
+  // لاستدعاء الـAPI الداخلي لكل أصل ثابت. أيضاً نتجاهل أي مضيف من
+  // PLATFORM_HOSTS حتى لا نلف كل زيارة عادية للمنصة بطلب إضافي.
+  const host = request.headers.get("host")?.toLowerCase() ?? "";
+  const isAsset = pathname.startsWith("/_next") || pathname.startsWith("/api/") || /\.[a-z0-9]+$/i.test(pathname);
+  if (host && !PLATFORM_HOSTS.has(host) && !isAsset) {
+    try {
+      const resolveUrl = new URL("/api/internal/resolve-domain", INTERNAL_API_BASE);
+      resolveUrl.searchParams.set("host", host);
+      const res = await fetch(resolveUrl);
+      const { slug } = (await res.json()) as { slug: string | null };
+      if (slug) {
+        const rewritten = request.nextUrl.clone();
+        // ⚠️ الحالة الحالية (يدوية وأولية): كل مسارات الدومين المخصص تعرض
+        // الصفحة الرئيسية للمتجر — لا مطابقة لمسارات فرعية (/products/x)
+        // بعد، لأن هذه المسارات بالمنصة عامة وليست مربوطة بمتجر أصلاً.
+        rewritten.pathname = `/store/${slug}`;
+        return withSecurityHeaders(NextResponse.rewrite(rewritten));
+      }
+      // دومين غير مرتبط بأي متجر مفعَّل: نكمل التدفق العادي (سيعرض 404
+      // الصفحة الرئيسية للمنصة) بدل قطع الطلب بخطأ خام.
+    } catch {
+      // فشل الاتصال الداخلي: لا نُسقِط الموقع — نكمل بلا توجيه دومين
+    }
+  }
 
   // ── 1) Rate limiting على كل API ────────────────────────
   if (pathname.startsWith("/api/")) {

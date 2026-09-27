@@ -2,9 +2,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, Search, Users, UserRound } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Search, Users, UserRound, PauseCircle, PlayCircle } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { t } from "@/theme";
+
+const actionBtn = (color: string, bg: string): React.CSSProperties => ({
+  minHeight: 28,
+  padding: "0 10px",
+  background: bg,
+  color,
+  border: "none",
+  borderRadius: t.radius.sm,
+  fontSize: 10,
+  fontWeight: 600,
+  cursor: "pointer",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 5,
+  flexShrink: 0,
+});
 
 const ROLE_BADGE: Record<string, { color: string; bg: string }> = {
   BUYER: { color: t.colors.text.mid, bg: t.colors.cream.bg },
@@ -22,6 +38,22 @@ export default function UsersTab() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [total, setTotal] = useState(0);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [msg, setMsg] = useState<{ type: "error" | "success"; text: string } | null>(null);
+
+  const action = async (userId: string, body: object) => {
+    setBusy(userId);
+    setMsg(null);
+    try {
+      await api.post(`/api/admin/users/${userId}/suspend`, body);
+      setMsg({ type: "success", text: "تم" });
+      load();
+    } catch (e: any) {
+      setMsg({ type: "error", text: e.message ?? "تعذّر تنفيذ الإجراء" });
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const load = async (s = search) => {
     setLoading(true);
@@ -129,6 +161,35 @@ export default function UsersTab() {
           بحث
         </button>
       </div>
+
+      {/* الرسالة */}
+      {msg && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 9,
+            padding: "11px 13px",
+            marginBottom: t.spacing["2"],
+            borderRadius: t.radius.md,
+            border: `1px solid ${t.colors.cream.border}`,
+            background: t.colors.white,
+            color: msg.type === "error" ? t.colors.semantic.danger : t.colors.semantic.success,
+            fontSize: t.typography.fontSize.xs,
+          }}
+        >
+          <span
+            style={{
+              width: 28, height: 28, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+              borderRadius: "50%",
+              background: msg.type === "error" ? t.colors.semantic.dangerBg : t.colors.semantic.successBg,
+            }}
+          >
+            {msg.type === "error" ? <AlertTriangle size={14} strokeWidth={1.8} /> : <CheckCircle2 size={14} strokeWidth={1.8} />}
+          </span>
+          <span>{msg.text}</span>
+        </div>
+      )}
 
       {/* رأس القائمة */}
       <div
@@ -407,26 +468,56 @@ export default function UsersTab() {
                       }}
                     >
                       {u.email}
+                      {u.phone && ` · ${u.phone}`}
                       {u.store && ` · متجر: ${u.store.nameAr}`}
                     </p>
                   </div>
                 </div>
 
-                {/* الدور */}
-                <span
-                  style={{
-                    flexShrink: 0,
-                    padding: "5px 10px",
-                    borderRadius: t.radius.full,
-                    background: badge.bg,
-                    color: badge.color,
-                    fontSize: 9,
-                    fontWeight: t.typography.fontWeight.bold,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {u.role}
-                </span>
+                {/* الدور + الإجراء */}
+                <div style={{ display: "flex", alignItems: "center", gap: 7, flexShrink: 0 }}>
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      padding: "5px 10px",
+                      borderRadius: t.radius.full,
+                      background: badge.bg,
+                      color: badge.color,
+                      fontSize: 9,
+                      fontWeight: t.typography.fontWeight.bold,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {u.role}
+                  </span>
+
+                  {u.isActive ? (
+                    <button
+                      type="button"
+                      disabled={busy === u.id}
+                      onClick={() => {
+                        const r = prompt("سبب الإيقاف؟");
+                        if (r) action(u.id, { action: "suspend", reason: r });
+                      }}
+                      aria-label="إيقاف المستخدم"
+                      style={{ ...actionBtn(t.colors.semantic.warning, t.colors.semantic.warningBg), opacity: busy === u.id ? 0.55 : 1 }}
+                    >
+                      <PauseCircle size={13} strokeWidth={2} />
+                      إيقاف
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={busy === u.id}
+                      onClick={() => action(u.id, { action: "reactivate" })}
+                      aria-label="تفعيل المستخدم"
+                      style={{ ...actionBtn(t.colors.semantic.success, t.colors.semantic.successBg), opacity: busy === u.id ? 0.55 : 1 }}
+                    >
+                      <PlayCircle size={13} strokeWidth={2} />
+                      تفعيل
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}

@@ -10,6 +10,11 @@ export async function GET() {
   try {
     const { storeId } = await requireActiveStore();
 
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+      select: { customDomain: true, customDomainEnabled: true },
+    });
+
     const subscription = await prisma.storeSubscription.findUnique({
       where: { storeId },
       include: {
@@ -36,6 +41,7 @@ export async function GET() {
       },
       planConfig,
       invoices: subscription.invoices,
+      store,
     });
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });

@@ -17,12 +17,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     const courier = await prisma.cityCourier.update({
       where: { id: params.id },
-      data: { isActive: parsed.data.isActive },
-      select: { id: true, isActive: true },
+      data: parsed.data,
+      select: { id: true, isActive: true, commissionPerShipment: true },
     });
     await logAudit({
       actorId: admin.id, action: "SHIPPING_PROVIDER_ADDED", targetType: "CityCourier", targetId: courier.id,
-      metadata: { event: courier.isActive ? "city_courier_enabled" : "city_courier_disabled" }, ipAddress: getClientIp(req.headers),
+      metadata: { event: "city_courier_updated", ...parsed.data }, ipAddress: getClientIp(req.headers),
     });
     return NextResponse.json({ courier });
   } catch (err) {

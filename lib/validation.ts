@@ -42,6 +42,20 @@ export const updateStoreSchema = createStoreSchema.partial().extend({
   coverImage: z.string().url().optional(),
 });
 
+// ⚠️ إضافي — دومين مخصص (مرحلة يدوية): يقبل النطاق فقط للتاجر الذي فتحت
+// له الإدارة الميزة يدوياً بعد التحقق من اشتراكه، عبر PATCH /api/stores/[slug]/domain
+export const updateCustomDomainSchema = z.object({
+  customDomain: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/, "صيغة الدومين غير صحيحة (مثال: mystore.com)")
+    .max(253)
+    .nullable(),
+});
+
+export const setStoreDomainGateSchema = z.object({ customDomainEnabled: z.boolean() });
+
 // ⚠️ إضافي — يخص تحديث StorePublicInfo (منفصل عن Store نفسه، عبر
 // PATCH /api/stores/[slug]/public-info الجديد). لا يمس updateStoreSchema.
 export const updatePublicInfoSchema = z.object({

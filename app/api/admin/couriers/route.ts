@@ -11,7 +11,7 @@ export async function GET() {
   try {
     await requireRole("ADMIN", "SUPER_ADMIN");
     const couriers = await prisma.cityCourier.findMany({
-      select: { id: true, city: true, name: true, phone: true, isActive: true, createdAt: true, _count: { select: { shipments: true } } },
+      select: { id: true, city: true, name: true, phone: true, isActive: true, commissionPerShipment: true, createdAt: true, _count: { select: { shipments: true } } },
       orderBy: [{ city: "asc" }, { createdAt: "asc" }],
     });
     return NextResponse.json({ couriers: couriers.map(({ _count, ...c }) => ({ ...c, shipmentsCount: _count.shipments })) });
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     const courier = await prisma.cityCourier.create({
       data: parsed.data,
-      select: { id: true, city: true, name: true, phone: true, isActive: true, createdAt: true },
+      select: { id: true, city: true, name: true, phone: true, isActive: true, commissionPerShipment: true, createdAt: true },
     });
     await logAudit({
       actorId: admin.id, action: "SHIPPING_PROVIDER_ADDED", targetType: "CityCourier", targetId: courier.id,
