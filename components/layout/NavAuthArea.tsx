@@ -215,6 +215,21 @@ export default function NavAuthArea({
             </span>
           </a>
 
+          {/* ⚠️ للتاجر تحديداً: /account هو أيضاً مكان زر "التبديل لحساب
+              مشتري" (راجع RoleSwitchCard) — بدون هذا الرابط لا طريقة له
+              للوصول إليه، لأن "لوحة متجري" أعلاه تأخذه لـ/dashboard فقط. */}
+          {user.role === "SELLER" && (
+            <a
+              href="/account"
+              onClick={() => setOpen(false)}
+              className="basita-account-menu-item"
+              style={menuItemStyle}
+            >
+              <UserRound size={16} strokeWidth={1.8} />
+              <span>حسابي الشخصي</span>
+            </a>
+          )}
+
           <button
             type="button"
             onClick={async () => {

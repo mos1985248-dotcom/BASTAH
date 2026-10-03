@@ -6,7 +6,7 @@ import { t } from "@/theme";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import {
   Home, ShoppingCart, Package, MapPin, Heart, Tag, Undo2, Headset, Settings,
-  Wallet, Star, MessageSquare, LogOut, type LucideIcon,
+  LogOut, type LucideIcon,
 } from "lucide-react";
 
 const REAL_LINKS: { href: string; Icon: LucideIcon; label: string }[] = [
@@ -19,16 +19,6 @@ const REAL_LINKS: { href: string; Icon: LucideIcon; label: string }[] = [
   { href: "#orders", Icon: Undo2, label: "إرجاع واستبدال" },
   { href: "/dashboard/support", Icon: Headset, label: "الدعم والمساعدة" },
   { href: "/account/settings", Icon: Settings, label: "الإعدادات" },
-];
-
-// ⚠️ لا يوجد أي backend model لهذه الميزات حالياً (لا Wallet، لا Points/Loyalty،
-// لا listing endpoint للمراجعات أو المحادثات العامة) — معروضة كـ"قريباً" بدل
-// اختراع بيانات أو روابط لصفحات لا تعمل.
-const COMING_SOON: { Icon: LucideIcon; label: string }[] = [
-  { Icon: Wallet, label: "محفظتي" },
-  { Icon: Star, label: "نقاط بسطة" },
-  { Icon: MessageSquare, label: "تقييماتي" },
-  { Icon: MessageSquare, label: "محادثاتي" },
 ];
 
 export default function AccountSidebar() {
@@ -45,16 +35,6 @@ export default function AccountSidebar() {
           <l.Icon size={18} strokeWidth={1.7} />
           {l.label}
         </a>
-      ))}
-
-      {COMING_SOON.map((c) => (
-        <div key={c.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", color: t.colors.text.light, fontSize: t.typography.fontSize.sm }}>
-          <span style={{ display: "flex", alignItems: "center", gap: t.spacing["2"] }}>
-            <c.Icon size={18} strokeWidth={1.7} />
-            {c.label}
-          </span>
-          <span style={{ fontSize: 10, background: t.colors.cream.bg, padding: "2px 8px", borderRadius: t.radius.full }}>قريباً</span>
-        </div>
       ))}
 
       <button

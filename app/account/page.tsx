@@ -1,8 +1,8 @@
 // app/account/page.tsx
-// ⚠️ نسخة واقعية من Image 1 المرجعية: حذفت/استبدلت العناصر التي لا يوجد
-// لها backend حقيقي ("نقاط بسطة"، "عضو ذهبي"، "محفظتي"، "متاجر المفضلة")
-// بدل تلفيق بيانات، ووضعتها كـ"قريباً" بالسايدبار. الباقي (الاسم، الطلبات،
-// العناوين، المفضلة، الكوبونات) بيانات حقيقية من الـ API الفعلي.
+// ⚠️ نسخة واقعية من Image 1 المرجعية: عناصر لا يوجد لها backend حقيقي
+// ("نقاط بسطة"، "عضو ذهبي"، "محفظتي"، "تقييماتي"، "محادثاتي") أُزيلت بالكامل
+// (لا سايدبار "قريباً") بدل تلفيق بيانات أو وعد بميزة غير مجدولة. الباقي
+// (الاسم، الطلبات، العناوين، المفضلة، الكوبونات) بيانات حقيقية من الـ API الفعلي.
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,6 +19,7 @@ import RecentOrdersList, { BuyerOrder } from "@/components/account/RecentOrdersL
 import AddressesList, { BuyerAddress } from "@/components/account/AddressesList";
 import AccountSidebar from "@/components/account/AccountSidebar";
 import HelpCard from "@/components/account/HelpCard";
+import RoleSwitchCard from "@/components/account/RoleSwitchCard";
 
 export default function AccountPage() {
   const { user, loading: userLoading } = useCurrentUser();
@@ -71,6 +72,7 @@ export default function AccountPage() {
 
         <main style={{ display: "flex", flexDirection: "column", gap: t.spacing["5"] }}>
           <AccountHeroCard name={user.name} email={user.email} />
+          <RoleSwitchCard role={user.role} />
           <StatsRow totalSpent={totalSpent} ordersCount={orders.length} addressesCount={addresses.length} favoritesCount={favoritesCount} />
           <OrderStatusSummary orders={orders} />
           <QuickActions />
