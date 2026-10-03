@@ -156,7 +156,10 @@ export async function POST(req: NextRequest) {
   try {
     const user = await requireUser();
 
-    if (user.role === "SELLER" && user.store) {
+    // ⚠️ ملكية المتجر مستقلة عن الدور الحالي — مع تبديل الحساب (BUYER↔SELLER)
+    // شخص بدّل مؤقتاً لـBUYER لكنه يملك متجراً فعلياً يجب أن يُمنع من إنشاء
+    // متجر ثانٍ بنفس القوة، لا أن يفلت الفحص لأن دوره الآن ليس SELLER.
+    if (user.store) {
       return NextResponse.json({ error: "لديك متجر بالفعل" }, { status: 409 });
     }
     if (!["BUYER", "SELLER"].includes(user.role)) {
