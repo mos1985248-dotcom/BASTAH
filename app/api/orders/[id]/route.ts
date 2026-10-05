@@ -9,10 +9,14 @@ import { createNotification } from "@/lib/notifications";
 import { fetchMoyasarInvoice, refundMoyasarPayment, toHalalas, MoyasarError } from "@/lib/moyasar";
 import { decryptSecret } from "@/lib/crypto";
 import { applyMoyasarPaymentStatus } from "@/lib/order-payment";
+import { recordEvent } from "@/lib/analytics";
 
 interface Params {
   params: { id: string };
 }
+
+/** يُرمى عند خسارة سباق تزامن على إلغاء الطلب — راجع حارس التزامن أدناه */
+class ConcurrentOrderStateError extends Error {}
 
 async function getOrderWithAccessCheck(orderId: string, userId: string, userRole: string) {
   const order = await prisma.order.findUnique({
@@ -170,20 +174,36 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           extraData.paymentStatus = "PAID";
         }
       }
+      let newOrder: { id: string; status: string; paymentStatus: string };
+
       if (status === "CANCELLED") {
         dateFieldUpdate.cancelledAt = new Date();
-        // غير مدفوع أصلاً (تحقّقنا أعلاه) — إعادة المخزون فقط، لا استرداد مطلوب
+        // ⚠️ حارس تزامن: الفحص أول الدالة (order.status قبل قليل) يمكن أن
+        // يفوته طلبا PATCH متزامنان لنفس الطلب يصلان قبل أن يكتب أيٌّ منهما —
+        // كلاهما يرى حالة غير نهائية ويحاول الإلغاء، فيُرجَع المخزون مرتين.
+        // التحديث الذري هنا (updateMany بشرط WHERE) يضمن أن واحداً فقط
+        // "يفوز"، ونُرجع المخزون له وحده (نفس مبدأ applyMoyasarPaymentStatus).
+        const guard = await tx.order.updateMany({
+          where: { id: order.id, status: { notIn: ["CANCELLED", "DELIVERED", "REFUNDED"] } },
+          data: { status, sellerNotes: sellerNotes ?? order.sellerNotes, ...dateFieldUpdate, ...extraData },
+        });
+        if (guard.count === 0) throw new ConcurrentOrderStateError();
+
         await releaseStock(
           tx,
           order.items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity }))
         );
+        newOrder = await tx.order.findUniqueOrThrow({
+          where: { id: order.id },
+          select: { id: true, status: true, paymentStatus: true },
+        });
+      } else {
+        newOrder = await tx.order.update({
+          where: { id: order.id },
+          data: { status, sellerNotes: sellerNotes ?? order.sellerNotes, ...dateFieldUpdate, ...extraData },
+          select: { id: true, status: true, paymentStatus: true },
+        });
       }
-
-      const newOrder = await tx.order.update({
-        where: { id: order.id },
-        data: { status, sellerNotes: sellerNotes ?? order.sellerNotes, ...dateFieldUpdate, ...extraData },
-        select: { id: true, status: true, paymentStatus: true },
-      });
 
       // ⚠️ شحنة مندوب بسطة (courierId): نزامن حالتها مع الطلب بدل إنشاء شحنة يدوية مكرَّرة
       const courierShipment =
@@ -217,6 +237,27 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       return newOrder;
     });
 
+    // ⚠️ تحليلات: الطلب تحوّل لمدفوع الآن فعلاً (COD عند DELIVERED، أو تحويل
+    // بنكي عند أول تقديم بعد رفع الإثبات) — order.paymentStatus أدناه يقصد
+    // الحالة *قبل* هذا التحديث (المتغيّر الأصلي المحمَّل أول الدالة). نُسند
+    // الحدث لمصدر الطلب المحفوظ وقت الإنشاء (OrderAttribution) حتى يُحتسب
+    // الإيراد تحت المصدر الصحيح بلوحة التسويق، لا "مباشر" دائماً. فشل هذا
+    // القسم بالكامل لا يجوز أن يُسقط استجابة تحديث الطلب نفسها.
+    if (order.paymentStatus !== "PAID" && updated.paymentStatus === "PAID") {
+      try {
+        const attribution = await prisma.orderAttribution.findUnique({
+          where: { orderId: order.id },
+          select: { utmSource: true, utmMedium: true, utmCampaign: true },
+        });
+        await recordEvent({
+          type: "ORDER_PAID", storeId: order.store.id, orderId: order.id, amount: order.total,
+          utmSource: attribution?.utmSource, utmMedium: attribution?.utmMedium, utmCampaign: attribution?.utmCampaign,
+        });
+      } catch (analyticsErr) {
+        console.error("[orders PATCH] ORDER_PAID analytics", analyticsErr);
+      }
+    }
+
     if (status === "SHIPPED") {
       createNotification({
         userId: order.buyerId,
@@ -239,6 +280,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     return NextResponse.json({ order: updated });
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    if (err instanceof ConcurrentOrderStateError) {
+      return NextResponse.json({ error: "تغيّرت حالة الطلب أثناء المعالجة — حدّثي الصفحة وحاولي مجدداً" }, { status: 409 });
+    }
     console.error("[PATCH /api/orders/:id]", err);
     return NextResponse.json({ error: "حدث خطأ غير متوقع" }, { status: 500 });
   }

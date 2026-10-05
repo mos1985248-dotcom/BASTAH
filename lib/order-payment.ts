@@ -10,6 +10,7 @@
 import { prisma } from "./prisma";
 import { releaseStock } from "./inventory";
 import { createNotification } from "./notifications";
+import { recordEvent } from "./analytics";
 
 export type PaymentApplyResult = {
   applied: boolean; // false لو الطلب غير موجود
@@ -22,7 +23,7 @@ export type PaymentApplyResult = {
 export async function applyMoyasarPaymentStatus(orderId: string, moyasarStatus: string): Promise<PaymentApplyResult> {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    include: { items: true, store: { select: { userId: true } } },
+    include: { items: true, store: { select: { id: true, userId: true } } },
   });
   if (!order) return { applied: false, changed: false, orderStatus: "", paymentStatus: "" };
 
@@ -55,6 +56,24 @@ export async function applyMoyasarPaymentStatus(orderId: string, moyasarStatus: 
       bodyAr: `طلب ${order.orderNumber} بانتظار تجهيزك`,
       data: { orderId: order.id, orderNumber: order.orderNumber },
     }).catch(() => {});
+    // ⚠️ هذا المسار وحده (result.count > 0) يعني تحوّلاً فعلياً لمدفوع —
+    // إعادة تسليم الـwebhook (idempotent) تمر من فرع changed:false أعلاه
+    // فلا يُسجَّل الحدث مرتين لنفس الطلب. نُسند الحدث لمصدر الطلب المحفوظ
+    // وقت الإنشاء (OrderAttribution) حتى يُحتسب الإيراد تحت المصدر الصحيح.
+    // فشل هذا القسم بالكامل لا يجوز أن يُسقط تأكيد الدفع نفسه — الدفع والحالة
+    // تحدّثا أعلاه بالفعل بنجاح بغض النظر عن نتيجة التحليلات.
+    try {
+      const attribution = await prisma.orderAttribution.findUnique({
+        where: { orderId: order.id },
+        select: { utmSource: true, utmMedium: true, utmCampaign: true },
+      });
+      await recordEvent({
+        type: "ORDER_PAID", storeId: order.store.id, orderId: order.id, amount: order.total,
+        utmSource: attribution?.utmSource, utmMedium: attribution?.utmMedium, utmCampaign: attribution?.utmCampaign,
+      });
+    } catch (analyticsErr) {
+      console.error("[applyMoyasarPaymentStatus] ORDER_PAID analytics", analyticsErr);
+    }
     return { applied: true, changed: true, orderStatus: "CONFIRMED", paymentStatus: "PAID" };
   }
 
@@ -63,20 +82,27 @@ export async function applyMoyasarPaymentStatus(orderId: string, moyasarStatus: 
     if (alreadyHandled) {
       return { applied: true, changed: false, orderStatus: order.status, paymentStatus: order.paymentStatus };
     }
+    // ⚠️ حارس تزامن (نفس مبدأ فرع paid أعلاه بالضبط): لو وصل إشعاران
+    // متزامنان (إعادة تسليم webhook + مصالحة verify-payment في نفس اللحظة)
+    // قبل أن يلتزم أيٌّ منهما، الفحص أعلاه (alreadyHandled) يفوته كلاهما —
+    // فيُعاد نفس المخزون مرتين. updateMany بشرط WHERE يضمن فوز واحد فقط.
+    let releasedByThisCall = false;
     await prisma.$transaction(async (tx) => {
+      const guard = await tx.order.updateMany({
+        where: { id: order.id, paymentStatus: { not: "FAILED" }, status: { notIn: ["CANCELLED", "REFUNDED"] } },
+        data: { paymentStatus: "FAILED", status: "CANCELLED", cancelledAt: new Date() },
+      });
+      if (guard.count === 0) return; // خسرنا السباق — استدعاء آخر تولّى الأمر فعلاً
+      releasedByThisCall = true;
       await releaseStock(
         tx,
         order.items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity }))
       );
-      await tx.order.update({
-        where: { id: order.id },
-        data: { paymentStatus: "FAILED", status: "CANCELLED", cancelledAt: new Date() },
-      });
       await tx.orderStatusHistory.create({
         data: { orderId: order.id, status: "CANCELLED", note: "فشل الدفع — تم إلغاء الطلب وإعادة المخزون" },
       });
     });
-    return { applied: true, changed: true, orderStatus: "CANCELLED", paymentStatus: "FAILED" };
+    return { applied: true, changed: releasedByThisCall, orderStatus: "CANCELLED", paymentStatus: "FAILED" };
   }
 
   if (moyasarStatus === "refunded") {
@@ -86,21 +112,30 @@ export async function applyMoyasarPaymentStatus(orderId: string, moyasarStatus: 
     // الاسترداد يعني الطلب كان مدفوعاً وتم إرجاع المبلغ — نُعيد المخزون فقط
     // لو لم يُعَد مسبقاً (أي لو الطلب لم يكن CANCELLED من قبل)
     const shouldReleaseStock = order.status !== "CANCELLED" && order.status !== "REFUNDED";
+    // ⚠️ حارس تزامن (نفس مبدأ الفرعين أعلاه): updateMany بشرط WHERE يضمن
+    // أن استرداداً واحداً فقط من بين نداءين متزامنين "يفوز" ويُرجع المخزون
+    // ويرسل الإشعار — لا مرتين لنفس الطلب.
+    let refundedByThisCall = false;
     await prisma.$transaction(async (tx) => {
+      const guard = await tx.order.updateMany({
+        where: { id: order.id, paymentStatus: { not: "REFUNDED" } },
+        data: { paymentStatus: "REFUNDED", status: "REFUNDED" },
+      });
+      if (guard.count === 0) return; // خسرنا السباق — نداء آخر تولّى الأمر فعلاً
+      refundedByThisCall = true;
       if (shouldReleaseStock) {
         await releaseStock(
           tx,
           order.items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity }))
         );
       }
-      await tx.order.update({
-        where: { id: order.id },
-        data: { paymentStatus: "REFUNDED", status: "REFUNDED" },
-      });
       await tx.orderStatusHistory.create({
         data: { orderId: order.id, status: "REFUNDED", note: "تم استرداد المبلغ عبر Moyasar" },
       });
     });
+    if (!refundedByThisCall) {
+      return { applied: true, changed: false, orderStatus: "REFUNDED", paymentStatus: "REFUNDED" };
+    }
     createNotification({
       userId: order.buyerId,
       type: "PAYMENT",

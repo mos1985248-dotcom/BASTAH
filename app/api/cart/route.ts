@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser, AuthError } from "@/lib/auth";
+import { readAttributionCookie, recordEvent } from "@/lib/analytics";
 import { z } from "zod";
 
 const addSchema = z.object({
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     const product = await prisma.product.findUnique({
       where: { id: productId },
-      select: { id: true, status: true, variants: { select: { id: true, quantity: true } } },
+      select: { id: true, status: true, storeId: true, variants: { select: { id: true, quantity: true } } },
     });
     if (!product || product.status !== "ACTIVE") {
       return NextResponse.json({ error: "هذا المنتج غير متاح حالياً" }, { status: 404 });
@@ -95,6 +96,12 @@ export async function POST(req: NextRequest) {
           data: { userId: user.id, productId, variantId, quantity },
           select: CART_ITEM_SELECT,
         });
+
+    const attribution = readAttributionCookie(req);
+    await recordEvent({
+      type: "ADD_TO_CART", storeId: product.storeId, productId: product.id,
+      utmSource: attribution?.utmSource, utmMedium: attribution?.utmMedium, utmCampaign: attribution?.utmCampaign,
+    });
 
     return NextResponse.json({ item }, { status: 201 });
   } catch (err) {

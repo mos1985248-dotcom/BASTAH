@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { readUtmFromUrl, persistAttributionCookie, recordEvent } from "@/lib/analytics";
 
 interface Params {
   params: { slug: string };
@@ -34,10 +35,16 @@ export async function POST(req: NextRequest, { params }: Params) {
       },
     });
 
+    // ⚠️ الواجهة الآن تُمرّر رابط الصفحة كاملاً (StoreDetailClient) — وسم utm
+    // يُقرأ من هنا، ويُحفَظ كإسناد أول لمسة لو كانت هذه أول زيارة موسومة.
+    const utm = readUtmFromUrl(req.url);
+    await recordEvent({ type: "STORE_VIEW", storeId: store.id, ...utm });
+
     const res = NextResponse.json({ success: true });
     if (!alreadyVisitedToday) {
       res.cookies.set(cookieName, "1", { maxAge: 60 * 60 * 24, path: "/", sameSite: "lax" });
     }
+    persistAttributionCookie(req, res, utm);
     return res;
   } catch (err) {
     // فشل تسجيل الزيارة ما يجب يكسر تجربة تصفّح المتجر — نتجاهل بصمت

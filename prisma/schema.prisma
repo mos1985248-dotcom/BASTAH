@@ -309,6 +309,8 @@ model Store {
   storeShipping   StoreShipping[]
   shippingRates   ShippingRate[]
   daftariProductCosts DaftariProductCost[]
+  analyticsEvents     AnalyticsEvent[]
+  marketingConnections MarketingProviderConnection[]
 
   @@index([status])
   @@index([verificationStatus])
@@ -679,6 +681,7 @@ model Product {
   cartItems       CartItem[]
   daftariCost     DaftariProductCost?
   productImages   ProductImage[]
+  analyticsEvents AnalyticsEvent[]
 
   @@unique([storeId, slug])
   @@index([storeId, status])
@@ -796,6 +799,8 @@ model Order {
   review          Review?
   daftariEntries  DaftariEntry[]
   shippingRates   ShippingRate[]
+  attribution     OrderAttribution?
+  analyticsEvents AnalyticsEvent[]
 
   @@index([storeId, status])
   @@index([buyerId, createdAt])
@@ -1556,6 +1561,101 @@ model PlatformSetting {
 }
 
 // ======================================================
+// COMMERCE ANALYTICS — تجهيز مبدأ الربط بأي منصة خارجية
+// ======================================================
+// ⚠️ التصميم مقصود أن يكون عاماً لا مرتبطاً بمنصة بعينها (لينز اليوم،
+// فيسبوك/تيك توك/سناب لاحقاً): بدل enum مصدر ثابت يحتاج migration مع كل
+// منصة جديدة، نلتقط utmSource/utmMedium/utmCampaign — المعيار القياسي
+// الذي تستخدمه كل منصات الإعلانات والمحتوى أصلاً لوسم روابطها. فتح "ربط"
+// منصة جديدة لاحقاً لا يحتاج أي تعديل هنا — فقط رابط بوسم utm صحيح.
+
+enum AnalyticsEventType {
+  STORE_VIEW
+  PRODUCT_VIEW
+  PRODUCT_CLICK           // نقرة على بطاقة منتج (بلا فتح صفحته الكاملة بعد)
+  ADD_TO_CART
+  CHECKOUT_STARTED
+  ORDER_CREATED
+  ORDER_PAID
+  CONTENT_PRODUCT_CLICK   // نقرة منتج داخل محتوى تسويقي (MarketingContent)
+  CAMPAIGN_CLICK
+}
+
+// سجل وقائع تجاري واحد يخدم كل وحدات "التسويق والتحليلات" — لا تكرار لأي
+// جدول إحصاء موجود (StoreAnalytics يبقى للعدّاد اليومي المبسَّط للمتجر).
+model AnalyticsEvent {
+  id        String             @id @default(cuid())
+  type      AnalyticsEventType
+
+  storeId   String
+  store     Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+  orderId   String?
+  order     Order?             @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  campaignId String?
+  campaign   AdCampaign?       @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  // محتوى تسويقي أُنشئ داخل بسطة ماركت نفسها (راجع MarketingContent)
+  contentId  String?
+  content    MarketingContent? @relation(fields: [contentId], references: [id], onDelete: SetNull)
+
+  // ⚠️ وسم المصدر القياسي (UTM) — "lens"/"facebook"/"tiktok"/"snapchat"/
+  // أي منصة أخرى مستقبلاً، بلا أي تعديل بنية. فاضية لتصفّح مباشر بالمنصة.
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+
+  sessionId String?  // ربط زائر مجهول عبر خطوات القمع قبل تسجيل الدخول
+  amount    Float?   // قيمة الطلب وقت ORDER_CREATED/ORDER_PAID (تسهيل تجميع الإيراد)
+
+  createdAt DateTime @default(now())
+
+  @@index([storeId, createdAt])
+  @@index([storeId, type])
+  @@index([productId])
+  @@index([utmSource])
+  @@map("analytics_events")
+}
+
+// إسناد الطلب لمصدره الأصلي — اختياري تماماً (ليس كل طلب له إسناد)، ولا يُنشأ
+// إلا إذا وصل الزائر فعلاً عبر رابط بوسم utm.
+model OrderAttribution {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  productId   String?  // أول منتج قاد لهذا الطلب (attribution بلمسة أخيرة)
+  createdAt   DateTime @default(now())
+
+  @@map("order_attributions")
+}
+
+// ⚠️ النصف الآخر من "الربط": ليس استقبال زيارات موسومة (أعلاه، لا يحتاج
+// مفتاحاً) بل نشر محتوى/قراءة أداء إعلانات فعلياً عند منصة خارجية — هنا
+// فعلاً نحتاج بيانات اعتماد التاجر عندها. صف واحد لكل (متجر، منصة)، بنفس
+// نمط StoreShipping/ShippingProviderConfig تماماً: JSON مشفّر (lib/crypto.ts،
+// AES-256-GCM) لأن شكل الحقول يختلف كلياً بين منصة وأخرى (Meta Conversions
+// API يحتاج pixelId+accessToken، TikTok يحتاج شيئاً آخر...). كل Provider
+// فعلي مستقبلي يطبّق MarketingProvider (lib/marketing/provider.interface.ts)
+// ويُقرأ هذا الصف بواسطته — لا تعديل هنا عند إضافة منصة جديدة.
+model MarketingProviderConnection {
+  id             String    @id @default(cuid())
+  storeId        String
+  store          Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  provider       String    // "lens" | "facebook" | "tiktok" | "snapchat" | ... نص حر عمداً
+  credentialsEnc String
+  isActive       Boolean   @default(true)
+  connectedAt    DateTime  @default(now())
+  lastTestedAt   DateTime?
+  lastTestOk     Boolean?
+
+  @@unique([storeId, provider])
+  @@map("marketing_provider_connections")
+}
+
+// ======================================================
 // MARKETING (القسم ٣ — بنية فقط، بدون أي Provider حقيقي)
 // ======================================================
 // ⚠️ لا يوجد أي تكامل فعلي مع إنستقرام/لينز/أي منصة فيديو بهذه المرحلة.
@@ -1580,6 +1680,7 @@ model MarketingContent {
   createdAt     DateTime               @default(now())
 
   metric        ConversionMetric?
+  analyticsEvents AnalyticsEvent[]
 
   @@index([storeId])
   @@map("marketing_content")
@@ -1611,6 +1712,7 @@ model AdCampaign {
   budget    Float
   status    AdCampaignStatus @default(DRAFT)
   createdAt DateTime         @default(now())
+  analyticsEvents AnalyticsEvent[]
 
   @@index([storeId])
   @@map("ad_campaigns")
