@@ -377,3 +377,12 @@ export const productVariantsSchema = z
       seen.add(key);
     });
   });
+
+// ── ربط منصات تسويق خارجية (لينز/فيسبوك/تيك توك/سناب...) — حقول حرة عمداً
+// لأن بيانات الاعتماد تختلف كلياً من منصة لأخرى (راجع MarketingProviderConnection) ──
+export const upsertMarketingConnectionSchema = z.object({
+  provider: z.string().trim().min(2, "اسم المنصة مطلوب").max(30),
+  credentials: z
+    .record(z.string().max(500))
+    .refine((v) => Object.keys(v).length > 0, "أدخلي بيانات اعتماد المنصة"),
+});

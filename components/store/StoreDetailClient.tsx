@@ -38,8 +38,10 @@ export default function StoreDetailClient() {
 
         setStore(store);
 
-        // تسجيل الزيارة — fire-and-forget
-        api.post(`/api/stores/${slug}/visit`, {}).catch(() => {});
+        // تسجيل الزيارة — fire-and-forget. نمرّر وسم utm الحالي (إن وُجد)
+        // عبر رابط الطلب نفسه حتى يسجّله السيرفر ويحفظ كوكي الإسناد.
+        const utmQuery = typeof window !== "undefined" ? window.location.search : "";
+        api.post(`/api/stores/${slug}/visit${utmQuery}`, {}).catch(() => {});
       } catch (err) {
         if (!active) return;
 

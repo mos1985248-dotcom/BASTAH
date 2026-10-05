@@ -28,6 +28,7 @@ import { computeVat } from "@/lib/tax";
 import { getCodFee } from "@/lib/platform-settings";
 import { decryptSecret } from "@/lib/crypto";
 import { resolveCheckoutItems, computeShippingCost, CheckoutItemError, ShippingCalcError } from "@/lib/checkout-pricing";
+import { readAttributionCookie, recordEvent } from "@/lib/analytics";
 
 function generateOrderNumber(): string {
   const ts = Date.now().toString().slice(-6);
@@ -198,6 +199,33 @@ export async function POST(req: NextRequest) {
 
       return newOrder;
     });
+
+    // ⚠️ تحليلات التسويق: نفس وسم utm المحفوظ أول لمسة (راجع lib/analytics.ts)
+    // يُنسَب له هذا الطلب — مرة واحدة فقط هنا بغض النظر عن طريقة الدفع،
+    // لأن المسارات الثلاثة أدناه (COD/تحويل بنكي/Moyasar) كلها تمر من هنا أولاً.
+    // ⚠️ الطلب نفسه أُنشئ بنجاح فعلاً أعلاه — فشل أي سطر هنا (recordEvent آمن
+    // أصلاً، لكن orderAttribution.create ليس كذلك) يجب ألا يُفشل الشراء بعد
+    // اكتماله فعلياً، فكل القسم داخل try/catch صامت.
+    try {
+      const attribution = readAttributionCookie(req);
+      await recordEvent({
+        type: "ORDER_CREATED", storeId, orderId: order.id, amount: order.total,
+        utmSource: attribution?.utmSource, utmMedium: attribution?.utmMedium, utmCampaign: attribution?.utmCampaign,
+      });
+      if (attribution?.utmSource) {
+        await prisma.orderAttribution.create({
+          data: {
+            orderId: order.id,
+            utmSource: attribution.utmSource,
+            utmMedium: attribution.utmMedium ?? undefined,
+            utmCampaign: attribution.utmCampaign ?? undefined,
+            productId: attribution.productId ?? undefined,
+          },
+        });
+      }
+    } catch (analyticsErr) {
+      console.error("[POST /api/checkout] attribution", analyticsErr);
+    }
 
     // ── الدفع عند الاستلام: لا Moyasar إطلاقاً — الطلب جاهز فوراً ──
     if (isCod) {

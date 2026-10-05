@@ -1,7 +1,9 @@
 // app/dashboard/marketing/page.tsx
-// بنية فقط (القسم ٣) — يستخدم /api/marketing/content و/api/marketing/campaigns
-// الجاهزين فعلياً. كل محتوى/حملة تُنشأ بحالة DRAFT دائماً؛ لا تكامل فعلي
-// مع أي منصة، وكل المقاييس صفر حقيقي حتى يتوفر Provider فعلي لاحقاً.
+// "التسويق والتحليلات": نظرة عامة ومصادر الزيارات حقيقية بالكامل الآن
+// (AnalyticsEvent)، وربط منصات خارجية (تخزين بيانات اعتماد فقط حتى الآن).
+// المحتوى/الحملات أدناه تبقى بنية فقط — تُنشأ بحالة DRAFT دائماً؛ لا تكامل
+// فعلي مع أي منصة لنشر المحتوى بعد، وكل مقاييسها صفر حقيقي حتى يتوفر
+// Provider فعلي (lib/marketing/provider.interface.ts) يستهلك الربط أعلاه.
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,6 +13,8 @@ import { t } from "@/theme";
 import LoadingState from "@/components/admin/ui/LoadingState";
 import ErrorState from "@/components/admin/ui/ErrorState";
 import MarketingStatusBadge from "@/components/dashboard/marketing/MarketingStatusBadge";
+import TrafficOverviewSection from "@/components/dashboard/marketing/TrafficOverviewSection";
+import PlatformConnectionsSection from "@/components/dashboard/marketing/PlatformConnectionsSection";
 
 interface ConversionMetric {
   views: number;
@@ -65,13 +69,15 @@ export default function MarketingPage() {
     <div style={{ padding: t.spacing["4"] }}>
       <div style={{ maxWidth: 780, margin: "0 auto", display: "flex", flexDirection: "column", gap: t.spacing["5"] }}>
         <div>
-          <h1 style={{ fontSize: t.typography.fontSize.xl, color: t.colors.primary[800], margin: `0 0 ${t.spacing["1"]}` }}>التسويق</h1>
+          <h1 style={{ fontSize: t.typography.fontSize.xl, color: t.colors.primary[800], margin: `0 0 ${t.spacing["1"]}` }}>التسويق والتحليلات</h1>
           <p style={{ display: "flex", alignItems: "center", gap: 6, margin: 0, fontSize: 12, color: t.colors.text.mid }}>
             <Info size={13} strokeWidth={1.8} />
-            هذه بنية أولية — لا يوجد ربط فعلي بإنستقرام أو أي منصة بعد. المقاييس تبدأ من صفر حتى يتوفر الربط.
+            المحتوى والحملات أدناه بنية أولية بلا نشر فعلي على أي منصة بعد. النظرة العامة ومصادر الزيارات بيانات حقيقية من متجرك.
           </p>
         </div>
 
+        <TrafficOverviewSection />
+        <PlatformConnectionsSection />
         <ContentSection content={content} onChanged={load} />
         <CampaignsSection campaigns={campaigns} onChanged={load} />
       </div>

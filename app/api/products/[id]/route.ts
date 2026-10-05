@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser, getCurrentUser, AuthError } from "@/lib/auth";
 import { updateProductSchema, formatZodError } from "@/lib/validation";
 import { isSubscriptionInGoodStanding } from "@/lib/subscription-limits";
+import { readUtmFromUrl, persistAttributionCookie, recordEvent } from "@/lib/analytics";
 
 interface Params {
   params: { id: string };
@@ -14,7 +15,7 @@ interface Params {
 // عام للزائر، لكن لو اشتراك المتجر غير سليم (معلّق/منتهي) يُخفى المنتج
 // تماماً عن أي زائر — إلا عن مالك المتجر نفسه أو الإدارة، اللذان يحتاجان
 // رؤيته لإدارته أو معرفة سبب اختفائه (مع تنبيه subscriptionWarning).
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(req: NextRequest, { params }: Params) {
   try {
     const product = await prisma.product.findUnique({
       where: { id: params.id },
@@ -80,7 +81,13 @@ export async function GET(_req: NextRequest, { params }: Params) {
       data: { viewCount: { increment: 1 } },
     });
 
-    return NextResponse.json({ product: responseProduct });
+    // ⚠️ تحليلات التسويق: وسم utm (إن وُجد برابط الزيارة) + حدث PRODUCT_VIEW.
+    // كوكي الإسناد أول لمسة فقط — راجع persistAttributionCookie بـlib/analytics.ts
+    const utm = readUtmFromUrl(req.url);
+    const res = NextResponse.json({ product: responseProduct });
+    persistAttributionCookie(req, res, utm, product.id);
+    await recordEvent({ type: "PRODUCT_VIEW", storeId: product.store.id, productId: product.id, ...utm });
+    return res;
   } catch (err) {
     console.error("[GET /api/products/:id]", err);
     return NextResponse.json({ error: "حدث خطأ في جلب المنتج" }, { status: 500 });

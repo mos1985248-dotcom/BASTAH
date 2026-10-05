@@ -28,8 +28,11 @@ export default function ProductDetailClient() {
   useEffect(() => {
     (async () => {
       try {
+        // ⚠️ نمرّر وسم utm الموجود برابط الصفحة الحالي (إن وُصل الزائر عبره)
+        // حتى يسجّله السيرفر فعلياً — بدونه، مشاهدة المنتج تُحتسب "مباشر"
+        // دائماً حتى لو وصل الزائر من رابط حملة موسوم فعلاً.
         const { product } = await api.get<{ product: ProductDetail }>(
-          `/api/products/${id}`
+          `/api/products/${id}${typeof window !== "undefined" ? window.location.search : ""}`
         );
         setProduct(product);
       } catch (err) {
