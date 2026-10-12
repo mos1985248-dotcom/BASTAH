@@ -1,3 +1,4 @@
+
 // components/layout/Footer.tsx
 
 import { t } from "@/theme";
@@ -10,9 +11,9 @@ export default function Footer() {
     <footer
       dir="rtl"
       style={{
-        background: t.colors.primary[950],
+        background: t.colors.primary[900],
         marginTop: t.spacing["16"],
-        borderTop: `1px solid ${t.colors.primary[800]}`,
+        borderTop: `1px solid ${t.colors.primary[700]}`,
         color: t.colors.text.onDark,
       }}
     >
@@ -20,7 +21,7 @@ export default function Footer() {
 
       <div
         style={{
-          borderTop: `1px solid rgba(255,255,255,0.08)`,
+          borderTop: "1px solid rgba(255,255,255,0.12)",
         }}
       >
         <FooterColumns />
@@ -28,7 +29,7 @@ export default function Footer() {
 
       <div
         style={{
-          borderTop: `1px solid rgba(255,255,255,0.10)`,
+          borderTop: "1px solid rgba(255,255,255,0.12)",
         }}
       >
         <FooterBottom />

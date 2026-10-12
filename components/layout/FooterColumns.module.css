@@ -1,23 +1,24 @@
+
+/* ========================================
+   FOOTER COLUMNS
+   Basita — Brand Identity
+======================================== */
+
 .grid {
   width: 100%;
   margin: 0 auto;
-
   padding: 64px 32px 58px;
-
   display: grid;
   grid-template-columns:
     minmax(330px, 1.7fr)
     repeat(4, minmax(150px, 1fr));
-
   gap: 48px;
-
   box-sizing: border-box;
 }
 
-
-/* =========================================================
+/* ========================================
    BRAND
-   ========================================================= */
+======================================== */
 
 .brandSection {
   min-width: 0;
@@ -27,33 +28,28 @@
 .brandHeader {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 13px;
 }
 
-.logoBox {
-  width: 64px;
-  height: 64px;
-  flex: 0 0 64px;
+/* شعار بسطة — خلفية بيضاء وحجم متوازن */
 
+.logoBox {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background: #ffffff;
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 18px;
-
-  box-shadow:
-    0 8px 22px rgba(0, 0, 0, 0.14);
-
+  background: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.12);
   overflow: hidden;
 }
 
 .logo {
-  width: 48px;
-  height: 48px;
-
+  width: 38px;
+  height: 38px;
   display: block;
   object-fit: contain;
 }
@@ -64,24 +60,19 @@
 
 .brandTitle {
   margin: 0;
-
-  color: #ffffff;
-
+  color: var(--color-text-on-dark);
   font-family:
     var(--font-kufi-arabic),
     "Noto Kufi Arabic",
     sans-serif;
-
-  font-size: 26px;
-  line-height: 1.35;
+  font-size: 23px;
+  line-height: 1.4;
   font-weight: 700;
 }
 
 .brandSubtitle {
   margin-top: 5px;
-
-  color: #d8e4df;
-
+  color: var(--color-text-on-dark-muted);
   font-size: 14px;
   line-height: 1.7;
   font-weight: 500;
@@ -90,30 +81,23 @@
 .brandAccent {
   width: 52px;
   height: 4px;
-
   margin: 22px 0 18px;
-
-  border-radius: 999px;
-
-  background: #c9973a;
+  border-radius: var(--radius-full);
+  background: var(--color-gold-600);
 }
 
 .description {
   max-width: 430px;
-
   margin: 0;
-
-  color: #d5dfdb;
-
+  color: #D5DFDB;
   font-size: 15px;
   line-height: 2;
   font-weight: 400;
 }
 
-
-/* =========================================================
+/* ========================================
    SOCIAL
-   ========================================================= */
+======================================== */
 
 .socialSection {
   margin-top: 30px;
@@ -121,9 +105,7 @@
 
 .socialTitle {
   margin: 0 0 13px;
-
-  color: #ffffff;
-
+  color: var(--color-text-on-dark);
   font-size: 15px;
   line-height: 1.6;
   font-weight: 700;
@@ -139,42 +121,34 @@
 .social {
   width: 42px;
   height: 42px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  color: #e6eee9;
-
+  color: #E6EEE9;
   background: rgba(255, 255, 255, 0.07);
-
   border: 1px solid rgba(255, 255, 255, 0.13);
-
-  border-radius: 12px;
-
+  border-radius: var(--radius-md);
   text-decoration: none;
-
   box-sizing: border-box;
-
   transition:
-    color 200ms ease,
-    background-color 200ms ease,
-    border-color 200ms ease,
-    transform 200ms ease,
-    box-shadow 200ms ease;
+    color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease);
 }
 
 .social:hover {
-  color: #ffffff;
-
-  background: #215b49;
-
-  border-color: #c9973a;
-
+  color: var(--color-white);
+  background: var(--color-primary-600);
+  border-color: var(--color-gold-600);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
 
-  box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.18);
+.social:focus-visible {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 3px;
 }
 
 .xIcon {
@@ -183,10 +157,9 @@
   font-weight: 600;
 }
 
-
-/* =========================================================
+/* ========================================
    COLUMNS
-   ========================================================= */
+======================================== */
 
 .column {
   min-width: 0;
@@ -196,96 +169,73 @@
   display: flex;
   align-items: center;
   gap: 10px;
-
   margin-bottom: 20px;
 }
 
 .columnMarker {
   width: 4px;
   height: 21px;
-
   flex: 0 0 4px;
-
-  border-radius: 999px;
-
-  background: #c9973a;
+  border-radius: var(--radius-full);
+  background: var(--color-gold-600);
 }
 
 .columnTitle {
   margin: 0;
-
-  color: #ffffff;
-
+  color: var(--color-text-on-dark);
   font-family:
     var(--font-kufi-arabic),
     "Noto Kufi Arabic",
     sans-serif;
-
   font-size: 17px;
   line-height: 1.55;
   font-weight: 700;
 }
 
-
-/* =========================================================
+/* ========================================
    LINKS
-   ========================================================= */
+======================================== */
 
 .links {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-
   gap: 4px;
 }
 
 .link {
   min-height: 39px;
-
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   gap: 12px;
-
   padding: 6px 0;
-
-  color: #cbd8d3;
-
+  color: #CBD8D3;
   font-size: 15px;
   line-height: 1.7;
   font-weight: 400;
-
   text-decoration: none;
-
-  border-radius: 8px;
-
+  border-radius: var(--radius-sm);
   transition:
-    color 200ms ease,
-    background-color 200ms ease,
-    padding 200ms ease;
+    color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    padding var(--motion-fast) var(--motion-ease);
 }
 
 .linkArrow {
   opacity: 0;
-
-  color: #d2a34a;
-
+  color: var(--color-gold-500);
   font-size: 15px;
   line-height: 1;
-
   transform: translateX(6px);
-
   transition:
-    opacity 200ms ease,
-    transform 200ms ease;
+    opacity var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
 
 .link:hover {
   padding-right: 9px;
-
-  color: #ffffff;
-
+  color: var(--color-white);
   background: rgba(255, 255, 255, 0.055);
 }
 
@@ -294,19 +244,21 @@
   transform: translateX(0);
 }
 
+.link:focus-visible {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 3px;
+}
 
-/* =========================================================
+/* ========================================
    TABLET
-   ========================================================= */
+======================================== */
 
 @media (max-width: 1150px) {
   .grid {
     grid-template-columns:
       minmax(290px, 1.45fr)
       repeat(4, minmax(125px, 1fr));
-
     gap: 30px;
-
     padding-left: 24px;
     padding-right: 24px;
   }
@@ -324,25 +276,20 @@
   }
 }
 
-
-/* =========================================================
+/* ========================================
    SMALL DESKTOP / TABLET
-   ========================================================= */
+======================================== */
 
 @media (max-width: 950px) {
   .grid {
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
-
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 40px 30px;
   }
 
   .brandSection {
     grid-column: 1 / -1;
-
     padding-left: 0;
     padding-bottom: 20px;
-
     border-bottom: 1px solid rgba(255, 255, 255, 0.10);
   }
 
@@ -359,22 +306,15 @@
   }
 }
 
-
-/* =========================================================
+/* ========================================
    MOBILE
-   ========================================================= */
+======================================== */
 
 @media (max-width: 640px) {
   .grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 34px 22px;
-
-    padding:
-      46px
-      20px
-      42px;
+    padding: 46px 20px 42px;
   }
 
   .brandSection {
@@ -382,7 +322,7 @@
   }
 
   .brandTitle {
-    font-size: 23px;
+    font-size: 21px;
   }
 
   .brandSubtitle {
@@ -409,40 +349,35 @@
   }
 }
 
-
-/* =========================================================
+/* ========================================
    SMALL MOBILE
-   ========================================================= */
+======================================== */
 
 @media (max-width: 430px) {
   .grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 30px 18px;
-
-    padding:
-      40px
-      16px
-      36px;
+    padding: 40px 16px 36px;
   }
 
   .logoBox {
-    width: 56px;
-    height: 56px;
-
-    flex-basis: 56px;
-
-    border-radius: 15px;
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+    border-radius: 13px;
   }
 
   .logo {
-    width: 43px;
-    height: 43px;
+    width: 35px;
+    height: 35px;
+  }
+
+  .brandHeader {
+    gap: 11px;
   }
 
   .brandTitle {
-    font-size: 21px;
+    font-size: 20px;
   }
 
   .brandSubtitle {
