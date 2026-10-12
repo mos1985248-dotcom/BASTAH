@@ -17,6 +17,7 @@ import BlogTab from "@/components/admin/BlogTab";
 import AuditTab from "@/components/admin/AuditTab";
 import SettingsSection from "@/components/admin/sections/SettingsSection";
 import ShippingProvidersSection from "@/components/admin/sections/ShippingProvidersSection";
+import IntegrationsSection from "@/components/admin/sections/IntegrationsSection";
 
 // ⚠️ ملاحظة انتقالية: أقسام "نظرة عامة/المتاجر/المستخدمون/الدعم/المدونة/
 // سجل العمليات" لا تزال تستخدم مكوّناتها القديمة كما هي (تعمل فعلياً،
@@ -59,6 +60,7 @@ export default function AdminPage() {
           {section === "blog" && <BlogTab />}
           {section === "settings" && <SettingsSection />}
           {section === "shipping" && <ShippingProvidersSection />}
+          {section === "integrations" && <IntegrationsSection />}
           {section === "audit" && <AuditTab />}
         </div>
       </div>
