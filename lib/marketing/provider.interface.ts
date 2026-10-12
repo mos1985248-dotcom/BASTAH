@@ -1,7 +1,12 @@
 // lib/marketing/provider.interface.ts
 //
-// ⚠️ عقد قديم غير مستخدم حالياً. نظام التكاملات الفعلي المركزي في lib/integrations/
-// (محرك + Provider Registry + Event Catalog). يُبقى هذا الملف لعدم حذف ما كان في main.
+// ⚠️ لا يوجد أي Provider حقيقي بهذا الملف ولا بأي ملف آخر بهذه المرحلة —
+// هذا عقد (interface) فقط، جاهز ليطبّقه لاحقاً أي مزود فعلي (إنستقرام،
+// TikTok، يوتيوب، إلخ) عند توفر مفتاح API/OAuth حقيقي. لا كود هنا يتصل
+// بأي شبكة خارجية إطلاقاً.
+//
+// TODO: يحتاج مفتاح API/OAuth فعلي عند التفعيل — راجع كل provider مستقبلي
+// (مثال: lib/marketing/providers/instagram.provider.ts) لتفاصيل الربط.
 
 export type MarketingContentStatus = "DRAFT" | "PENDING_CONNECTION" | "PUBLISHED" | "FAILED";
 
@@ -45,12 +50,9 @@ export interface MarketingProvider {
   /** نشر محتوى على منصة المزود */
   postContent(input: PostContentInput): Promise<PostContentResult>;
 
-  /** اختياري: إرسال حدث تجاري عام (مثل cart.abandoned) للطرف الآخر */
-  sendEvent?(event: string, data: Record<string, unknown>): Promise<{ success: boolean; errorMessage?: string }>;
+  /** جلب مقاييس تحويل محتوى منشور فعلياً */
+  getConversionMetrics(externalContentId: string): Promise<ConversionMetricsResult>;
 
-  /** اختياري: جلب مقاييس محتوى منشور من المنصة نفسها — غير مدعوم عند كل المنصات */
-  getConversionMetrics?(externalContentId: string): Promise<ConversionMetricsResult>;
-
-  /** اختياري: جلب أداء حملة إعلانية فعلية عند المزود */
-  getAdPerformance?(externalCampaignId: string): Promise<AdPerformanceResult>;
+  /** جلب أداء حملة إعلانية فعلية عند المزود */
+  getAdPerformance(externalCampaignId: string): Promise<AdPerformanceResult>;
 }

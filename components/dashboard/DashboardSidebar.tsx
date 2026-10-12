@@ -25,7 +25,6 @@ import {
   ChevronDown,
   Landmark,
   Megaphone,
-  Plug,
   type LucideIcon,
 } from "lucide-react";
 
@@ -112,11 +111,6 @@ const STORE_GROUP: NavGroup = {
       href: "/dashboard/marketing",
       label: "التسويق",
       Icon: Megaphone,
-    },
-    {
-      href: "/dashboard/integrations",
-      label: "التكاملات",
-      Icon: Plug,
     },
     {
       href: "/dashboard/munira",

@@ -1,7 +1,9 @@
 // app/dashboard/marketing/page.tsx
-// "التسويق والتحليلات": نظرة عامة ومصادر الزيارات حقيقية بالكامل (AnalyticsEvent).
-// المحتوى يُنشأ DRAFT ثم يُرسل بزر صريح عبر نظام التكاملات (ربط الحسابات من صفحة التكاملات).
-// الحملات الإعلانية تبقى DRAFT — لا إطلاق فعلي بلا Provider أصلي للإعلانات.
+// "التسويق والتحليلات": نظرة عامة ومصادر الزيارات حقيقية بالكامل الآن
+// (AnalyticsEvent)، وربط منصات خارجية (تخزين بيانات اعتماد فقط حتى الآن).
+// المحتوى/الحملات أدناه تبقى بنية فقط — تُنشأ بحالة DRAFT دائماً؛ لا تكامل
+// فعلي مع أي منصة لنشر المحتوى بعد، وكل مقاييسها صفر حقيقي حتى يتوفر
+// Provider فعلي (lib/marketing/provider.interface.ts) يستهلك الربط أعلاه.
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,8 +14,7 @@ import LoadingState from "@/components/admin/ui/LoadingState";
 import ErrorState from "@/components/admin/ui/ErrorState";
 import MarketingStatusBadge from "@/components/dashboard/marketing/MarketingStatusBadge";
 import TrafficOverviewSection from "@/components/dashboard/marketing/TrafficOverviewSection";
-import AbandonedCartsSection from "@/components/dashboard/marketing/AbandonedCartsSection";
-import PublishContentButton from "@/components/dashboard/marketing/PublishContentButton";
+import PlatformConnectionsSection from "@/components/dashboard/marketing/PlatformConnectionsSection";
 
 interface ConversionMetric {
   views: number;
@@ -76,7 +77,7 @@ export default function MarketingPage() {
         </div>
 
         <TrafficOverviewSection />
-        <AbandonedCartsSection />
+        <PlatformConnectionsSection />
         <ContentSection content={content} onChanged={load} />
         <CampaignsSection campaigns={campaigns} onChanged={load} />
       </div>
@@ -162,7 +163,6 @@ function ContentSection({ content, onChanged }: { content: MarketingContentRow[]
               <p style={{ margin: 0, fontSize: 11, color: t.colors.text.light }}>
                 {c.providerName ?? "غير مربوط بأي منصة بعد"}
               </p>
-              <PublishContentButton contentId={c.id} status={c.status} onDone={onChanged} />
               <div style={{ display: "flex", gap: t.spacing["4"], marginTop: 2 }}>
                 <Metric icon={Eye} label="مشاهدات" value={c.metric?.views ?? 0} />
                 <Metric icon={MousePointerClick} label="نقرات للمنتج" value={c.metric?.clicksToProduct ?? 0} />
