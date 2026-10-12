@@ -23,7 +23,7 @@ const STATUS_STYLE: Record<
   },
 
   PUBLISHED: {
-    label: "منشور",
+    label: "أُرسل للنشر",
     color: t.colors.semantic.success,
     bg: t.colors.semantic.successBg,
   },
