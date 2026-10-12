@@ -1,13 +1,14 @@
 // app/cart/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { ShoppingBag, ShoppingCart, AlertTriangle, Info, ArrowLeft } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { useCurrentUser } from "../providers";
 import { useAddressBook } from "@/hooks/useAddressBook";
 import { t } from "@/theme";
 import SiteShell from "@/components/layout/SiteShell";
+import CartContactConsent from "@/components/cart/CartContactConsent";
 import CartStoreGroup from "@/components/cart/CartStoreGroup";
 import CartTrustBar from "@/components/cart/CartTrustBar";
 import CartRelatedProducts from "@/components/cart/CartRelatedProducts";
@@ -161,8 +162,8 @@ export default function CartPage() {
             )}
 
             {Object.entries(groups).map(([storeId, g]) => (
+              <Fragment key={storeId}>
               <CartStoreGroup
-                key={storeId}
                 storeId={storeId}
                 storeName={g.storeName}
                 items={g.items}
@@ -173,6 +174,8 @@ export default function CartPage() {
                 onRemove={removeItem}
                 onToggleFavorite={toggleFavorite}
               />
+              <CartContactConsent storeId={storeId} storeName={g.storeName} />
+              </Fragment>
             ))}
 
             <CartTrustBar />
