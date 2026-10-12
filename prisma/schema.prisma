@@ -120,7 +120,6 @@ enum AuditAction {
   PRODUCT_REMOVED
   PAYOUT_PROCESSED
   SHIPPING_PROVIDER_ADDED
-  MARKETING_HUB_CONFIGURED
 }
 
 enum TicketStatus {
@@ -198,8 +197,6 @@ model User {
   reviews         Review[]
   wishlist        WishlistItem[]
   cartItems       CartItem[]
-  abandonedCarts  AbandonedCart[]
-  cartContactConsents CartContactConsent[]
   chatSessions    ChatSession[]
   notifications   Notification[]
   supportTickets  SupportTicket[]
@@ -314,9 +311,6 @@ model Store {
   daftariProductCosts DaftariProductCost[]
   analyticsEvents     AnalyticsEvent[]
   marketingConnections MarketingProviderConnection[]
-  abandonedCarts      AbandonedCart[]
-  cartContactConsents CartContactConsent[]
-  marketingLinks      StoreMarketingLink[]
 
   @@index([status])
   @@index([verificationStatus])
@@ -1818,79 +1812,4 @@ model CityCourier {
 
   @@index([city, isActive])
   @@map("city_couriers")
-}
-
-// ======================================================
-// ABANDONED CARTS (سلات متروكة)
-// ======================================================
-// سجل واحد لكل (مشتري، متجر) — السلة متعددة المتاجر تُعدّ سلة متروكة
-// منفصلة لكل متجر (كل متجر له checkout مستقل). لا نسخ للمنتجات هنا:
-// نخزّن فقط العدد والقيمة وقت الاكتشاف؛ تفاصيل المنتجات تأتي من CartItem
-// الحي. الاسترداد (RECOVERED) يُحسب بالكرون من وجود طلب لاحق للمشتري بنفس
-// المتجر — بلا أي تعديل على مسار checkout.
-enum AbandonedCartStatus {
-  DETECTED    // اكتُشفت ولم يُرسل أي تذكير بعد
-  REMINDED    // أُرسل تذكير للمشتري
-  RECOVERED   // أنشأ المشتري طلباً بعد التذكير
-}
-
-model AbandonedCart {
-  id             String              @id @default(cuid())
-  userId         String
-  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  storeId        String
-  store          Store               @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  status         AbandonedCartStatus @default(DETECTED)
-  itemCount      Int
-  cartValue      Float               // مجموع السعر × الكمية وقت الاكتشاف (قبل شحن/ضريبة)
-  cartUpdatedAt  DateTime            // آخر تعديل على سلة هذا المتجر وقت الاكتشاف
-  detectedAt     DateTime            @default(now())
-  remindedAt     DateTime?
-  merchantEventSentAt DateTime?      // وقت إرسال حدث cart.abandoned عبر الويب هوك (إن وُجد ربط)
-  recoveredAt    DateTime?
-  recoveredOrderId String?
-  recoveredValue Float?              // total الطلب الذي استرد السلة
-
-  @@unique([userId, storeId])
-  @@index([storeId, detectedAt])
-  @@index([status])
-  @@map("abandoned_carts")
-}
-
-// موافقة المشتري الصريحة على مشاركة اسمه وجواله مع متجر محدد لتذكيره بسلته.
-// الافتراضي: لا موافقة (لا صف). لكل (مشتري، متجر) صف واحد؛ الإلغاء = revokedAt
-// (يُحترم فوراً عند الإرسال التالي؛ ما أُرسل سابقاً لا يمكن استرجاعه).
-model CartContactConsent {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  storeId   String
-  store     Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  grantedAt DateTime  @default(now())
-  revokedAt DateTime?
-
-  @@unique([userId, storeId])
-  @@index([storeId])
-  @@map("cart_contact_consents")
-}
-
-// ======================================================
-// INTEGRATIONS — حسابات المتجر الخارجية
-// ======================================================
-// نظام التكاملات مركزي (lib/integrations/): الإدارة تضبط المزوّدين وتوجيه الأحداث
-// (PlatformSetting، مشفّر)، والتاجر لا يدخل أي مفتاح — يربط حساباته الخارجية فقط
-// أو يلغيها. وجود حساب واحد على الأقل = موافقة التاجر على إرسال أحداث متجره.
-// ⚠️ اسم الجدول والنموذج قديمان عمداً (لا migration لمجرد إعادة التسمية).
-// MarketingProviderConnection أعلاه قديم لم يعد يُستخدم.
-model StoreMarketingLink {
-  id        String   @id @default(cuid())
-  storeId   String
-  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  platform  String   // نوع الحساب — مفتاح من lib/integrations/account-types.ts (instagram | tiktok | ...)
-  url       String
-  createdAt DateTime @default(now())
-
-  @@unique([storeId, platform])
-  @@index([storeId])
-  @@map("store_marketing_links")
 }
