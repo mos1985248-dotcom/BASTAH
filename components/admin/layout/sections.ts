@@ -4,6 +4,7 @@ import {
   ClipboardList,
   Headset,
   LayoutDashboard,
+  Plug,
   Newspaper,
   Settings,
   Store,
@@ -20,6 +21,7 @@ export type AdminSection =
   | "blog"
   | "settings"
   | "shipping"
+  | "integrations"
   | "audit";
 
 export const ADMIN_SECTIONS: {
@@ -61,6 +63,11 @@ export const ADMIN_SECTIONS: {
     id: "shipping",
     label: "شركات الشحن",
     Icon: Truck,
+  },
+  {
+    id: "integrations",
+    label: "التكاملات",
+    Icon: Plug,
   },
   {
     id: "audit",
