@@ -8,7 +8,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 interface CurrentUser {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   avatar: string | null;
   role: "BUYER" | "SELLER" | "ADMIN" | "SUPER_ADMIN";
   isVerified: boolean;

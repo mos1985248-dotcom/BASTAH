@@ -1,5 +1,6 @@
 
 import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import styles from "./PricingHeader.module.css";
 
 export default function PricingHeader({
@@ -13,6 +14,7 @@ export default function PricingHeader({
     <section
       className={styles.header}
       dir="rtl"
+      style={uiVars}
     >
       <div className={styles.inner}>
         <div

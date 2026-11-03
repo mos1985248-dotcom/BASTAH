@@ -7,9 +7,9 @@
 import { useEffect, useState } from "react";
 import { Eye, ShoppingCart, Receipt, TrendingUp } from "lucide-react";
 import { api } from "@/lib/api-client";
-import { t } from "@/theme";
-import LoadingState from "@/components/admin/ui/LoadingState";
-import ErrorState from "@/components/admin/ui/ErrorState";
+import LoadingState from "@/components/dashboard/ui/LoadingState";
+import ErrorState from "@/components/dashboard/ui/ErrorState";
+import s from "./marketing.module.css";
 
 interface Overview {
   views: number; productClicks: number; addToCart: number; checkoutStarted: number;
@@ -52,20 +52,17 @@ export default function TrafficOverviewSection() {
     : [];
 
   return (
-    <section style={{ marginBottom: t.spacing["6"] }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: t.spacing["3"] }}>
-        <h2 style={{ margin: 0, fontSize: t.typography.fontSize.lg, color: t.colors.text.dark }}>نظرة عامة</h2>
-        <div style={{ display: "flex", gap: 6 }}>
+    <section className={s.sec}>
+      <div className={s.head}>
+        <h2 className={s.h2}>نظرة عامة</h2>
+        <div className={s.ranges} role="group" aria-label="الفترة">
           {RANGES.map((r) => (
             <button
               key={r.key}
+              type="button"
               onClick={() => setRange(r.key)}
-              style={{
-                padding: "6px 12px", borderRadius: t.radius.full, fontSize: 12, cursor: "pointer", border: "none",
-                background: range === r.key ? t.colors.primary[800] : t.colors.cream.bg,
-                color: range === r.key ? t.colors.white : t.colors.text.mid,
-                fontWeight: range === r.key ? t.typography.fontWeight.bold : 400,
-              }}
+              aria-pressed={range === r.key}
+              className={`${s.range} ${range === r.key ? s.rangeOn : ""}`}
             >
               {r.label}
             </button>
@@ -78,40 +75,40 @@ export default function TrafficOverviewSection() {
 
       {data && (
         <>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: t.spacing["2"], marginBottom: t.spacing["3"] }}>
+          <div className={s.stats}>
             {cards.map((c) => (
-              <div key={c.label} style={{ background: t.colors.white, borderRadius: t.radius.lg, border: `1px solid ${t.colors.cream.border}`, padding: t.spacing["3"] }}>
-                <c.Icon size={16} strokeWidth={1.8} color={t.colors.primary[800]} />
-                <p style={{ margin: "8px 0 0", fontSize: 20, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>{c.value}</p>
-                <p style={{ margin: "2px 0 0", fontSize: 11, color: t.colors.text.mid }}>{c.label}</p>
+              <div key={c.label} className={s.stat}>
+                <c.Icon size={17} strokeWidth={1.8} />
+                <p className={s.statVal}>{c.value}</p>
+                <p className={s.statLbl}>{c.label}</p>
               </div>
             ))}
-            <div style={{ background: t.colors.gold[50], borderRadius: t.radius.lg, border: `1px solid ${t.colors.gold[200]}`, padding: t.spacing["3"] }}>
-              <p style={{ margin: 0, fontSize: 20, fontWeight: t.typography.fontWeight.bold, color: t.colors.gold[700] }}>{data.overview.revenue.toFixed(0)} ر.س</p>
-              <p style={{ margin: "2px 0 0", fontSize: 11, color: t.colors.text.mid }}>الإيراد المحصَّل</p>
+            <div className={`${s.stat} ${s.statSand}`}>
+              <p className={s.statVal}>{data.overview.revenue.toFixed(0)} ر.س</p>
+              <p className={s.statLbl}>الإيراد المحصَّل</p>
             </div>
           </div>
 
-          <h3 style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.sm, color: t.colors.text.dark }}>مصادر الزيارات</h3>
+          <h3 className={s.h3}>مصادر الزيارات</h3>
           {data.sources.length === 0 ? (
-            <p style={{ fontSize: 12, color: t.colors.text.mid }}>لا بيانات بعد لهذه الفترة.</p>
+            <p className={s.empty}>لا بيانات بعد لهذه الفترة.</p>
           ) : (
-            <div style={{ background: t.colors.white, borderRadius: t.radius.lg, border: `1px solid ${t.colors.cream.border}`, overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "right" }}>
+            <div className={s.tableBox}>
+              <table className={s.table}>
                 <thead>
-                  <tr style={{ color: t.colors.text.mid, borderBottom: `1px solid ${t.colors.cream.border}` }}>
+                  <tr>
                     {["المصدر", "زيارات", "طلبات", "إيراد"].map((h) => (
-                      <th key={h} style={{ padding: "8px 10px", fontWeight: t.typography.fontWeight.bold }}>{h}</th>
+                      <th key={h} scope="col">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {data.sources.map((s) => (
-                    <tr key={s.source} style={{ borderBottom: `1px solid ${t.colors.cream.border}` }}>
-                      <td style={{ padding: "8px 10px", textTransform: "capitalize" }}>{s.source}</td>
-                      <td style={{ padding: "8px 10px" }}>{s.visits}</td>
-                      <td style={{ padding: "8px 10px" }}>{s.orders}</td>
-                      <td style={{ padding: "8px 10px" }}>{s.revenue.toFixed(0)} ر.س</td>
+                  {data.sources.map((src) => (
+                    <tr key={src.source}>
+                      <td className={s.cap}>{src.source}</td>
+                      <td>{src.visits}</td>
+                      <td>{src.orders}</td>
+                      <td>{src.revenue.toFixed(0)} ر.س</td>
                     </tr>
                   ))}
                 </tbody>

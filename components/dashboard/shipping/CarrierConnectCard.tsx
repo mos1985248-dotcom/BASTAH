@@ -7,7 +7,8 @@
 import { useState } from "react";
 import { Truck, AlertTriangle } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
+import f from "../forms.module.css";
+import s from "./shipping.module.css";
 
 export default function CarrierConnectCard({
   carrier,
@@ -38,26 +39,21 @@ export default function CarrierConnectCard({
   };
 
   return (
-    <div style={{ background: t.colors.white, borderRadius: t.radius.lg, border: `1px solid ${t.colors.cream.border}`, padding: t.spacing["4"] }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ width: 32, height: 32, borderRadius: t.radius.md, background: t.colors.cream.warm, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Truck size={16} strokeWidth={1.7} color={t.colors.text.body} />
+    <div className={`${s.card} ${s.cardAvail}`}>
+      <div className={s.cardTop}>
+        <div className={s.lead}>
+          <span className={s.iconBox}>
+            <Truck size={19} strokeWidth={1.7} aria-hidden="true" />
           </span>
-          <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>{displayNameAr}</p>
+          <p className={s.name}>{displayNameAr}</p>
         </div>
-        <button
-          onClick={handleConnect}
-          disabled={saving}
-          style={{ padding: "7px 16px", background: saving ? t.colors.primary[600] : t.colors.primary[800], color: t.colors.white, border: "none", borderRadius: t.radius.full, fontSize: t.typography.fontSize.xs, fontWeight: t.typography.fontWeight.bold, cursor: saving ? "not-allowed" : "pointer" }}
-        >
+        <button type="button" onClick={handleConnect} disabled={saving} className={`${f.btnSm} ${f.btnPrimary}`}>
           {saving ? "جاري التفعيل..." : "تفعيل"}
         </button>
       </div>
-
       {error && (
-        <p style={{ display: "flex", alignItems: "center", gap: 6, margin: `${t.spacing["2"]} 0 0`, fontSize: 12, color: t.colors.semantic.danger }}>
-          <AlertTriangle size={12} strokeWidth={1.8} />
+        <p className={f.err} role="alert">
+          <AlertTriangle size={13} strokeWidth={1.8} aria-hidden="true" />
           {error}
         </p>
       )}

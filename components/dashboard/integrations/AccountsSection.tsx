@@ -6,12 +6,9 @@
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
+import f from "../forms.module.css";
+import s from "./integrations.module.css";
 import type { MerchantIntegrations } from "./types";
-
-const inputStyle: React.CSSProperties = {
-  flex: 1, minWidth: 0, padding: 9, border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, fontSize: 13, boxSizing: "border-box",
-};
 
 export default function AccountsSection({ data, onChanged }: { data: MerchantIntegrations; onChanged: () => void }) {
   const [drafts, setDrafts] = useState<Record<string, string>>({});
@@ -40,33 +37,40 @@ export default function AccountsSection({ data, onChanged }: { data: MerchantInt
   };
 
   return (
-    <section style={{ marginBottom: t.spacing["6"] }}>
-      <h2 style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.lg, color: t.colors.text.dark }}>حساباتك</h2>
-      <p style={{ margin: `0 0 ${t.spacing["3"]}`, fontSize: 12, color: t.colors.text.mid }}>
-        أضيفي رابط حسابك، وتتولى بسطة بقية الربط. بإضافة حساب واحد على الأقل توافقين على إرسال محتواك وأحداث متجرك (مثل السلات المتروكة) إلى نظام التكاملات في بسطة. يمكنك الإلغاء في أي وقت.
+    <section className={s.section}>
+      <h2 className={s.h2}>حساباتك</h2>
+      <p className={s.lead}>
+        أضف رابط حسابك، وتتولى بسطة بقية الربط. بإضافة حساب واحد على الأقل توافق على إرسال محتواك وأحداث متجرك (مثل السلات المتروكة) إلى نظام التكاملات في بسطة. يمكنك الإلغاء في أي وقت.
       </p>
-      {error && <p style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: 12, color: t.colors.semantic.danger }}>{error}</p>}
+      {error && <p className={f.err} role="alert">{error}</p>}
 
-      {data.platforms.length === 0 && <p style={{ fontSize: 13, color: t.colors.text.mid }}>لا توجد أنواع حسابات متاحة حالياً.</p>}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {data.platforms.length === 0 && <p className={s.empty}>لا توجد أنواع حسابات متاحة حالياً.</p>}
+      <div className={f.stackCol}>
         {data.platforms.map((p) => {
           const link = data.links.find((l) => l.platform === p.key);
           const disabled = busy === p.key || !(drafts[p.key] ?? "").trim();
           return (
-            <div key={p.key} style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", background: t.colors.white, border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, padding: "10px 14px" }}>
-              <span style={{ width: 80, fontSize: 13, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>{p.label}</span>
+            <div key={p.key} className={s.account}>
+              <span className={s.platform}>{p.label}</span>
               {link ? (
                 <>
-                  <span dir="ltr" style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 12, color: t.colors.text.mid }}>{link.url}</span>
-                  <button onClick={() => remove(p.key)} disabled={busy === p.key} style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 10px", border: `1px solid ${t.colors.cream.border}`, background: t.colors.white, borderRadius: t.radius.md, fontSize: 12, cursor: "pointer", color: t.colors.semantic.danger }}>
-                    <Trash2 size={13} strokeWidth={1.8} />
+                  <span dir="ltr" className={s.url}>{link.url}</span>
+                  <button type="button" onClick={() => remove(p.key)} disabled={busy === p.key} className={`${f.btnSm} ${f.btnDanger}`}>
+                    <Trash2 size={14} strokeWidth={1.8} />
                     إلغاء
                   </button>
                 </>
               ) : (
                 <>
-                  <input dir="ltr" placeholder={p.example} value={drafts[p.key] ?? ""} onChange={(e) => setDrafts((d) => ({ ...d, [p.key]: e.target.value }))} style={inputStyle} />
-                  <button onClick={() => add(p.key)} disabled={disabled} style={{ padding: "7px 16px", background: t.colors.primary[800], color: t.colors.white, border: "none", borderRadius: t.radius.md, fontSize: 12, fontWeight: t.typography.fontWeight.bold, cursor: "pointer", opacity: disabled ? 0.5 : 1 }}>
+                  <input
+                    dir="ltr"
+                    placeholder={p.example}
+                    value={drafts[p.key] ?? ""}
+                    onChange={(e) => setDrafts((d) => ({ ...d, [p.key]: e.target.value }))}
+                    aria-label={`رابط ${p.label}`}
+                    className={`${f.field} ${f.ltr} ${s.draft}`}
+                  />
+                  <button type="button" onClick={() => add(p.key)} disabled={disabled} className={`${f.btnSm} ${f.btnPrimary} ${s.link}`}>
                     ربط
                   </button>
                 </>

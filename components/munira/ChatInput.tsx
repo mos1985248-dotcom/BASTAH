@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { Mic, Square, ArrowLeft } from "lucide-react";
 import { t } from "@/theme";
 
+import { ui } from "@/components/ui/css-vars";
 interface Props {
   onSend: (text: string) => void;
   onCancel: () => void;
@@ -45,7 +46,7 @@ export function ChatInput({ onSend, onCancel, onStartRecording, onStopRecording,
   const canSend = value.trim().length > 0 && !streaming && !disabled;
 
   return (
-    <div style={{ background: t.colors.white, borderTop: `1px solid ${t.colors.cream.border}`, padding: "12px 16px", display: "flex", gap: t.spacing["3"], alignItems: "flex-end", flexShrink: 0, direction: "rtl" }}>
+    <div style={{ background: ui.card, borderTop: `1px solid ${ui.border}`, padding: "12px 16px", display: "flex", gap: t.spacing["3"], alignItems: "flex-end", flexShrink: 0, direction: "rtl" }}>
       <button
         onClick={recording ? onStopRecording : onStartRecording}
         disabled={streaming || disabled}
@@ -53,17 +54,17 @@ export function ChatInput({ onSend, onCancel, onStartRecording, onStopRecording,
         className="basita-btn-interactive"
         style={{
           width: 40, height: 40, borderRadius: t.radius.full, flexShrink: 0,
-          background: recording ? t.colors.semantic.dangerBg : t.colors.primary[100],
-          border: recording ? `1.5px solid ${t.colors.semantic.danger}` : "none",
+          background: recording ? ui.dangerBg : ui.sand,
+          border: recording ? `1.5px solid ${ui.danger}` : "none",
           cursor: streaming || disabled ? "not-allowed" : "pointer",
           fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center",
           animation: recording ? "pulse-red 1s ease-in-out infinite" : "none",
         }}
       >
         {recording ? (
-          <Square size={16} strokeWidth={2} fill={t.colors.semantic.danger} color={t.colors.semantic.danger} />
+          <Square size={16} strokeWidth={2} fill={ui.danger} color={ui.danger} />
         ) : (
-          <Mic size={18} strokeWidth={1.8} color={t.colors.primary[800]} />
+          <Mic size={18} strokeWidth={1.8} color={ui.greenDeep} />
         )}
       </button>
 
@@ -78,7 +79,7 @@ export function ChatInput({ onSend, onCancel, onStartRecording, onStopRecording,
         style={{
           flex: 1,
           padding: "10px 16px",
-          border: `1.5px solid ${t.colors.cream.border}`,
+          border: `1.5px solid ${ui.border}`,
           borderRadius: t.radius.full,
           fontSize: t.typography.fontSize.sm,
           direction: "rtl",
@@ -86,16 +87,16 @@ export function ChatInput({ onSend, onCancel, onStartRecording, onStopRecording,
           outline: "none",
           lineHeight: t.typography.lineHeight.normal,
           overflow: "hidden",
-          background: disabled ? (t.colors.cream?.bg || "#f9f6f0") : t.colors.white,
-          color: t.colors.text.body,
+          background: disabled ? (ui.sand) : ui.card,
+          color: ui.ink,
         }}
-        onFocus={(e) => { e.target.style.borderColor = t.colors.primary[800]; }}
-        onBlur={(e) => { e.target.style.borderColor = t.colors.cream.border; }}
+        onFocus={(e) => { e.target.style.borderColor = ui.greenDeep; }}
+        onBlur={(e) => { e.target.style.borderColor = ui.border; }}
       />
 
       {streaming ? (
-        <button onClick={onCancel} title="إلغاء" className="basita-btn-interactive" style={{ width: 40, height: 40, borderRadius: t.radius.full, flexShrink: 0, background: t.colors.semantic.dangerBg, border: `1.5px solid ${t.colors.semantic.danger}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Square size={15} strokeWidth={2} fill={t.colors.semantic.danger} color={t.colors.semantic.danger} />
+        <button onClick={onCancel} title="إلغاء" className="basita-btn-interactive" style={{ width: 40, height: 40, borderRadius: t.radius.full, flexShrink: 0, background: ui.dangerBg, border: `1.5px solid ${ui.danger}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Square size={15} strokeWidth={2} fill={ui.danger} color={ui.danger} />
         </button>
       ) : (
         <button
@@ -105,10 +106,10 @@ export function ChatInput({ onSend, onCancel, onStartRecording, onStopRecording,
           className={canSend ? "basita-btn-interactive" : undefined}
           style={{
             width: 40, height: 40, borderRadius: t.radius.full, flexShrink: 0,
-            background: canSend ? t.colors.primary[800] : t.colors.cream.border,
+            background: canSend ? ui.greenDeep : ui.border,
             border: "none",
             cursor: canSend ? "pointer" : "not-allowed",
-            fontSize: 16, color: canSend ? t.colors.white : t.colors.text.light,
+            fontSize: 16, color: canSend ? ui.card : ui.inkMuted,
             display: "flex", alignItems: "center", justifyContent: "center",
           }}
         >

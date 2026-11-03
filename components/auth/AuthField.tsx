@@ -1,12 +1,11 @@
 // components/auth/AuthField.tsx
-// حقل إدخال موحّد لنماذج المصادقة.
-// يدعم إظهار وإخفاء كلمة المرور عند استخدام type="password".
-
+// حقل إدخال موحّد لنماذج المصادقة. يدعم إظهار/إخفاء كلمة المرور عند type="password"،
+// واتجاه LTR للبريد والجوال والرموز.
 "use client";
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { t } from "@/theme";
+import s from "./auth.module.css";
 
 export default function AuthField({
   label,
@@ -15,6 +14,12 @@ export default function AuthField({
   onChange,
   onKeyDown,
   placeholder,
+  ltr,
+  inputMode,
+  autoComplete,
+  maxLength,
+  hint,
+  otp,
 }: {
   label: string;
   type?: string;
@@ -22,106 +27,48 @@ export default function AuthField({
   onChange: (v: string) => void;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   placeholder?: string;
+  ltr?: boolean;
+  inputMode?: "numeric" | "tel" | "email" | "text";
+  autoComplete?: string;
+  maxLength?: number;
+  hint?: string;
+  otp?: boolean;
 }) {
   const isPassword = type === "password";
   const [showPassword, setShowPassword] = useState(false);
-
-  const inputType =
-    isPassword && showPassword ? "text" : type;
+  const inputType = isPassword && showPassword ? "text" : type;
+  const forceLtr = ltr || type === "email" || otp;
 
   return (
-    <label
-      style={{
-        display: "block",
-        width: "100%",
-      }}
-    >
-      <span
-        style={{
-          display: "block",
-          marginBottom: 7,
-          fontFamily: t.typography.fontFamily.base,
-          fontSize: t.typography.fontSize.sm,
-          fontWeight: t.typography.fontWeight.semibold,
-          color: t.colors.text.dark,
-          lineHeight: 1.5,
-        }}
-      >
-        {label}
-      </span>
+    <label className={s.field}>
+      <span className={s.label}>{label}</span>
 
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-        }}
-      >
+      <div className={s.inputWrap}>
         <input
           type={inputType}
           value={value}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={onKeyDown}
-          className="basita-auth-field"
-          style={{
-            width: "100%",
-            height: 48,
-            padding: isPassword
-              ? "0 46px 0 14px"
-              : "0 14px",
-            border: `1px solid ${t.colors.cream.border}`,
-            borderRadius: 13,
-            fontFamily: t.typography.fontFamily.base,
-            fontSize: t.typography.fontSize.base,
-            direction: "rtl",
-            textAlign: "right",
-            outline: "none",
-            background: t.colors.cream.card,
-            color: t.colors.text.dark,
-            boxSizing: "border-box",
-            transition:
-              `border-color ${t.motion.base} ${t.motion.ease}, ` +
-              `box-shadow ${t.motion.base} ${t.motion.ease}, ` +
-              `background ${t.motion.base} ${t.motion.ease}`,
-          }}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
+          maxLength={maxLength}
+          className={`${s.input} ${forceLtr ? s.ltr : ""} ${isPassword ? s.withToggle : ""} ${otp ? s.otp : ""}`}
         />
 
         {isPassword && (
           <button
             type="button"
-            aria-label={
-              showPassword
-                ? "إخفاء كلمة المرور"
-                : "إظهار كلمة المرور"
-            }
+            aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
             onClick={() => setShowPassword((prev) => !prev)}
-            className="basita-password-toggle"
-            style={{
-              position: "absolute",
-              top: "50%",
-              right: 7,
-              transform: "translateY(-50%)",
-              width: 34,
-              height: 34,
-              padding: 0,
-              border: "none",
-              borderRadius: 10,
-              background: "transparent",
-              color: t.colors.text.mid,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
+            className={s.toggle}
           >
-            {showPassword ? (
-              <EyeOff size={18} strokeWidth={1.8} />
-            ) : (
-              <Eye size={18} strokeWidth={1.8} />
-            )}
+            {showPassword ? <EyeOff size={18} strokeWidth={1.8} /> : <Eye size={18} strokeWidth={1.8} />}
           </button>
         )}
       </div>
+
+      {hint && <span className={s.hint}>{hint}</span>}
     </label>
   );
 }

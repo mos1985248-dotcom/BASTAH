@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { t } from "@/theme";
 
+import { ui } from "@/components/ui/css-vars";
 const MAX_UPLOAD_MB = 8;
 
 export default function StoreImageUpload({
@@ -117,7 +118,7 @@ export default function StoreImageUpload({
             fontFamily: t.typography.fontFamily.base,
             fontSize: t.typography.fontSize.sm,
             fontWeight: t.typography.fontWeight.bold,
-            color: t.colors.text.dark,
+            color: ui.ink,
           }}
         >
           {label}
@@ -129,7 +130,7 @@ export default function StoreImageUpload({
               display: "inline-flex",
               alignItems: "center",
               gap: 5,
-              color: t.colors.semantic.success,
+              color: ui.green,
               fontSize: t.typography.fontSize.xs,
               fontWeight: t.typography.fontWeight.semibold,
               whiteSpace: "nowrap",
@@ -157,8 +158,8 @@ export default function StoreImageUpload({
           overflow: "hidden",
           background: currentUrl
             ? `url("${currentUrl}") center / cover no-repeat`
-            : t.colors.cream.warm,
-          border: `1px solid ${t.colors.cream.border}`,
+            : ui.sand,
+          border: `1px solid ${ui.border}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -179,7 +180,7 @@ export default function StoreImageUpload({
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              color: t.colors.text.light,
+              color: ui.inkMuted,
               padding: t.spacing["4"],
               textAlign: "center",
             }}
@@ -189,8 +190,8 @@ export default function StoreImageUpload({
                 width: 44,
                 height: 44,
                 borderRadius: 13,
-                background: t.colors.white,
-                border: `1px solid ${t.colors.cream.border}`,
+                background: ui.card,
+                border: `1px solid ${ui.border}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -199,7 +200,7 @@ export default function StoreImageUpload({
               <ImageIcon
                 size={21}
                 strokeWidth={1.6}
-                color={t.colors.primary[800]}
+                color={ui.greenDeep}
               />
             </div>
 
@@ -227,7 +228,7 @@ export default function StoreImageUpload({
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              color: t.colors.white,
+              color: ui.white,
               fontSize: t.typography.fontSize.xs,
               fontWeight:
                 t.typography.fontWeight.semibold,
@@ -272,9 +273,9 @@ export default function StoreImageUpload({
           minHeight: 40,
           padding: "0 15px",
           borderRadius: t.radius.full,
-          border: `1px solid ${t.colors.cream.border}`,
-          background: t.colors.white,
-          color: t.colors.primary[800],
+          border: `1px solid ${ui.border}`,
+          background: ui.card,
+          color: ui.greenDeep,
           fontFamily: t.typography.fontFamily.base,
           fontSize: t.typography.fontSize.xs,
           fontWeight: t.typography.fontWeight.bold,
@@ -305,7 +306,7 @@ export default function StoreImageUpload({
           fontSize: t.typography.fontSize.xs,
           lineHeight:
             t.typography.lineHeight.relaxed,
-          color: t.colors.text.mid,
+          color: ui.inkMuted,
           fontWeight:
             t.typography.fontWeight.medium,
         }}
@@ -326,12 +327,12 @@ export default function StoreImageUpload({
             marginTop: 9,
             padding: "9px 10px",
             borderRadius: 12,
-            background: t.colors.semantic.dangerBg,
+            background: ui.dangerBg,
             border:
               "1px solid rgba(220,38,38,0.12)",
             borderRight:
-              `3px solid ${t.colors.semantic.danger}`,
-            color: t.colors.semantic.danger,
+              `3px solid ${ui.danger}`,
+            color: ui.danger,
             fontSize: t.typography.fontSize.xs,
             lineHeight:
               t.typography.lineHeight.relaxed,

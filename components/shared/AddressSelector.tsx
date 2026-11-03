@@ -1,6 +1,8 @@
 // components/shared/AddressSelector.tsx
+// مشترك بين صفحة المنتج والدفع. عرض فقط؛ المنطق (useAddressBook) من الصفحات كما هو.
 import { MapPin } from "lucide-react";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
+import c from "@/components/checkout/checkout.module.css";
 import { Address } from "./address-types";
 
 interface AddrForm {
@@ -10,6 +12,14 @@ interface AddrForm {
   region: string;
   address: string;
 }
+
+const FIELDS: { key: keyof AddrForm; label: string; full?: boolean }[] = [
+  { key: "name", label: "الاسم" },
+  { key: "phone", label: "الجوال (+9665XXXXXXXX)" },
+  { key: "city", label: "المدينة" },
+  { key: "region", label: "المنطقة" },
+  { key: "address", label: "العنوان التفصيلي", full: true },
+];
 
 export default function AddressSelector({
   hasUser,
@@ -34,73 +44,47 @@ export default function AddressSelector({
   onFormChange: (k: keyof AddrForm, v: string) => void;
   onSave: () => void;
 }) {
-  const FIELDS: { key: keyof AddrForm; label: string }[] = [
-    { key: "name", label: "الاسم" },
-    { key: "phone", label: "الجوال (+9665XXXXXXXX)" },
-    { key: "city", label: "المدينة" },
-    { key: "region", label: "المنطقة" },
-    { key: "address", label: "العنوان التفصيلي" },
-  ];
-
   return (
-    <div style={{ background: t.colors.white, borderRadius: t.radius.lg, padding: t.spacing["5"], marginTop: t.spacing["4"] }}>
-      <h3 style={{ display: "flex", alignItems: "center", gap: 6, margin: `0 0 ${t.spacing["3"]}`, fontSize: t.typography.fontSize.base, color: t.colors.primary[800] }}>
-        <MapPin size={16} strokeWidth={1.8} />
-        عنوان الشحن
-      </h3>
+    <section className={c.card} style={uiVars} aria-labelledby="address-title">
+      <div className={c.cardHead}>
+        <span className={c.cardIcon}><MapPin size={19} strokeWidth={1.7} aria-hidden="true" /></span>
+        <h2 id="address-title" className={c.cardTitle}>عنوان الشحن</h2>
+      </div>
 
-      {!hasUser && !userLoading && (
-        <p style={{ fontSize: t.typography.fontSize.sm, color: t.colors.text.mid }}>سجّلي دخولك لإضافة عنوان والشراء</p>
-      )}
+      <div className={c.cardBody}>
+        {!hasUser && !userLoading && <p className={c.hint}>سجّل دخولك لإضافة عنوان والشراء</p>}
 
-      {hasUser && addresses.length > 0 && !showForm && (
-        <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"] }}>
-          {addresses.map((a) => (
-            <label
-              key={a.id}
-              style={{
-                display: "flex",
-                gap: t.spacing["2"],
-                padding: "10px 12px",
-                borderRadius: t.radius.md,
-                border: `1.5px solid ${selectedAddressId === a.id ? t.colors.primary[800] : t.colors.cream.border}`,
-                cursor: "pointer",
-              }}
-            >
-              <input type="radio" checked={selectedAddressId === a.id} onChange={() => onSelect(a.id)} />
-              <span style={{ fontSize: t.typography.fontSize.sm, color: t.colors.text.body }}>
-                {a.label} — {a.name} — {a.city}، {a.address}
-              </span>
-            </label>
-          ))}
-          <button
-            onClick={onShowForm}
-            style={{ background: "none", border: "none", color: t.colors.gold[600], fontWeight: t.typography.fontWeight.bold, fontSize: t.typography.fontSize.sm, cursor: "pointer", textAlign: "start" }}
-          >
-            + إضافة عنوان آخر
-          </button>
-        </div>
-      )}
+        {hasUser && addresses.length > 0 && !showForm && (
+          <div className={c.addrList} role="radiogroup" aria-labelledby="address-title">
+            {addresses.map((a) => (
+              <label key={a.id} className={`${c.addr} ${selectedAddressId === a.id ? c.addrOn : ""}`}>
+                <input type="radio" name="addressId" checked={selectedAddressId === a.id} onChange={() => onSelect(a.id)} />
+                <span className={c.addrText}>
+                  <span className={c.addrLabel}>{a.label}</span> — {a.name} — {a.city}، {a.address}
+                </span>
+              </label>
+            ))}
+            <button type="button" onClick={onShowForm} className={c.linkBtn}>+ إضافة عنوان آخر</button>
+          </div>
+        )}
 
-      {hasUser && (addresses.length === 0 || showForm) && (
-        <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"] }}>
-          {FIELDS.map((f) => (
-            <input
-              key={f.key}
-              placeholder={f.label}
-              value={form[f.key]}
-              onChange={(e) => onFormChange(f.key, e.target.value)}
-              style={{ padding: "10px 12px", border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, fontSize: t.typography.fontSize.sm, direction: "rtl" }}
-            />
-          ))}
-          <button
-            onClick={onSave}
-            style={{ padding: "10px", background: t.colors.primary[800], color: t.colors.text.onDark, border: "none", borderRadius: t.radius.md, cursor: "pointer", fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold }}
-          >
-            حفظ العنوان
-          </button>
-        </div>
-      )}
-    </div>
+        {hasUser && (addresses.length === 0 || showForm) && (
+          <div className={c.form}>
+            {FIELDS.map((f) => (
+              <div key={f.key} className={`${c.fieldWrap} ${f.full ? c.fieldFull : ""}`}>
+                <label htmlFor={`addr-${f.key}`} className={c.fieldLabel}>{f.label}</label>
+                <input
+                  id={`addr-${f.key}`}
+                  className={c.field}
+                  value={form[f.key]}
+                  onChange={(e) => onFormChange(f.key, e.target.value)}
+                />
+              </div>
+            ))}
+            <button type="button" onClick={onSave} className={c.save}>حفظ العنوان</button>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

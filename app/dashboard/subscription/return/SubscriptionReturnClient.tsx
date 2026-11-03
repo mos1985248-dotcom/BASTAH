@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { PartyPopper, AlertTriangle } from "lucide-react";
 import { t } from "@/theme";
-import LoadingState from "@/components/admin/ui/LoadingState";
+import LoadingState from "@/components/dashboard/ui/LoadingState";
 
+import { ui } from "@/components/ui/css-vars";
 export default function SubscriptionReturnClient() {
   const params = useSearchParams();
   const router = useRouter();
@@ -85,7 +86,7 @@ export default function SubscriptionReturnClient() {
             <PartyPopper
               size={44}
               strokeWidth={1.5}
-              color={t.colors.gold[600]}
+              color={ui.gold}
               style={{
                 margin: `0 auto ${t.spacing["3"]}`,
               }}
@@ -94,7 +95,7 @@ export default function SubscriptionReturnClient() {
             <h1
               style={{
                 fontSize: t.typography.fontSize.lg,
-                color: t.colors.primary[800],
+                color: ui.greenDeep,
                 margin: `0 0 ${t.spacing["2"]}`,
               }}
             >
@@ -103,7 +104,7 @@ export default function SubscriptionReturnClient() {
 
             <p
               style={{
-                color: t.colors.text.mid,
+                color: ui.inkMuted,
                 marginBottom: t.spacing["5"],
               }}
             >
@@ -114,8 +115,8 @@ export default function SubscriptionReturnClient() {
               onClick={() => router.push("/dashboard")}
               style={{
                 padding: "12px 28px",
-                background: t.colors.primary[800],
-                color: t.colors.white,
+                background: ui.green,
+                color: ui.white,
                 border: "none",
                 borderRadius: t.radius.full,
                 fontWeight: t.typography.fontWeight.bold,
@@ -132,7 +133,7 @@ export default function SubscriptionReturnClient() {
             <AlertTriangle
               size={44}
               strokeWidth={1.5}
-              color={t.colors.semantic.danger}
+              color={ui.danger}
               style={{
                 margin: `0 auto ${t.spacing["3"]}`,
               }}
@@ -141,7 +142,7 @@ export default function SubscriptionReturnClient() {
             <h1
               style={{
                 fontSize: t.typography.fontSize.lg,
-                color: t.colors.semantic.danger,
+                color: ui.danger,
                 margin: `0 0 ${t.spacing["2"]}`,
               }}
             >
@@ -150,7 +151,7 @@ export default function SubscriptionReturnClient() {
 
             <p
               style={{
-                color: t.colors.text.mid,
+                color: ui.inkMuted,
                 marginBottom: t.spacing["5"],
               }}
             >
@@ -161,8 +162,8 @@ export default function SubscriptionReturnClient() {
               onClick={() => router.push("/pricing")}
               style={{
                 padding: "12px 28px",
-                background: t.colors.primary[800],
-                color: t.colors.white,
+                background: ui.green,
+                color: ui.white,
                 border: "none",
                 borderRadius: t.radius.full,
                 fontWeight: t.typography.fontWeight.bold,

@@ -1,0 +1,62 @@
+/* components/cart/cart.module.css — إطار السلة والحالات وشريط الثقة والموافقة. الألوان عبر --ui-* فقط */
+.page { margin: 0 auto; padding: 20px 16px 72px; direction: rtl; }
+.crumbs { margin: 0 0 14px; font-size: 13px; color: var(--ui-ink-muted); }
+.crumbs a { color: var(--ui-ink-muted); text-decoration: none; }
+.crumbs a:hover { color: var(--ui-green); }
+.title { display: flex; align-items: center; gap: 12px; margin: 0 0 22px; font-size: clamp(32px, 4.14vw, 46px); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.title svg { flex: none; color: var(--ui-kicker); }
+.notice { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; padding: 14px 18px; border-radius: 18px; background: var(--ui-sand); border: 1px solid var(--ui-gold); font-size: 14px; line-height: 1.8; color: var(--ui-ink); }
+.notice svg { flex: none; margin-top: 3px; color: var(--ui-kicker); }
+
+/* ───── حالات الصفحة ───── */
+.state { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 56px 24px; text-align: center; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted); }
+.state svg { color: var(--ui-kicker); }
+.stateTitle { margin: 8px 0 0; font-size: 25.5px; font-weight: 700; color: var(--ui-ink); }
+.stateText { margin: 0 0 12px; font-size: 15px; line-height: 1.8; }
+.cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 28px; border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white); font-weight: 600; text-decoration: none; }
+.cta:hover { background: var(--ui-green-hover); }
+.cta:focus-visible, .stickyBtn:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+.error { display: flex; align-items: center; gap: 8px; padding: 14px 18px; border-radius: 16px; background: var(--ui-danger-bg); color: var(--ui-danger); font-size: 14px; }
+
+/* ───── مجموعة المتجر ───── */
+.group { margin-bottom: 32px; }
+.groupGrid { display: grid; grid-template-columns: minmax(0, 1.72fr) minmax(300px, 0.95fr); gap: 20px; align-items: start; }
+.products { min-width: 0; overflow: hidden; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.groupHead { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--ui-border); background: var(--ui-sand); }
+.storeId { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.storeMark { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--ui-gold); background: var(--ui-card); color: var(--ui-green-deep); font-size: 20px; font-weight: 700; }
+.storeName { margin: 0; font-size: 17px; font-weight: 700; color: var(--ui-ink); }
+.storeName a { color: inherit; text-decoration: none; }
+.storeName a:hover { color: var(--ui-green); }
+.storeCount { display: block; font-size: 13px; font-weight: 400; color: var(--ui-ink-muted); }
+.pill { flex: none; padding: 4px 12px; border-radius: var(--ui-pill); background: var(--ui-card); border: 1px solid var(--ui-border); font-size: 12px; font-weight: 600; color: var(--ui-ink-muted); }
+.list { margin: 0; padding: 0; list-style: none; }
+
+/* ───── الثقة والموافقة ───── */
+.trust { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 40px 0 0; padding: 0; list-style: none; border-radius: 22px; border: 1px solid var(--ui-border); background: var(--ui-card); overflow: hidden; }
+.trustItem { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 60px; padding: 0 12px; font-size: 14px; font-weight: 600; color: var(--ui-ink); }
+.trustItem + .trustItem { border-inline-start: 1px solid var(--ui-border); }
+.trustItem svg { flex: none; color: var(--ui-kicker); }
+.consent { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 28px; padding: 14px 16px; border-radius: 16px; background: var(--ui-card); border: 1px solid var(--ui-border); font-size: 13px; line-height: 1.9; color: var(--ui-ink-muted); cursor: pointer; }
+.consent input { flex: none; width: 20px; height: 20px; margin-top: 3px; accent-color: var(--ui-green); }
+.consentErr { display: block; margin-top: 4px; color: var(--ui-danger); }
+
+/* ───── شريط الدفع الثابت (الجوال) ───── */
+.sticky { display: none; }
+@media (max-width: 900px) {
+  .groupGrid { grid-template-columns: minmax(0, 1fr); }
+  .page { padding-bottom: 120px; }
+  .trust { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trustItem:nth-child(n + 3) { border-top: 1px solid var(--ui-border); }
+  .trustItem:nth-child(3) { border-inline-start: none; }
+  .sticky {
+    position: fixed; inset-inline: 0; bottom: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--ui-card); border-top: 1px solid var(--ui-border); box-shadow: var(--ui-shadow);
+  }
+}
+.stickyLabel { margin: 0; font-size: 12px; color: var(--ui-ink-muted); }
+.stickyTotal { margin: 0; font-size: 20px; font-weight: 700; color: var(--ui-green-deep); }
+.stickyBtn { flex: 1; max-width: 240px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white); font-size: 16px; font-weight: 700; text-decoration: none; }
+.stickyBtn[aria-disabled="true"] { background: var(--ui-sand); color: var(--ui-ink-muted); pointer-events: none; }
+@media (max-width: 600px) { .page { padding-inline: 12px; } .products { border-radius: 20px; } .groupHead { padding: 14px 14px; } }
+/* basita-font-scale: applied */

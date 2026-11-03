@@ -3,6 +3,7 @@
 
 import { t } from "@/theme";
 
+import { ui } from "@/components/ui/css-vars";
 export function TypingIndicator() {
   return (
     <div style={{ display: "flex", gap: 6, padding: "8px 12px", alignItems: "center", direction: "rtl" }}>
@@ -13,7 +14,7 @@ export function TypingIndicator() {
             width: 8,
             height: 8,
             borderRadius: t.radius.full,
-            background: t.colors.gold[600],
+            background: ui.gold,
             display: "inline-block",
             animation: `munira-bounce 1s ${i * 0.18}s ease-in-out infinite`,
           }}

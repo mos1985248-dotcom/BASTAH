@@ -4,11 +4,13 @@
 import { useEffect, useState } from "react";
 import { Plus, ArrowRight } from "lucide-react";
 import { api } from "@/lib/api-client";
-import { t } from "@/theme";
 import NewTicketForm from "@/components/dashboard/support/NewTicketForm";
 import TicketList, { Ticket } from "@/components/dashboard/support/TicketList";
 import TicketDetail, { TicketMessage } from "@/components/dashboard/support/TicketDetail";
 
+import { uiVars } from "@/components/ui/vars";
+import f from "@/components/dashboard/forms.module.css";
+import c from "@/components/dashboard/support/support.module.css";
 export default function SupportPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selected, setSelected] = useState<{ ticket: Ticket; messages: TicketMessage[] } | null>(null);
@@ -76,28 +78,24 @@ export default function SupportPage() {
   };
 
   return (
-    <div style={{ padding: t.spacing["4"] }}>
-      <div style={{ maxWidth: 650, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: t.spacing["4"] }}>
-          <h1 style={{ margin: 0, fontSize: t.typography.fontSize.xl, color: t.colors.primary[800] }}>الدعم والمساعدة</h1>
-          {view !== "new" && (
-            <button
-              onClick={() => { setView("new"); setError(""); }}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", background: t.colors.primary[800], color: t.colors.text.onDark, border: "none", borderRadius: t.radius.full, fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, cursor: "pointer" }}
-            >
-              <Plus size={14} strokeWidth={2} />
-              طلب دعم جديد
-            </button>
-          )}
-          {view !== "list" && (
-            <button
-              onClick={() => setView("list")}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "none", border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.full, fontSize: t.typography.fontSize.xs, cursor: "pointer", color: t.colors.text.mid }}
-            >
-              <ArrowRight size={13} strokeWidth={1.8} />
-              رجوع للقائمة
-            </button>
-          )}
+    <div className={f.page} style={uiVars}>
+      <div className={c.wrap}>
+        <div className={c.head}>
+          <h1 className={c.title}>الدعم والمساعدة</h1>
+          <div className={c.headBtns}>
+            {view !== "new" && (
+              <button type="button" onClick={() => { setView("new"); setError(""); }} className={f.cta}>
+                <Plus size={15} strokeWidth={2} />
+                طلب دعم جديد
+              </button>
+            )}
+            {view !== "list" && (
+              <button type="button" onClick={() => setView("list")} className={`${f.cta} ${f.ghost}`}>
+                <ArrowRight size={15} strokeWidth={1.8} />
+                رجوع للقائمة
+              </button>
+            )}
+          </div>
         </div>
 
         {view === "new" && (

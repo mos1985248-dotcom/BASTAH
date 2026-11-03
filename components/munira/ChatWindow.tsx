@@ -7,6 +7,7 @@ import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import type { Message } from "@/hooks/useMuniraChat";
 
+import { ui } from "@/components/ui/css-vars";
 interface Props {
   messages: Message[];
   streaming: boolean;
@@ -27,11 +28,11 @@ export function ChatWindow({
   onStartRecording, onStopRecording, onCancel,
 }: Props) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", maxWidth: 380, marginLeft: "0", marginRight: "auto", background: t.colors.cream?.warm || "#fdfbf7", borderLeft: `1px solid ${t.colors.cream.border}`, direction: "rtl" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", maxWidth: 920, marginLeft: "auto", marginRight: "auto", background: ui.sand, borderInline: `1px solid ${ui.border}`, direction: "rtl" }}>
       <div
         style={{
-          background: t.colors.white,
-          borderBottom: `1px solid ${t.colors.cream.border}`,
+          background: ui.card,
+          borderBottom: `1px solid ${ui.border}`,
           padding: "14px 20px",
           display: "flex",
           justifyContent: "space-between",
@@ -40,14 +41,14 @@ export function ChatWindow({
         }}
       >
         <div style={{ display: "flex", gap: t.spacing["3"], alignItems: "center" }}>
-          <div style={{ position: "relative", width: 42, height: 42, borderRadius: "50%", overflow: "hidden", border: `1.5px solid ${t.colors.gold[400]}` }}>
+          <div style={{ position: "relative", width: 42, height: 42, borderRadius: "50%", overflow: "hidden", border: `1.5px solid ${ui.gold}` }}>
             <Image src="/images/munira-avatar.png" alt="منيرة" fill style={{ objectFit: "cover" }} />
           </div>
           <div>
-            <p style={{ margin: 0, fontSize: t.typography.fontSize.base, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>
+            <p style={{ margin: 0, fontSize: t.typography.fontSize.base, fontWeight: t.typography.fontWeight.bold, color: ui.greenDeep }}>
               منيرة
             </p>
-            <p style={{ margin: 0, fontSize: t.typography.fontSize.xs, color: streaming ? t.colors.gold[600] : t.colors.text.mid }}>
+            <p style={{ margin: 0, fontSize: t.typography.fontSize.xs, color: streaming ? ui.gold : ui.inkMuted }}>
               {streaming ? "تكتب..." : "جاهزة للمساعدة"}
             </p>
           </div>
@@ -58,13 +59,13 @@ export function ChatWindow({
             onClick={onClear}
             className="basita-btn-interactive"
             style={{
-              background: t.colors.cream?.bg || "#f9f6f0",
-              border: `1px solid ${t.colors.cream.border}`,
+              background: ui.sand,
+              border: `1px solid ${ui.border}`,
               borderRadius: t.radius.full,
               padding: "6px 14px",
               fontSize: t.typography.fontSize.xs,
               fontWeight: t.typography.fontWeight.medium,
-              color: t.colors.primary[800],
+              color: ui.greenDeep,
               cursor: "pointer",
             }}
           >

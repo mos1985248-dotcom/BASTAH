@@ -109,7 +109,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <AuthShell>
+    <AuthShell scene="home">
       {step === "request" && (
         <RequestStep email={email} onEmailChange={setEmail} error={error} loading={loading} onSubmit={handleRequest} />
       )}

@@ -209,89 +209,6 @@ textarea:focus-visible {
 }
 
 /* ─────────────────────────────────────────
-   Hero Slideshow
-   ───────────────────────────────────────── */
-
-.basita-hero-slide {
-  opacity: 0;
-  animation: basita-hero-fade 12s infinite;
-  transform: scale(1.02);
-  will-change: opacity, transform;
-}
-
-.basita-hero-slide-1 {
-  animation-delay: 0s;
-}
-
-.basita-hero-slide-2 {
-  animation-delay: 4s;
-}
-
-.basita-hero-slide-3 {
-  animation-delay: 8s;
-}
-
-@keyframes basita-hero-fade {
-  0%,
-  28% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  33%,
-  95% {
-    opacity: 0;
-    transform: scale(1.03);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.basita-hero-visual {
-  overflow: hidden;
-}
-
-.basita-hero-slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Hero responsive */
-
-@media (max-width: 900px) {
-  .basita-hero-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .basita-hero-visual {
-    min-height: 380px !important;
-    order: -1;
-  }
-
-  .basita-hero-content {
-    padding: 34px 28px !important;
-  }
-}
-
-@media (max-width: 600px) {
-  .basita-hero-visual {
-    min-height: 300px !important;
-  }
-
-  .basita-hero-content {
-    padding: 28px 20px !important;
-  }
-
-  .basita-hero-content h1 {
-    font-size: 27px !important;
-  }
-}
-
-/* ─────────────────────────────────────────
    Why Basita
    ───────────────────────────────────────── */
 
@@ -582,19 +499,6 @@ textarea:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .basita-hero-slide {
-    animation: none;
-  }
-
-  .basita-hero-slide-1 {
-    opacity: 1;
-  }
-
-  .basita-hero-slide-2,
-  .basita-hero-slide-3 {
-    opacity: 0;
   }
 }
 /* ─────────────────────────────────────────

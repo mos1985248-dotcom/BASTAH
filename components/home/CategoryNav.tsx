@@ -1,178 +1,71 @@
 // components/home/CategoryNav.tsx
-import { t } from "@/theme";
+import Image from "next/image";
 import {
-  MoreHorizontal,
-  Palmtree,
+  ArrowLeft,
+  ChefHat,
   Droplet,
   FlaskConical,
-  Shirt,
   Home,
   Leaf,
-  ChefHat,
+  MoreHorizontal,
+  Palmtree,
+  Shirt,
   type LucideIcon,
 } from "lucide-react";
+import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
+import { CATEGORY_LABELS } from "./categories-data";
+import { homeImages } from "./homeImages";
+import s from "./categories.module.css";
 
-const CATEGORIES: {
-  slug: string;
-  label: string;
-  Icon: LucideIcon;
-  href?: string;
-}[] = [
-  { slug: "dates", label: "تمور", Icon: Palmtree },
-  { slug: "honey", label: "عسل ومنتجات النحل", Icon: Droplet },
-  { slug: "oud-perfumes", label: "عطور وبخور", Icon: FlaskConical },
-  { slug: "abayas-accessories", label: "أزياء وإكسسوارات", Icon: Shirt },
-  { slug: "home-decor", label: "أزياء وديكور منزلي", Icon: Home },
-  { slug: "natural-products", label: "منتجات طبيعية", Icon: Leaf },
-  { slug: "kitchen", label: "مطبخ وأدوات منزلية", Icon: ChefHat },
+const CATEGORIES: { slug: string; label: string; Icon: LucideIcon; href?: string }[] = [
+  { slug: "dates", label: CATEGORY_LABELS["dates"], Icon: Palmtree },
+  { slug: "honey", label: CATEGORY_LABELS["honey"], Icon: Droplet },
+  { slug: "oud-perfumes", label: CATEGORY_LABELS["oud-perfumes"], Icon: FlaskConical },
+  { slug: "abayas-accessories", label: CATEGORY_LABELS["abayas-accessories"], Icon: Shirt },
+  { slug: "home-decor", label: CATEGORY_LABELS["home-decor"], Icon: Home },
+  { slug: "natural-products", label: CATEGORY_LABELS["natural-products"], Icon: Leaf },
+  { slug: "kitchen", label: CATEGORY_LABELS["kitchen"], Icon: ChefHat },
   { slug: "", label: "المزيد", Icon: MoreHorizontal, href: "/marketplace" },
 ];
 
 export default function CategoryNav() {
   return (
     <section
-      style={{
-        maxWidth: t.layout.containerMaxWidth,
-        margin: "0 auto",
-        padding: `${t.spacing["10"]} ${t.spacing["4"]} 0`,
-        direction: "rtl",
-      }}
+      aria-labelledby="categories-heading"
+      className={s.section}
+      style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
-      {/* عنوان القسم */}
-      <div
-        style={{
-          textAlign: "center",
-          marginBottom: t.spacing["6"],
-        }}
-      >
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: t.spacing["2"],
-            marginBottom: t.spacing["2"],
-          }}
-        >
-          <span
-            style={{
-              width: 28,
-              height: 1,
-              background: t.colors.gold[400],
-            }}
-          />
+      <p className={s.kicker}>من سوق بسطة</p>
+      <h2 id="categories-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
+        تسوّق حسب الفئة
+      </h2>
 
-          <span
-            style={{
-              fontSize: t.typography.fontSize.sm,
-              color: t.colors.gold[700],
-              fontWeight: t.typography.fontWeight.semibold,
-            }}
-          >
-            من سوق بسطة
-          </span>
-
-          <span
-            style={{
-              width: 28,
-              height: 1,
-              background: t.colors.gold[400],
-            }}
-          />
-        </div>
-
-        <h2
-          style={{
-            fontFamily: t.typography.fontFamily.heading,
-            fontSize:
-              t.typography.fontSize["2xl"] ?? t.typography.fontSize.xl,
-            fontWeight: t.typography.fontWeight.bold,
-            color: t.colors.text.dark,
-            margin: 0,
-          }}
-        >
-          تسوّق حسب الفئة
-        </h2>
-      </div>
-
-      {/* الفئات */}
-      <div
-        className="basita-category-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(8, minmax(0, 1fr))",
-          gap: t.spacing["3"],
-          direction: "rtl",
-        }}
-      >
-        {CATEGORIES.map((c) => (
-          <a
-            key={c.label}
-            href={c.href ?? `/marketplace?category=${c.slug}`}
-            className="basita-category-card"
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              minWidth: 0,
-            }}
-          >
-            <div
-              className="basita-category-card-inner"
-              style={{
-                height: 128,
-                padding: t.spacing["3"],
-                borderRadius: 18,
-                background: "#F8F3E8",
-                border: "1px solid rgba(109, 88, 59, 0.12)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: t.spacing["2"],
-                boxSizing: "border-box",
-                transition:
-                  `transform ${t.motion.base} ${t.motion.ease}, ` +
-                  `box-shadow ${t.motion.base} ${t.motion.ease}, ` +
-                  `border-color ${t.motion.base} ${t.motion.ease}, ` +
-                  `background ${t.motion.base} ${t.motion.ease}`,
-              }}
-            >
-              <div
-                className="basita-category-icon"
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 14,
-                  background: "#FFFDF7",
-                  border: "1px solid rgba(109, 88, 59, 0.1)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  transition: `transform ${t.motion.base} ${t.motion.ease}`,
-                }}
-              >
-                <c.Icon
-                  size={24}
-                  strokeWidth={1.7}
-                  color={t.colors.gold[700]}
-                />
-              </div>
-
-              <span
-                style={{
-                  display: "block",
-                  fontSize: t.typography.fontSize.sm,
-                  fontWeight: t.typography.fontWeight.semibold,
-                  color: t.colors.text.dark,
-                  lineHeight: 1.5,
-                  textAlign: "center",
-                }}
-              >
-                {c.label}
+      <div className={s.grid}>
+        {CATEGORIES.map(({ slug, label, Icon, href }) => {
+          const photo = homeImages.categories[slug];
+          return (
+            <a key={label} href={href ?? `/marketplace?category=${slug}`} className={s.tile}>
+              <span className={s.media}>
+                {photo ? (
+                  <Image
+                    src={photo}
+                    alt=""
+                    fill
+                    sizes="(max-width: 767px) 50vw, (max-width: 900px) 33vw, 25vw"
+                    className={s.photo}
+                  />
+                ) : (
+                  <Icon size={36} strokeWidth={1.4} className={s.icon} aria-hidden="true" />
+                )}
               </span>
-            </div>
-          </a>
-        ))}
+              <span className={s.row}>
+                <span className={s.label}>{label}</span>
+                <ArrowLeft size={18} strokeWidth={1.9} className={s.arrow} aria-hidden="true" />
+              </span>
+            </a>
+          );
+        })}
       </div>
     </section>
   );

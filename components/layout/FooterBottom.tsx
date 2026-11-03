@@ -1,7 +1,6 @@
 
 // components/layout/FooterBottom.tsx
 
-import { t } from "@/theme";
 import { SOCIAL_LINKS, SocialLinks } from "@/lib/social-links";
 import SocialIcon, { SocialPlatform } from "./SocialIcon";
 import styles from "./FooterBottom.module.css";
@@ -33,15 +32,10 @@ const PAYMENT_METHODS = [
 export default function FooterBottom() {
   return (
     <div className={styles.wrapper}>
-      <div
-        className={styles.inner}
-        style={{
-          maxWidth: t.layout.containerMaxWidth,
-        }}
-      >
+      <div className={styles.inner}>
         {/* حقوق النشر */}
         <span className={styles.copyright}>
-          بسطة © 2026 — جميع الحقوق محفوظة
+          بسطة مارت © 2026 — جميع الحقوق محفوظة
         </span>
 
         {/* وسائل الدفع */}

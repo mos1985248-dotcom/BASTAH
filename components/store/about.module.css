@@ -1,0 +1,53 @@
+/* components/store/about.module.css — القصة والثقة والمؤشرات والمعلومات */
+.story { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items: stretch; }
+.storyCard { overflow: hidden; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.storyImage { height: 200px; background: var(--ui-sand) center / cover no-repeat; }
+.storyBody { padding: 24px 28px 28px; }
+.storyTitle { margin: 0 0 10px; font-size: 27.5px; font-weight: 700; color: var(--ui-green-deep); }
+.storyText { margin: 0; font-size: 16px; line-height: 2; color: var(--ui-ink); white-space: pre-line; }
+
+.trust { padding: 24px 28px; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-sand); }
+.trustTitle { margin: 0; font-size: 25.5px; font-weight: 700; color: var(--ui-green-deep); }
+.trustSub { margin: 4px 0 18px; font-size: 14px; color: var(--ui-ink-muted); }
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.badge {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: var(--ui-pill);
+  background: var(--ui-card); border: 1px solid var(--ui-border); font-size: 14px; font-weight: 600; color: var(--ui-ink);
+}
+.badge svg { flex: none; color: var(--ui-kicker); }
+
+/* ───── مؤشرات المتجر ───── */
+.metrics {
+  display: flex; margin: 0; padding: 0; list-style: none; overflow: hidden;
+  border-radius: 28px; background: var(--ui-green-deep); color: var(--ui-white); border: 1px solid var(--ui-gold);
+}
+.metric { flex: 1 1 0; padding: 26px 12px; text-align: center; }
+.metric + .metric { border-inline-start: 1px solid var(--ui-green); }
+.metricValue { display: block; font-size: 33px; font-weight: 700; line-height: 1.4; color: var(--ui-gold); }
+.metricLabel { font-size: 14px; color: var(--ui-card); opacity: 0.88; }
+
+/* ───── معلومات المتجر ───── */
+.info { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); overflow: hidden; }
+.infoItem { padding: 18px 22px; border-top: 1px solid var(--ui-border); }
+.infoItem:nth-child(-n + 3) { border-top: none; }
+.infoItem:not(:nth-child(3n + 1)) { border-inline-start: 1px solid var(--ui-border); }
+.infoLabel { display: flex; align-items: center; gap: 6px; margin: 0 0 4px; font-size: 13px; color: var(--ui-ink-muted); }
+.infoLabel svg { color: var(--ui-kicker); }
+.infoValue { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.7; color: var(--ui-ink); }
+
+@media (max-width: 900px) {
+  .story { grid-template-columns: 1fr; }
+  .info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .infoItem:nth-child(-n + 3) { border-top: 1px solid var(--ui-border); }
+  .infoItem:nth-child(-n + 2) { border-top: none; }
+  .infoItem:not(:nth-child(3n + 1)) { border-inline-start: none; }
+  .infoItem:nth-child(even) { border-inline-start: 1px solid var(--ui-border); }
+}
+@media (max-width: 767px) {
+  .metrics { flex-wrap: wrap; border-radius: 24px; }
+  .metric { flex: 1 1 50%; }
+  .metric:nth-child(n + 3) { border-top: 1px solid var(--ui-green); }
+  .metric:nth-child(odd) { border-inline-start: none; }
+  .storyBody, .trust { padding: 20px; }
+}
+/* basita-font-scale: applied */

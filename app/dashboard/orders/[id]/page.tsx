@@ -1,53 +1,15 @@
 // app/dashboard/orders/[id]/page.tsx
+// المنطق (جلب الطلب، الحالات التالية، تحديث الحالة مع التتبع) كما كان حرفياً؛ التغيير في العرض والصياغة فقط.
 "use client";
-
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { AlertTriangle, Landmark } from "lucide-react";
+import { AlertTriangle, ChevronRight, Landmark, MapPin, ReceiptText, RefreshCw } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
 import { ORDER_STATUS_LABEL, ORDER_STATUS_COLOR } from "@/lib/order-status";
+import { uiVars } from "@/components/ui/vars";
 import CourierDispatchCard from "@/components/dashboard/CourierDispatchCard";
-
-interface OrderDetail {
-  id: string; orderNumber: string; status: string; paymentStatus: string; paymentMethod: string; total: number; fulfillmentMethod?: string;
-  shippingName: string; shippingPhone: string; shippingCity: string; shippingAddress: string;
-  buyerNotes: string | null;
-  items: { nameAr: string; price: number; quantity: number; total: number }[];
-  bankTransferReference: string | null;
-  bankTransferProofUrl: string | null;
-  bankTransferSubmittedAt: string | null;
-}
-
-const STATIC_NEXT_STATUS: Record<string, { value: string; label: string }[]> = {
-  CONFIRMED: [{ value: "PROCESSING", label: "بدء التجهيز" }, { value: "CANCELLED", label: "إلغاء الطلب" }],
-  PROCESSING: [{ value: "SHIPPED", label: "تم الشحن" }],
-  SHIPPED: [{ value: "DELIVERED", label: "تم التسليم" }],
-};
-
-/**
- * ⚠️ إصلاح فجوة موجودة مسبقاً: NEXT_STATUS ما كانت تحوي مفتاح PENDING
- * إطلاقاً — طلبات البطاقات تنتقل لـCONFIRMED تلقائياً بمجرد نجاح الدفع
- * (webhook مويسّر، راجع lib/order-payment.ts)، لكن COD والتحويل البنكي
- * ما عندهما أي webhook، فتبقى عالقة PENDING بدون أي زر إجراء بهذي
- * الصفحة. نحسبها ديناميكياً حسب طريقة الدفع بدل تعديل الكائن الثابت:
- * - COD: يقدر التاجر يبدأ التجهيز فوراً (الدفع يصير عند التسليم أصلاً)
- * - تحويل بنكي: زر "تأكيد استلام التحويل" يظهر فقط بعد رفع المشتري
- *   للإثبات (الباكند برضو يحرس هذا الشرط بـPATCH /api/orders/[id])
- * - بطاقات (لسه PENDING): بدون زر — طلب لم يُدفع فعلياً بعد، ننتظر الـwebhook
- */
-function getNextStatusOptions(order: OrderDetail): { value: string; label: string }[] | undefined {
-  if (order.status !== "PENDING") return STATIC_NEXT_STATUS[order.status];
-  if (order.paymentMethod === "CASH_ON_DELIVERY") {
-    return [{ value: "PROCESSING", label: "بدء التجهيز" }, { value: "CANCELLED", label: "إلغاء الطلب" }];
-  }
-  if (order.paymentMethod === "BANK_TRANSFER" && order.bankTransferProofUrl) {
-    return [{ value: "PROCESSING", label: "تأكيد استلام التحويل وبدء التجهيز" }, { value: "CANCELLED", label: "إلغاء الطلب" }];
-  }
-  return undefined;
-}
-
-const cardStyle = { background: t.colors.white, borderRadius: t.radius.lg, padding: t.spacing["4"], marginBottom: t.spacing["3"] };
+import { OrderDetail, PAYMENT_LABEL, METHOD_LABEL, getNextStatusOptions } from "@/components/dashboard/orderDetailLogic";
+import s from "@/components/dashboard/orders.module.css";
 
 export default function SellerOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -81,138 +43,136 @@ export default function SellerOrderDetailPage() {
     }
   };
 
-  if (error && !order) return (
-    <p style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, textAlign: "center", padding: t.spacing["10"], color: t.colors.semantic.danger }}>
-      <AlertTriangle size={16} strokeWidth={1.8} />
-      {error}
-    </p>
-  );
-  if (!order) return <p style={{ textAlign: "center", padding: t.spacing["10"], color: t.colors.text.mid }}>جاري التحميل...</p>;
+  const wrap = (children: React.ReactNode) => <div className={s.page} style={uiVars}>{children}</div>;
+
+  if (error && !order) {
+    return wrap(
+      <p className={s.err} role="alert">
+        <AlertTriangle size={16} strokeWidth={1.8} aria-hidden="true" />
+        {error}
+      </p>,
+    );
+  }
+  if (!order) return wrap(<p className={s.state} role="status">جاري التحميل...</p>);
 
   const nextOptions = getNextStatusOptions(order);
   const isBankTransfer = order.paymentMethod === "BANK_TRANSFER";
   const awaitingProof = isBankTransfer && order.status === "PENDING" && !order.bankTransferProofUrl;
 
-  return (
-    <div style={{ padding: t.spacing["4"] }}>
-      <div style={{ maxWidth: 500, margin: "0 auto" }}>
-        <div style={cardStyle}>
-          <h1 style={{ margin: "0 0 6px", fontSize: t.typography.fontSize.lg, color: t.colors.text.dark }}>{order.orderNumber}</h1>
-          <p style={{ margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.text.mid, display: "flex", alignItems: "center", gap: 6 }}>
-            الحالة:
-            <span style={{ padding: "2px 10px", borderRadius: t.radius.full, background: (ORDER_STATUS_COLOR[order.status] ?? ORDER_STATUS_COLOR.PENDING).bg, color: (ORDER_STATUS_COLOR[order.status] ?? ORDER_STATUS_COLOR.PENDING).color }}>
+  const color = ORDER_STATUS_COLOR[order.status] ?? ORDER_STATUS_COLOR.PENDING;
+  const methodLabel = METHOD_LABEL[order.paymentMethod] ?? order.paymentMethod;
+
+  return wrap(
+    <>
+      <a href="/dashboard/orders" className={s.back}>
+        <ChevronRight size={15} strokeWidth={2} aria-hidden="true" />
+        كل الطلبات
+      </a>
+      <div className={s.head}>
+        <div>
+          <h1 className={s.title}>{order.orderNumber}</h1>
+          <div className={s.meta}>
+            <span className={s.badge} style={{ color: color.color, background: color.bg }}>
               {ORDER_STATUS_LABEL[order.status] ?? order.status}
             </span>
-            · الدفع: {order.paymentStatus}
-          </p>
-        </div>
-
-        <div style={cardStyle}>
-          <h3 style={{ margin: "0 0 10px", fontSize: t.typography.fontSize.base, color: t.colors.text.dark }}>المنتجات</h3>
-          {order.items.map((it, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", fontSize: t.typography.fontSize.sm }}>
-              <span>{it.nameAr} × {it.quantity}</span>
-              <span>{it.total} ر.س</span>
-            </div>
-          ))}
-          <div style={{ display: "flex", justifyContent: "space-between", fontWeight: t.typography.fontWeight.bold, marginTop: t.spacing["2"], paddingTop: t.spacing["2"], borderTop: `1px solid ${t.colors.cream.border}` }}>
-            <span>الإجمالي</span>
-            <span>{order.total} ر.س</span>
+            <span>الدفع: {PAYMENT_LABEL[order.paymentStatus] ?? order.paymentStatus} · {methodLabel}</span>
           </div>
         </div>
+      </div>
 
-        <div style={cardStyle}>
-          <h3 style={{ margin: "0 0 8px", fontSize: t.typography.fontSize.base, color: t.colors.text.dark }}>الشحن إلى</h3>
-          <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid }}>{order.shippingName} — {order.shippingPhone}</p>
-          <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid }}>{order.shippingCity}، {order.shippingAddress}</p>
-        </div>
+      {error && (
+        <p className={s.err} role="alert">
+          <AlertTriangle size={15} strokeWidth={1.8} aria-hidden="true" />
+          {error}
+        </p>
+      )}
 
-        {(order.status === "CONFIRMED" || order.status === "PROCESSING") && order.fulfillmentMethod !== "PICKUP" && (
-          <CourierDispatchCard orderId={order.id} onDone={load} />
-        )}
+      <div className={s.detail}>
+        <div className={s.col}>
+          <section className={s.panel} aria-labelledby="od-items">
+            <div className={s.panelHead}><ReceiptText size={18} strokeWidth={1.7} aria-hidden="true" /><h2 id="od-items" className={s.panelTitle}>المنتجات</h2></div>
+            <div className={s.panelBody}>
+              <ul className={s.items}>
+                {order.items.map((it, i) => (
+                  <li key={i} className={s.item}>
+                    <span>{it.nameAr} × {it.quantity}</span>
+                    <span>{it.total} ر.س</span>
+                  </li>
+                ))}
+              </ul>
+              <div className={s.total}>
+                <span>الإجمالي</span>
+                <span className={s.totalValue}>{order.total} ر.س</span>
+              </div>
+            </div>
+          </section>
 
-        {isBankTransfer && (
-          <div style={cardStyle}>
-            <h3 style={{ display: "flex", alignItems: "center", gap: 6, margin: "0 0 10px", fontSize: t.typography.fontSize.base, color: t.colors.text.dark }}>
-              <Landmark size={15} strokeWidth={1.8} color={t.colors.primary[800]} />
-              إثبات التحويل البنكي
-            </h3>
-            {order.bankTransferProofUrl ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid }}>
-                  الرقم المرجعي: <strong style={{ color: t.colors.text.dark }}>{order.bankTransferReference}</strong>
-                </p>
-                <a href={order.bankTransferProofUrl} target="_blank" rel="noopener noreferrer">
-                  <img
-                    src={order.bankTransferProofUrl}
-                    alt="إثبات التحويل"
-                    style={{ maxWidth: "100%", borderRadius: t.radius.md, border: `1px solid ${t.colors.cream.border}` }}
-                  />
-                </a>
-                {order.paymentStatus !== "PAID" && (
-                  <p style={{ display: "flex", alignItems: "center", gap: 6, margin: 0, fontSize: 12, color: t.colors.semantic.warning }}>
-                    <AlertTriangle size={12} strokeWidth={1.8} />
-                    راجعي الإيصال، ولو صحيح اضغطي "تأكيد استلام التحويل" بالأسفل
-                  </p>
+          <section className={s.panel} aria-labelledby="od-ship">
+            <div className={s.panelHead}><MapPin size={18} strokeWidth={1.7} aria-hidden="true" /><h2 id="od-ship" className={s.panelTitle}>الشحن إلى</h2></div>
+            <div className={s.panelBody}>
+              <p className={s.p}>{order.shippingName} — {order.shippingPhone}</p>
+              <p className={s.p}>{order.shippingCity}، {order.shippingAddress}</p>
+              {order.buyerNotes && <p className={s.notes}>ملاحظات العميل: {order.buyerNotes}</p>}
+            </div>
+          </section>
+
+          {isBankTransfer && (
+            <section className={s.panel} aria-labelledby="od-bank">
+              <div className={s.panelHead}><Landmark size={18} strokeWidth={1.7} aria-hidden="true" /><h2 id="od-bank" className={s.panelTitle}>إثبات التحويل البنكي</h2></div>
+              <div className={s.panelBody}>
+                {order.bankTransferProofUrl ? (
+                  <>
+                    <p className={s.p}>الرقم المرجعي: <strong>{order.bankTransferReference}</strong></p>
+                    <a href={order.bankTransferProofUrl} target="_blank" rel="noopener noreferrer" aria-label="فتح صورة إثبات التحويل">
+                      <span className={s.proof} role="img" aria-label="إثبات التحويل" style={{ backgroundImage: `url(${order.bankTransferProofUrl})` }} />
+                    </a>
+                    <p className={s.note}>
+                      <AlertTriangle size={14} strokeWidth={1.8} aria-hidden="true" />
+                      راجع الإيصال، وإن كان صحيحاً فاضغط «تأكيد استلام التحويل» من لوحة تحديث الحالة
+                    </p>
+                  </>
+                ) : (
+                  <p className={s.p}>لم يرفع المشتري إثبات التحويل بعد.</p>
                 )}
               </div>
-            ) : (
-              <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid }}>المشتري لسه ما رفع إثبات التحويل.</p>
-            )}
-          </div>
-        )}
+            </section>
+          )}
+        </div>
 
-        {nextOptions && (
-          <div style={cardStyle}>
-            <h3 style={{ margin: "0 0 10px", fontSize: t.typography.fontSize.base, color: t.colors.text.dark }}>تحديث الحالة</h3>
-            {order.status === "PROCESSING" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"], marginBottom: t.spacing["3"] }}>
-                <input
-                  placeholder="رقم التتبع"
-                  value={tracking.trackingNumber}
-                  onChange={(e) => setTracking((p) => ({ ...p, trackingNumber: e.target.value }))}
-                  style={{ padding: 10, border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, direction: "rtl" }}
-                />
-                <input
-                  placeholder="شركة الشحن"
-                  value={tracking.carrier}
-                  onChange={(e) => setTracking((p) => ({ ...p, carrier: e.target.value }))}
-                  style={{ padding: 10, border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, direction: "rtl" }}
-                />
+        <div className={s.col}>
+          {(order.status === "CONFIRMED" || order.status === "PROCESSING") && order.fulfillmentMethod !== "PICKUP" && (
+            <CourierDispatchCard orderId={order.id} onDone={load} />
+          )}
+
+          {nextOptions && (
+            <section className={s.panel} aria-labelledby="od-status">
+              <div className={s.panelHead}><RefreshCw size={18} strokeWidth={1.7} aria-hidden="true" /><h2 id="od-status" className={s.panelTitle}>تحديث الحالة</h2></div>
+              <div className={s.panelBody}>
+                {order.status === "PROCESSING" && (
+                  <div className={s.fields}>
+                    <input className={s.field} placeholder="رقم التتبع" aria-label="رقم التتبع" value={tracking.trackingNumber} onChange={(e) => setTracking((p) => ({ ...p, trackingNumber: e.target.value }))} />
+                    <input className={s.field} placeholder="شركة الشحن" aria-label="شركة الشحن" value={tracking.carrier} onChange={(e) => setTracking((p) => ({ ...p, carrier: e.target.value }))} />
+                  </div>
+                )}
+                <div className={s.actions}>
+                  {nextOptions.map((opt) => (
+                    <button key={opt.value} type="button" className={`${s.btn} ${opt.value === "CANCELLED" ? s.btnDanger : ""}`} onClick={() => updateStatus(opt.value)} disabled={updating}>
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
-            <div style={{ display: "flex", gap: t.spacing["2"] }}>
-              {nextOptions.map((s) => (
-                <button
-                  key={s.value}
-                  onClick={() => updateStatus(s.value)}
-                  disabled={updating}
-                  style={{
-                    flex: 1, padding: 11,
-                    background: s.value === "CANCELLED" ? t.colors.semantic.dangerBg : t.colors.primary[800],
-                    color: s.value === "CANCELLED" ? t.colors.semantic.danger : t.colors.white,
-                    border: "none", borderRadius: t.radius.md, cursor: "pointer", fontWeight: t.typography.fontWeight.bold,
-                  }}
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {awaitingProof && (
-          <p style={{ display: "flex", alignItems: "center", gap: 6, color: t.colors.text.mid, fontSize: t.typography.fontSize.xs, marginBottom: t.spacing["3"] }}>
-            <AlertTriangle size={13} strokeWidth={1.8} />
-            بانتظار المشتري يرفع إثبات التحويل — بعدها يظهر لك زر التأكيد هنا
-          </p>
-        )}
-        {error && (
-          <p style={{ display: "flex", alignItems: "center", gap: 6, color: t.colors.semantic.danger, fontSize: t.typography.fontSize.xs }}>
-            <AlertTriangle size={13} strokeWidth={1.8} />
-            {error}
-          </p>
-        )}
+            </section>
+          )}
+
+          {awaitingProof && (
+            <p className={s.note} style={{ margin: 0 }}>
+              <AlertTriangle size={14} strokeWidth={1.8} aria-hidden="true" />
+              بانتظار المشتري يرفع إثبات التحويل — بعدها يظهر لك زر التأكيد هنا
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </>,
   );
 }

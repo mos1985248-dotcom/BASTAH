@@ -3,16 +3,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Store } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import { useCurrentUser } from "../../providers";
-import { t } from "@/theme";
 import { DashboardField } from "@/components/dashboard/DashboardField";
+import f from "@/components/dashboard/forms.module.css";
+import s from "@/components/dashboard/create-store.module.css";
 
-const FIELDS: { key: "nameAr" | "city" | "whatsapp" | "shortDesc"; label: string }[] = [
+const FIELDS: { key: "nameAr" | "city" | "whatsapp" | "shortDesc"; label: string; placeholder?: string }[] = [
   { key: "nameAr", label: "اسم المتجر" },
   { key: "city", label: "المدينة" },
-  { key: "whatsapp", label: "واتساب (+9665XXXXXXXX)" },
+  { key: "whatsapp", label: "واتساب المتجر", placeholder: "+966512345678" },
   { key: "shortDesc", label: "وصف مختصر" },
 ];
 
@@ -30,6 +31,11 @@ export default function CreateStorePage() {
       setError("اسم المتجر والمدينة مطلوبان");
       return;
     }
+    // تغيير سلوكي: واتساب المتجر إلزامي (عليه يتواصل العملاء وتُرسل طلبات المناديب)
+    if (!form.whatsapp.trim()) {
+      setError("رقم واتساب المتجر مطلوب");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -44,28 +50,34 @@ export default function CreateStorePage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: t.colors.cream.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: t.spacing["5"] }}>
-      <div style={{ width: "100%", maxWidth: 420, background: t.colors.white, borderRadius: t.radius.xl, padding: `${t.spacing["8"]} ${t.spacing["6"]}` }}>
-        <h1 style={{ margin: `0 0 ${t.spacing["5"]}`, fontSize: t.typography.fontSize.xl, color: t.colors.primary[800], textAlign: "center" }}>إنشاء متجرك</h1>
-        <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["3"] }}>
-          {FIELDS.map((f) => (
-            <DashboardField key={f.key} label={f.label} value={form[f.key]} onChange={(v) => set(f.key, v)} />
+    <div className={s.wrap}>
+      <section className={`${f.panel} ${s.card}`}>
+        <header className={s.head}>
+          <span className={s.icon}>
+            <Store size={24} strokeWidth={1.7} aria-hidden="true" />
+          </span>
+          <h1 className={s.title}>إنشاء متجرك</h1>
+          <p className={s.sub}>أدخل بيانات متجرك الأساسية، ويمكنك تعديل الاسم وبقية المعلومات لاحقًا من إعدادات المتجر.</p>
+        </header>
+
+        <div className={s.body}>
+          {FIELDS.map((field) => (
+            <DashboardField key={field.key} label={field.label} value={form[field.key]} onChange={(v) => set(field.key, v)} placeholder={field.placeholder} />
           ))}
+          <p className={f.help}>رقم واتساب المتجر يستقبل عليه العملاء طلباتهم، وتُرسل إليه تفاصيل الشحن، فاكتبه بالصيغة الدولية.</p>
+
           {error && (
-            <p style={{ display: "flex", alignItems: "center", gap: 6, margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.semantic.danger }}>
-              <AlertTriangle size={13} strokeWidth={1.8} />
+            <p className={f.err} role="alert">
+              <AlertTriangle size={15} strokeWidth={1.8} />
               {error}
             </p>
           )}
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            style={{ padding: 13, background: loading ? t.colors.primary[600] : t.colors.primary[800], color: t.colors.white, border: "none", borderRadius: t.radius.lg, fontWeight: t.typography.fontWeight.bold, cursor: loading ? "not-allowed" : "pointer" }}
-          >
+
+          <button type="button" onClick={handleSubmit} disabled={loading} className={`${f.cta} ${s.submit}`}>
             {loading ? "جاري الإنشاء..." : "إنشاء المتجر"}
           </button>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -76,7 +76,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── 1) Rate limiting على كل API ────────────────────────
-  if (pathname.startsWith("/api/")) {
+  // ⚠️ /api/auth/sms-hook مستثنى: Supabase هو من يستدعيه (عناوين قليلة مشتركة)، فحد 60 طلب/دقيقة للـIP
+  // سيحجب رموز مستخدمين حقيقيين. الحماية هنا بالتوقيع + حد لكل رقم جوال داخل المسار نفسه.
+  if (pathname.startsWith("/api/") && pathname !== "/api/auth/sms-hook") {
     const ip = getClientIp(request);
     const { allowed, remaining, resetAt } = await checkRateLimit(apiRateLimit, ip);
     if (!allowed) {

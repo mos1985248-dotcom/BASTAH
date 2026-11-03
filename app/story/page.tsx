@@ -1,18 +1,13 @@
-
-// app/story/page.tsx
-
+// app/story/page.tsx — «قصتنا»: حكاية بسطة (تختلف عن /about الذي يعرّف بالشركة).
 import type { Metadata } from "next";
 import SiteShell from "@/components/layout/SiteShell";
-import AboutHero from "@/components/about/AboutHero";
-import AboutIntro from "@/components/about/AboutIntro";
-import AboutStoryPart1 from "@/components/about/AboutStoryPart1";
-import AboutStoryPart2 from "@/components/about/AboutStoryPart2";
-import AboutStoreLife from "@/components/about/AboutStoreLife";
-import AboutExperience from "@/components/about/AboutExperience";
-import AboutGlobalReach from "@/components/about/AboutGlobalReach";
-import AboutTech from "@/components/about/AboutTech";
-import AboutPeopleFirst from "@/components/about/AboutPeopleFirst";
-import AboutClosing from "@/components/about/AboutClosing";
+import { uiVars } from "@/components/ui/vars";
+import StoryHero from "@/components/story/StoryHero";
+import StoryBlock from "@/components/story/StoryBlock";
+import StoryExperience from "@/components/story/StoryExperience";
+import StoryClosing from "@/components/story/StoryClosing";
+import { BLOCKS_BEFORE, BLOCKS_AFTER } from "@/components/story/story-content";
+import s from "@/components/story/story.module.css";
 
 export const metadata: Metadata = {
   title: "قصتنا | بسطة",
@@ -23,17 +18,21 @@ export const metadata: Metadata = {
 export default function StoryPage() {
   return (
     <SiteShell>
-      <AboutHero />
-      <AboutIntro />
-      <AboutStoryPart1 />
-      <AboutStoryPart2 />
-      <AboutStoreLife />
-      <AboutExperience />
-      <AboutGlobalReach />
-      <AboutTech />
-      <AboutPeopleFirst />
-      <AboutClosing />
+      <div className={s.page} style={uiVars}>
+        <StoryHero />
+
+        {BLOCKS_BEFORE.map((block, i) => (
+          <StoryBlock key={block.title} block={block} index={i} />
+        ))}
+
+        <StoryExperience />
+
+        {BLOCKS_AFTER.map((block, i) => (
+          <StoryBlock key={block.title} block={block} index={BLOCKS_BEFORE.length + 1 + i} />
+        ))}
+
+        <StoryClosing />
+      </div>
     </SiteShell>
   );
 }
-

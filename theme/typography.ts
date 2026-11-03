@@ -16,6 +16,9 @@
 export const fontFamily = {
   base: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
   heading: "var(--font-kufi-arabic), 'Noto Kufi Arabic', system-ui, sans-serif",
+  // خط العناوين التراثي (تجربة): display هو المعتمد مؤقتاً، وdisplayAlt للمقارنة.
+  display: "var(--font-amiri), 'Amiri', serif", // Amiri هو الخط الرئيسي المعتمد للعناوين
+  displayAlt: "var(--font-amiri), 'Amiri', serif",
 } as const;
 
 export const fontWeight = {

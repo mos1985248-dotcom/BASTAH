@@ -1,0 +1,74 @@
+/* components/story/story.module.css — صفحة «قصتنا». الألوان عبر --ui-* فقط؛ تتكيّف مع الكمبيوتر والجوال. */
+.page { direction: rtl; background: var(--ui-sand); color: var(--ui-ink); overflow-x: clip; }
+.wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 32px); }
+.display { font-family: var(--font-amiri), "Amiri", serif; }
+
+/* ───── الهيرو ───── */
+.hero { padding: clamp(28px, 6vw, 72px) 0 clamp(20px, 4vw, 40px); }
+.heroGrid { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(24px, 5vw, 64px); align-items: center; }
+.kicker { display: inline-block; margin-bottom: 16px; padding: 6px 16px; border-radius: var(--ui-pill); background: var(--ui-gold); color: var(--ui-ink); font-size: 14px; font-weight: 700; }
+.h1 { margin: 0 0 18px; font-size: clamp(34px, 5.4vw, 60px); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.lead { max-width: 560px; margin: 0; font-size: clamp(16px, 2vw, 19px); line-height: 2; color: var(--ui-ink-muted); }
+.heroImg { position: relative; aspect-ratio: 5 / 4; overflow: hidden; border-radius: 32px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.pillars { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: clamp(28px, 5vw, 52px); }
+.pillar { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 20px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); font-size: 15px; font-weight: 700; line-height: 1.6; }
+.pillarSvg { display: block; flex-shrink: 0; }
+.pillarIcon { display: flex; flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--ui-sand); border: 1px solid var(--ui-border); }
+
+/* ───── الكتل (صورة + نص) ───── */
+.block { padding: clamp(36px, 6vw, 72px) 0; }
+.band { background: var(--ui-card); border-block: 1px solid var(--ui-border); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 64px); align-items: center; }
+.rev .media { order: 2; }
+.media { position: relative; aspect-ratio: 5 / 4; overflow: hidden; border-radius: 32px; border: 1px solid var(--ui-border); background: var(--ui-sand); }
+.img { object-fit: cover; }
+.eyebrow { margin: 0 0 8px; font-size: 14.5px; font-weight: 700; color: var(--ui-kicker); }
+.h2 { margin: 0 0 20px; font-size: clamp(28px, 3.8vw, 42px); font-weight: 700; line-height: 1.55; color: var(--ui-green-deep); }
+.text p { margin: 0 0 14px; font-size: 17px; line-height: 2.05; color: var(--ui-ink); }
+.text p:last-child { margin-bottom: 0; }
+.text .strong { font-weight: 700; }
+.text .hl { padding: 6px 18px; border-inline-start: 4px solid var(--ui-green); border-radius: 0 12px 12px 0; background: color-mix(in srgb, var(--ui-green) 8%, transparent); font-weight: 700; color: var(--ui-green-deep); }
+.text .gold { padding: 6px 18px; border-inline-start: 4px solid var(--ui-gold); border-radius: 0 12px 12px 0; background: color-mix(in srgb, var(--ui-gold) 16%, transparent); font-weight: 700; }
+.text .final { margin-top: 6px; font-size: 19px; font-weight: 700; color: var(--ui-green-deep); }
+
+/* ───── تجربة المتجر ───── */
+.expTop { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 56px); align-items: center; }
+.expLead { margin: 0; font-size: 17px; line-height: 2; color: var(--ui-ink-muted); }
+.expGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: clamp(24px, 4vw, 40px); }
+.expCard { padding: 22px; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-sand); }
+.expIcon { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; margin-bottom: 14px; border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); }
+.expTitle { margin: 0 0 6px; font-size: 18px; font-weight: 700; color: var(--ui-green-deep); }
+.expDesc { margin: 0; font-size: 15px; line-height: 1.9; color: var(--ui-ink-muted); }
+
+/* ───── الخاتمة ───── */
+.closeImg { position: relative; aspect-ratio: 21 / 9; overflow: hidden; margin-bottom: clamp(24px, 4vw, 40px); border-radius: 32px; border: 1px solid var(--ui-border); }
+.closeText { max-width: 780px; margin: 0 auto; }
+.closeText .h2 { text-align: center; }
+.closeText .eyebrow { text-align: center; }
+.final2 { margin-top: clamp(28px, 5vw, 48px); padding: clamp(28px, 5vw, 52px) clamp(18px, 4vw, 40px); text-align: center; border-radius: 32px; background: linear-gradient(135deg, var(--ui-green-deep), var(--ui-green)); color: var(--ui-white); }
+.brand { margin: 0; font-size: clamp(36px, 5vw, 54px); line-height: 1.3; color: var(--ui-gold); }
+.sub { margin: 4px 0 8px; font-size: clamp(20px, 2.6vw, 26px); font-weight: 700; }
+.desc { max-width: 560px; margin: 0 auto; font-size: 16.5px; line-height: 1.9; opacity: 0.93; }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 24px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 30px; border-radius: var(--ui-pill); font-size: 16px; font-weight: 700; text-decoration: none; }
+.btnGold { background: var(--ui-gold); color: var(--ui-ink); }
+.btnGold:hover { background: var(--ui-white); }
+.btnLine { border: 1px solid color-mix(in srgb, var(--ui-white) 60%, transparent); color: var(--ui-white); }
+.btnLine:hover { background: color-mix(in srgb, var(--ui-white) 14%, transparent); }
+.btn:focus-visible { outline: 2px solid var(--ui-white); outline-offset: 3px; }
+
+/* ───── الجوال والتابلت ───── */
+@media (max-width: 900px) {
+  .heroGrid, .grid, .expTop { grid-template-columns: minmax(0, 1fr); }
+  .rev .media { order: 0; }
+  .media, .heroImg { aspect-ratio: 16 / 11; border-radius: 24px; }
+  .heroImg { order: -1; }
+  .pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .closeImg { aspect-ratio: 16 / 10; border-radius: 24px; }
+  .text p { font-size: 16.5px; line-height: 2; }
+}
+@media (max-width: 520px) {
+  .pillar { flex-direction: column; justify-content: center; text-align: center; gap: 8px; padding: 14px 10px; font-size: 14px; }
+  .actions .btn { width: 100%; }
+  .text .final { font-size: 18px; }
+}

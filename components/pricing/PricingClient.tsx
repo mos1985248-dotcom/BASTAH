@@ -7,6 +7,9 @@ import SiteShell from "@/components/layout/SiteShell";
 import PricingHeader from "@/components/pricing/PricingHeader";
 import PricingGrid from "@/components/pricing/PricingGrid";
 import NoCommissionBanner from "@/components/pricing/NoCommissionBanner";
+import ComparisonTable from "@/components/pricing/ComparisonTable";
+import { uiVars } from "@/components/ui/vars";
+import p from "@/components/pricing/pricing.module.css";
 import LoadingState from "@/components/admin/ui/LoadingState";
 import ErrorState from "@/components/admin/ui/ErrorState";
 import { t } from "@/theme";
@@ -24,7 +27,7 @@ export default function PricingClient() {
     fetch("/api/subscription/plans")
       .then((r) => r.json())
       .then((d) => setPlans(d.plans))
-      .catch(() => setError("تعذّر تحميل الباقات — حاولي مجدداً"));
+      .catch(() => setError("تعذّر تحميل الباقات — حاول مجدداً"));
   };
 
   useEffect(load, []);
@@ -100,6 +103,13 @@ export default function PricingClient() {
             </section>
           )}
         </main>
+
+        {/* جدول المقارنة التفصيلية (الجديد) — الوحيد الذي أُعيد تصميمه في هذه الصفحة */}
+        {plans && !error && (
+          <div dir="rtl" style={uiVars} className={p.band}>
+            <ComparisonTable plans={plans} billing={billing} />
+          </div>
+        )}
 
         {/* مزايا بسطة */}
         <section
@@ -211,8 +221,9 @@ export default function PricingClient() {
           }
 
           .basita-pricing-faq-link-content strong {
-            color: ${t.colors.primary[800]};
-            font-size: ${t.typography.fontSize.sm};
+            color: ${t.colors.heritage.greenDeep};
+            font-family: ${t.typography.fontFamily.displayAlt};
+            font-size: 17px;
             font-weight: ${t.typography.fontWeight.bold};
             line-height: 1.5;
           }

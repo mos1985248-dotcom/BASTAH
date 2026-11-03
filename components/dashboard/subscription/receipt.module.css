@@ -1,0 +1,22 @@
+/* components/dashboard/subscription/receipt.module.css — إيصال الاشتراك (شاشة + طباعة) */
+.toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; max-width: 720px; margin: 0 auto 12px; }
+.paper { max-width: 720px; margin: 0 auto; padding: 32px; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.head { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding-bottom: 18px; border-bottom: 2px solid var(--ui-gold); }
+.brand { margin: 0; font-family: var(--font-amiri), "Amiri", serif; font-size: 31px; font-weight: 700; color: var(--ui-green-deep); }
+.title { margin: 2px 0 0; font-size: 20px; font-weight: 700; color: var(--ui-ink); }
+.refBox { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.refLabel { font-size: 12px; color: var(--ui-ink-muted); }
+.ref { font-size: 16px; font-weight: 700; color: var(--ui-ink); direction: ltr; }
+.list { margin: 8px 0 0; }
+.line { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--ui-border); font-size: 14.5px; }
+.line dt { color: var(--ui-ink-muted); }
+.line dd { margin: 0; font-weight: 600; color: var(--ui-ink); word-break: break-all; text-align: end; }
+.total { display: flex; align-items: baseline; justify-content: space-between; margin-top: 16px; padding: 14px 16px; border-radius: 14px; background: var(--ui-sand); font-size: 16px; font-weight: 700; }
+.totalValue { font-size: 26px; color: var(--ui-green-deep); }
+.note { margin: 16px 0 0; font-size: 12.5px; line-height: 1.8; color: var(--ui-ink-muted); }
+@media (max-width: 600px) { .paper { padding: 20px; border-radius: 20px; } .refBox { align-items: flex-start; } }
+@media print {
+  .toolbar { display: none; }
+  .paper { border: 0; border-radius: 0; padding: 0; max-width: none; }
+}
+/* basita-font-scale: applied */

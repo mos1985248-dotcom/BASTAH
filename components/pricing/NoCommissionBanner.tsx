@@ -47,10 +47,10 @@ export default function NoCommissionBanner() {
           width: "100%",
           maxWidth: 1180,
           margin: "0 auto",
-          background: t.colors.primary[900],
+          background: t.colors.heritage.greenDeep,
           borderRadius: t.radius.xl,
           border: "1px solid rgba(255,255,255,0.06)",
-          boxShadow: "0 14px 35px rgba(15,61,46,0.12)",
+          boxShadow: `0 14px 35px color-mix(in srgb, ${t.colors.heritage.greenDeep} 22%, transparent)`,
           padding: `${t.spacing["4"]} ${t.spacing["5"]}`,
           boxSizing: "border-box",
         }}
@@ -112,7 +112,8 @@ export default function NoCommissionBanner() {
                     style={{
                       margin: "0 0 4px",
                       color: t.colors.gold[400],
-                      fontSize: t.typography.fontSize.sm,
+                      fontFamily: t.typography.fontFamily.displayAlt,
+                      fontSize: "18px",
                       fontWeight: t.typography.fontWeight.bold,
                       lineHeight: 1.45,
                     }}

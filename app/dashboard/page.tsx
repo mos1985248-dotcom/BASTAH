@@ -1,11 +1,12 @@
 // app/dashboard/page.tsx
+// المنطق (جلب الملخص والمتجر وحالات الدخول) كما كان حرفياً؛ التغيير في التخطيط والعرض فقط.
 "use client";
 
 import { useEffect, useState } from "react";
-import { Wallet, Receipt, PackageCheck, Eye, Star, AlertTriangle, ArrowLeft } from "lucide-react";
+import { Wallet, Receipt, PackageCheck, Eye, Star, AlertTriangle } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import { useCurrentUser } from "../providers";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import KpiCard from "@/components/dashboard/KpiCard";
 import KpiGridSkeleton from "@/components/dashboard/KpiGridSkeleton";
@@ -16,6 +17,7 @@ import DaftariDashboardCard from "@/components/dashboard/DaftariDashboardCard";
 import StoreSettingsQuickEdit from "@/components/dashboard/StoreSettingsQuickEdit";
 import StorePreviewCard from "@/components/dashboard/StorePreviewCard";
 import { DashboardOrder } from "@/components/dashboard/RecentOrderRow";
+import s from "@/components/dashboard/home.module.css";
 
 interface Summary {
   totalSales: { value: number; changePct: number };
@@ -60,86 +62,80 @@ export default function SellerDashboard() {
       .finally(() => setLoading(false));
   }, [user]);
 
-  if (userLoading) {
-    return <p style={{ textAlign: "center", padding: t.spacing["12"], color: t.colors.text.mid }}>جاري التحميل...</p>;
-  }
+  const wrap = (children: React.ReactNode) => <div className={s.page} style={uiVars}>{children}</div>;
+
+  if (userLoading) return wrap(<p className={s.muted} role="status">جاري التحميل...</p>);
   if (!user) {
-    return (
-      <div style={{ textAlign: "center", padding: t.spacing["12"] }}>
-        <p style={{ color: t.colors.text.mid }}>يجب تسجيل الدخول أولاً</p>
-        <a href="/login?redirect=/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: t.colors.gold[600] }}>
-          تسجيل الدخول
-          <ArrowLeft size={15} strokeWidth={2} />
-        </a>
-      </div>
+    return wrap(
+      <div className={s.empty}>
+        <p className={s.emptyTitle}>يجب تسجيل الدخول أولاً</p>
+        <a href="/login?redirect=/dashboard" className={s.cta}>تسجيل الدخول</a>
+      </div>,
     );
   }
   if (!user.store) {
-    return (
-      <div style={{ textAlign: "center", padding: t.spacing["12"] }}>
-        <p style={{ color: t.colors.text.mid }}>لا يوجد متجر مرتبط بحسابك بعد</p>
-        <a href="/dashboard/create-store" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: t.colors.gold[600] }}>
-          إنشاء متجر
-          <ArrowLeft size={15} strokeWidth={2} />
-        </a>
-      </div>
+    return wrap(
+      <div className={s.empty}>
+        <p className={s.emptyTitle}>لا يوجد متجر مرتبط بحسابك بعد</p>
+        <a href="/dashboard/create-store" className={s.cta}>إنشاء متجر</a>
+      </div>,
     );
   }
 
   return (
-    <div>
+    <div className={s.page} style={uiVars}>
       <DashboardHeader storeName={store?.nameAr ?? "متجرك"} storeSlug={user.store.slug} subscriptionStatus={store?.subscription?.status} />
 
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: t.spacing["5"], display: "flex", flexDirection: "column", gap: t.spacing["5"] }}>
-        {error && (
-          <p style={{ display: "flex", alignItems: "center", gap: 6, color: t.colors.semantic.danger }}>
-            <AlertTriangle size={15} strokeWidth={1.8} />
-            تعذّر تحميل بيانات اللوحة، حاول تحديث الصفحة
-          </p>
-        )}
+      {error && (
+        <p className={s.err} role="alert">
+          <AlertTriangle size={15} strokeWidth={1.8} aria-hidden="true" />
+          تعذّر تحميل بيانات اللوحة، حاول تحديث الصفحة
+        </p>
+      )}
 
-        {loading ? (
-          <KpiGridSkeleton />
-        ) : summary ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: t.spacing["3"] }}>
-            <KpiCard icon={Wallet} value={`${summary.totalSales.value.toFixed(0)} ر.س`} label="إجمالي المبيعات (هذا الشهر)" changePct={summary.totalSales.changePct} highlighted />
-            <KpiCard icon={Receipt} value={String(summary.totalOrders.value)} label="عدد الطلبات" changePct={summary.totalOrders.changePct} />
-            <KpiCard icon={PackageCheck} value={String(summary.totalProducts.value)} label="عدد المنتجات" changePct={summary.totalProducts.changePct} />
-            <KpiCard icon={Eye} value={String(summary.totalVisitors.value)} label="الزوار (٣٠ يوم)" changePct={summary.totalVisitors.changePct} />
-            <KpiCard icon={Star} value={summary.rating.avg.toFixed(1)} label={`التقييمات (${summary.rating.count})`} />
-          </div>
-        ) : null}
+      {loading ? (
+        <KpiGridSkeleton />
+      ) : summary ? (
+        <div className={s.kpis}>
+          <KpiCard icon={Wallet} value={`${summary.totalSales.value.toFixed(0)} ر.س`} label="إجمالي المبيعات (هذا الشهر)" changePct={summary.totalSales.changePct} highlighted />
+          <KpiCard icon={Receipt} value={String(summary.totalOrders.value)} label="عدد الطلبات" changePct={summary.totalOrders.changePct} />
+          <KpiCard icon={PackageCheck} value={String(summary.totalProducts.value)} label="عدد المنتجات" changePct={summary.totalProducts.changePct} />
+          <KpiCard icon={Eye} value={String(summary.totalVisitors.value)} label="الزوار (٣٠ يوم)" changePct={summary.totalVisitors.changePct} />
+          <KpiCard icon={Star} value={summary.rating.avg.toFixed(1)} label={`التقييمات (${summary.rating.count})`} />
+        </div>
+      ) : null}
 
-        <QuickActionsBar />
+      <QuickActionsBar />
 
-        {summary && <SalesTrendChart data={summary.salesTrend} />}
+      {summary && (
+        <div className={s.row2}>
+          <SalesTrendChart data={summary.salesTrend} />
+          <RecentOrdersCard orders={summary.recentOrders} />
+        </div>
+      )}
 
-        {store && <DaftariDashboardCard plan={store.subscription?.plan ?? "FREE"} />}
+      {store && (
+        <div className={s.pair}>
+          <DaftariDashboardCard plan={store.subscription?.plan ?? "FREE"} />
+          <StorePreviewCard store={{ nameAr: store.nameAr, shortDesc: store.shortDesc, logo: store.logo, coverImage: store.coverImage, whatsapp: store.whatsapp, slug: store.slug }} />
+        </div>
+      )}
 
-        {summary && <RecentOrdersCard orders={summary.recentOrders} />}
-
-        {store && (
-          <div id="settings" style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: t.spacing["4"] }} className="basita-dashboard-settings-grid">
-            <StoreSettingsQuickEdit
+      {store && (
+        <div id="settings">
+          <StoreSettingsQuickEdit
               store={{
-                slug: store.slug, logo: store.logo, coverImage: store.coverImage, whatsapp: store.whatsapp, city: store.city,
+                slug: store.slug, nameAr: store.nameAr, logo: store.logo, coverImage: store.coverImage, whatsapp: store.whatsapp, city: store.city,
                 storyAr: store.publicInfo?.storyAr ?? null, videoUrl: store.publicInfo?.videoUrl ?? null,
                 storyTags: store.publicInfo?.storyTags ?? [], workingHours: store.publicInfo?.workingHours ?? null,
                 licenseNumber: store.publicInfo?.licenseNumber ?? null, deliveryPartner: store.publicInfo?.deliveryPartner ?? null,
                 paymentMethods: store.publicInfo?.paymentMethods ?? [], returnPolicyDays: store.publicInfo?.returnPolicyDays ?? null,
                 latitude: store.latitude, longitude: store.longitude, pickupEnabled: store.pickupEnabled,
               }}
-            />
-            <StorePreviewCard store={{ nameAr: store.nameAr, shortDesc: store.shortDesc, logo: store.logo, coverImage: store.coverImage, whatsapp: store.whatsapp, slug: store.slug }} />
-          </div>
-        )}
-      </div>
-
-      <style>{`
-        @media (max-width: 760px) {
-          .basita-dashboard-settings-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+              onSaved={({ nameAr }) => setStore((prev) => (prev ? { ...prev, nameAr } : prev))}
+          />
+        </div>
+      )}
     </div>
   );
 }

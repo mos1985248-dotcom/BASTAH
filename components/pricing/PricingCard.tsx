@@ -167,10 +167,11 @@ export default function PricingCard({
         <h3
           style={{
             margin: `0 0 ${t.spacing["1"]}`,
-            fontSize: t.typography.fontSize.lg,
+            fontFamily: t.typography.fontFamily.displayAlt,
+            fontSize: "26px",
             fontWeight:
               t.typography.fontWeight.bold,
-            color: t.colors.primary[800],
+            color: t.colors.heritage.greenDeep,
             lineHeight: 1.4,
           }}
         >
@@ -261,7 +262,7 @@ export default function PricingCard({
               margin: "7px 0 0",
               fontSize:
                 t.typography.fontSize.xs,
-              color: t.colors.semantic.success,
+              color: t.colors.heritage.green,
               fontWeight:
                 t.typography.fontWeight.semibold,
             }}
@@ -297,11 +298,11 @@ export default function PricingCard({
               borderRadius: t.radius.md,
               border: "none",
               background: highlighted
-                ? t.colors.primary[800]
-                : t.colors.primary[100],
+                ? t.colors.heritage.greenDeep
+                : `color-mix(in srgb, ${t.colors.heritage.greenDeep} 9%, ${t.colors.white})`,
               color: highlighted
                 ? t.colors.text.onDark
-                : t.colors.primary[800],
+                : t.colors.heritage.greenDeep,
               fontWeight:
                 t.typography.fontWeight.bold,
               fontSize:
@@ -338,11 +339,11 @@ export default function PricingCard({
               padding: "10px 12px",
               borderRadius: t.radius.md,
               background: highlighted
-                ? t.colors.primary[800]
-                : t.colors.primary[100],
+                ? t.colors.heritage.greenDeep
+                : `color-mix(in srgb, ${t.colors.heritage.greenDeep} 9%, ${t.colors.white})`,
               color: highlighted
                 ? t.colors.text.onDark
-                : t.colors.primary[800],
+                : t.colors.heritage.greenDeep,
               fontWeight:
                 t.typography.fontWeight.bold,
               fontSize:
@@ -436,14 +437,14 @@ export default function PricingCard({
                 flexShrink: 0,
                 marginTop: 1,
                 background:
-                  "rgba(34, 197, 94, 0.10)",
+                  `color-mix(in srgb, ${t.colors.heritage.green} 12%, transparent)`,
               }}
             >
               <Check
                 size={13}
                 strokeWidth={2.4}
                 color={
-                  t.colors.semantic.success
+                  t.colors.heritage.green
                 }
                 aria-hidden="true"
               />

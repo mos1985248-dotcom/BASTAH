@@ -1,13 +1,14 @@
 // components/dashboard/product-new/NewImagesPicker.tsx
 // اختيار صور المنتج داخل صفحة الإضافة نفسها (معاينة محلية، تُرفع عند الحفظ).
 // الصورة الأولى هي الغلاف تلقائياً (نفس قاعدة السيرفر)، ونجعل أي صورة غلافاً
-// بنقلها لأول القائمة.
+// بنقلها لأول القائمة. المنطق كما كان؛ التغيير في الشكل فقط.
 "use client";
 
 import { useRef } from "react";
-import { Star, Trash2, ImagePlus } from "lucide-react";
-import { t } from "@/theme";
+import { ImagePlus, Star, Trash2 } from "lucide-react";
+import { uiVars } from "@/components/ui/vars";
 import { MAX_PRODUCT_IMAGES, type PendingImage } from "@/lib/upload-product-images";
+import s from "../forms.module.css";
 
 export default function NewImagesPicker({
   images, disabled, onPick, onRemove, onMakeCover,
@@ -21,42 +22,28 @@ export default function NewImagesPicker({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div>
-      <p style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.semibold, color: t.colors.text.dark }}>
-        صور المنتج ({images.length}/{MAX_PRODUCT_IMAGES})
-      </p>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: t.spacing["2"] }}>
-        {images.map((img, idx) => (
-          <div key={img.id} style={{ position: "relative", borderRadius: t.radius.lg, overflow: "hidden", border: `2px solid ${idx === 0 ? t.colors.gold[600] : t.colors.cream.border}` }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img.previewUrl} alt="" style={{ width: "100%", height: 90, objectFit: "cover", display: "block" }} />
-            {idx === 0 && (
-              <span style={{ position: "absolute", top: 4, insetInlineEnd: 4, background: t.colors.gold[600], color: t.colors.white, fontSize: 9, padding: "2px 6px", borderRadius: t.radius.sm }}>
-                غلاف
-              </span>
-            )}
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 6px", background: "rgba(0,0,0,0.04)" }}>
-              {idx !== 0 ? (
-                <button type="button" onClick={() => onMakeCover(img.id)} disabled={disabled} title="تعيين كغلاف" style={{ border: "none", background: "none", cursor: "pointer", display: "flex", color: t.colors.gold[600] }}>
-                  <Star size={13} strokeWidth={1.8} />
+    <div style={uiVars}>
+      <span className={s.fieldLabel}>صور المنتج ({images.length}/{MAX_PRODUCT_IMAGES})</span>
+      <div className={s.tiles}>
+        {images.map((img, index) => (
+          <div key={img.id} className={`${s.tile} ${index === 0 ? s.tileCover : ""}`} style={{ backgroundImage: `url(${img.previewUrl})` }} role="img" aria-label={`صورة ${index + 1}`}>
+            {index === 0 && <span className={s.tileBadge}>غلاف</span>}
+            <div className={s.tileBar}>
+              {index !== 0 && (
+                <button type="button" className={s.tileBtn} onClick={() => onMakeCover(img.id)} disabled={disabled} title="تعيين كغلاف" aria-label="تعيين كغلاف">
+                  <Star size={16} strokeWidth={1.9} />
                 </button>
-              ) : <span />}
-              <button type="button" onClick={() => onRemove(img.id)} disabled={disabled} title="حذف" style={{ border: "none", background: "none", cursor: "pointer", display: "flex", color: t.colors.semantic.danger }}>
-                <Trash2 size={13} strokeWidth={1.8} />
+              )}
+              <button type="button" className={s.tileBtn} onClick={() => onRemove(img.id)} disabled={disabled} title="حذف" aria-label="حذف الصورة">
+                <Trash2 size={16} strokeWidth={1.9} />
               </button>
             </div>
           </div>
         ))}
-
         {images.length < MAX_PRODUCT_IMAGES && (
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            disabled={disabled}
-            style={{ height: 90, borderRadius: t.radius.lg, border: `2px dashed ${t.colors.cream.border}`, background: "none", cursor: disabled ? "not-allowed" : "pointer", color: t.colors.text.mid, display: "flex", alignItems: "center", justifyContent: "center" }}
-          >
-            <ImagePlus size={22} strokeWidth={1.6} />
+          <button type="button" className={s.drop} onClick={() => inputRef.current?.click()} disabled={disabled}>
+            <ImagePlus size={24} strokeWidth={1.6} aria-hidden="true" />
+            إضافة صور
           </button>
         )}
       </div>
@@ -72,9 +59,7 @@ export default function NewImagesPicker({
           e.target.value = ""; // يسمح باختيار نفس الملف مجدداً بعد حذفه
         }}
       />
-      <p style={{ margin: `${t.spacing["2"]} 0 0`, fontSize: t.typography.fontSize.xs, color: t.colors.text.mid }}>
-        JPG أو PNG أو WebP — حتى 8MB للصورة. الصورة الأولى هي الغلاف.
-      </p>
+      <p className={s.help} style={{ marginTop: 8 }}>JPG أو PNG أو WebP — حتى 8MB للصورة. الصورة الأولى هي الغلاف.</p>
     </div>
   );
 }

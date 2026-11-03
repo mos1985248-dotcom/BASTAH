@@ -1,26 +1,33 @@
-
 "use client";
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { useCurrentUser } from "../providers";
-import { t } from "@/theme";
 import AuthShell from "@/components/auth/AuthShell";
 import AuthField from "@/components/auth/AuthField";
 import AuthButton from "@/components/auth/AuthButton";
 import AuthError from "@/components/auth/AuthError";
 import AuthFooterLine from "@/components/auth/AuthFooterLine";
+import AuthMethodTabs, { type AuthMethod } from "@/components/auth/AuthMethodTabs";
+import GoogleButton from "@/components/auth/GoogleButton";
+import PhoneAuthForm from "@/components/auth/PhoneAuthForm";
+import { finishLogin, safeRedirect } from "@/components/auth/finishLogin";
+import s from "@/components/auth/auth.module.css";
 
 export default function LoginClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { refresh } = useCurrentUser();
 
+  const [method, setMethod] = useState<AuthMethod>("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  // callback يعيد إلى هنا بـ?error=oauth عند فشل الدخول عبر Google
+  const [error, setError] = useState(searchParams.get("error") === "oauth" ? "تعذّر الدخول عبر Google، حاول مجدداً." : "");
   const [loading, setLoading] = useState(false);
+
+  const redirectTo = searchParams.get("redirect");
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -33,110 +40,59 @@ export default function LoginClient() {
 
     const supabase = getSupabaseBrowserClient();
 
-    const { error: authError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (authError) {
       setLoading(false);
       setError(
         authError.message === "Invalid login credentials"
-          ? "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+          ? "البريد الإلكتروني أو كلمة المرور غير صحيحة. إن كان حسابك عبر Google أو الجوال فادخل بالطريقة نفسها."
           : authError.message
       );
       return;
     }
 
-    // إجبار Next.js على إعادة تشغيل Server Components بالكوكيز الجديدة
-    router.refresh();
-
-    // تحديث UserProvider بالمستخدم الجديد
-    await refresh();
-
-    // التحقق من أن الحساب الداخلي صالح ونشط
-    const res = await fetch("/api/auth/me");
-
-    if (!res.ok) {
-      setLoading(false);
-      setError(
-        "تعذّر تسجيل الدخول إلى حسابك — قد يكون حسابك معلّقاً أو غير نشط حالياً. تواصلي مع الدعم إذا استمرت المشكلة."
-      );
-      return;
-    }
-
+    const message = await finishLogin(router, refresh, redirectTo);
     setLoading(false);
-
-    const { user } = await res.json();
-
-    // إذا كان هناك redirect محدد في الرابط، نستخدمه أولاً
-    const redirectTo = searchParams.get("redirect");
-
-    if (redirectTo) {
-      router.push(redirectTo);
-      return;
-    }
-
-    // توجيه ذكي حسب الدور
-    if (user.role === "ADMIN" || user.role === "SUPER_ADMIN") {
-      router.push("/admin");
-    } else if (user.role === "SELLER") {
-      router.push("/dashboard");
-    } else {
-      router.push("/marketplace");
-    }
+    if (message) setError(message);
   };
 
   return (
-    <AuthShell
-      title="تسجيل الدخول"
-      subtitle="أهلاً بك مجدداً في بسطة"
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: t.spacing["4"],
-        }}
-      >
-        <AuthField
-          label="البريد الإلكتروني"
-          type="email"
-          value={email}
-          onChange={setEmail}
-        />
+    <AuthShell title="تسجيل الدخول" subtitle="أهلاً بك مجدداً في بسطة" scene="heritage">
+      <div className={s.stack}>
+        <GoogleButton label="المتابعة باستخدام Google" next={safeRedirect(redirectTo)} />
 
-        <AuthField
-          label="كلمة المرور"
-          type="password"
-          value={password}
-          onChange={setPassword}
-          onKeyDown={(e) =>
-            e.key === "Enter" && handleSubmit()
-          }
-        />
+        <p className={s.divider}>أو</p>
 
-        <AuthError message={error} />
+        <AuthMethodTabs value={method} onChange={(m) => { setMethod(m); setError(""); }} />
 
-        <AuthButton
-          onClick={handleSubmit}
-          loading={loading}
-          idleLabel="تسجيل الدخول"
-          loadingLabel="جاري تسجيل الدخول..."
-        />
+        {method === "email" ? (
+          <>
+            <AuthField label="البريد الإلكتروني" type="email" value={email} onChange={setEmail} autoComplete="email" />
 
-        <AuthFooterLine
-          prompt="نسيتِ كلمة المرور؟"
-          linkLabel="استعادة"
-          href="/reset-password"
-        />
+            <AuthField
+              label="كلمة المرور"
+              type="password"
+              value={password}
+              onChange={setPassword}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              autoComplete="current-password"
+            />
 
-        <AuthFooterLine
-          prompt="ليس لديك حساب؟"
-          linkLabel="إنشاء حساب"
-          href="/register"
-        />
+            <AuthError message={error} />
+
+            <AuthButton onClick={handleSubmit} loading={loading} idleLabel="تسجيل الدخول" loadingLabel="جاري تسجيل الدخول..." />
+
+            <AuthFooterLine prompt="نسيت كلمة المرور؟" linkLabel="استعادة" href="/reset-password" />
+          </>
+        ) : (
+          <>
+            {error && <AuthError message={error} />}
+            <PhoneAuthForm mode="login" redirectTo={redirectTo} />
+          </>
+        )}
+
+        <AuthFooterLine prompt="ليس لديك حساب؟" linkLabel="إنشاء حساب" href="/register" />
       </div>
     </AuthShell>
   );

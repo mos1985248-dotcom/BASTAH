@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import nav from "@/components/layout/navctl.module.css";
 import { Bell, ShoppingBag, CreditCard, Star, Store, Megaphone, Gem, Truck, Check, type LucideIcon } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { t } from "@/theme";
@@ -28,8 +29,8 @@ export function NotificationBell({ userId }: Props) {
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
-      <button onClick={() => setOpen((p) => !p)} style={{ position: "relative", background: "none", border: "none", cursor: "pointer", padding: 6 }}>
-        <Bell size={20} strokeWidth={1.8} color={t.colors.text.body} />
+      <button type="button" onClick={() => setOpen((p) => !p)} className={nav.icon} aria-label="الإشعارات" aria-expanded={open}>
+        <Bell size={20} strokeWidth={1.8} />
         {unreadCount > 0 && (
           <span
             style={{

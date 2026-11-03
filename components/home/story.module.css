@@ -1,0 +1,42 @@
+/* components/home/story.module.css — الألوان عبر متغيرات --ui-* فقط */
+.section { margin: 0 auto; padding: 56px 16px 64px; direction: rtl; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
+.three { grid-template-columns: 1fr 1fr 1.25fr; }
+
+.card {
+  display: flex; flex-direction: column; min-height: 260px; padding: 30px 28px;
+  border-radius: 28px; background: var(--ui-card); border: 1px solid var(--ui-border);
+  color: var(--ui-ink); text-decoration: none;
+  transition: border-color 0.25s var(--ui-ease), box-shadow 0.25s var(--ui-ease);
+}
+.card:hover { border-color: var(--ui-gold); box-shadow: var(--ui-shadow); }
+.card:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+
+.icon { margin-bottom: 18px; color: var(--ui-kicker); }
+.title { margin: 0 0 8px; font-size: 30px; font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.text { margin: 0; font-size: 15px; line-height: 1.9; color: var(--ui-ink-muted); }
+.link { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 20px; font-size: 15px; font-weight: 600; color: var(--ui-green); }
+.link svg { transition: transform 0.2s var(--ui-ease); }
+.card:hover .link svg { transform: translateX(-4px); }
+
+.start { background: var(--ui-green-deep); border-color: var(--ui-gold); color: var(--ui-white); }
+.kicker { margin: 0 0 12px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
+.startTitle { color: var(--ui-white); }
+.start .text { color: var(--ui-card); opacity: 0.88; }
+.startCta {
+  align-self: flex-start; display: inline-flex; align-items: center; min-height: 48px; margin-top: auto;
+  padding: 0 28px; border-radius: var(--ui-pill); background: var(--ui-gold); color: var(--ui-ink); font-size: 15px; font-weight: 600;
+}
+.start .text { margin-bottom: 22px; }
+
+@media (max-width: 1000px) {
+  .three { grid-template-columns: 1fr 1fr; }
+  .three .start { grid-column: 1 / -1; min-height: 0; }
+}
+@media (max-width: 767px) {
+  .section { padding: 36px 12px 40px; }
+  .grid, .three { grid-template-columns: 1fr; gap: 14px; }
+  .card { min-height: 0; border-radius: 24px; padding: 26px 22px; }
+  .start { order: -1; }
+}
+@media (prefers-reduced-motion: reduce) { .card, .link svg { transition: none; } .card:hover .link svg { transform: none; } }

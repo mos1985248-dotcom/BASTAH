@@ -1,39 +1,26 @@
-
 // components/layout/Footer.tsx
-
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
+import FooterBrand from "./FooterBrand";
 import FooterNewsletter from "./FooterNewsletter";
 import FooterColumns from "./FooterColumns";
 import FooterBottom from "./FooterBottom";
+import s from "./footer.module.css";
 
 export default function Footer() {
   return (
-    <footer
-      dir="rtl"
-      style={{
-        background: t.colors.primary[900],
-        marginTop: t.spacing["16"],
-        borderTop: `1px solid ${t.colors.primary[700]}`,
-        color: t.colors.text.onDark,
-      }}
-    >
-      <FooterNewsletter />
+    <footer dir="rtl" className={s.footer} style={uiVars}>
+      {/* صورة زخرفية: لا تحجب الروابط ولا الأزرار */}
+      <div className={s.art} aria-hidden="true" />
 
-      <div
-        style={{
-          borderTop: "1px solid rgba(255,255,255,0.12)",
-        }}
-      >
-        <FooterColumns />
+      <div className={s.inner}>
+        <FooterBrand />
+        <FooterNewsletter />
+        <div className={s.links}>
+          <FooterColumns />
+        </div>
       </div>
 
-      <div
-        style={{
-          borderTop: "1px solid rgba(255,255,255,0.12)",
-        }}
-      >
-        <FooterBottom />
-      </div>
+      <FooterBottom />
     </footer>
   );
 }

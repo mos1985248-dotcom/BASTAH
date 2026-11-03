@@ -1,0 +1,68 @@
+/* components/home/munira.module.css — الألوان عبر متغيرات --ui-* فقط */
+.section { margin: 0 auto; padding: 40px 16px 0; direction: rtl; }
+.card {
+  display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: center; gap: 40px;
+  padding: clamp(24px, 4vw, 56px);
+  border-radius: 32px; background: var(--ui-card); border: 1px solid var(--ui-border);
+}
+
+.kicker { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
+.title { margin: 0 0 8px; font-size: clamp(46px, 5.75vw, 69px); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.lead { margin: 0 0 24px; font-size: 17px; line-height: 1.8; color: var(--ui-ink-muted); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 28px; padding: 0; list-style: none; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px;
+  border-radius: var(--ui-pill); background: var(--ui-sand); border: 1px solid var(--ui-border);
+  font-size: 14px; font-weight: 600; color: var(--ui-ink);
+}
+.chip svg { color: var(--ui-kicker); }
+
+.cta {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 32px;
+  border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white);
+  font-size: 15px; font-weight: 600; text-decoration: none;
+  transition: background-color 0.2s var(--ui-ease), box-shadow 0.2s var(--ui-ease);
+}
+.cta:hover { background: var(--ui-green-hover); box-shadow: var(--ui-shadow); }
+.cta:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+
+/* ───── صورة المحادثة ───── */
+.figure { margin: 0; justify-self: center; width: 100%; max-width: 400px; }
+.chat {
+  overflow: hidden; border-radius: 28px; background: var(--ui-sand);
+  border: 1px solid var(--ui-gold); box-shadow: var(--ui-shadow);
+}
+.chatHead { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: var(--ui-green-deep); color: var(--ui-white); }
+.chatName { margin: 0; font-size: 17px; font-weight: 700; }
+.chatRole { margin: 2px 0 0; font-size: 13px; color: var(--ui-kicker); }
+
+.avatar {
+  position: relative; display: inline-block; flex: none; overflow: hidden; border-radius: 50%;
+  border: 2px solid var(--ui-gold); background: var(--ui-green-deep);
+}
+.avatarImg { width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); }
+
+.chatBody { display: flex; flex-direction: column; gap: 14px; padding: 22px 18px; }
+.bubble { margin: 0; padding: 12px 16px; font-size: 15px; line-height: 1.8; border-radius: 20px; }
+.bubbleUser {
+  align-self: flex-start; max-width: 85%;
+  background: var(--ui-green); color: var(--ui-white); border-start-start-radius: 6px;
+}
+.replyRow { display: flex; align-items: flex-end; gap: 8px; align-self: flex-end; max-width: 92%; }
+.bubbleBot { background: var(--ui-card); color: var(--ui-ink); border: 1px solid var(--ui-border); border-end-start-radius: 6px; }
+
+.chatInput {
+  display: flex; align-items: center; justify-content: space-between; margin: 0 18px 18px; padding: 6px; padding-inline-start: 18px;
+  border-radius: var(--ui-pill); background: var(--ui-card); border: 1px solid var(--ui-border);
+  font-size: 14px; color: var(--ui-ink-muted);
+}
+.send { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ui-gold); color: var(--ui-ink); }
+.send svg { transform: scaleX(-1); }
+.caption { margin-top: 12px; text-align: center; font-size: 13px; color: var(--ui-ink-muted); }
+
+@media (max-width: 900px) {
+  .card { grid-template-columns: 1fr; gap: 28px; border-radius: 24px; }
+  .section { padding: 28px 12px 0; }
+}
+/* basita-font-scale: applied */

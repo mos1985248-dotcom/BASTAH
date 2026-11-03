@@ -12,6 +12,8 @@ export const radius = {
   md: "12px",
   lg: "16px",
   xl: "24px",
+  card: "28px",
+  hero: "32px",
   full: "999px",
 } as const;
 

@@ -1,14 +1,16 @@
 // app/dashboard/daftari/page.tsx
+// المنطق (جلب القيود والملخص، إضافة قيد) كما كان حرفياً؛ التغيير في التخطيط والعرض والصياغة فقط.
 "use client";
 
 import { useEffect, useState } from "react";
 import { Wallet, ArrowLeft } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import MonthSummaryCard, { MonthSummary } from "@/components/daftari/MonthSummaryCard";
 import AddEntryForm, { EntryFormState } from "@/components/daftari/AddEntryForm";
 import EntryRow from "@/components/daftari/EntryRow";
 import { DaftariEntryItem } from "@/components/daftari/types";
+import s from "@/components/daftari/daftari.module.css";
 
 const EMPTY_FORM: EntryFormState = { type: "SALE", amount: "", expenseCategory: "", description: "" };
 
@@ -34,7 +36,7 @@ export default function DaftariPage() {
   const handleSubmit = async () => {
     const amount = Number(form.amount);
     if (!amount || amount <= 0) {
-      setFormError("أدخلي مبلغاً صحيحاً");
+      setFormError("أدخل مبلغاً صحيحاً");
       return;
     }
     setSubmitting(true);
@@ -55,48 +57,60 @@ export default function DaftariPage() {
     }
   };
 
-  if (loading) return <p style={{ textAlign: "center", padding: t.spacing["10"], color: t.colors.text.mid }}>جاري التحميل...</p>;
+  if (loading) return <div className={s.page} style={uiVars}><p className={s.empty} role="status">جاري التحميل...</p></div>;
 
   if (accessError) {
     return (
-      <div style={{ textAlign: "center", padding: t.spacing["12"] }}>
-        <Wallet size={38} strokeWidth={1.5} color={t.colors.text.light} style={{ margin: "0 auto" }} />
-        <p style={{ color: t.colors.text.mid, margin: `${t.spacing["3"]} 0` }}>{accessError}</p>
-        <a href="/pricing" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: t.colors.gold[600], fontWeight: t.typography.fontWeight.bold }}>
-          عرض الباقات
-          <ArrowLeft size={15} strokeWidth={2} />
-        </a>
+      <div className={s.page} style={uiVars}>
+        <div className={s.state}>
+          <Wallet size={38} strokeWidth={1.5} aria-hidden="true" />
+          <p>{accessError}</p>
+          <a href="/pricing" className={s.cta}>
+            عرض الباقات
+            <ArrowLeft size={15} strokeWidth={2} aria-hidden="true" />
+          </a>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: t.spacing["4"] }}>
-      <div style={{ maxWidth: 700, margin: "0 auto", display: "flex", flexDirection: "column", gap: t.spacing["4"] }}>
-        <h1 style={{ display: "flex", alignItems: "center", gap: 8, margin: 0, fontSize: t.typography.fontSize.xl, color: t.colors.primary[800] }}>
-          <Wallet size={22} strokeWidth={1.8} />
+    <div className={s.page} style={uiVars}>
+      <div className={s.head}>
+        <h1 className={s.title}>
+          <Wallet size={26} strokeWidth={1.8} aria-hidden="true" />
           دفاتري
         </h1>
+        <p className={s.sub}>محاسبة بسيطة لمتجرك: مبيعاتك ومصروفاتك وأرباحك في مكان واحد</p>
+      </div>
 
-        {summary && <MonthSummaryCard summary={summary} />}
+      {summary && <MonthSummaryCard summary={summary} />}
 
-        <AddEntryForm
-          form={form}
-          onChange={(patch) => setForm((p) => ({ ...p, ...patch }))}
-          onSubmit={handleSubmit}
-          submitting={submitting}
-          error={formError}
-        />
-
-        <div>
-          <h2 style={{ fontSize: t.typography.fontSize.base, color: t.colors.text.dark, marginBottom: t.spacing["2"] }}>آخر القيود</h2>
-          {entries.length === 0 ? (
-            <p style={{ color: t.colors.text.mid, fontSize: t.typography.fontSize.sm }}>لا توجد قيود بعد — سجّلي أول عملية بيع أو مصروف</p>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"] }}>
-              {entries.map((e) => <EntryRow key={e.id} entry={e} />)}
+      <div className={s.layout}>
+        <section className={s.panel} aria-labelledby="entries-title">
+          <div className={s.panelHead}>
+            <div>
+              <h2 id="entries-title" className={s.panelTitle}>آخر القيود</h2>
+              <p className={s.panelSub}>أحدث 30 حركة مالية</p>
             </div>
+          </div>
+          {entries.length === 0 ? (
+            <p className={s.empty}>لا توجد قيود بعد — سجّل أول عملية بيع أو مصروف</p>
+          ) : (
+            <ul className={s.list}>
+              {entries.map((e) => <li key={e.id}><EntryRow entry={e} /></li>)}
+            </ul>
           )}
+        </section>
+
+        <div className={`${s.col} ${s.sticky}`}>
+          <AddEntryForm
+            form={form}
+            onChange={(patch) => setForm((p) => ({ ...p, ...patch }))}
+            onSubmit={handleSubmit}
+            submitting={submitting}
+            error={formError}
+          />
         </div>
       </div>
     </div>

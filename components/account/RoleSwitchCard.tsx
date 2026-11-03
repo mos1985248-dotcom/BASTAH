@@ -8,8 +8,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Repeat, Store, User as UserIcon, AlertTriangle } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
 import { useCurrentUser } from "@/app/providers";
+import s from "./account.module.css";
 
 export default function RoleSwitchCard({ role }: { role: string }) {
   const router = useRouter();
@@ -41,27 +41,21 @@ export default function RoleSwitchCard({ role }: { role: string }) {
   };
 
   return (
-    <div style={{ background: t.colors.white, borderRadius: t.radius.lg, border: `1px solid ${t.colors.cream.border}`, padding: t.spacing["4"], display: "flex", alignItems: "center", justifyContent: "space-between", gap: t.spacing["3"], flexWrap: "wrap" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: t.spacing["2"] }}>
-        {isSeller ? <Store size={18} strokeWidth={1.8} color={t.colors.primary[800]} /> : <UserIcon size={18} strokeWidth={1.8} color={t.colors.primary[800]} />}
+    <div className={s.role}>
+      <div className={s.roleLead}>
+        {isSeller ? <Store size={20} strokeWidth={1.8} aria-hidden="true" /> : <UserIcon size={20} strokeWidth={1.8} aria-hidden="true" />}
         <div>
-          <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
-            أنت الآن في وضع {isSeller ? "التاجر" : "المشتري"}
-          </p>
+          <p className={s.roleTitle}>أنت الآن في وضع {isSeller ? "التاجر" : "المشتري"}</p>
           {error && (
-            <p style={{ display: "flex", alignItems: "center", gap: 5, margin: "2px 0 0", fontSize: 11, color: t.colors.semantic.danger }}>
-              <AlertTriangle size={11} strokeWidth={1.8} />
+            <p className={s.roleErr} role="alert">
+              <AlertTriangle size={13} strokeWidth={1.8} />
               {error}
             </p>
           )}
         </div>
       </div>
-      <button
-        onClick={handleSwitch}
-        disabled={loading}
-        style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", background: t.colors.primary[100], color: t.colors.primary[800], border: "none", borderRadius: t.radius.md, fontSize: 12, fontWeight: t.typography.fontWeight.bold, cursor: loading ? "not-allowed" : "pointer" }}
-      >
-        <Repeat size={13} strokeWidth={2} />
+      <button type="button" onClick={handleSwitch} disabled={loading} className={s.switch}>
+        <Repeat size={14} strokeWidth={2} />
         {loading ? "جاري التبديل..." : `التبديل لحساب ${targetLabel}`}
       </button>
     </div>

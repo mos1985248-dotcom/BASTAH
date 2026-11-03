@@ -1,16 +1,16 @@
-// app/dashboard/products/[id]/edit/page.tsx
+// app/dashboard/products/[id]/edit/page.tsx — المنطق كما كان حرفياً؛ التغيير في التخطيط والعرض فقط.
 "use client";
-
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { AlertTriangle, ArrowRight } from "lucide-react";
+import { AlertTriangle, ChevronRight } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import ImageManagerCard from "@/components/dashboard/product-edit/ImageManagerCard";
 import DetailsFormCard from "@/components/dashboard/product-edit/DetailsFormCard";
 import VariantsCard, { EditVariant } from "@/components/dashboard/product-edit/VariantsCard";
 import { useProductTranslate } from "@/hooks/useProductTranslate";
 import { EditProductImage } from "@/components/dashboard/product-edit/ProductImageTile";
+import s from "@/components/dashboard/forms.module.css";
 
 interface ProductDetail {
   id: string; nameAr: string; price: number; quantity: number; shortDescAr: string | null;
@@ -138,55 +138,61 @@ export default function EditProductPage() {
     }
   };
 
-  if (loading) return <p style={{ textAlign: "center", padding: t.spacing["10"], color: t.colors.text.mid }}>جاري التحميل...</p>;
-  if (!product) return (
-    <p style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, textAlign: "center", padding: t.spacing["10"], color: t.colors.semantic.danger }}>
-      <AlertTriangle size={16} strokeWidth={1.8} />
-      {error}
-    </p>
-  );
+  const wrap = (children: React.ReactNode) => <div className={s.page} style={uiVars}>{children}</div>;
+
+  if (loading) return wrap(<p className={s.state} role="status">جاري التحميل...</p>);
+  if (!product) {
+    return wrap(
+      <p className={s.err} role="alert">
+        <AlertTriangle size={16} strokeWidth={1.8} aria-hidden="true" />
+        {error}
+      </p>,
+    );
+  }
 
   const sortedImages = [...product.productImages].sort((a, b) => a.position - b.position);
 
-  return (
-    <div style={{ padding: t.spacing["4"] }}>
-      <div style={{ maxWidth: 500, margin: "0 auto" }}>
-        <h1 style={{ fontSize: t.typography.fontSize.xl, color: t.colors.primary[800], marginBottom: t.spacing["4"] }}>تعديل المنتج</h1>
-
-        <ImageManagerCard
-          images={sortedImages}
-          busyImageId={busyImageId}
-          uploading={uploading}
-          fileInputRef={fileInputRef}
-          onMove={moveImage}
-          onSetCover={setCover}
-          onDelete={deleteImage}
-          onFileSelected={handleFileSelected}
-        />
-
-        <DetailsFormCard
-          form={form}
-          onChange={(k, v) => setForm((p) => ({ ...p, [k]: v }))}
-          onTranslate={translateToEnglish}
-          translating={translating}
-          onSave={saveDetails}
-          saving={savingDetails}
-          quantityLocked={hasVariants}
-        />
-
-        <VariantsCard productId={id} variants={product.variants ?? []} basePrice={product.price} onSaved={load} />
-
-        {error && (
-          <p style={{ display: "flex", alignItems: "center", gap: 6, color: t.colors.semantic.danger, fontSize: t.typography.fontSize.xs }}>
-            <AlertTriangle size={13} strokeWidth={1.8} />
-            {error}
-          </p>
-        )}
-        <a href="/dashboard/products" style={{ display: "flex", alignItems: "center", gap: 5, color: t.colors.text.mid, fontSize: t.typography.fontSize.sm }}>
-          <ArrowRight size={14} strokeWidth={2} />
-          رجوع لمنتجاتي
-        </a>
+  return wrap(
+    <>
+      <a href="/dashboard/products" className={s.back}>
+        <ChevronRight size={15} strokeWidth={2} aria-hidden="true" />
+        رجوع لمنتجاتي
+      </a>
+      <div className={s.head}>
+        <div>
+          <h1 className={s.title}>تعديل المنتج</h1>
+          <p className={s.sub}>{product.nameAr}</p>
+        </div>
       </div>
-    </div>
+
+      {error && <p className={s.err} role="alert" style={{ marginBottom: 14 }}>{error}</p>}
+
+      <div className={s.layout}>
+        <div className={s.col}>
+          <DetailsFormCard
+            form={form}
+            onChange={(k, v) => setForm((p) => ({ ...p, [k]: v }))}
+            onTranslate={translateToEnglish}
+            translating={translating}
+            onSave={saveDetails}
+            saving={savingDetails}
+            quantityLocked={hasVariants}
+          />
+          <VariantsCard productId={id} variants={product.variants ?? []} basePrice={product.price} onSaved={load} />
+        </div>
+        <div className={`${s.col} ${s.sticky}`}>
+          <ImageManagerCard
+            images={sortedImages}
+            busyImageId={busyImageId}
+            uploading={uploading}
+            fileInputRef={fileInputRef}
+            onMove={moveImage}
+            onSetCover={setCover}
+            onDelete={deleteImage}
+            onFileSelected={handleFileSelected}
+          />
+        </div>
+      </div>
+    </>,
   );
 }

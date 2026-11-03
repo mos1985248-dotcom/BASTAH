@@ -1,0 +1,83 @@
+/* components/product/buy.module.css — معلومات المنتج ولوحة الشراء */
+/* ───── المعلومات ───── */
+.info { min-width: 0; }
+.topRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.storeLink { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--ui-green); text-decoration: none; }
+.storeLink:hover { text-decoration: underline; text-underline-offset: 4px; }
+.storeLink:focus-visible, .iconBtn:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.tools { display: flex; gap: 8px; }
+.iconBtn {
+  display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 50%;
+  border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted); cursor: pointer;
+  transition: color 0.2s var(--ui-ease), border-color 0.2s var(--ui-ease);
+}
+.iconBtn:hover { border-color: var(--ui-gold); color: var(--ui-ink); }
+.iconOn { color: var(--ui-danger); }
+.name { margin: 0 0 12px; font-size: clamp(24px, 3vw, 32px); font-weight: 700; line-height: 1.6; color: var(--ui-ink); }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: 14px; color: var(--ui-ink-muted); }
+.rating { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--ui-ink); }
+.rating svg { color: var(--ui-gold); }
+
+/* ───── لوحة الشراء ───── */
+.panel { padding: 24px; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.priceRow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; padding-bottom: 18px; border-bottom: 1px solid var(--ui-border); }
+.price { font-size: 38px; font-weight: 700; line-height: 1.2; color: var(--ui-green-deep); }
+.unit { font-size: 16px; font-weight: 600; color: var(--ui-ink-muted); }
+.compare { font-size: 16px; color: var(--ui-ink-muted); text-decoration: line-through; }
+.sale { padding: 4px 12px; border-radius: var(--ui-pill); background: var(--ui-green-deep); color: var(--ui-white); font-size: 13px; font-weight: 700; }
+.stock { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 14px; font-weight: 600; color: var(--ui-green); }
+.stock::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.stockLow { color: var(--ui-kicker); }
+.stockOut { color: var(--ui-danger); }
+.block { padding: 18px 0; border-bottom: 1px solid var(--ui-border); }
+.label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 700; color: var(--ui-ink); }
+
+.variantHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.variantGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+.variant {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 56px; padding: 8px 10px; border-radius: 16px;
+  border: 1.5px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink); font: inherit; cursor: pointer;
+  transition: border-color 0.2s var(--ui-ease), background-color 0.2s var(--ui-ease);
+}
+.variant:hover:not(:disabled) { border-color: var(--ui-green); }
+.variant:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.variantOn { background: var(--ui-green); border-color: var(--ui-green); color: var(--ui-white); }
+.variant:disabled { color: var(--ui-ink-muted); background: var(--ui-sand); cursor: not-allowed; }
+.variantName { font-size: 14px; font-weight: 700; }
+.variantPrice { font-size: 12px; opacity: 0.85; }
+.chosen { font-size: 12px; font-weight: 600; color: var(--ui-green); }
+
+.qty { display: inline-flex; align-items: center; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-card); }
+.qtyBtn {
+  display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
+  background: transparent; color: var(--ui-ink); cursor: pointer; transition: background-color 0.2s var(--ui-ease);
+}
+.qtyBtn:hover:not(:disabled) { background: var(--ui-sand); }
+.qtyBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.qtyBtn:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 1px; }
+.qtyVal { min-width: 36px; text-align: center; font-size: 16px; font-weight: 700; color: var(--ui-ink); }
+
+.alert { display: flex; align-items: flex-start; gap: 8px; margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: var(--ui-danger-bg); color: var(--ui-danger); font-size: 14px; line-height: 1.7; }
+.alert svg { flex: none; margin-top: 3px; }
+.buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 24px; border-radius: var(--ui-pill);
+  border: 1px solid var(--ui-green); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
+  transition: background-color 0.2s var(--ui-ease), box-shadow 0.2s var(--ui-ease);
+}
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+.btnBuy { background: var(--ui-green); color: var(--ui-white); }
+.btnBuy:hover:not(:disabled) { background: var(--ui-green-hover); box-shadow: var(--ui-shadow); }
+.btnCart { background: transparent; color: var(--ui-green); }
+.btnCart:hover:not(:disabled) { background: var(--ui-sand); }
+.cartLink { align-self: center; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--ui-green); }
+
+/* ───── الثقة ───── */
+.assure { margin: 20px 0 0; font-size: 13px; font-weight: 600; color: var(--ui-ink-muted); text-align: center; }
+.trust { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.trustItem { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--ui-sand); font-size: 13px; font-weight: 600; color: var(--ui-ink); }
+.trustItem svg { flex: none; color: var(--ui-kicker); }
+
+@media (max-width: 900px) { .panel { padding: 20px; border-radius: 24px; } .price { font-size: 34px; } }
+@media (prefers-reduced-motion: reduce) { .iconBtn, .variant, .qtyBtn, .btn { transition: none; } }

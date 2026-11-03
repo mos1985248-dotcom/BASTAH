@@ -13,6 +13,7 @@ import CategoryNav from "@/components/home/CategoryNav";
 import FeaturedStores from "@/components/home/FeaturedStores";
 import WhyBasita from "@/components/home/WhyBasita";
 import SectionBand from "@/components/home/SectionBand";
+import { t } from "@/theme";
 
 export default function HomeClient() {
   const { user, loading } = useCurrentUser();
@@ -24,6 +25,7 @@ export default function HomeClient() {
 
   return (
     <SiteShell>
+      <div style={{ background: t.colors.heritage.sand }}>
       {/* رحلة المتسوّق أولاً */}
       <HeroSection showStartStore={showStartStore} />
 
@@ -60,6 +62,7 @@ export default function HomeClient() {
       <SectionBand tone="tint">
         <StoryBlogCTARow showStartStore={showStartStore} />
       </SectionBand>
+      </div>
     </SiteShell>
   );
 }

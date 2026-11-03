@@ -3,7 +3,7 @@
 
 import { useRef, useState } from "react";
 import { AlertTriangle } from "lucide-react";
-import { t } from "@/theme";
+import s from "./account.module.css";
 
 const MAX_UPLOAD_MB = 8;
 
@@ -35,16 +35,9 @@ export default function AvatarUpload({ currentUrl, name, onUploaded }: { current
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: t.spacing["4"] }}>
-      <div
-        style={{
-          width: 80, height: 80, borderRadius: t.radius.full, flexShrink: 0,
-          background: currentUrl ? `url(${currentUrl}) center/cover` : t.colors.primary[100],
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800],
-          border: `1px solid ${t.colors.cream.border}`,
-        }}
-      >
+    <div className={s.avatarRow}>
+      {/* صورة المستخدم قيمة ديناميكية فتبقى مضمّنة */}
+      <div className={s.avatarBig} style={currentUrl ? { backgroundImage: `url(${currentUrl})` } : undefined} aria-hidden="true">
         {!currentUrl && name.trim().charAt(0)}
       </div>
 
@@ -53,30 +46,19 @@ export default function AvatarUpload({ currentUrl, name, onUploaded }: { current
           ref={inputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp"
-          style={{ display: "none" }}
+          hidden
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) handleFile(file);
           }}
         />
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={uploading}
-          style={{
-            padding: "7px 16px", borderRadius: t.radius.full, border: `1px solid ${t.colors.cream.border}`,
-            background: t.colors.white, color: t.colors.primary[800], fontSize: 12, fontWeight: t.typography.fontWeight.bold,
-            cursor: uploading ? "not-allowed" : "pointer",
-          }}
-        >
+        <button type="button" onClick={() => inputRef.current?.click()} disabled={uploading} className={s.upload}>
           {uploading ? "جاري الرفع..." : currentUrl ? "تغيير الصورة" : "رفع صورة"}
         </button>
-        <p style={{ margin: "6px 0 0", fontSize: 11, color: t.colors.text.light }}>
-          JPG أو PNG أو WebP، حتى {MAX_UPLOAD_MB}MB
-        </p>
+        <p className={s.avatarHint}>JPG أو PNG أو WebP، حتى {MAX_UPLOAD_MB}MB</p>
         {error && (
-          <p style={{ display: "flex", alignItems: "center", gap: 6, margin: "4px 0 0", fontSize: 12, color: t.colors.semantic.danger }}>
-            <AlertTriangle size={12} strokeWidth={1.8} />
+          <p className={s.avatarErr} role="alert">
+            <AlertTriangle size={13} strokeWidth={1.8} />
             {error}
           </p>
         )}
