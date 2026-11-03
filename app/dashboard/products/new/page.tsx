@@ -1,18 +1,20 @@
 // app/dashboard/products/new/page.tsx
 // صفحة واحدة: البيانات + الصور ثم "حفظ" واحد. الصور تُرفع بعد إنشاء المنتج
 // مباشرة (السيرفر يحتاج productId) لكن التاجر لا يرى خطوة ثانية أو صفحة أخرى.
+// المنطق كما كان حرفياً؛ التغيير في التخطيط والعرض فقط.
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, ArrowLeft } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ChevronRight } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import { DashboardField, DashboardTextarea } from "@/components/dashboard/DashboardField";
 import NewImagesPicker from "@/components/dashboard/product-new/NewImagesPicker";
 import {
   MAX_PRODUCT_IMAGES, validateImageFile, uploadImagesSequentially, type PendingImage,
 } from "@/lib/upload-product-images";
+import s from "@/components/dashboard/forms.module.css";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -102,59 +104,68 @@ export default function AddProductPage() {
     }
   };
 
-  const primary = { padding: 12, background: loading ? t.colors.primary[600] : t.colors.primary[800], color: t.colors.text.onDark, border: "none", borderRadius: t.radius.lg, cursor: loading ? "not-allowed" : "pointer", fontWeight: t.typography.fontWeight.bold } as const;
-
   return (
-    <div style={{ minHeight: "100vh", padding: t.spacing["5"] }}>
-      <div style={{ maxWidth: 460, margin: "0 auto", background: t.colors.white, borderRadius: t.radius.xl, padding: t.spacing["6"] }}>
-        <h1 style={{ margin: `0 0 ${t.spacing["4"]}`, fontSize: t.typography.fontSize.xl, color: t.colors.primary[800] }}>إضافة منتج جديد</h1>
+    <div className={s.page} style={uiVars}>
+      <a href="/dashboard/products" className={s.back}>
+        <ChevronRight size={15} strokeWidth={2} aria-hidden="true" />
+        منتجاتي
+      </a>
+      <div className={s.head}>
+        <div>
+          <h1 className={s.title}>إضافة منتج جديد</h1>
+          <p className={s.sub}>أدخل البيانات الأساسية وأضف الصور، ويمكنك استكمال التفاصيل والمتغيّرات بعد الحفظ</p>
+        </div>
+      </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["3"] }}>
-          <fieldset disabled={!!createdId} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: "flex", flexDirection: "column", gap: t.spacing["3"] }}>
-            <DashboardField label="اسم المنتج" value={form.nameAr} onChange={(v) => set("nameAr", v)} />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: t.spacing["2"] }}>
-              <DashboardField label="السعر (ر.س)" type="number" value={form.price} onChange={(v) => set("price", v)} />
-              <DashboardField label="الكمية" type="number" value={form.quantity} onChange={(v) => set("quantity", v)} />
+      <div className={s.layout}>
+        <div className={s.col}>
+          <section className={s.panel} aria-labelledby="np-data">
+            <div className={s.panelHead}><h2 id="np-data" className={s.panelTitle}>بيانات المنتج</h2></div>
+            <fieldset disabled={!!createdId} style={{ border: 0, margin: 0, minWidth: 0 }} className={s.panelBody}>
+              <DashboardField label="اسم المنتج" value={form.nameAr} onChange={(v) => set("nameAr", v)} />
+              <div className={s.two}>
+                <DashboardField label="السعر (ر.س)" type="number" value={form.price} onChange={(v) => set("price", v)} />
+                <DashboardField label="الكمية" type="number" value={form.quantity} onChange={(v) => set("quantity", v)} />
+              </div>
+              <DashboardTextarea label="وصف مختصر" value={form.shortDescAr} onChange={(v) => set("shortDescAr", v)} />
+            </fieldset>
+          </section>
+        </div>
+
+        <div className={`${s.col} ${s.sticky}`}>
+          <section className={s.panel} aria-labelledby="np-images">
+            <div className={s.panelHead}><h2 id="np-images" className={s.panelTitle}>الصور</h2></div>
+            <div className={s.panelBody}>
+              <NewImagesPicker images={images} disabled={loading} onPick={handlePick} onRemove={handleRemove} onMakeCover={handleMakeCover} />
             </div>
-            <DashboardTextarea label="وصف مختصر" value={form.shortDescAr} onChange={(v) => set("shortDescAr", v)} />
-          </fieldset>
-
-          <NewImagesPicker images={images} disabled={loading} onPick={handlePick} onRemove={handleRemove} onMakeCover={handleMakeCover} />
+          </section>
 
           {error && (
             <div>
-              <p style={{ display: "flex", alignItems: "center", gap: 6, margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.semantic.danger }}>
-                <AlertTriangle size={13} strokeWidth={1.8} />
+              <p className={s.err} role="alert">
+                <AlertTriangle size={14} strokeWidth={1.8} aria-hidden="true" />
                 {error}
               </p>
               {upgradeRequired && (
-                <a href="/pricing" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: t.typography.fontSize.xs, color: t.colors.gold[600], fontWeight: t.typography.fontWeight.bold }}>
+                <a href="/pricing" className={s.link}>
                   ترقية الباقة
-                  <ArrowLeft size={12} strokeWidth={2} />
+                  <ArrowLeft size={13} strokeWidth={2} aria-hidden="true" />
                 </a>
               )}
             </div>
           )}
 
           {createdId ? (
-            <div style={{ display: "flex", gap: t.spacing["2"] }}>
-              <a href={`/dashboard/products/${createdId}/edit`} style={{ flex: 1, padding: 12, textAlign: "center", textDecoration: "none", background: t.colors.white, border: `1.5px solid ${t.colors.cream.border}`, borderRadius: t.radius.lg, color: t.colors.text.dark, fontWeight: t.typography.fontWeight.semibold }}>
-                تعديل المنتج
-              </a>
-              <button onClick={() => handleSubmit(true)} disabled={loading} style={{ ...primary, flex: 2 }}>
+            <div className={s.actions}>
+              <a href={`/dashboard/products/${createdId}/edit`} className={`${s.cta} ${s.ghost}`}>تعديل المنتج</a>
+              <button type="button" onClick={() => handleSubmit(true)} disabled={loading} className={s.cta}>
                 {loading ? "جاري رفع الصور..." : images.length > 0 ? "إعادة رفع الصور المتبقية" : "إنهاء"}
               </button>
             </div>
           ) : (
-            <div style={{ display: "flex", gap: t.spacing["2"] }}>
-              <button
-                onClick={() => handleSubmit(false)}
-                disabled={loading}
-                style={{ flex: 1, padding: 12, background: t.colors.white, border: `1.5px solid ${t.colors.cream.border}`, borderRadius: t.radius.lg, cursor: "pointer", fontWeight: t.typography.fontWeight.semibold }}
-              >
-                حفظ كمسودة
-              </button>
-              <button onClick={() => handleSubmit(true)} disabled={loading} style={{ ...primary, flex: 2 }}>
+            <div className={s.actions}>
+              <button type="button" onClick={() => handleSubmit(false)} disabled={loading} className={`${s.cta} ${s.ghost}`}>حفظ كمسودة</button>
+              <button type="button" onClick={() => handleSubmit(true)} disabled={loading} className={s.cta}>
                 {loading ? "جاري الحفظ..." : "حفظ ونشر المنتج"}
               </button>
             </div>

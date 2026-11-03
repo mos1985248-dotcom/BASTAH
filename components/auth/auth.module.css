@@ -1,0 +1,92 @@
+/* components/auth/auth.module.css — الدخول والتسجيل واستعادة كلمة المرور. الألوان عبر --ui-* فقط.
+   يشمل القالب (صورة تراثية + نموذج) والحقول والتبويبات وخطوات الاستعادة. */
+.root { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); min-height: 100dvh; background: var(--ui-sand); direction: rtl; }
+
+/* ───── منطقة النموذج ───── */
+.main { display: flex; align-items: center; justify-content: center; padding: clamp(24px, 5vw, 56px); }
+.panel { width: 100%; max-width: 440px; }
+.title { margin: 0; text-align: center; font-family: var(--font-amiri), "Amiri", serif; font-size: clamp(33px, 3.96vw, 44px); font-weight: 700; line-height: 1.4; color: var(--ui-green-deep); }
+.sub { margin: 8px 0 24px; text-align: center; font-size: 15px; line-height: 1.8; color: var(--ui-ink-muted); }
+.card { padding: clamp(20px, 4vw, 30px); border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+
+/* ───── لوحة الصورة ───── */
+.aside { position: relative; display: flex; flex-direction: column; justify-content: space-between; min-height: 100dvh; overflow: hidden; padding: clamp(28px, 4vw, 56px); color: var(--ui-white); background: var(--ui-green-deep); }
+.asideImg { object-fit: cover; }
+.shade { position: absolute; inset: 0; background: linear-gradient(180deg, color-mix(in srgb, var(--ui-green-deep) 60%, transparent) 0%, color-mix(in srgb, var(--ui-green-deep) 18%, transparent) 42%, color-mix(in srgb, var(--ui-green-deep) 92%, transparent) 100%); }
+.asideTop, .asideBottom { position: relative; z-index: 1; }
+.brand { display: inline-flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+.logoBox { display: flex; flex: none; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 14px; background: var(--ui-white); }
+.brandName { display: block; font-family: var(--font-amiri), "Amiri", serif; font-size: 31px; font-weight: 700; line-height: 1.2; }
+.brandTag { display: block; margin-top: 2px; font-size: 13px; opacity: 0.9; }
+.kicker { display: inline-block; margin-bottom: 12px; padding: 6px 14px; border-radius: var(--ui-pill); background: var(--ui-gold); color: var(--ui-ink); font-size: 13px; font-weight: 700; }
+.headline { max-width: 480px; margin: 0 0 12px; font-family: var(--font-amiri), "Amiri", serif; font-size: clamp(33px, 3.52vw, 50.5px); font-weight: 700; line-height: 1.5; }
+.lead { max-width: 460px; margin: 0; font-size: 16px; line-height: 1.9; opacity: 0.95; }
+@media (max-width: 900px) {
+  .root { grid-template-columns: minmax(0, 1fr); }
+  .aside { order: -1; min-height: 150px; padding: 20px 16px; justify-content: center; }
+  .asideBottom { display: none; }
+  .main { align-items: flex-start; padding: 20px 14px 40px; }
+}
+
+/* ───── الحقول والأزرار ───── */
+.field { display: block; width: 100%; }
+.label { display: block; margin-bottom: 7px; font-size: 14px; font-weight: 700; color: var(--ui-ink); }
+.inputWrap { position: relative; }
+.input { width: 100%; height: 50px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink); font: inherit; font-size: 16px; text-align: start; outline: none; box-sizing: border-box; }
+.input:focus { border-color: var(--ui-green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-green) 18%, transparent); }
+.input::placeholder { color: var(--ui-ink-muted); opacity: 0.7; }
+.ltr { direction: ltr; text-align: left; }
+.withToggle { padding-inline-end: 48px; }
+.toggle { position: absolute; top: 50%; inset-inline-end: 6px; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; transform: translateY(-50%); border: 0; border-radius: 12px; background: transparent; color: var(--ui-ink-muted); cursor: pointer; }
+.toggle:hover { color: var(--ui-green-deep); }
+.toggle:focus-visible, .btn:focus-visible, .google:focus-visible, .tab:focus-visible, .role:focus-visible, .linkBtn:focus-visible, .back:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 50px; padding: 0 18px; border: 0; border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white); font: inherit; font-size: 16px; font-weight: 700; text-decoration: none; cursor: pointer; }
+.btn:hover:not(:disabled) { background: var(--ui-green-hover); }
+.btn:disabled { opacity: 0.65; cursor: not-allowed; }
+.err { display: flex; align-items: flex-start; gap: 9px; margin: 0; padding: 11px 13px; border-radius: 12px; background: var(--ui-danger-bg); border: 1px solid color-mix(in srgb, var(--ui-danger) 18%, transparent); border-inline-start: 3px solid var(--ui-danger); color: var(--ui-danger); font-size: 14px; line-height: 1.7; }
+.err svg { flex: none; margin-top: 3px; }
+.foot { margin: 0; text-align: center; font-size: 14.5px; color: var(--ui-ink-muted); }
+.foot a { margin-inline-start: 4px; color: var(--ui-green-deep); font-weight: 700; text-decoration: none; }
+.foot a:hover { text-decoration: underline; }
+.hint { margin: 6px 0 0; font-size: 13px; color: var(--ui-ink-muted); }
+
+/* ───── Google والفاصل والتبويبات ───── */
+.google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 50px; padding: 0 18px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink); font: inherit; font-size: 15.5px; font-weight: 700; cursor: pointer; }
+.google:hover:not(:disabled) { border-color: var(--ui-green); background: var(--ui-sand); }
+.google:disabled { opacity: 0.65; cursor: not-allowed; }
+.divider { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 13.5px; color: var(--ui-ink-muted); }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--ui-border); }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: var(--ui-pill); background: var(--ui-sand); border: 1px solid var(--ui-border); }
+.tab { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; border: 0; border-radius: var(--ui-pill); background: transparent; color: var(--ui-ink-muted); font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; }
+.tab:hover { color: var(--ui-green-deep); }
+.tabOn, .tabOn:hover { background: var(--ui-card); color: var(--ui-green-deep); box-shadow: 0 1px 4px color-mix(in srgb, var(--ui-ink) 14%, transparent); }
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.role { min-height: 48px; border-radius: 14px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.roleOn { border-color: var(--ui-green); background: var(--ui-sand); color: var(--ui-green-deep); }
+.otp { letter-spacing: 0.5em; text-align: center; font-size: 22px; font-weight: 700; direction: ltr; padding-inline: 14px; }
+.linkBtn { min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: var(--ui-green-deep); font: inherit; font-size: 14.5px; font-weight: 700; cursor: pointer; }
+.linkBtn:disabled { color: var(--ui-ink-muted); cursor: not-allowed; }
+.rowBetween { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* ───── قوة كلمة المرور ───── */
+.strength { margin-top: 8px; }
+.bar { height: 6px; overflow: hidden; border-radius: var(--ui-pill); background: var(--ui-border); }
+.barFill { height: 100%; border-radius: var(--ui-pill); transition: width 250ms ease; }
+.weak { background: var(--ui-danger); width: 30%; }
+.mid { background: var(--ui-gold); width: 65%; }
+.strong { background: var(--ui-green); width: 100%; }
+.strengthRow { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font-size: 13px; color: var(--ui-ink-muted); }
+
+/* ───── خطوات الاستعادة والتأكيد ───── */
+.step { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+.stepIcon { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: var(--ui-sand); border: 1px solid var(--ui-border); color: var(--ui-green-deep); }
+.stepOk { color: var(--ui-green); }
+.stepTitle { margin: 0; font-family: var(--font-amiri), "Amiri", serif; font-size: 31px; font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.stepText { margin: 0; font-size: 15px; line-height: 1.9; color: var(--ui-ink-muted); }
+.stepText strong { color: var(--ui-ink); overflow-wrap: anywhere; direction: ltr; unicode-bidi: plaintext; }
+.fullStep { width: 100%; text-align: start; align-items: stretch; }
+.fullStep .stepIcon, .fullStep .stepTitle, .fullStep .stepText { align-self: center; text-align: center; }
+.back { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; color: var(--ui-green-deep); font-size: 14.5px; font-weight: 700; text-decoration: none; }
+.back:hover { text-decoration: underline; }
+/* basita-font-scale: applied */

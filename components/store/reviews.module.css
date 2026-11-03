@@ -1,0 +1,37 @@
+/* components/store/reviews.module.css — التقييمات */
+.layout { display: grid; grid-template-columns: 320px 1fr; gap: 28px; align-items: start; }
+.summary { padding: 26px; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.avg { display: flex; align-items: baseline; gap: 10px; }
+.avgNum { font-size: 52px; font-weight: 700; line-height: 1; color: var(--ui-green-deep); }
+.avgOf { font-size: 14px; color: var(--ui-ink-muted); }
+.stars { display: inline-flex; gap: 2px; color: var(--ui-gold); }
+.total { margin: 6px 0 18px; font-size: 14px; color: var(--ui-ink-muted); }
+.bars { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.bar { display: grid; grid-template-columns: 22px 1fr 28px; align-items: center; gap: 10px; font-size: 13px; color: var(--ui-ink-muted); }
+.track { height: 8px; overflow: hidden; border-radius: 999px; background: var(--ui-sand); }
+.fill { display: block; height: 100%; border-radius: 999px; background: var(--ui-gold); }
+
+.list { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.review { padding: 20px 22px; border-radius: 22px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.reviewHead { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.avatar {
+  display: inline-flex; flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--ui-sand) center / cover no-repeat; border: 1px solid var(--ui-border); font-weight: 700; color: var(--ui-green-deep);
+}
+.who { min-width: 0; }
+.name { display: block; font-size: 15px; font-weight: 700; color: var(--ui-ink); }
+.when { font-size: 13px; color: var(--ui-ink-muted); }
+.stars-sm { margin-inline-start: auto; }
+.comment { margin: 0; font-size: 15px; line-height: 1.9; color: var(--ui-ink); }
+.about { margin: 8px 0 0; font-size: 13px; color: var(--ui-ink-muted); }
+.reply { margin-top: 14px; padding: 12px 16px; border-radius: 16px; background: var(--ui-sand); border-inline-start: 3px solid var(--ui-gold); }
+.replyLabel { display: block; margin-bottom: 2px; font-size: 13px; font-weight: 700; color: var(--ui-green-deep); }
+.replyText { margin: 0; font-size: 14px; line-height: 1.8; color: var(--ui-ink); }
+.more {
+  align-self: center; min-height: 48px; margin-top: 6px; padding: 0 28px; border-radius: var(--ui-pill); border: 1px solid var(--ui-green);
+  background: transparent; color: var(--ui-green); font: inherit; font-weight: 600; cursor: pointer;
+}
+.more:disabled { opacity: 0.6; cursor: not-allowed; }
+.more:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }

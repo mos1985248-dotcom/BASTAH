@@ -1,0 +1,22 @@
+/* components/pricing/pricing.module.css — جدول مقارنة الباقات فقط. الألوان عبر --ui-* (يُلفّ بعنصر style={uiVars}) */
+.band { margin-top: 40px; padding: clamp(8px, 2vw, 16px) 0 clamp(32px, 5vw, 64px); background: var(--ui-white); direction: rtl; }
+.section { width: 100%; max-width: 1240px; margin: 0 auto; padding-inline: 16px; box-sizing: border-box; }
+
+/* ───── جدول المقارنة ───── */
+.compare { margin-top: clamp(24px, 4vw, 48px); scroll-margin-top: 80px; }
+.h2 { margin: 0 0 6px; font-family: var(--font-amiri), "Amiri", serif; font-size: clamp(28px, 3.4vw, 38px); font-weight: 700; color: var(--ui-green-deep); }
+.lead { margin: 0 0 18px; font-size: 15px; line-height: 1.9; color: var(--ui-ink-muted); }
+.tableBox { overflow-x: auto; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.table { width: 100%; min-width: 680px; border-collapse: separate; border-spacing: 0; text-align: center; font-size: 14.5px; }
+.table th, .table td { padding: 13px 14px; border-bottom: 1px solid var(--ui-border); color: var(--ui-ink); }
+.table tbody tr:last-child th, .table tbody tr:last-child td { border-bottom: 0; }
+.corner, .rowLabel { position: sticky; inset-inline-start: 0; z-index: 1; min-width: 150px; text-align: start; background: var(--ui-card); font-weight: 700; }
+.corner { background: var(--ui-sand); }
+.colHead { background: var(--ui-sand); vertical-align: bottom; }
+.colName { display: block; font-family: var(--font-amiri), "Amiri", serif; font-size: 21px; font-weight: 700; color: var(--ui-green-deep); }
+.colPrice { display: block; margin-top: 2px; font-size: 13px; font-weight: 600; color: var(--ui-ink-muted); }
+.hotCol { background: var(--ui-sand); }
+.groupRow th { padding-block: 10px; background: var(--ui-sand); color: var(--ui-kicker); font-size: 13px; font-weight: 700; text-align: start; }
+.yes { color: var(--ui-green); }
+.no { color: var(--ui-ink-muted); opacity: 0.55; }
+.val { font-weight: 600; }

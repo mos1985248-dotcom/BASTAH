@@ -1,6 +1,9 @@
 // components/marketplace/ProductCard.tsx
-import { ShoppingBag, Star, Heart } from "lucide-react";
-import { t } from "@/theme";
+// بطاقة المنتج المشتركة: السوق، المتجر، المفضلة، المنتجات المشابهة، السلة.
+"use client";
+import { Heart, ShoppingBag, Star } from "lucide-react";
+import { uiVars } from "@/components/ui/vars";
+import s from "./card.module.css";
 
 export interface MarketplaceProduct {
   id: string;
@@ -23,110 +26,58 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, badge, isFavorite, onToggleFavorite }: ProductCardProps) {
+  const { price, comparePrice } = product;
+  const discount =
+    comparePrice && comparePrice > price ? Math.round((1 - price / comparePrice) * 100) : 0;
+
   return (
-    <div style={{ position: "relative" }}>
-      <a href={`/products/${product.id}`} style={{ textDecoration: "none" }}>
-        <div
-          className="basita-card-interactive"
-          style={{
-            background: t.colors.white,
-            borderRadius: t.radius.lg,
-            overflow: "hidden",
-            border: `1px solid ${t.colors.cream.border}`,
-          }}
+    <div className={s.wrap} style={uiVars}>
+      <a href={`/products/${product.id}`} className={s.card}>
+        <span
+          className={s.media}
+          style={product.mainImage ? { backgroundImage: `url(${product.mainImage})` } : undefined}
         >
-          <div
-            style={{
-              height: 150,
-              position: "relative",
-              background: product.mainImage
-                ? `url(${product.mainImage}) center/cover`
-                : `linear-gradient(135deg, ${t.colors.gold[700]}, ${t.colors.gold[600]})`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 40,
-            }}
-          >
-            {!product.mainImage && <ShoppingBag size={36} strokeWidth={1.5} color="rgba(255,255,255,0.85)" />}
-            {badge && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: t.spacing["2"],
-                  insetInlineStart: t.spacing["2"],
-                  background: t.colors.gold[600],
-                  color: t.colors.white,
-                  fontSize: t.typography.fontSize.xs,
-                  fontWeight: t.typography.fontWeight.bold,
-                  padding: "4px 10px",
-                  borderRadius: t.radius.full,
-                  boxShadow: t.shadows.gold,
-                }}
-              >
-                {badge}
+          {!product.mainImage && <ShoppingBag size={40} strokeWidth={1.3} aria-hidden="true" />}
+          {(badge || discount > 0) && (
+            <span className={s.tags}>
+              {badge && <span className={s.tag}>{badge}</span>}
+              {discount > 0 && <span className={`${s.tag} ${s.tagSale}`}>خصم {discount}%</span>}
+            </span>
+          )}
+        </span>
+
+        <span className={s.body}>
+          <span className={s.store}>
+            {product.store.nameAr} · {product.store.city}
+          </span>
+          <span className={s.name}>
+            {product.nameAr}
+          </span>
+          <span className={s.foot}>
+            <span className={s.price}>
+              {price}
+              <small>ر.س</small>
+              {discount > 0 && <span className={s.compare}>{comparePrice}</span>}
+            </span>
+            {product.totalReviews > 0 && (
+              <span className={s.rating}>
+                <Star size={14} strokeWidth={1.8} fill="currentColor" aria-hidden="true" />
+                {product.avgRating.toFixed(1)} ({product.totalReviews})
               </span>
             )}
-          </div>
-          <div style={{ padding: t.spacing["3"] }}>
-            <p style={{ margin: `0 0 ${t.spacing["1"]}`, fontSize: t.typography.fontSize.xs, color: t.colors.primary[800] }}>
-              {product.store.nameAr}
-            </p>
-            <p
-              style={{
-                margin: `0 0 ${t.spacing["2"]}`,
-                fontSize: t.typography.fontSize.base,
-                fontWeight: t.typography.fontWeight.semibold,
-                color: t.colors.text.dark,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {product.nameAr}
-            </p>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: t.typography.fontSize.xs, color: t.colors.gold[600] }}>
-                {product.totalReviews > 0 && (
-                  <>
-                    <Star size={11} strokeWidth={1.8} fill={t.colors.gold[600]} />
-                    {product.avgRating.toFixed(1)} ({product.totalReviews})
-                  </>
-                )}
-              </span>
-              <span style={{ fontSize: t.typography.fontSize.lg, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>
-                {product.price} ر.س
-              </span>
-            </div>
-          </div>
-        </div>
+          </span>
+        </span>
       </a>
 
       {onToggleFavorite && (
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            onToggleFavorite(product.id);
-          }}
+          type="button"
+          className={`${s.fav} ${isFavorite ? s.favOn : ""}`}
           aria-label={isFavorite ? "إزالة من المفضلة" : "إضافة للمفضلة"}
-          className="basita-btn-interactive"
-          style={{
-            position: "absolute",
-            top: t.spacing["2"],
-            insetInlineEnd: t.spacing["2"],
-            width: 30,
-            height: 30,
-            borderRadius: t.radius.full,
-            border: "none",
-            background: "rgba(255,255,255,0.92)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: isFavorite ? t.colors.semantic.danger : t.colors.text.mid,
-            boxShadow: t.shadows.sm,
-          }}
+          aria-pressed={Boolean(isFavorite)}
+          onClick={() => onToggleFavorite(product.id)}
         >
-          <Heart size={14} strokeWidth={1.8} fill={isFavorite ? t.colors.semantic.danger : "none"} />
+          <Heart size={18} strokeWidth={1.8} fill={isFavorite ? "currentColor" : "none"} />
         </button>
       )}
     </div>

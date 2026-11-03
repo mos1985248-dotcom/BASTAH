@@ -2,14 +2,15 @@
 // عرض فقط — يعكس حرفياً ما يرجعه GET /api/stores/bank-transfer
 // (enabled, accountHolder, bankName, ibanPreview). الآيبان الكامل لا
 // يظهر هنا (نفس الـAPI لا يعيده — يعرض مقنَّعاً فقط).
-
+// التعطيل: DELETE /api/stores/bank-transfer كما كان؛ استُبدل confirm() الأصلي بنافذة تأكيد التطبيق.
 "use client";
-
 import { useState } from "react";
-import { Landmark } from "lucide-react";
+import { AlertTriangle, Landmark } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
-import StatusBadge from "@/components/admin/ui/StatusBadge";
+import { uiVars } from "@/components/ui/vars";
+import StatusBadge from "@/components/dashboard/ui/StatusBadge";
+import ConfirmDialog from "@/components/dashboard/ui/ConfirmDialog";
+import s from "../forms.module.css";
 
 interface Props {
   accountHolder: string | null;
@@ -26,16 +27,10 @@ export default function BankTransferStatus({
 }: Props) {
   const [disabling, setDisabling] = useState(false);
   const [error, setError] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const handleDisable = async () => {
-    if (
-      !confirm(
-        "تعطيل التحويل البنكي؟ المشترون الحاليون ما راح يقدرون يختارونه بعدها."
-      )
-    ) {
-      return;
-    }
-
+    setConfirmOpen(false);
     setDisabling(true);
     setError("");
 
@@ -54,204 +49,51 @@ export default function BankTransferStatus({
   };
 
   return (
-    <div
-      style={{
-        background: t.colors.white,
-        border: `1px solid ${t.colors.cream.border}`,
-        borderRadius: t.radius.lg,
-        padding: t.spacing["4"],
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          marginBottom: t.spacing["4"],
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            minWidth: 0,
-          }}
-        >
-          <span
-            aria-hidden="true"
-            style={{
-              width: 36,
-              height: 36,
-              flexShrink: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: t.radius.md,
-              background: t.colors.primary[100],
-            }}
-          >
-            <Landmark
-              size={17}
-              strokeWidth={1.8}
-              color={t.colors.primary[800]}
-            />
-          </span>
-
-          <div style={{ minWidth: 0 }}>
-            <p
-              style={{
-                margin: 0,
-                fontSize: t.typography.fontSize.sm,
-                fontWeight: t.typography.fontWeight.bold,
-                color: t.colors.text.dark,
-              }}
-            >
-              التحويل البنكي
-            </p>
-
-            <p
-              style={{
-                margin: "2px 0 0",
-                fontSize: t.typography.fontSize.xs,
-                color: t.colors.text.light,
-              }}
-            >
-              يستقبل المدفوعات مباشرة في حسابك
-            </p>
+    <section className={s.panel} style={uiVars} aria-labelledby="bt-status-title">
+      <div className={s.panelHead}>
+        <div className={s.itemLead}>
+          <span className={s.itemIcon} style={{ color: "var(--ui-green)" }}><Landmark size={18} strokeWidth={1.7} aria-hidden="true" /></span>
+          <div>
+            <h2 id="bt-status-title" className={s.panelTitle}>التحويل البنكي</h2>
+            <p className={s.panelSub}>يستقبل المدفوعات مباشرة في حسابك</p>
           </div>
         </div>
-
-        <StatusBadge
-          label="مفعَّل"
-          color={t.colors.semantic.success}
-          bg={t.colors.semantic.successBg}
-        />
+        <StatusBadge label="مفعَّل" tone="ok" />
       </div>
-
-      {/* Bank details */}
-      <div
-        style={{
-          display: "grid",
-          gap: t.spacing["2"],
-          padding: `${t.spacing["3"]} 0`,
-          borderTop: `1px solid ${t.colors.cream.borderLight}`,
-          borderBottom: `1px solid ${t.colors.cream.borderLight}`,
-        }}
-      >
-        <div>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 11,
-              color: t.colors.text.light,
-            }}
-          >
-            صاحب الحساب
-          </p>
-
-          <p
-            style={{
-              margin: "2px 0 0",
-              fontSize: t.typography.fontSize.sm,
-              color: t.colors.text.body,
-              lineHeight: 1.7,
-            }}
-          >
-            {accountHolder ?? "—"}
-          </p>
+      <div className={s.panelBody}>
+        <div className={s.two}>
+          <div>
+            <p className={s.help}>صاحب الحساب</p>
+            <p className={s.itemName}>{accountHolder ?? "—"}</p>
+          </div>
+          <div>
+            <p className={s.help}>البنك</p>
+            <p className={s.itemName}>{bankName ?? "—"}</p>
+          </div>
         </div>
-
         <div>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 11,
-              color: t.colors.text.light,
-            }}
-          >
-            البنك
-          </p>
-
-          <p
-            style={{
-              margin: "2px 0 0",
-              fontSize: t.typography.fontSize.sm,
-              color: t.colors.text.body,
-              lineHeight: 1.7,
-            }}
-          >
-            {bankName ?? "—"}
-          </p>
+          <p className={s.help}>رقم الآيبان</p>
+          <code dir="ltr" style={{ fontSize: 15, fontWeight: 700, color: "var(--ui-ink)" }}>{ibanPreview ?? "—"}</code>
         </div>
-
-        <div>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 11,
-              color: t.colors.text.light,
-            }}
-          >
-            رقم الآيبان
+        {error && (
+          <p className={s.err} role="alert">
+            <AlertTriangle size={14} strokeWidth={1.8} aria-hidden="true" />
+            {error}
           </p>
-
-          <code
-            dir="ltr"
-            style={{
-              display: "inline-block",
-              marginTop: 2,
-              fontSize: 13,
-              color: t.colors.text.body,
-              letterSpacing: "0.02em",
-              wordBreak: "break-all",
-            }}
-          >
-            {ibanPreview ?? "—"}
-          </code>
-        </div>
+        )}
+        <button type="button" className={`${s.btnSm} ${s.btnDanger}`} style={{ alignSelf: "flex-start" }} onClick={() => setConfirmOpen(true)} disabled={disabling}>
+          {disabling ? "جاري التعطيل..." : "تعطيل التحويل البنكي"}
+        </button>
       </div>
-
-      {/* Error */}
-      {error && (
-        <p
-          role="alert"
-          style={{
-            margin: `${t.spacing["2"]} 0 0`,
-            fontSize: 12,
-            color: t.colors.semantic.danger,
-            lineHeight: 1.7,
-          }}
-        >
-          {error}
-        </p>
-      )}
-
-      {/* Disable */}
-      <button
-        type="button"
-        onClick={handleDisable}
-        disabled={disabling}
-        style={{
-          width: "100%",
-          marginTop: t.spacing["3"],
-          minHeight: 40,
-          padding: "9px 14px",
-          borderRadius: t.radius.md,
-          border: `1px solid ${t.colors.semantic.danger}`,
-          background: t.colors.white,
-          color: t.colors.semantic.danger,
-          fontSize: 12,
-          fontWeight: t.typography.fontWeight.bold,
-          cursor: disabling ? "not-allowed" : "pointer",
-          opacity: disabling ? 0.65 : 1,
-          transition: "background-color 0.18s ease, color 0.18s ease",
-        }}
-      >
-        {disabling ? "جاري التعطيل..." : "تعطيل التحويل البنكي"}
-      </button>
-    </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        title="تعطيل التحويل البنكي؟"
+        body="لن يتمكن المشترون من اختيار التحويل البنكي بعد الآن."
+        confirmLabel="تعطيل"
+        danger
+        onConfirm={handleDisable}
+        onCancel={() => setConfirmOpen(false)}
+      />
+    </section>
   );
 }

@@ -127,15 +127,34 @@ export async function POST(req: NextRequest) {
       });
 
       return NextResponse.json({ requiresPayment: true, invoiceId: invoice.id, paymentUrl: moyasarInvoice.url });
+
     } catch (err) {
       if (err instanceof MoyasarError) {
-        return NextResponse.json({ error: "تعذّر إنشاء عملية الدفع الآن — حاولي مجدداً" }, { status: 502 });
+        console.error("[Moyasar checkout failure]", {
+          errorName: err.name,
+          message: err.message,
+        });
+
+        return NextResponse.json(
+          { error: "تعذّر إنشاء عملية الدفع الآن — حاولي مجدداً" },
+          { status: 502 }
+        );
       }
       throw err;
     }
   } catch (err) {
-    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    if (err instanceof AuthError) {
+      return NextResponse.json(
+        { error: err.message },
+        { status: err.status }
+      );
+    }
+
     console.error("[POST /api/subscription/checkout]", err);
-    return NextResponse.json({ error: "حدث خطأ غير متوقع" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "حدث خطأ غير متوقع" },
+      { status: 500 }
+    );
   }
 }

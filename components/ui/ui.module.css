@@ -1,0 +1,141 @@
+/* components/ui/ui.module.css
+   لا ألوان مباشرة هنا: كل شيء عبر متغيرات --ui-* القادمة من vars.ts */
+
+/* ───── Button ───── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 1px solid transparent;
+  border-radius: var(--ui-pill);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color 0.2s var(--ui-ease),
+    border-color 0.2s var(--ui-ease),
+    box-shadow 0.2s var(--ui-ease),
+    transform 0.2s var(--ui-ease);
+}
+.btn:focus-visible,
+.input:focus-visible {
+  outline: 2px solid var(--ui-gold);
+  outline-offset: 2px;
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sm { min-height: 44px; padding: 0 16px; font-size: 14px; }
+.lg { min-height: 56px; padding: 0 32px; font-size: 16px; }
+.full { width: 100%; }
+
+.green { background: var(--ui-green); color: var(--ui-white); }
+.green:hover:not(:disabled) { background: var(--ui-green-hover); }
+.gold { background: var(--ui-gold); color: var(--ui-ink); }
+.gold:hover:not(:disabled) { box-shadow: var(--ui-shadow); }
+.outline { background: transparent; color: var(--ui-green); border-color: var(--ui-green); }
+.outline:hover:not(:disabled) { background: var(--ui-sand); }
+.ghost { background: transparent; color: var(--ui-ink); }
+.ghost:hover:not(:disabled) { background: var(--ui-sand); }
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ───── Card ───── */
+.card {
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-card);
+  color: var(--ui-ink);
+}
+.outlined { border: 1px solid var(--ui-border); }
+.deep {
+  background: var(--ui-green-deep);
+  color: var(--ui-white);
+  border: 1px solid var(--ui-gold);
+}
+
+/* ───── Input ───── */
+.label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--ui-ink); }
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-card);
+  color: var(--ui-ink);
+  font-family: inherit;
+  font-size: 16px;
+  transition: border-color 0.2s var(--ui-ease), box-shadow 0.2s var(--ui-ease);
+}
+.input:hover:not(:disabled) { border-color: var(--ui-green); }
+.input:focus-visible { border-color: var(--ui-green); outline-offset: 0; }
+.input:disabled { opacity: 0.6; cursor: not-allowed; }
+.invalid { border-color: var(--ui-danger); }
+.hint { margin-top: 6px; font-size: 13px; color: var(--ui-ink-muted); }
+.error { margin-top: 6px; font-size: 13px; color: var(--ui-danger); }
+
+/* ───── Badge ───── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--ui-pill);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.bGold { background: var(--ui-gold); color: var(--ui-ink); }
+.bGreen { background: var(--ui-green); color: var(--ui-white); }
+.bSand { background: var(--ui-sand); color: var(--ui-ink); border: 1px solid var(--ui-border); }
+.bDanger { background: var(--ui-danger-bg); color: var(--ui-danger); }
+
+/* ───── EmptyState ───── */
+.empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 24px; text-align: center; }
+.emptyTitle { margin: 0; font-size: 19px; font-weight: 700; color: var(--ui-ink); }
+.emptyText { margin: 0; max-width: 360px; font-size: 15px; line-height: 1.7; color: var(--ui-ink-muted); }
+
+/* ───── Toast ───── */
+.toasts {
+  position: fixed;
+  inset-inline: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  max-width: 420px;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: var(--ui-radius-md);
+  background: var(--ui-green-deep);
+  color: var(--ui-white);
+  border: 1px solid var(--ui-gold);
+  box-shadow: var(--ui-shadow);
+  font-size: 15px;
+  animation: toastIn 0.25s var(--ui-ease);
+}
+.toastError { background: var(--ui-danger-bg); color: var(--ui-danger); border-color: var(--ui-danger); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .input, .toast { transition: none; animation: none; }
+  .spinner { animation-duration: 1.6s; }
+}

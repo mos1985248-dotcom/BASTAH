@@ -7,7 +7,9 @@ import { useCallback } from "react";
 import { useMuniraChat } from "@/hooks/useMuniraChat";
 import { ChatWindow } from "@/components/munira/ChatWindow";
 import { useCurrentUser } from "@/app/providers";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
+import f from "@/components/dashboard/forms.module.css";
+import m from "@/components/dashboard/munira-page.module.css";
 
 export default function MuniraPage() {
   const { user } = useCurrentUser();
@@ -30,7 +32,7 @@ export default function MuniraPage() {
   }, [streaming, cancel, recording, stopRecording]);
 
   return (
-    <div style={{ height: "100dvh", display: "flex", flexDirection: "column" }}>
+    <div className={`${f.chatPage} ${m.scope}`} style={uiVars}>
       <ChatWindow
         messages={messages}
         streaming={streaming}
@@ -44,11 +46,6 @@ export default function MuniraPage() {
         onCancel={handleCancel}
         userName={user?.name}
       />
-      <style>{`
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: ${t.colors.cream.border}; border-radius: 4px; }
-      `}</style>
     </div>
   );
 }

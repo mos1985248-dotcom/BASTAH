@@ -2,12 +2,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { t } from "@/theme";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import {
   Home, ShoppingCart, Package, MapPin, Heart, Tag, Undo2, Headset, Settings,
   LogOut, type LucideIcon,
 } from "lucide-react";
+import s from "./account.module.css";
 
 const REAL_LINKS: { href: string; Icon: LucideIcon; label: string }[] = [
   { href: "/account", Icon: Home, label: "الرئيسية" },
@@ -25,24 +25,21 @@ export default function AccountSidebar() {
   const router = useRouter();
 
   return (
-    <div style={{ background: t.colors.white, borderRadius: t.radius.lg, padding: t.spacing["3"], border: `1px solid ${t.colors.cream.border}` }}>
+    <nav className={s.nav} aria-label="قائمة الحساب">
       {REAL_LINKS.map((l) => (
-        <a
-          key={l.label}
-          href={l.href}
-          style={{ display: "flex", alignItems: "center", gap: t.spacing["2"], padding: "10px 12px", borderRadius: t.radius.md, textDecoration: "none", color: t.colors.text.body, fontSize: t.typography.fontSize.sm }}
-        >
-          <l.Icon size={18} strokeWidth={1.7} />
+        <a key={l.label} href={l.href} className={s.navLink}>
+          <l.Icon size={18} strokeWidth={1.7} aria-hidden="true" />
           {l.label}
         </a>
       ))}
 
       <button
+        type="button"
         onClick={async () => { await getSupabaseBrowserClient().auth.signOut(); router.push("/"); router.refresh(); }}
-        style={{ display: "flex", alignItems: "center", gap: t.spacing["2"], width: "100%", padding: "10px 12px", borderRadius: t.radius.md, border: "none", background: t.colors.semantic.dangerBg, color: t.colors.semantic.danger, fontSize: t.typography.fontSize.sm, cursor: "pointer", marginTop: t.spacing["2"], textAlign: "start" }}
+        className={s.logout}
       >
-        <LogOut size={18} strokeWidth={1.7} /> تسجيل الخروج
+        <LogOut size={18} strokeWidth={1.7} aria-hidden="true" /> تسجيل الخروج
       </button>
-    </div>
+    </nav>
   );
 }

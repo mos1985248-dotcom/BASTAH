@@ -4,7 +4,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import { t } from "@/theme";
 import SiteShell from "@/components/layout/SiteShell";
@@ -15,7 +14,7 @@ import StoreInfoGrid from "@/components/store/StoreInfoGrid";
 import StoreReviewsSection from "@/components/store/StoreReviewsSection";
 import StoreProductsSection from "@/components/store/StoreProductsSection";
 import StoreClosingBanner from "@/components/store/StoreClosingBanner";
-import Skeleton from "@/components/ui/Skeleton";
+import { StoreError, StoreLoading } from "@/components/store/StoreStates";
 import { StoreDetail } from "@/components/store/types";
 
 export default function StoreDetailClient() {
@@ -62,178 +61,32 @@ export default function StoreDetailClient() {
     };
   }, [slug]);
 
-  /* ─────────────────────────────────────────
-     Loading
-  ───────────────────────────────────────── */
-
   if (loading) {
     return (
       <SiteShell>
-        <main
-          style={{
-            width: "100%",
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: `${t.spacing["6"]} ${t.spacing["4"]}`,
-            boxSizing: "border-box",
-            direction: "rtl",
-          }}
-        >
-          <Skeleton
-            height={220}
-            radius={t.radius.lg}
-            style={{ marginBottom: t.spacing["4"] }}
-          />
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: t.spacing["3"],
-              marginBottom: t.spacing["4"],
-            }}
-          >
-            <Skeleton
-              width={72}
-              height={72}
-              radius={t.radius.full}
-            />
-
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                gap: t.spacing["2"],
-              }}
-            >
-              <Skeleton width="32%" height={22} />
-              <Skeleton width="55%" height={14} />
-            </div>
-          </div>
-
-          <Skeleton
-            height={90}
-            radius={t.radius.lg}
-            style={{ marginBottom: t.spacing["4"] }}
-          />
-
-          <Skeleton
-            height={280}
-            radius={t.radius.lg}
-          />
-        </main>
+        <StoreLoading />
       </SiteShell>
     );
   }
-
-  /* ─────────────────────────────────────────
-     Error / Not found
-  ───────────────────────────────────────── */
 
   if (error || !store) {
     return (
       <SiteShell>
-        <main
-          style={{
-            minHeight: "55vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: t.spacing["8"],
-            direction: "rtl",
-          }}
-        >
-          <div
-            role="alert"
-            style={{
-              width: "100%",
-              maxWidth: 560,
-              padding: t.spacing["6"],
-              borderRadius: t.radius.xl,
-              border: `1px solid ${t.colors.cream.border}`,
-              background: t.colors.white,
-              textAlign: "center",
-              boxShadow: t.shadows.sm,
-            }}
-          >
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                margin: `0 auto ${t.spacing["3"]}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: t.radius.full,
-                background: t.colors.semantic.dangerBg,
-                color: t.colors.semantic.danger,
-              }}
-            >
-              <AlertTriangle size={21} strokeWidth={1.8} />
-            </div>
-
-            <h1
-              style={{
-                margin: 0,
-                color: t.colors.text.dark,
-                fontSize: t.typography.fontSize.lg,
-                fontWeight: t.typography.fontWeight.bold,
-              }}
-            >
-              {error ? "تعذّر تحميل المتجر" : "المتجر غير موجود"}
-            </h1>
-
-            <p
-              style={{
-                margin: `${t.spacing["2"]} 0 0`,
-                color: error
-                  ? t.colors.text.mid
-                  : t.colors.text.light,
-                fontSize: t.typography.fontSize.sm,
-                lineHeight: 1.8,
-              }}
-            >
-              {error ||
-                "قد يكون الرابط غير صحيح أو أن المتجر لم يعد متاحًا."}
-            </p>
-          </div>
-        </main>
+        <StoreError message={error} />
       </SiteShell>
     );
   }
 
-  /* ─────────────────────────────────────────
-     Store
-  ───────────────────────────────────────── */
-
+  // الترتيب يخدم رحلة الشراء: الرأس ← المنتجات ← القصة والثقة ← المؤشرات والمعلومات ← التقييمات ← الختام
   return (
     <SiteShell>
-      <main
-        style={{
-          width: "100%",
-          direction: "rtl",
-        }}
-      >
-        {/* رأس المتجر */}
+      <main style={{ width: "100%", direction: "rtl", background: t.colors.heritage.sand }}>
         <StoreHero store={store} />
-
-        {/* معلومات المتجر — في الأعلى وبحجم مختصر */}
-        <StoreInfoGrid store={store} />
-
-        {/* قصة المتجر والشارات */}
-        <StoreStoryAndBadges store={store} />
-
-        {/* إنجازات المتجر */}
-        <StoreAchievements store={store} />
-
-        {/* المنتجات */}
         <StoreProductsSection storeId={store.id} />
-
-        {/* التقييمات */}
+        <StoreStoryAndBadges store={store} />
+        <StoreAchievements store={store} />
+        <StoreInfoGrid store={store} />
         <StoreReviewsSection store={store} />
-
-        {/* ختام الصفحة */}
         <StoreClosingBanner store={store} />
       </main>
     </SiteShell>

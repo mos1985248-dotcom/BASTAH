@@ -1,0 +1,54 @@
+/* components/checkout/pay.module.css — طرق الدفع والاستلام ولوحة التأكيد */
+.methods { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.option {
+  position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 12px 16px;
+  border-radius: 16px; border: 1.5px solid var(--ui-border); background: var(--ui-card); cursor: pointer;
+  transition: border-color 0.2s var(--ui-ease), background-color 0.2s var(--ui-ease);
+}
+.option:hover { border-color: var(--ui-green); }
+.optionOn { border-color: var(--ui-green); background: var(--ui-sand); }
+.option:has(input:focus-visible) { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.option input { position: absolute; opacity: 0; pointer-events: none; }
+.optMain { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.radio { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--ui-border); background: var(--ui-card); color: var(--ui-white); }
+.optionOn .radio { background: var(--ui-green); border-color: var(--ui-green); }
+.optLabel { font-size: 15px; font-weight: 600; line-height: 1.5; color: var(--ui-ink); }
+.badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.badge { padding: 2px 10px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-card); font-size: 11.5px; font-weight: 600; color: var(--ui-ink-muted); white-space: nowrap; }
+
+.fulfil { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--ui-border); }
+.fulfilTitle { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--ui-ink); }
+.fulfilTitle svg { color: var(--ui-kicker); }
+.fulfilGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.fulfilBtn { min-height: 48px; padding: 0 12px; border-radius: 14px; border: 1.5px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.fulfilBtn:hover { border-color: var(--ui-green); }
+.fulfilBtn:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.fulfilOn { border-color: var(--ui-green); background: var(--ui-sand); color: var(--ui-green-deep); }
+.bankNote { margin: 12px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--ui-sand); font-size: 13px; line-height: 1.9; color: var(--ui-ink-muted); }
+
+/* ───── التأكيد ───── */
+.confirm { padding: 20px; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.err { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px; padding: 12px 14px; border-radius: 14px; background: var(--ui-danger-bg); color: var(--ui-danger); font-size: 14px; line-height: 1.7; }
+.err svg { flex: none; margin-top: 3px; }
+.terms { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; font-size: 14px; line-height: 1.9; color: var(--ui-ink); cursor: pointer; }
+.terms input { flex: none; width: 22px; height: 22px; margin-top: 2px; accent-color: var(--ui-green); }
+.terms a { color: var(--ui-green); font-weight: 600; text-underline-offset: 3px; }
+.terms:has(input:focus-visible) { outline: 2px solid var(--ui-gold); outline-offset: 4px; border-radius: 6px; }
+.confirmBtn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 54px; border: 0; border-radius: var(--ui-pill);
+  background: var(--ui-green); color: var(--ui-white); font: inherit; font-size: 17px; font-weight: 700; cursor: pointer;
+  transition: background-color 0.2s var(--ui-ease), box-shadow 0.2s var(--ui-ease);
+}
+.confirmBtn:hover:not(:disabled) { background: var(--ui-green-hover); box-shadow: var(--ui-shadow); }
+.confirmBtn:disabled { background: var(--ui-sand); color: var(--ui-ink-muted); cursor: not-allowed; }
+.confirmBtn:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+.secure { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 12px 0 0; font-size: 12px; text-align: center; color: var(--ui-ink-muted); }
+.secure svg { flex: none; color: var(--ui-kicker); }
+
+@media (max-width: 600px) {
+  .option { padding: 10px 12px; min-height: 56px; }
+  .badges { display: none; }
+  .fulfilGrid { grid-template-columns: minmax(0, 1fr); }
+  .confirm { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .option, .confirmBtn { transition: none; } }

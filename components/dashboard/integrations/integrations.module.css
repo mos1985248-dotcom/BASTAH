@@ -1,0 +1,18 @@
+/* components/dashboard/integrations/integrations.module.css — التكاملات. الألوان عبر --ui-* فقط.
+   يكمل forms.module.css (item، field، btnSm، err، help، stackCol). */
+.section { min-width: 0; }
+.h2 { margin: 0 0 6px; font-size: 18px; font-weight: 700; color: var(--ui-green-deep); }
+.lead { margin: 0 0 14px; font-size: 13.5px; line-height: 1.9; color: var(--ui-ink-muted); }
+.notice { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--ui-border); background: var(--ui-sand); font-size: 13.5px; line-height: 1.8; color: var(--ui-ink); }
+.notice svg { flex: none; margin-top: 4px; color: var(--ui-kicker); }
+.service { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.service svg { flex: none; margin-top: 3px; color: var(--ui-green); }
+.sName { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--ui-ink); }
+.sDesc { margin: 2px 0 0; font-size: 13px; line-height: 1.7; color: var(--ui-ink-muted); }
+.account { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.platform { flex: none; min-width: 80px; font-size: 14px; font-weight: 700; color: var(--ui-ink); }
+.url { flex: 1 1 140px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--ui-ink-muted); direction: ltr; text-align: left; }
+.draft { flex: 1 1 160px; min-width: 0; }
+.link { flex: none; }
+.empty { margin: 0; font-size: 13.5px; color: var(--ui-ink-muted); }
+.titleRow { display: flex; align-items: center; gap: 10px; }

@@ -1,0 +1,292 @@
+@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap");
+
+/* components/home/stalls.module.css — الألوان عبر متغيرات --ui-* فقط */
+.section { margin: 0 auto; padding: 56px 16px; box-sizing: border-box; direction: rtl; }
+.header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+.kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
+.kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
+.title { margin: 0; font-size: clamp(34.5px, 4.6vw, 50.5px); font-weight: 700; line-height: 1.6; color: var(--ui-green-deep); }
+.sub { margin: 4px 0 0; font-size: 15px; line-height: 1.8; color: var(--ui-ink-muted); }
+.all {
+  flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px;
+  border-radius: var(--ui-pill); border: 1px solid var(--ui-green); color: var(--ui-green);
+  font-size: 14px; font-weight: 600; text-decoration: none; transition: background-color 0.2s var(--ui-ease);
+}
+.all:hover { background: var(--ui-sand); }
+.all:focus-visible, .stall:focus-visible, .lane:focus-visible, .arrow:focus-visible, .endCta:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+
+/* ───── ممشى السوق ───── */
+.laneWrap { position: relative; }
+.lane {
+  display: flex; gap: 20px; overflow-x: auto; padding: 8px 4px 24px;
+  scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.lane::-webkit-scrollbar { display: none; }
+.arrows { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.arrow {
+  display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px;
+  border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); cursor: pointer;
+  transition: background-color 0.2s var(--ui-ease), border-color 0.2s var(--ui-ease);
+}
+.arrow:hover { background: var(--ui-green); border-color: var(--ui-green); color: var(--ui-white); }
+
+/* ───── البسطة التراثية: مظلة بارزة، لافتة واحدة، واجهة خشبية ───── */
+.stall {
+  --awning: #075437;
+  flex: none; width: 300px; scroll-snap-align: start;
+  display: flex; flex-direction: column; min-width: 0;
+  color: var(--ui-ink); text-decoration: none;
+  transition: transform .24s var(--ui-ease);
+}
+.fluid { width: 100%; }
+.stall:nth-child(3n + 2) { --awning: #a87434; }
+.stall:nth-child(3n + 3) { --awning: #267653; }
+.stall:hover { transform: translateY(-5px); }
+.stallRoof {
+  display: block; position: relative; z-index: 2; height: 48px;
+  margin: 0 -3px; border-radius: 16px 16px 2px 2px;
+  background: repeating-linear-gradient(90deg, var(--awning) 0 30px, #fff3d9 30px 60px);
+  box-shadow: 0 -3px 0 #986638 inset, 0 5px 8px #3c241b26;
+}
+.roofEdge {
+  position: absolute; inset-inline: 0; bottom: -10px; height: 17px;
+  background: repeating-linear-gradient(90deg, var(--awning) 0 30px, #fff3d9 30px 60px);
+  -webkit-mask: radial-gradient(ellipse 30px 17px at 30px 0, #000 99%, transparent 100%) left top / 60px 17px repeat-x;
+  mask: radial-gradient(ellipse 30px 17px at 30px 0, #000 99%, transparent 100%) left top / 60px 17px repeat-x;
+}
+.stallFrame {
+  display: flex; flex: 1; flex-direction: column; overflow: hidden;
+  border: 1px solid #dfc7a8; border-top: 0; border-radius: 0 0 19px 19px;
+  background: #fffaf3; box-shadow: 0 8px 22px #5135161a;
+}
+.stallScene {
+  position: relative; height: 225px; overflow: hidden;
+  border-inline: 10px solid #86572f;
+  background: #c5a27b;
+}
+.stallScene::before, .stallScene::after {
+  content: ""; position: absolute; z-index: 2; top: 0; bottom: 0; width: 5px;
+  background: linear-gradient(90deg, #633c20, #c9945a, #6f4325);
+}
+.stallScene::before { right: 0; }
+.stallScene::after { left: 0; }
+.cover {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #d8b990, #85603c) center / cover no-repeat;
+  transition: transform .35s var(--ui-ease);
+}
+.stall:hover .cover { transform: scale(1.035); }
+.initialBig { font-size: 80px; font-weight: 700; color: #fff6e5; text-shadow: 0 3px 14px #45280d80; }
+.sceneGlow {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, #39220c50 0%, transparent 34%, #3820091f 65%, #2e1709a8 100%);
+}
+/* لوحة اسم تراثية معلّقة: تتكيّف مع طول الاسم ولا تملأ عرض البسطة */
+.woodSign {
+  position: absolute; z-index: 3; top: 30px; left: 50%; right: auto;
+  transform: translateX(-50%);
+  width: max-content; max-width: calc(100% - 30px); box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 46px; padding: 5px 24px;
+  border: 2px solid #855024;
+  border-radius: 15px 15px 8px 8px / 12px 12px 8px 8px;
+  background:
+    radial-gradient(circle at 11px 50%, #9c682d 0 2px, transparent 2.5px),
+    radial-gradient(circle at calc(100% - 11px) 50%, #9c682d 0 2px, transparent 2.5px),
+    linear-gradient(180deg, #f9e6bc 0%, #e9c58d 53%, #d7a76b 100%);
+  box-shadow: inset 0 0 0 2px #f9e8c7, inset 0 -4px 0 #b78143,
+              0 4px 0 #70401f, 0 8px 16px #27150866;
+}
+/* حبال تعليق اللوحة الخشبية */
+.woodSign::before, .woodSign::after {
+  content: ""; position: absolute; top: -31px; height: 29px;
+  width: 2px; background: linear-gradient(90deg, #b48a50, #f2d8a2, #8d663a);
+}
+.woodSign::before { right: 18px; }
+.woodSign::after { left: 18px; }
+.name {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  font-family: "Amiri", "Traditional Arabic", serif !important;
+  text-align: center; font-size: 21px; line-height: 1.5; font-weight: 700; color: #3c2618;
+}
+.verified { flex: none; color: #08744a; }
+.counter {
+  position: absolute; z-index: 2; bottom: 0; inset-inline: 0; height: 19px;
+  background: repeating-linear-gradient(90deg, #a97440 0 24px, #936031 24px 27px, #bb8b53 27px 49px);
+  border-top: 5px solid #d3a36a; box-shadow: 0 -5px 12px #29140866;
+}
+.info { display: flex; flex: 1; flex-direction: column; gap: 11px; padding: 14px; }
+.infoTop { display: flex; align-items: center; gap: 9px; min-height: 44px; }
+.logo {
+  display: inline-flex; flex: none; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 50%; border: 2px solid #c9a36b;
+  background: #f7e9cf center / cover no-repeat; color: #075437;
+}
+.meta { display: inline-flex; align-items: center; gap: 4px; min-width: 0; font-size: 13px; color: #63564a; }
+.meta svg { flex: none; }
+.rating { display: inline-flex; align-items: center; gap: 3px; margin-inline-start: auto; font-size: 13px; font-weight: 700; color: #8e651c; }
+.desc {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  min-height: 39px; font-size: 13px; line-height: 1.55; color: #65594f;
+}
+.enter {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 45px; margin-top: auto; padding: 10px 12px; border-radius: 12px;
+  background: #075437; color: #fff; font-size: 15px; font-weight: 700;
+  transition: background-color .2s var(--ui-ease);
+}
+.enter svg:last-child { margin-inline-start: auto; transition: transform .2s var(--ui-ease); }
+.stall:hover .enter { background: #0b6947; }
+.stall:hover .enter svg:last-child { transform: translateX(-3px); }
+
+/* ───── نهاية الممشى ───── */
+.endCard {
+  flex: none; width: 280px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; gap: 12px;
+  margin-top: 22px; padding: 28px 24px; border-radius: 24px; background: var(--ui-green-deep); color: var(--ui-white); border: 1px solid var(--ui-gold);
+}
+.endTitle { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.6; }
+.endText { margin: 0; font-size: 14px; line-height: 1.8; color: var(--ui-card); opacity: 0.85; }
+.endCta {
+  align-self: flex-start; display: inline-flex; align-items: center; min-height: 48px; margin-top: 8px; padding: 0 24px;
+  border-radius: var(--ui-pill); background: var(--ui-gold); color: var(--ui-ink); font-size: 15px; font-weight: 600; text-decoration: none;
+}
+
+/* ───── حالات: تحميل / خطأ / فراغ ───── */
+.skeleton { flex: none; width: 280px; overflow: hidden; border-radius: 20px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.skeletonBody { display: flex; flex-direction: column; gap: 10px; padding: 16px; }
+.notice {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 24px; text-align: center;
+  border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted);
+}
+.notice p { margin: 0; font-size: 15px; line-height: 1.8; }
+.noticeTitle { font-size: 17px !important; font-weight: 700; color: var(--ui-ink); }
+
+@media (max-width: 767px) {
+  .section { padding: 36px 12px; }
+  .header { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .stall, .endCard, .skeleton { width: min(82vw, 300px); }
+  .stallScene { height: 205px; }
+  .arrows { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stall, .enter svg, .cover { transition: none; }
+  .stall:hover { transform: none; }
+}
+
+/* Mobile: show two complete stalls side-by-side, retain horizontal swipe. */
+@media (max-width: 767px) {
+  .lane { gap: 10px; padding: 8px 0 18px; scroll-snap-type: x mandatory; }
+  .lane > .stall, .lane > .skeleton, .lane > .endCard {
+    flex: 0 0 calc((100% - 10px) / 2);
+    width: calc((100% - 10px) / 2);
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .stallRoof { height: 31px; border-radius: 10px 10px 2px 2px; background-size: 40px 100%; background-image: repeating-linear-gradient(90deg, var(--awning) 0 20px, #fff3d9 20px 40px); }
+  .roofEdge { bottom: -7px; height: 12px; background: repeating-linear-gradient(90deg, var(--awning) 0 20px, #fff3d9 20px 40px); -webkit-mask: radial-gradient(ellipse 20px 12px at 20px 0, #000 99%, transparent 100%) left top / 40px 12px repeat-x; mask: radial-gradient(ellipse 20px 12px at 20px 0, #000 99%, transparent 100%) left top / 40px 12px repeat-x; }
+  .stallFrame { border-radius: 0 0 12px 12px; }
+  .stallScene { height: clamp(135px, 43vw, 180px); border-inline-width: 5px; }
+  .woodSign { top: 22px; left: 50%; right: auto; max-width: calc(100% - 12px); min-height: 33px; padding: 3px 13px; border-width: 1px; border-radius: 10px 10px 6px 6px; }
+  .woodSign::before, .woodSign::after { top: -23px; height: 22px; }
+  .woodSign::before { right: 9px; } .woodSign::after { left: 9px; }
+  .name { font-size: clamp(12px, 3.6vw, 17px); line-height: 1.4; overflow-wrap: anywhere; }
+  .verified { width: 13px; height: 13px; }
+  .initialBig { font-size: 52px; }
+  .info { padding: 9px 7px 10px; gap: 7px; }
+  .infoTop { gap: 4px; min-height: 30px; flex-wrap: wrap; }
+  .logo { width: 29px; height: 29px; }
+  .logo svg { width: 16px; height: 16px; }
+  .meta, .rating { font-size: 10px; gap: 2px; }
+  .meta svg, .rating svg { width: 11px; height: 11px; }
+  .desc { font-size: 11px; line-height: 1.45; min-height: 32px; }
+  .enter { min-height: 36px; padding: 7px 4px; border-radius: 8px; font-size: 11px; gap: 3px; }
+  .enter svg { width: 13px; height: 13px; flex: none; }
+  .endCard { margin-top: 0; padding: 14px 10px; border-radius: 13px; }
+  .endTitle { font-size: 15px; } .endText { font-size: 11px; }
+  .endCta { font-size: 11px; padding: 0 9px; min-height: 36px; }
+}
+
+/* Refinement: warmer, deeper stall and optional real merchant product display. */
+.stallRoof { box-shadow: 0 -3px 0 #986638 inset, 0 7px 13px #3c241b35; }
+.stallFrame { border-color: #d7b88f; box-shadow: 0 10px 24px #51351621; }
+.stallScene { background: linear-gradient(160deg, #ad8055, #e4c49a 60%, #94643e); }
+.stallScene::before, .stallScene::after { width: 7px; }
+.cover { background-position: center; }
+.woodSign { box-shadow: 0 3px 0 #76471f, 0 7px 18px #27150855; }
+.sceneProducts {
+  position: absolute; z-index: 2; bottom: 18px; inset-inline: 12px;
+  display: flex; justify-content: center; align-items: flex-end; gap: 9px;
+  height: 76px; pointer-events: none;
+}
+.sceneProduct {
+  display: block; width: 31%; max-width: 86px; aspect-ratio: 1;
+  background-color: #fff4e5; background-position: center; background-size: cover;
+  border: 3px solid #f7e4c8; border-radius: 11px 11px 5px 5px;
+  box-shadow: 0 5px 12px #29170a7a;
+}
+.sceneProduct:nth-child(2) { transform: translateY(-5px); }
+.info { gap: 8px; }
+.infoTop { min-height: 38px; }
+.desc { min-height: 34px; }
+@media (max-width: 767px) {
+  .sceneProducts { inset-inline: 5px; bottom: 13px; gap: 3px; height: 45px; }
+  .sceneProduct { border-width: 2px; border-radius: 6px 6px 3px 3px; }
+  .info { gap: 6px; }
+  .desc { min-height: 30px; }
+  .stallScene::before, .stallScene::after { width: 3px; }
+}
+
+/* v3: accessible, independent favorite button; store link remains clickable. */
+.stall { position: relative; }
+.stallLink { display: flex; flex: 1; flex-direction: column; min-width: 0; color: inherit; text-decoration: none; }
+.stallLink:focus-visible, .favorite:focus-visible { outline: 3px solid #b88c44; outline-offset: 3px; }
+.favorite {
+  position: absolute; z-index: 8; top: 64px; inset-inline-end: 19px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; padding: 0; border-radius: 50%;
+  border: 1px solid #e2d3bb; background: #fffaf2f0;
+  color: #765c4a; box-shadow: 0 2px 8px #2c1d1538; cursor: pointer;
+}
+.favorite:hover, .favoriteActive { color: #b33b53; background: #fff4f5; }
+@media (max-width: 767px) {
+  .favorite { top: 41px; inset-inline-end: 8px; width: 29px; height: 29px; }
+  .favorite svg { width: 15px; height: 15px; }
+  .rating { white-space: nowrap; }
+}
+
+/* v4 — Mobile: visible two-column grid, no horizontal scrolling. */
+@media (max-width: 767px) {
+  .lane {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 14px 10px;
+    overflow: visible;
+    scroll-snap-type: none;
+    padding: 8px 0 16px;
+  }
+  .lane > .stall,
+  .lane > .skeleton {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: initial;
+    margin: 0;
+  }
+  .lane > .endCard {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: initial;
+    margin: 0;
+    box-sizing: border-box;
+    min-height: 150px;
+    align-items: center;
+    text-align: center;
+  }
+  .lane > .endCard .endCta { align-self: center; }
+  .arrows { display: none; }
+  .stall:hover { transform: none; }
+}
+/* basita-font-scale: applied */

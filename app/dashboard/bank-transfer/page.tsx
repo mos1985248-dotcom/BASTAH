@@ -1,15 +1,17 @@
 // app/dashboard/bank-transfer/page.tsx
 // يستخدم GET/POST/DELETE /api/stores/bank-transfer الجاهزين فعلياً بلا
 // أي تعديل عليهما أو على السكيما أو الـcheckout.
+// المنطق كما كان حرفياً؛ التغيير في التخطيط والعرض فقط.
 "use client";
-
 import { useEffect, useState } from "react";
+import { Info } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
-import LoadingState from "@/components/admin/ui/LoadingState";
-import ErrorState from "@/components/admin/ui/ErrorState";
+import { uiVars } from "@/components/ui/vars";
+import LoadingState from "@/components/dashboard/ui/LoadingState";
+import ErrorState from "@/components/dashboard/ui/ErrorState";
 import BankTransferForm from "@/components/dashboard/bank-transfer/BankTransferForm";
 import BankTransferStatus from "@/components/dashboard/bank-transfer/BankTransferStatus";
+import s from "@/components/dashboard/forms.module.css";
 
 interface BankTransferStatusResponse {
   enabled: boolean;
@@ -32,25 +34,40 @@ export default function BankTransferPage() {
 
   useEffect(load, []);
 
-  if (error) return <div style={{ padding: t.spacing["4"] }}><ErrorState message={error} onRetry={load} /></div>;
-  if (!status) return <LoadingState label="جاري تحميل التحويل البنكي..." />;
+  const wrap = (children: React.ReactNode) => <div className={s.page} style={uiVars}>{children}</div>;
 
-  return (
-    <div style={{ padding: t.spacing["4"] }}>
-      <div style={{ maxWidth: 640, margin: "0 auto" }}>
-        <h1 style={{ fontSize: t.typography.fontSize.xl, color: t.colors.primary[800], margin: `0 0 ${t.spacing["4"]}` }}>التحويل البنكي</h1>
+  if (error) return wrap(<ErrorState message={error} onRetry={load} />);
+  if (!status) return wrap(<LoadingState label="جاري تحميل التحويل البنكي..." />);
 
+  return wrap(
+    <>
+      <div className={s.head}>
+        <div>
+          <h1 className={s.title}>التحويل البنكي</h1>
+          <p className={s.sub}>استقبل دفعات المشترين مباشرة في حسابك البنكي دون ربط بوابة دفع إلكترونية</p>
+        </div>
+      </div>
+      <div className={s.layoutEq}>
         {status.enabled ? (
-          <BankTransferStatus
-            accountHolder={status.accountHolder}
-            bankName={status.bankName}
-            ibanPreview={status.ibanPreview}
-            onDisabled={load}
-          />
+          <BankTransferStatus accountHolder={status.accountHolder} bankName={status.bankName} ibanPreview={status.ibanPreview} onDisabled={load} />
         ) : (
           <BankTransferForm onConnected={load} />
         )}
+        <section className={s.panel} aria-labelledby="bt-info">
+          <div className={s.panelHead}><h2 id="bt-info" className={s.panelTitle}>كيف يعمل؟</h2></div>
+          <div className={s.panelBody}>
+            <p className={s.note}>
+              <Info size={15} strokeWidth={1.8} aria-hidden="true" />
+              التحويل البنكي متاح أيضًا على الباقة المجانية.
+            </p>
+            <ol className={s.help} style={{ margin: 0, paddingInlineStart: 20, lineHeight: 2.2 }}>
+              <li>يحوّل المشتري المبلغ إلى حسابك ثم يرفع إثبات التحويل.</li>
+              <li>تراجع الإثبات من صفحة الطلب قبل التجهيز.</li>
+              <li>تؤكد استلام التحويل فيبدأ تجهيز الطلب.</li>
+            </ol>
+          </div>
+        </section>
       </div>
-    </div>
+    </>,
   );
 }

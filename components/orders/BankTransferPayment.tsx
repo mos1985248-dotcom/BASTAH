@@ -1,13 +1,15 @@
 // components/orders/BankTransferPayment.tsx
 // يظهر فقط لطلبات paymentMethod=BANK_TRANSFER. ثلاث حالات:
-// 1) لسه ما رفع المشتري إثبات → نموذج رفع (رقم مرجعي إلزامي + صورة إلزامية)
+// 1) لم يرفع المشتري إثباتاً بعد → نموذج رفع (رقم مرجعي إلزامي + صورة إلزامية)
 // 2) رفع الإثبات وبانتظار مراجعة التاجر → رسالة "قيد المراجعة"
 // 3) paymentStatus=PAID → لا يظهر هذا المكوّن أصلاً (الصفحة الأم تتحقق)
+// عرض فقط: منطق الرفع (POST /api/orders/:id/bank-transfer-proof) كما كان حرفياً.
 "use client";
 
 import { useState } from "react";
-import { Landmark, MapPin, UploadCloud, CheckCircle2, AlertTriangle } from "lucide-react";
-import { t } from "@/theme";
+import { AlertTriangle, CheckCircle2, Landmark, MapPin, UploadCloud } from "lucide-react";
+import { uiVars } from "@/components/ui/vars";
+import c from "./order.module.css";
 
 interface BankAccount { iban: string | null; accountHolder: string | null; bankName: string | null }
 interface PickupInfo { city: string | null; region: string | null; latitude: number | null; longitude: number | null }
@@ -25,6 +27,7 @@ export default function BankTransferPayment({ orderId, bankAccount, pickupInfo, 
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const mapsUrl =
     pickupInfo?.latitude != null && pickupInfo?.longitude != null
@@ -53,82 +56,116 @@ export default function BankTransferPayment({ orderId, bankAccount, pickupInfo, 
     }
   };
 
+  const copyIban = async () => {
+    try {
+      await navigator.clipboard.writeText(bankAccount?.iban ?? "");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* النسخ غير متاح في هذا المتصفح: يبقى الرقم ظاهراً للنسخ اليدوي */
+    }
+  };
+
   return (
-    <div style={{ background: t.colors.cream.warm, borderRadius: t.radius.lg, padding: t.spacing["4"], textAlign: "right", marginBottom: t.spacing["4"] }}>
-      <p style={{ display: "flex", alignItems: "center", gap: 6, margin: `0 0 ${t.spacing["3"]}`, fontSize: t.typography.fontSize.sm, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
-        <Landmark size={15} strokeWidth={1.8} color={t.colors.primary[800]} />
-        الدفع بتحويل بنكي
-      </p>
+    <section className={c.card} style={uiVars} aria-labelledby="bank-title">
+      <div className={c.cardHead}>
+        <Landmark size={19} strokeWidth={1.7} aria-hidden="true" />
+        <h2 id="bank-title" className={c.cardTitle}>الدفع بتحويل بنكي</h2>
+      </div>
 
-      {bankAccount && (
-        <div style={{ background: t.colors.white, borderRadius: t.radius.md, padding: t.spacing["3"], marginBottom: t.spacing["3"], display: "flex", flexDirection: "column", gap: 6 }}>
-          <InfoRow label="اسم صاحب الحساب" value={bankAccount.accountHolder} />
-          <InfoRow label="البنك" value={bankAccount.bankName} />
-          <InfoRow label="رقم الآيبان" value={bankAccount.iban} dir="ltr" />
-        </div>
-      )}
+      <div className={`${c.cardBody} ${c.bank}`}>
+        {bankAccount && (
+          <div className={c.info}>
+            <InfoRow label="اسم صاحب الحساب" value={bankAccount.accountHolder} />
+            <InfoRow label="البنك" value={bankAccount.bankName} />
+            <InfoRow label="رقم الآيبان" value={bankAccount.iban} dir="ltr">
+              {bankAccount.iban && (
+                <button type="button" className={c.copy} onClick={copyIban}>
+                  {copied ? "تم النسخ" : "نسخ"}
+                </button>
+              )}
+            </InfoRow>
+          </div>
+        )}
 
-      {pickupInfo && (
-        <div style={{ background: t.colors.white, borderRadius: t.radius.md, padding: t.spacing["3"], marginBottom: t.spacing["3"] }}>
-          <p style={{ display: "flex", alignItems: "center", gap: 5, margin: "0 0 4px", fontSize: 12, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
-            <MapPin size={13} strokeWidth={1.8} />
-            استلام شخصي من موقع التاجر
-          </p>
-          <p style={{ margin: 0, fontSize: 12, color: t.colors.text.body }}>{pickupInfo.city}{pickupInfo.region ? `، ${pickupInfo.region}` : ""}</p>
-          {mapsUrl && (
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: t.colors.primary[800], fontWeight: t.typography.fontWeight.bold, display: "inline-block", marginTop: 6 }}>
-              فتح الموقع بخرائط قوقل ←
-            </a>
-          )}
-        </div>
-      )}
-
-      {bankTransferSubmittedAt ? (
-        <p style={{ display: "flex", alignItems: "center", gap: 6, margin: 0, fontSize: 12, color: t.colors.semantic.success, background: t.colors.semantic.successBg, padding: t.spacing["3"], borderRadius: t.radius.md }}>
-          <CheckCircle2 size={14} strokeWidth={1.8} />
-          تم رفع إثبات التحويل — بانتظار مراجعة التاجر لتأكيد الطلب
-        </p>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"] }}>
-          <p style={{ margin: 0, fontSize: 11, color: t.colors.text.mid }}>بعد إتمام التحويل، ارفعي رقم العملية وصورة الإيصال:</p>
-          <input
-            value={referenceNumber}
-            onChange={(e) => setReferenceNumber(e.target.value)}
-            placeholder="الرقم المرجعي للتحويل"
-            dir="rtl"
-            style={{ width: "100%", padding: "9px 12px", border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, fontSize: 13, boxSizing: "border-box" }}
-          />
-          <label
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "10px", border: `1.5px dashed ${t.colors.cream.border}`, borderRadius: t.radius.md, cursor: "pointer", fontSize: 12, color: t.colors.text.mid, background: t.colors.white }}
-          >
-            <UploadCloud size={14} strokeWidth={1.8} />
-            {file ? file.name : "اختيار صورة إيصال التحويل"}
-            <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} style={{ display: "none" }} />
-          </label>
-          {error && (
-            <p style={{ display: "flex", alignItems: "center", gap: 5, margin: 0, fontSize: 11, color: t.colors.semantic.danger }}>
-              <AlertTriangle size={11} strokeWidth={1.8} />
-              {error}
+        {pickupInfo && (
+          <div className={c.pickup}>
+            <p className={c.pickupTitle}>
+              <MapPin size={15} strokeWidth={1.8} aria-hidden="true" />
+              استلام شخصي من موقع التاجر
             </p>
-          )}
-          <button
-            onClick={handleSubmit}
-            disabled={uploading || referenceNumber.trim().length < 3 || !file}
-            style={{ padding: 10, borderRadius: t.radius.md, border: "none", background: t.colors.primary[800], color: t.colors.white, fontWeight: t.typography.fontWeight.bold, fontSize: 13, cursor: uploading ? "not-allowed" : "pointer", opacity: referenceNumber.trim().length < 3 || !file ? 0.6 : 1 }}
-          >
-            {uploading ? "جاري الرفع..." : "رفع إثبات التحويل"}
-          </button>
-        </div>
-      )}
-    </div>
+            <p className={c.pickupText}>
+              {pickupInfo.city}
+              {pickupInfo.region ? `، ${pickupInfo.region}` : ""}
+            </p>
+            {mapsUrl && (
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className={c.mapLink}>
+                فتح الموقع بخرائط قوقل ←
+              </a>
+            )}
+          </div>
+        )}
+
+        {bankTransferSubmittedAt ? (
+          <p className={c.sent} role="status">
+            <CheckCircle2 size={18} strokeWidth={1.8} aria-hidden="true" />
+            تم رفع إثبات التحويل — بانتظار مراجعة التاجر لتأكيد الطلب
+          </p>
+        ) : (
+          <>
+            <p className={c.proofNote}>بعد إتمام التحويل، ارفع رقم العملية وصورة الإيصال:</p>
+            <input
+              value={referenceNumber}
+              onChange={(e) => setReferenceNumber(e.target.value)}
+              placeholder="الرقم المرجعي للتحويل"
+              aria-label="الرقم المرجعي للتحويل"
+              dir="rtl"
+              className={c.input}
+            />
+            <label className={c.upload}>
+              <UploadCloud size={18} strokeWidth={1.8} aria-hidden="true" />
+              {file ? file.name : "اختيار صورة إيصال التحويل"}
+              <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            </label>
+            {error && (
+              <p className={c.err} role="alert">
+                <AlertTriangle size={15} strokeWidth={1.8} aria-hidden="true" />
+                {error}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={uploading || referenceNumber.trim().length < 3 || !file}
+              className={c.submit}
+            >
+              {uploading ? "جاري الرفع..." : "رفع إثبات التحويل"}
+            </button>
+          </>
+        )}
+      </div>
+    </section>
   );
 }
 
-function InfoRow({ label, value, dir = "rtl" }: { label: string; value: string | null; dir?: "rtl" | "ltr" }) {
+function InfoRow({
+  label,
+  value,
+  dir = "rtl",
+  children,
+}: {
+  label: string;
+  value: string | null;
+  dir?: "rtl" | "ltr";
+  children?: React.ReactNode;
+}) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-      <span style={{ fontSize: 11, color: t.colors.text.light }}>{label}</span>
-      <span dir={dir} style={{ fontSize: 13, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>{value ?? "—"}</span>
+    <div className={c.infoRow}>
+      <span className={c.infoLabel}>{label}</span>
+      <span className={c.infoValue}>
+        <span dir={dir}>{value ?? "—"}</span>
+        {children}
+      </span>
     </div>
   );
 }

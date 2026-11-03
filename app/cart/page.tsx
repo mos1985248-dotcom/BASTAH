@@ -1,18 +1,22 @@
 // app/cart/page.tsx
+// المنطق (الجلب والكمية والحذف والمفضلة والتجميع حسب المتجر) كما كان حرفياً؛ التغيير في العرض فقط.
 "use client";
 
 import { Fragment, useEffect, useState } from "react";
-import { ShoppingBag, ShoppingCart, AlertTriangle, Info, ArrowLeft } from "lucide-react";
+import { ArrowLeft, Info, ShoppingCart } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { useCurrentUser } from "../providers";
 import { useAddressBook } from "@/hooks/useAddressBook";
 import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import SiteShell from "@/components/layout/SiteShell";
 import CartContactConsent from "@/components/cart/CartContactConsent";
 import CartStoreGroup from "@/components/cart/CartStoreGroup";
 import CartTrustBar from "@/components/cart/CartTrustBar";
 import CartRelatedProducts from "@/components/cart/CartRelatedProducts";
+import { CartEmpty, CartError, CartLoading, CartLoginPrompt } from "@/components/cart/CartStates";
 import { CartItemData } from "@/components/cart/types";
+import c from "@/components/cart/cart.module.css";
 
 export default function CartPage() {
   const { user, loading: userLoading } = useCurrentUser();
@@ -86,130 +90,101 @@ export default function CartPage() {
     }
   };
 
-  if (userLoading) {
-    return (
-      <SiteShell>
-        <p style={{ textAlign: "center", padding: t.spacing["16"], color: t.colors.text.mid }}>جاري التحميل...</p>
-      </SiteShell>
-    );
-  }
+  const shell = (children: React.ReactNode) => (
+    <SiteShell>
+      <div style={{ background: t.colors.heritage.sand }}>
+        <main className={c.page} style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}>
+          {children}
+        </main>
+      </div>
+    </SiteShell>
+  );
 
-  if (!user) {
-    return (
-      <SiteShell>
-        <div style={{ textAlign: "center", padding: t.spacing["16"] }}>
-          <ShoppingBag size={40} strokeWidth={1.5} color={t.colors.text.light} style={{ margin: "0 auto" }} />
-          <p style={{ color: t.colors.text.mid, margin: `${t.spacing["3"]} 0` }}>سجّلي دخولك لعرض سلة التسوق</p>
-          <a href="/login?redirect=/cart" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: t.colors.gold[600], fontWeight: t.typography.fontWeight.bold }}>
-            تسجيل الدخول
-            <ArrowLeft size={15} strokeWidth={2} />
-          </a>
-        </div>
-      </SiteShell>
-    );
-  }
+  if (userLoading) return shell(<CartLoading />);
+  if (!user) return shell(<CartLoginPrompt />);
 
-  const groups = items.reduce<Record<string, { storeName: string; items: CartItemData[] }>>((acc, item) => {
+  const groups = items.reduce<Record<string, { storeName: string; storeSlug: string; items: CartItemData[] }>>((acc, item) => {
     const sid = item.product.store.id;
-    if (!acc[sid]) acc[sid] = { storeName: item.product.store.nameAr, items: [] };
+    if (!acc[sid]) acc[sid] = { storeName: item.product.store.nameAr, storeSlug: item.product.store.slug, items: [] };
     acc[sid].items.push(item);
     return acc;
   }, {});
   const storeIds = Object.keys(groups);
+  // نفس شرط CartStoreGroup: منتج غير نشط أو نفدت كميته يمنع المتابعة (الشريط الثابت كان لا يلتزم به)
+  const hasIssue = items.some(
+    (i) =>
+      i.product.status !== "ACTIVE" ||
+      (i.variant ? i.variant.quantity === 0 : i.product.quantity === 0),
+  );
   const grandTotal = items.reduce((s, i) => s + (i.variant?.price ?? i.product.price) * i.quantity, 0);
 
   return (
     <SiteShell>
-      <div className="basita-cart-container" style={{ maxWidth: 1200, margin: "0 auto", padding: `${t.spacing["5"]} ${t.spacing["5"]} ${t.spacing["16"]}` }}>
-        <nav style={{ fontSize: t.typography.fontSize.xs, color: t.colors.text.light, marginBottom: t.spacing["2"] }}>
-          <a href="/" style={{ color: t.colors.text.light, textDecoration: "none" }}>الرئيسية</a> ‹ السلة
-        </nav>
-        <h1 style={{ fontSize: t.typography.fontSize["2xl"], fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800], margin: `0 0 ${t.spacing["5"]}`, display: "flex", alignItems: "center", gap: 8 }}>
-          <ShoppingCart size={22} strokeWidth={1.8} />
-          سلة مشترياتك
-        </h1>
+      <div style={{ background: t.colors.heritage.sand }}>
+        <main className={c.page} style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}>
+          <nav className={c.crumbs} aria-label="مسار التصفح">
+            <a href="/">الرئيسية</a> ‹ السلة
+          </nav>
+          <h1 className={c.title} style={{ fontFamily: t.typography.fontFamily.display }}>
+            <ShoppingCart size={26} strokeWidth={1.7} aria-hidden="true" />
+            سلة مشترياتك
+          </h1>
 
-        {loading && <p style={{ color: t.colors.text.mid }}>جاري التحميل...</p>}
-        {error && !loading && (
-          <p style={{ display: "flex", alignItems: "center", gap: 6, color: t.colors.semantic.danger }}>
-            <AlertTriangle size={15} strokeWidth={1.8} />
-            حدث خطأ، حاولي تحديث الصفحة
-          </p>
-        )}
+          {loading && <CartLoading />}
+          {error && !loading && <CartError />}
+          {!loading && !error && items.length === 0 && <CartEmpty />}
 
-        {!loading && !error && items.length === 0 && (
-          <div style={{ textAlign: "center", padding: `${t.spacing["16"]} ${t.spacing["4"]}`, background: t.colors.white, borderRadius: t.radius.xl }}>
-            <ShoppingCart size={48} strokeWidth={1.5} color={t.colors.text.light} style={{ margin: "0 auto" }} />
-            <p style={{ fontSize: t.typography.fontSize.lg, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark, margin: `${t.spacing["4"]} 0 ${t.spacing["1"]}` }}>سلتك فارغة</p>
-            <p style={{ color: t.colors.text.mid, margin: `0 0 ${t.spacing["5"]}` }}>لسه ما أضفتِ أي منتج — تصفّحي الأسر المنتجة واكتشفي منتجاتهم</p>
-            <a
-              href="/marketplace"
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 28px", background: t.colors.primary[800], color: t.colors.white, borderRadius: t.radius.full, textDecoration: "none", fontWeight: t.typography.fontWeight.bold }}
-            >
-              <ShoppingBag size={16} strokeWidth={1.8} />
-              تصفّحي المنتجات
-            </a>
-          </div>
-        )}
-
-        {!loading && items.length > 0 && (
-          <>
-            {storeIds.length > 1 && (
-              <p style={{ display: "flex", alignItems: "center", gap: 6, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid, marginBottom: t.spacing["4"], background: t.colors.cream.warm, padding: t.spacing["3"], borderRadius: t.radius.md }}>
-                <Info size={15} strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                سلتك تحتوي منتجات من {storeIds.length} متاجر — لكل متجر عملية دفع منفصلة. إجمالي السلة كاملة: <strong style={{ color: t.colors.text.dark }}>{grandTotal} ر.س</strong>
-              </p>
-            )}
-
-            {Object.entries(groups).map(([storeId, g]) => (
-              <Fragment key={storeId}>
-              <CartStoreGroup
-                storeId={storeId}
-                storeName={g.storeName}
-                items={g.items}
-                busyId={busyId}
-                favoriteIds={favoriteIds}
-                addressId={selectedAddressId}
-                onQtyChange={updateQty}
-                onRemove={removeItem}
-                onToggleFavorite={toggleFavorite}
-              />
-              <CartContactConsent storeId={storeId} storeName={g.storeName} />
-              </Fragment>
-            ))}
-
-            <CartTrustBar />
-            <CartRelatedProducts excludeProductIds={items.map((i) => i.product.id)} />
-          </>
-        )}
+          {!loading && items.length > 0 && (
+            <>
+              {storeIds.length > 1 && (
+                <p className={c.notice}>
+                  <Info size={17} strokeWidth={1.8} aria-hidden="true" />
+                  <span>
+                    سلتك تحتوي منتجات من {storeIds.length} متاجر — لكل متجر عملية دفع منفصلة. إجمالي السلة كاملة: <strong>{grandTotal} ر.س</strong>
+                  </span>
+                </p>
+              )}
+              {Object.entries(groups).map(([storeId, g]) => (
+                <Fragment key={storeId}>
+                  <CartStoreGroup
+                    storeId={storeId}
+                    storeName={g.storeName}
+                    storeSlug={g.storeSlug}
+                    items={g.items}
+                    busyId={busyId}
+                    favoriteIds={favoriteIds}
+                    addressId={selectedAddressId}
+                    onQtyChange={updateQty}
+                    onRemove={removeItem}
+                    onToggleFavorite={toggleFavorite}
+                  />
+                  <CartContactConsent storeId={storeId} storeName={g.storeName} />
+                </Fragment>
+              ))}
+              <CartTrustBar />
+              <CartRelatedProducts excludeProductIds={items.map((i) => i.product.id)} />
+            </>
+          )}
+        </main>
       </div>
 
       {/* شريط سفلي ثابت بالجوال — فقط لو متجر واحد بالسلة (تفادياً لغموض "أي متجر؟") */}
       {!loading && storeIds.length === 1 && (
-        <div className="basita-cart-sticky" style={{ display: "none", position: "fixed", bottom: 0, insetInline: 0, background: t.colors.white, borderTop: `1px solid ${t.colors.cream.border}`, padding: t.spacing["3"], zIndex: 50, boxShadow: t.shadows.lg }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: t.spacing["3"] }}>
-            <div>
-              <p style={{ margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.text.mid }}>الإجمالي</p>
-              <p style={{ margin: 0, fontSize: t.typography.fontSize.lg, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>{grandTotal} ر.س</p>
-            </div>
-            <a
-              href={`/checkout?store=${storeIds[0]}`}
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, flex: 1, maxWidth: 220, textAlign: "center", padding: 13, background: t.colors.primary[800], color: t.colors.white, borderRadius: t.radius.lg, textDecoration: "none", fontWeight: t.typography.fontWeight.bold }}
-            >
-              إتمام الطلب
-              <ArrowLeft size={15} strokeWidth={2} />
-            </a>
+        <div className={c.sticky} style={uiVars}>
+          <div>
+            <p className={c.stickyLabel}>الإجمالي</p>
+            <p className={c.stickyTotal}>{grandTotal} ر.س</p>
           </div>
+          <a
+            href={hasIssue ? undefined : `/checkout?store=${storeIds[0]}`}
+            aria-disabled={hasIssue}
+            className={c.stickyBtn}
+          >
+            إتمام الطلب
+            <ArrowLeft size={16} strokeWidth={2} aria-hidden="true" />
+          </a>
         </div>
       )}
-
-      <style>{`
-        html, body { overflow-x: hidden; }
-        @media (max-width: 700px) {
-          .basita-cart-sticky { display: block !important; }
-          .basita-cart-container { padding-bottom: 100px !important; }
-        }
-      `}</style>
     </SiteShell>
   );
 }

@@ -1,0 +1,38 @@
+/* components/product/product.module.css — إطار صفحة المنتج. الألوان عبر متغيرات --ui-* فقط */
+.page { margin: 0 auto; padding: 20px 16px 64px; direction: rtl; }
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 0 18px; padding: 0; list-style: none; font-size: 13px; color: var(--ui-ink-muted); }
+.crumbs a { color: var(--ui-ink-muted); text-decoration: none; }
+.crumbs a:hover { color: var(--ui-green); }
+.crumbs a:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.sep { opacity: 0.5; }
+.current { color: var(--ui-ink); font-weight: 600; }
+
+.warning { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 18px; padding: 14px 18px; border-radius: 16px; background: var(--ui-sand); border: 1px solid var(--ui-gold); font-size: 14px; line-height: 1.8; color: var(--ui-ink); }
+.warning svg { flex: none; margin-top: 3px; color: var(--ui-kicker); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr); gap: 32px; align-items: start; }
+.galleryCol { position: sticky; top: 96px; min-width: 0; }
+.infoCol { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.lower { display: flex; flex-direction: column; gap: 56px; margin-top: 56px; }
+
+.sectionKicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
+.sectionKicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
+.sectionTitle { margin: 0 0 6px; font-size: clamp(30px, 3.68vw, 41.5px); font-weight: 700; line-height: 1.6; color: var(--ui-green-deep); }
+.sectionSub { margin: 0 0 22px; font-size: 15px; color: var(--ui-ink-muted); }
+
+.state { display: flex; align-items: center; justify-content: center; min-height: 52vh; padding: 32px 16px; direction: rtl; }
+.stateCard { width: 100%; max-width: 520px; padding: 36px 28px; text-align: center; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted); }
+.stateCard h1 { margin: 12px 0 6px; font-size: 22px; color: var(--ui-ink); }
+.stateCard p { margin: 0 0 18px; line-height: 1.8; }
+.stateCard a {
+  display: inline-flex; align-items: center; min-height: 48px; padding: 0 28px; border-radius: var(--ui-pill);
+  background: var(--ui-green); color: var(--ui-white); font-weight: 600; text-decoration: none;
+}
+
+@media (max-width: 900px) {
+  .page { padding: 12px 12px 120px; }
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .galleryCol { position: static; }
+  .lower { gap: 40px; margin-top: 40px; }
+}
+/* basita-font-scale: applied */

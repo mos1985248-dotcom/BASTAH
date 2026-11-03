@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const { allowed } = await checkRateLimit(authRateLimit, `reset:${ip}`);
   if (!allowed) {
     return NextResponse.json(
-      { error: "طلبات كثيرة جداً، حاولي مجدداً بعد دقيقة" },
+      { error: "طلبات كثيرة جداً، حاول مجدداً بعد دقيقة" },
       { status: 429 }
     );
   }

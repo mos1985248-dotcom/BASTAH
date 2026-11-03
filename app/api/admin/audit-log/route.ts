@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 
     const targets = new Map<string, { name: string; sub?: string }>();
     stores.forEach((x) => targets.set(`Store:${x.id}`, { name: x.nameAr, sub: x.slug }));
-    users.forEach((x) => targets.set(`User:${x.id}`, { name: x.name, sub: x.email }));
+    users.forEach((x) => targets.set(`User:${x.id}`, { name: x.name, sub: x.email ?? undefined }));
     couriers.forEach((x) => targets.set(`CityCourier:${x.id}`, { name: x.name, sub: x.city }));
     providers.forEach((x) => targets.set(`ShippingProviderConfig:${x.id}`, { name: x.displayNameAr, sub: x.carrierKey }));
     creds.forEach((x) => targets.set(`PlatformCarrierCredential:${x.id}`, { name: x.carrier }));

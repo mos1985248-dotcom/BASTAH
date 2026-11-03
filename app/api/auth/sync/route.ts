@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       },
       create: {
         supabaseId: supabaseUser.id,
-        email: supabaseUser.email!,
+        email: supabaseUser.email ?? null,
         phone: phone ?? null,
         name,
         role,

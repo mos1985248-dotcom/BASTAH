@@ -1,0 +1,13 @@
+/* components/dashboard/courier.module.css — بطاقة إسناد الطلب لمندوب بسطة للشحن. الألوان عبر --ui-* فقط.
+   يكمل forms.module.css (panel، field، cta، err). */
+.card { margin-bottom: 12px; }
+.assigned { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--ui-border); background: var(--ui-sand); }
+.assignedText { margin: 0; font-size: 13.5px; color: var(--ui-ink-muted); }
+.assignedText strong { color: var(--ui-ink); }
+.label { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13.5px; font-weight: 700; color: var(--ui-green-deep); text-decoration: none; }
+.label:hover { color: var(--ui-green); }
+.label:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; border-radius: 8px; }
+.none { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 14px; background: var(--ui-sand); border: 1px solid var(--ui-border); font-size: 13.5px; line-height: 1.7; color: var(--ui-ink); }
+.none svg { flex: none; margin-top: 4px; color: var(--ui-kicker); }
+.select { appearance: auto; direction: rtl; }
+.send { width: 100%; }

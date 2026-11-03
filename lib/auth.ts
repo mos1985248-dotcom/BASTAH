@@ -10,6 +10,7 @@ import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { prisma } from "./prisma";
 import type { User as PrismaUser, UserRole } from "@prisma/client";
+import { normalizeSaudiMobile } from "./phone";
 
 export class AuthError extends Error {
   constructor(message: string, public status: number = 401) {
@@ -66,30 +67,42 @@ export async function getCurrentUser(): Promise<AuthedUser | null> {
   // من user_metadata المخزَّنة بحساب Supabase نفسه وقت signUp — يعمل عند
   // أول طلب مُصادَق من أي صفحة، بلا اعتماد على أي رابط تحويل محدَّد.
   if (!user) {
-    const meta = data.user.user_metadata as { name?: string; phone?: string; role?: UserRole } | null;
+    // بيانات الهوية تختلف حسب طريقة الدخول: بريد (name/phone/role من signUp)،
+    // Google (full_name/avatar_url)، جوال OTP (الرقم في data.user.phone بلا "+").
+    const meta = data.user.user_metadata as {
+      name?: string; full_name?: string; phone?: string; role?: UserRole;
+      avatar_url?: string; picture?: string;
+    } | null;
+    const email = data.user.email ?? null;
+    const createData = {
+      supabaseId: data.user.id,
+      email,
+      name: meta?.name?.trim() || meta?.full_name?.trim() || email?.split("@")[0] || "مستخدم بسطة",
+      phone: normalizeSaudiMobile(data.user.phone) ?? meta?.phone ?? null,
+      avatar: meta?.avatar_url ?? meta?.picture ?? null,
+      // دائماً BUYER افتراضياً لو الدور غير موجود بالـmetadata (Google وحسابات قديمة)
+      // — لا نمنح صلاحية بائع تلقائياً بلا تأكيد صريح من المستخدم وقت التسجيل.
+      role: (meta?.role === "SELLER" ? "SELLER" : "BUYER") as UserRole,
+      isVerified: !!(data.user.email_confirmed_at || data.user.phone_confirmed_at),
+    };
+    const include = { store: { select: { id: true, slug: true, status: true } } };
+    const upsert = (create: typeof createData) =>
+      prisma.user.upsert({ where: { supabaseId: data.user.id }, update: {}, create, include });
     try {
-      user = await prisma.user.upsert({
-        where: { supabaseId: data.user.id },
-        update: {},
-        create: {
-          supabaseId: data.user.id,
-          email: data.user.email!,
-          name: meta?.name?.trim() || data.user.email!.split("@")[0],
-          phone: meta?.phone ?? null,
-          // دائماً BUYER افتراضياً لو الدور غير موجود بالـmetadata (حسابات
-          // قديمة أو مسارات OAuth مستقبلية) — لا نمنح صلاحية بائع تلقائياً
-          // بلا تأكيد صريح من المستخدم وقت التسجيل.
-          role: meta?.role === "SELLER" ? "SELLER" : "BUYER",
-          isVerified: !!data.user.email_confirmed_at,
-        },
-        include: { store: { select: { id: true, slug: true, status: true } } },
-      });
-    } catch {
-      // تعارض نادر (سباق مع /api/auth/sync يعمل بنفس اللحظة) — أعيدي القراءة
-      user = await prisma.user.findUnique({
-        where: { supabaseId: data.user.id },
-        include: { store: { select: { id: true, slug: true, status: true } } },
-      });
+      user = await upsert(createData);
+    } catch (err: any) {
+      try {
+        // الرقم محجوز لحساب آخر (مثلاً كُتب بلا تحقق عند تسجيل ببريد): لا نحبس المستخدم خارج
+        // حسابه — نُنشئه بلا رقم في جدولنا (الرقم الموثَّق يبقى في Supabase) بدل دمج الحسابين تلقائياً.
+        if (err?.code === "P2002" && createData.phone && String(err?.meta?.target).includes("phone")) {
+          user = await upsert({ ...createData, phone: null });
+        } else {
+          throw err;
+        }
+      } catch {
+        // تعارض آخر (سباق مع /api/auth/sync يعمل بنفس اللحظة) — أعد القراءة
+        user = await prisma.user.findUnique({ where: { supabaseId: data.user.id }, include });
+      }
     }
   }
 

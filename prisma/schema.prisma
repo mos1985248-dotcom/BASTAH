@@ -175,8 +175,8 @@ enum ReviewStatus {
 model User {
   id            String    @id @default(cuid())
   supabaseId    String?   @unique // Supabase Auth UUID
-  email         String    @unique
-  phone         String?   @unique
+  email         String?   @unique // اختياري: حساب الجوال/OTP قد لا يملك بريداً (NULL مسموح بأكثر من صف مع UNIQUE في PostgreSQL)
+  phone         String?   @unique // بصيغة +9665XXXXXXXX
   name          String
   nameEn        String?
   avatar        String?

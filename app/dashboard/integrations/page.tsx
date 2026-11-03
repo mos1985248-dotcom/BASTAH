@@ -5,12 +5,15 @@
 import { useEffect, useState } from "react";
 import { Plug } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
-import LoadingState from "@/components/admin/ui/LoadingState";
-import ErrorState from "@/components/admin/ui/ErrorState";
+import LoadingState from "@/components/dashboard/ui/LoadingState";
+import ErrorState from "@/components/dashboard/ui/ErrorState";
 import AccountsSection from "@/components/dashboard/integrations/AccountsSection";
 import ServicesSection from "@/components/dashboard/integrations/ServicesSection";
 import type { MerchantIntegrations } from "@/components/dashboard/integrations/types";
+
+import { uiVars } from "@/components/ui/vars";
+import f from "@/components/dashboard/forms.module.css";
+import s from "@/components/dashboard/integrations/integrations.module.css";
 
 export default function IntegrationsPage() {
   const [data, setData] = useState<MerchantIntegrations | null>(null);
@@ -22,17 +25,24 @@ export default function IntegrationsPage() {
   };
   useEffect(load, []);
 
-  if (error) return <ErrorState message={error} onRetry={load} />;
-  if (!data) return <LoadingState />;
+  if (error) return <div className={f.page} style={uiVars}><ErrorState message={error} onRetry={load} /></div>;
+  if (!data) return <div className={f.page} style={uiVars}><LoadingState /></div>;
 
   return (
-    <div dir="rtl" style={{ maxWidth: 760 }}>
-      <h1 style={{ display: "flex", alignItems: "center", gap: 8, margin: `0 0 ${t.spacing["4"]}`, fontSize: t.typography.fontSize.xl, color: t.colors.text.dark }}>
-        <Plug size={20} strokeWidth={1.8} />
-        التكاملات
-      </h1>
-      <ServicesSection services={data.services} />
-      <AccountsSection data={data} onChanged={load} />
+    <div className={f.page} style={uiVars} dir="rtl">
+      <div className={f.head}>
+        <div>
+          <h1 className={`${f.title} ${s.titleRow}`}>
+            <Plug size={24} strokeWidth={1.8} aria-hidden="true" />
+            التكاملات
+          </h1>
+          <p className={f.sub}>اربط حساباتك الخارجية وتابع الخدمات التي فعّلتها الإدارة لمتجرك</p>
+        </div>
+      </div>
+      <div className={f.layoutEq}>
+        <ServicesSection services={data.services} />
+        <AccountsSection data={data} onChanged={load} />
+      </div>
     </div>
   );
 }

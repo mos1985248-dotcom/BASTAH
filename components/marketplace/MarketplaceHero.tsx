@@ -1,6 +1,8 @@
 // components/marketplace/MarketplaceHero.tsx
 import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import SearchBar from "@/components/layout/SearchBar";
+import s from "./market.module.css";
 
 export default function MarketplaceHero({
   search,
@@ -12,33 +14,23 @@ export default function MarketplaceHero({
   onSubmit: () => void;
 }) {
   return (
-    <div
-      style={{
-        background: `linear-gradient(135deg, ${t.colors.primary[900]}, ${t.colors.primary[800]})`,
-        padding: `${t.spacing["10"]} ${t.spacing["4"]}`,
-      }}
-    >
-      <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
-        <h1
-          style={{
-            color: t.colors.text.onDark,
-            fontSize: t.typography.fontSize["2xl"],
-            fontWeight: t.typography.fontWeight.bold,
-            margin: `0 0 ${t.spacing["5"]}`,
-          }}
-        >
-          تسوّقي من بيوت سعودية
+    <section className={s.heroWrap} style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}>
+      <div className={s.hero}>
+        <p className={s.heroKicker}>سوق بسطة</p>
+        <h1 className={s.heroTitle} style={{ fontFamily: t.typography.fontFamily.display }}>
+          تسوّق من بيوت سعودية
         </h1>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <p className={s.heroSub}>منتجات وحرف يدوية من الأسر السعودية المنتجة</p>
+        <div className={s.heroSearch}>
           <SearchBar
             value={search}
             onChange={onSearchChange}
             onSubmit={onSubmit}
-            placeholder="ابحثي عن منتج أو متجر..."
+            placeholder="ابحث عن منتج أو متجر..."
             variant="onDark"
           />
         </div>
       </div>
-    </div>
+    </section>
   );
 }

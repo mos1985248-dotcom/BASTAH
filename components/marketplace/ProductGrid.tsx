@@ -1,40 +1,59 @@
 // components/marketplace/ProductGrid.tsx
 import { AlertTriangle } from "lucide-react";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
+import EmptyState from "@/components/ui/EmptyState";
+import Skeleton from "@/components/ui/Skeleton";
 import ProductCard, { MarketplaceProduct } from "./ProductCard";
+import card from "./card.module.css";
+import s from "./market.module.css";
 
 export default function ProductGrid({
   products,
   loading,
   error,
+  onRetry,
 }: {
   products: MarketplaceProduct[];
   loading: boolean;
   error: string;
+  onRetry?: () => void;
 }) {
   if (loading) {
-    return <p style={{ textAlign: "center", color: t.colors.text.mid, padding: t.spacing["10"] }}>جاري التحميل...</p>;
+    return (
+      <div className={s.grid} style={uiVars} aria-busy="true">
+        {Array.from({ length: 8 }, (_, i) => (
+          <div key={i} className={card.skeleton}>
+            <Skeleton height={200} radius="0" />
+            <div className={card.skeletonBody}>
+              <Skeleton height={12} width="45%" />
+              <Skeleton height={16} />
+              <Skeleton height={18} width="35%" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   }
   if (error) {
     return (
-      <p style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, textAlign: "center", color: t.colors.semantic.danger, padding: t.spacing["10"] }}>
-        <AlertTriangle size={16} strokeWidth={1.8} />
-        {error}
-      </p>
+      <div className={s.notice} style={uiVars} role="alert">
+        <AlertTriangle size={26} strokeWidth={1.8} aria-hidden="true" />
+        <p>{error}</p>
+        {onRetry && (
+          <button type="button" className={s.retry} onClick={onRetry}>
+            إعادة المحاولة
+          </button>
+        )}
+      </div>
     );
   }
   if (products.length === 0) {
-    return <p style={{ textAlign: "center", color: t.colors.text.mid, padding: t.spacing["10"] }}>لا توجد منتجات حالياً</p>;
+    return (
+      <EmptyState title="لا توجد منتجات حالياً" description="جرّب تغيير القسم أو كلمة البحث." />
+    );
   }
-
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-        gap: t.spacing["4"],
-      }}
-    >
+    <div className={s.grid} style={uiVars}>
       {products.map((p) => (
         <ProductCard key={p.id} product={p} />
       ))}

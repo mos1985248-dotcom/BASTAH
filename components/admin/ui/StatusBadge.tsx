@@ -1,20 +1,10 @@
 // components/admin/ui/StatusBadge.tsx
-import { t } from "@/theme";
+// لون الشارة قيمة ديناميكية من ثوابت الحالات (lib/*-status) فيبقى مضمّناً؛ والباقي بالفئة.
+import s from "../admin-ui.module.css";
 
 export default function StatusBadge({ label, color, bg }: { label: string; color: string; bg: string }) {
   return (
-    <span
-      style={{
-        display: "inline-block",
-        padding: "3px 11px",
-        borderRadius: t.radius.full,
-        background: bg,
-        color,
-        fontSize: t.typography.fontSize.xs,
-        fontWeight: t.typography.fontWeight.bold,
-        whiteSpace: "nowrap",
-      }}
-    >
+    <span className={s.badge} style={{ background: bg, color }}>
       {label}
     </span>
   );

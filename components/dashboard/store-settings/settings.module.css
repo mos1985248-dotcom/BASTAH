@@ -1,0 +1,57 @@
+/* components/dashboard/store-settings/settings.module.css — إعدادات المتجر. الألوان عبر --ui-* فقط.
+   يُكمل forms.module.css (panel، field، cta، tag…) ولا يكرّره. */
+.root { display: flex; flex-direction: column; gap: 16px; min-width: 0; direction: rtl; container: settings / inline-size; }
+.intro { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 16px; padding: 4px 4px 2px; }
+.introText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.introTitle { margin: 0; font-family: var(--font-amiri), "Amiri", serif; font-size: clamp(24px, 2.6vw, 30px); font-weight: 700; line-height: 1.4; color: var(--ui-green-deep); }
+.introSub { margin: 0; font-size: 14px; line-height: 1.8; color: var(--ui-ink-muted); }
+.preview { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 0 18px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); font-size: 14px; font-weight: 700; text-decoration: none; }
+.preview:hover { border-color: var(--ui-green); background: var(--ui-sand); }
+.preview:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+
+/* ───── عمودان على المساحات الواسعة، وعمود واحد على الضيقة (يتبع عرض الحاوية لا الشاشة) ───── */
+.cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+@container settings (min-width: 780px) { .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } .col { gap: 20px; } }
+
+.headLead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.headIcon { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); }
+.sand { background: var(--ui-sand); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 14px; }
+.full { grid-column: 1 / -1; }
+.pay { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; align-items: start; }
+
+.lbl { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 700; color: var(--ui-ink); }
+.lbl svg { flex: none; color: var(--ui-green-deep); }
+.lblBlock { display: flex; margin-bottom: 6px; }
+.note { display: block; margin-top: 5px; font-size: 12px; color: var(--ui-ink-muted); }
+
+.tagsBox { display: flex; flex-direction: column; gap: 9px; }
+.tagsBox .tag { min-height: 34px; }
+.addBtn { flex: none; min-width: 76px; min-height: 48px; padding: 0 16px; border-radius: 13px; border: 1px solid var(--ui-border); background: var(--ui-sand); color: var(--ui-green-deep); font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+.addBtn:hover { border-color: var(--ui-green); }
+.addBtn:focus-visible, .locate:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+
+.locate { display: inline-flex; align-self: flex-start; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: var(--ui-pill); border: 1px solid var(--ui-green-deep); background: var(--ui-card); color: var(--ui-green-deep); font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+.locate:hover:not(:disabled) { background: var(--ui-sand); }
+.locate:disabled { opacity: 0.65; cursor: not-allowed; }
+.coords { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 12px; }
+.coordLbl { display: block; margin-bottom: 6px; font-size: 12.5px; font-weight: 600; color: var(--ui-ink-muted); }
+.coordField { min-height: 46px; font-size: 14px; }
+.pickup { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--ui-border); background: var(--ui-card); font-size: 13.5px; font-weight: 700; line-height: 1.8; color: var(--ui-ink); cursor: pointer; }
+.pickup input { flex: none; width: 20px; height: 20px; margin-top: 3px; accent-color: var(--ui-green-deep); cursor: pointer; }
+.pickupOff { opacity: 0.6; cursor: not-allowed; }
+.pickupOff input { cursor: not-allowed; }
+
+.alert { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--ui-danger-bg); border: 1px solid color-mix(in srgb, var(--ui-danger) 18%, transparent); color: var(--ui-danger); font-size: 13.5px; font-weight: 600; line-height: 1.7; }
+.alert svg { flex: none; margin-top: 3px; }
+.alertErr { border-inline-start: 3px solid var(--ui-danger); }
+.saved { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--ui-sand); border: 1px solid var(--ui-border); border-inline-start: 3px solid var(--ui-green); color: var(--ui-green); font-size: 13.5px; font-weight: 600; line-height: 1.7; }
+.saved svg { flex: none; margin-top: 3px; }
+.saveBar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 16px; padding: 14px 18px; border-radius: 22px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.saveHint { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--ui-ink-muted); }
+.saveBar .save { min-width: 220px; }
+@media (min-width: 901px) { .saveBar { position: sticky; bottom: 12px; z-index: 5; box-shadow: 0 8px 28px color-mix(in srgb, var(--ui-ink) 14%, transparent); } }
+@media (max-width: 520px) { .saveBar .save { width: 100%; } }

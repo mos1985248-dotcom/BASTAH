@@ -1,0 +1,83 @@
+/* components/orders/order.module.css — صفحة الطلب. الألوان عبر --ui-* فقط */
+.page { margin: 0 auto; padding: 32px 16px 72px; direction: rtl; }
+.stack { display: flex; flex-direction: column; gap: 18px; }
+.card { overflow: hidden; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.cardHead { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--ui-border); background: var(--ui-sand); }
+.cardHead svg { color: var(--ui-kicker); }
+.cardTitle { margin: 0; font-size: 17px; font-weight: 700; color: var(--ui-green-deep); }
+.cardBody { padding: 20px; }
+
+/* ───── رأس الحالة ───── */
+.status { padding: 36px 24px 28px; text-align: center; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.statusIcon { display: inline-flex; align-items: center; justify-content: center; width: 76px; height: 76px; border-radius: 50%; border: 2px solid var(--ui-gold); background: var(--ui-sand); color: var(--ui-ink-muted); }
+.ok { color: var(--ui-green); }
+.bad { color: var(--ui-danger); background: var(--ui-danger-bg); border-color: var(--ui-danger); }
+.spin { animation: orderSpin 1s linear infinite; }
+@keyframes orderSpin { to { transform: rotate(360deg); } }
+.statusTitle { margin: 16px 0 6px; font-size: clamp(30px, 4.14vw, 39px); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.statusMeta { margin: 0 0 4px; font-size: 15px; color: var(--ui-ink); }
+.statusMeta a { color: var(--ui-green); font-weight: 600; text-underline-offset: 4px; }
+.statusNote { margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: var(--ui-ink-muted); }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-sand); font-size: 13px; color: var(--ui-ink-muted); }
+.chip strong { color: var(--ui-ink); }
+
+/* ───── تفاصيل الطلب ───── */
+.items { margin: 0; padding: 0; list-style: none; }
+.item { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 8px 0; font-size: 15px; color: var(--ui-ink); border-top: 1px solid var(--ui-border); }
+.item:first-child { border-top: none; padding-top: 0; }
+.itemQty { color: var(--ui-ink-muted); }
+.itemTotal { white-space: nowrap; font-weight: 600; }
+.rows { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--ui-border); }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 14px; color: var(--ui-ink-muted); }
+.rowValue { white-space: nowrap; color: var(--ui-ink); font-weight: 500; }
+.discount { color: var(--ui-green); font-weight: 700; }
+.total { display: flex; align-items: baseline; justify-content: space-between; margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--ui-border); }
+.totalLabel { font-size: 16px; font-weight: 700; color: var(--ui-ink); }
+.totalValue { font-size: 24px; font-weight: 700; color: var(--ui-green-deep); }
+
+.deliver { margin: 0; font-size: 15px; line-height: 1.9; color: var(--ui-ink); }
+.mapLink { display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; color: var(--ui-green); font-weight: 600; text-underline-offset: 4px; }
+
+.cta { display: inline-flex; align-self: center; align-items: center; justify-content: center; min-height: 50px; padding: 0 32px; border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white); font-weight: 600; text-decoration: none; }
+.cta:hover { background: var(--ui-green-hover); }
+.cta:focus-visible, .mapLink:focus-visible, .copy:focus-visible, .upload:focus-visible, .submit:focus-visible, .input:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+
+.state { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 48px auto; padding: 44px 24px; text-align: center; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted); }
+.stateErr svg { color: var(--ui-danger); }
+.stateText { margin: 0; font-size: 16px; line-height: 1.8; }
+
+/* ───── التحويل البنكي ───── */
+.bank { display: flex; flex-direction: column; gap: 14px; }
+.info { display: flex; flex-direction: column; border-radius: 16px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.infoRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--ui-border); }
+.infoRow:first-child { border-top: none; }
+.infoLabel { font-size: 13px; color: var(--ui-ink-muted); }
+.infoValue { display: inline-flex; align-items: center; gap: 8px; font-size: 14.5px; font-weight: 700; color: var(--ui-ink); word-break: break-all; }
+.copy { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; margin: -8px 0; padding: 0 10px; border: 0; border-radius: 12px; background: transparent; color: var(--ui-green); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.copy:hover { background: var(--ui-sand); }
+.pickup { padding: 14px 16px; border-radius: 16px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.pickupTitle { display: flex; align-items: center; gap: 6px; margin: 0 0 4px; font-size: 14px; font-weight: 700; color: var(--ui-ink); }
+.pickupTitle svg { color: var(--ui-kicker); }
+.pickupText { margin: 0; font-size: 14px; color: var(--ui-ink-muted); }
+.proofNote { margin: 0; font-size: 14px; line-height: 1.8; color: var(--ui-ink-muted); }
+.input { min-height: 48px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink); font: inherit; font-size: 15px; direction: rtl; }
+.input:hover { border-color: var(--ui-green); }
+.upload { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 16px; border-radius: 14px; border: 1.5px dashed var(--ui-green); background: var(--ui-sand); color: var(--ui-green-deep); font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; word-break: break-all; }
+.upload:has(input:focus-visible) { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+.upload input { display: none; }
+.err { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--ui-danger-bg); color: var(--ui-danger); font-size: 13.5px; line-height: 1.7; }
+.err svg { flex: none; margin-top: 3px; }
+.submit { min-height: 52px; border: 0; border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white); font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.submit:hover:not(:disabled) { background: var(--ui-green-hover); }
+.submit:disabled { background: var(--ui-sand); color: var(--ui-ink-muted); cursor: not-allowed; }
+.sent { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--ui-green); background: var(--ui-sand); color: var(--ui-green-deep); font-size: 14.5px; line-height: 1.8; }
+.sent svg { flex: none; margin-top: 3px; color: var(--ui-green); }
+
+@media (max-width: 600px) {
+  .page { padding: 20px 12px 56px; }
+  .status { padding: 28px 18px 22px; border-radius: 24px; }
+  .cardBody { padding: 16px; }
+  .infoRow { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+/* basita-font-scale: applied */

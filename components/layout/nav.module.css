@@ -1,0 +1,191 @@
+/* components/layout/nav.module.css — الترويسة. الألوان عبر متغيرات --ui-* فقط (components/ui/vars.ts) */
+.header { position: sticky; top: 0; z-index: 40; background: var(--ui-card); box-shadow: var(--ui-shadow); direction: rtl; }
+
+/* ───── الشريط العلوي ───── */
+.topbar { background: var(--ui-green-deep); color: var(--ui-white); }
+.topbarInner {
+  max-width: var(--nav-max); margin: 0 auto; min-height: 38px; padding: 0 16px; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center; gap: 12px 32px; font-size: 13px; font-weight: 500;
+}
+.topItem { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.topItem svg { flex: none; color: var(--ui-gold); }
+
+/* ───── الصف الرئيسي ───── */
+.main {
+  max-width: var(--nav-max); margin: 0 auto; min-height: 76px; padding: 8px 16px; box-sizing: border-box;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(220px, 280px) auto; align-items: center; gap: 16px;
+  border-bottom: 1px solid var(--ui-border);
+}
+.logo { display: inline-flex; align-items: center; gap: 10px; min-width: 0; text-decoration: none; }
+.logo:focus-visible, .menuBtn:focus-visible, .toggleBtn:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+.logoMark {
+  display: flex; flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; overflow: hidden;
+  border-radius: 12px; background: var(--ui-card); border: 1px solid var(--ui-border);
+}
+.brand { display: flex; flex-direction: column; min-width: 0; }
+.brandName { font-family: var(--font-amiri), "Amiri", serif; font-size: 31px; font-weight: 700; line-height: 1.15; color: var(--ui-green-deep); white-space: nowrap; }
+
+.tagline {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--ui-ink-muted);
+  white-space: nowrap;
+}
+
+
+.nav { min-width: 0; }
+.search { min-width: 0; width: 100%; }
+.actions { display: flex; align-items: center; gap: 8px; }
+.bellWrap { display: inline-flex; }
+
+
+/* أزرار الجوال: القائمة والبحث */
+.menuBtn, .toggleBtn {
+  display: none; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border-radius: 50%;
+  border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); cursor: pointer;
+  transition: background-color 0.2s var(--ui-ease), border-color 0.2s var(--ui-ease);
+}
+.menuBtn:hover, .toggleBtn:hover { background: var(--ui-sand); border-color: var(--ui-gold); }
+
+
+
+/* ───── روابط التنقل ───── */
+.links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
+  border-radius: 12px;
+
+  font-family: var(--font-amiri), "Amiri", serif;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ui-green-deep);
+
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s var(--ui-ease),
+              background-color 0.2s var(--ui-ease);
+}
+
+.link:hover {
+  color: var(--ui-green);
+  background: var(--ui-sand);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--ui-gold);
+  outline-offset: 2px;
+}
+
+.active {
+  font-weight: 700;
+  color: var(--ui-green-deep);
+  background: var(--ui-sand);
+}
+
+.active::after {
+  content: "";
+  position: absolute;
+  inset-inline: 10px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ui-gold);
+}
+
+/* ───── قائمة الجوال والتابلت ───── */
+.drawer {
+  border-bottom: 1px solid var(--ui-border);
+  background: var(--ui-card);
+}
+
+.drawerInner {
+  max-width: var(--nav-max);
+  margin: 0 auto;
+  padding: 8px 16px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drawerLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ui-ink);
+  text-decoration: none;
+}
+
+.drawerLink:hover,
+.drawerLink:focus-visible {
+  background: var(--ui-sand);
+  outline: none;
+}
+
+.drawerActive {
+  background: var(--ui-sand);
+  color: var(--ui-green-deep);
+  box-shadow: inset 3px 0 0 var(--ui-gold);
+}
+
+.drawerSep {
+  height: 1px;
+  margin: 6px 0;
+  background: var(--ui-border);
+}
+
+.mobileSearch {
+  padding: 0 16px 12px;
+  max-width: var(--nav-max);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+
+/* ───── نقاط التوقّف ───── */
+@media (max-width: 1439px) { .actions :global(.basita-nav-register) { display: none; } }
+@media (max-width: 1359px) {
+  .nav { display: none; }
+  .menuBtn { display: inline-flex; }
+  .main { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 12px; }
+}
+@media (min-width: 1360px) { .drawer, .mobileSearch { display: none; } }
+@media (max-width: 767px) {
+  .topOptional { display: none; }
+  .search { display: none; }
+  .toggleBtn { display: inline-flex; }
+  .main { grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 8px; min-height: 64px; padding: 8px 12px; }
+  .logoMark { width: 38px; height: 38px; }
+  .brandName { font-size: 25.5px; }
+  .tagline { display: none; }
+  .actions { gap: 6px; }
+  .actions :global(.basita-fav-icon), .bellWrap { display: none; }
+}
+@media (max-width: 380px) { .brandName { font-size: 23px; } .logo { gap: 8px; } }
+@media (max-width: 340px) {
+  .main { gap: 4px; padding-inline: 8px; }
+  .logoMark { width: 32px; height: 32px; }
+  .brandName { font-size: 20px; }
+  .menuBtn, .toggleBtn { width: 40px; height: 40px; }
+}
+@media (min-width: 768px) { .mobileSearch { display: none; } }
+@media (prefers-reduced-motion: reduce) { .link, .menuBtn, .toggleBtn { transition: none; } }
+/* basita-font-scale: applied */

@@ -1,12 +1,13 @@
 // components/dashboard/product-edit/VariantsCard.tsx
 // متغيرات المنتج (اختيارية): اسم الخاصية نص حر (المقاس، الوزن، اللون...) + صفوف قيمة/سعر/كمية/SKU.
 // منتج بدون صفوف يبقى كما هو تماماً — الكمية الكلية تُحسب من المتغيرات على السيرفر.
+// المنطق (التحقق والحفظ عبر /api/products/:id/variants) كما كان حرفياً؛ التغيير في الشكل فقط.
 "use client";
-
 import { useState } from "react";
 import { Plus, Trash2, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
+import s from "../forms.module.css";
 
 export interface EditVariant {
   id: string;
@@ -24,11 +25,6 @@ const toRow = (v: EditVariant): Row => ({
   key: v.id, id: v.id, value: v.options?.[0]?.value ?? "",
   price: v.price == null ? "" : String(v.price), quantity: String(v.quantity), sku: v.sku ?? "",
 });
-
-const inputStyle = {
-  padding: 9, border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md,
-  fontSize: t.typography.fontSize.sm, boxSizing: "border-box" as const, width: "100%", minWidth: 0,
-};
 
 export default function VariantsCard({
   productId, variants, basePrice, onSaved,
@@ -84,64 +80,68 @@ export default function VariantsCard({
   };
 
   const total = rows.reduce((sum, r) => sum + (Number(r.quantity) || 0), 0);
-  const small = { margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.text.mid } as const;
+  const bind = (key: string, field: keyof Row) => ({ value: rowsMap[key][field] as string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => update(key, field, e.target.value) });
+  const rowsMap: Record<string, Row> = Object.fromEntries(rows.map((r) => [r.key, r]));
 
   return (
-    <div style={{ background: t.colors.white, borderRadius: t.radius.xl, padding: t.spacing["5"], marginBottom: t.spacing["4"] }}>
-      <h3 style={{ margin: `0 0 ${t.spacing["1"]}`, fontSize: t.typography.fontSize.base, color: t.colors.text.dark }}>متغيرات المنتج (اختياري)</h3>
-      <p style={{ ...small, marginBottom: t.spacing["3"] }}>
-        للمنتجات ذات المقاسات أو الأوزان أو الأحجام. بدون متغيرات يبقى المنتج بسعره وكميته كما هما.
-      </p>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"] }}>
-        <input value={optionName} onChange={(e) => { setSaved(false); setOptionName(e.target.value); }} placeholder="اسم الخاصية — مثل: المقاس، الوزن، اللون" style={{ ...inputStyle, direction: "rtl" }} />
+    <section className={s.panel} style={uiVars} aria-labelledby="pe-variants">
+      <div className={s.panelHead}>
+        <h2 id="pe-variants" className={s.panelTitle}>متغيرات المنتج (اختياري)</h2>
+        <p className={s.panelSub}>للمنتجات ذات المقاسات أو الأوزان أو الأحجام. بدون متغيرات يبقى المنتج بسعره وكميته كما هما.</p>
+      </div>
+      <div className={s.panelBody}>
+        <label className={s.fieldWrap}>
+          <span className={s.fieldLabel}>اسم الخاصية — مثل: المقاس، الوزن، اللون</span>
+          <input className={s.field} value={optionName} onChange={(e) => { setSaved(false); setOptionName(e.target.value); }} />
+        </label>
 
         {rows.map((r) => (
-          <div key={r.key} style={{ border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, padding: t.spacing["2"], display: "grid", gridTemplateColumns: "1fr 1fr", gap: t.spacing["2"] }}>
-            <input value={r.value} onChange={(e) => update(r.key, "value", e.target.value)} placeholder="القيمة (M / نصف كيلو)" style={{ ...inputStyle, direction: "rtl" }} />
-            <input type="number" min={0} value={r.quantity} onChange={(e) => update(r.key, "quantity", e.target.value)} placeholder="الكمية" style={inputStyle} />
-            <input type="number" min={0} value={r.price} onChange={(e) => update(r.key, "price", e.target.value)} placeholder={`السعر (فارغ = ${basePrice})`} style={inputStyle} />
-            <input value={r.sku} onChange={(e) => update(r.key, "sku", e.target.value)} placeholder="SKU (اختياري)" dir="ltr" style={inputStyle} />
-            <button
-              type="button" onClick={() => { setSaved(false); setRows((rs) => rs.filter((x) => x.key !== r.key)); }}
-              style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, padding: 6, background: "transparent", border: "none", color: t.colors.semantic.danger, fontSize: t.typography.fontSize.xs, cursor: "pointer" }}
-            >
-              <Trash2 size={13} strokeWidth={1.8} />
+          <div key={r.key} className={s.vrow}>
+            <label className={s.fieldWrap}>
+              <span className={s.fieldLabel}>القيمة (M / نصف كيلو)</span>
+              <input className={s.field} {...bind(r.key, "value")} />
+            </label>
+            <label className={s.fieldWrap}>
+              <span className={s.fieldLabel}>الكمية</span>
+              <input className={`${s.field} ${s.ltr}`} type="number" min={0} {...bind(r.key, "quantity")} />
+            </label>
+            <label className={s.fieldWrap}>
+              <span className={s.fieldLabel}>{`السعر (فارغ = ${basePrice})`}</span>
+              <input className={`${s.field} ${s.ltr}`} type="number" min={0} {...bind(r.key, "price")} />
+            </label>
+            <label className={s.fieldWrap}>
+              <span className={s.fieldLabel}>SKU (اختياري)</span>
+              <input className={`${s.field} ${s.ltr}`} dir="ltr" {...bind(r.key, "sku")} />
+            </label>
+            <button type="button" className={s.vdel} onClick={() => { setSaved(false); setRows((rs) => rs.filter((x) => x.key !== r.key)); }}>
+              <Trash2 size={14} strokeWidth={1.8} aria-hidden="true" />
               حذف هذا المتغيّر
             </button>
           </div>
         ))}
 
-        <button
-          type="button" onClick={() => { setSaved(false); setRows((rs) => [...rs, blankRow()]); }}
-          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: 10, background: t.colors.primary[100], border: "none", borderRadius: t.radius.md, color: t.colors.primary[800], fontSize: t.typography.fontSize.xs, fontWeight: t.typography.fontWeight.bold, cursor: "pointer" }}
-        >
-          <Plus size={14} strokeWidth={2.2} />
+        <button type="button" className={s.vadd} onClick={() => { setSaved(false); setRows((rs) => [...rs, blankRow()]); }}>
+          <Plus size={16} strokeWidth={2.2} aria-hidden="true" />
           إضافة متغيّر آخر
         </button>
 
-        {rows.length > 0 && <p style={small}>إجمالي المخزون: {total} قطعة (يُحسب من المتغيرات)</p>}
-
+        {rows.length > 0 && <p className={s.help}>إجمالي المخزون: {total} قطعة (يُحسب من المتغيرات)</p>}
         {error && (
-          <p style={{ display: "flex", alignItems: "center", gap: 6, margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.semantic.danger }}>
-            <AlertTriangle size={13} strokeWidth={1.8} />
+          <p className={s.err} role="alert">
+            <AlertTriangle size={14} strokeWidth={1.8} aria-hidden="true" />
             {error}
           </p>
         )}
         {saved && (
-          <p style={{ display: "flex", alignItems: "center", gap: 6, margin: 0, fontSize: t.typography.fontSize.xs, color: t.colors.semantic.success }}>
-            <CheckCircle2 size={13} strokeWidth={1.8} />
+          <p className={s.ok} role="status">
+            <CheckCircle2 size={15} strokeWidth={1.8} aria-hidden="true" />
             تم حفظ المتغيرات
           </p>
         )}
-
-        <button
-          type="button" onClick={save} disabled={saving}
-          style={{ padding: 12, background: saving ? t.colors.primary[600] : t.colors.primary[800], color: t.colors.text.onDark, border: "none", borderRadius: t.radius.lg, fontWeight: t.typography.fontWeight.bold, cursor: saving ? "not-allowed" : "pointer" }}
-        >
+        <button type="button" className={s.cta} onClick={save} disabled={saving}>
           {saving ? "جاري الحفظ..." : "حفظ المتغيرات"}
         </button>
       </div>
-    </div>
+    </section>
   );
 }

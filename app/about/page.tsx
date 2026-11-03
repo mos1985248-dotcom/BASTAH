@@ -1,15 +1,15 @@
-
-// app/about/page.tsx
-
+// app/about/page.tsx — «من نحن»: التعريف بالشركة (تختلف عن /story التي تحكي قصة بسطة).
 import type { Metadata } from "next";
 import SiteShell from "@/components/layout/SiteShell";
-import CompanyHero from "@/components/about/company/CompanyHero";
-import CompanyIntro from "@/components/about/company/CompanyIntro";
-import CompanyServices from "@/components/about/company/CompanyServices";
-import CompanyVisionMission from "@/components/about/company/CompanyVisionMission";
-import CompanyValues from "@/components/about/company/CompanyValues";
-import CompanyEcosystem from "@/components/about/company/CompanyEcosystem";
-import CompanyClosing from "@/components/about/company/CompanyClosing";
+import { uiVars } from "@/components/ui/vars";
+import CompanyHero from "@/components/company/CompanyHero";
+import CompanyFacts from "@/components/company/CompanyFacts";
+import CompanyIntro from "@/components/company/CompanyIntro";
+import CompanyServices from "@/components/company/CompanyServices";
+import CompanyPrinciples from "@/components/company/CompanyPrinciples";
+import CompanyEcosystem from "@/components/company/CompanyEcosystem";
+import CompanyClosing from "@/components/company/CompanyClosing";
+import s from "@/components/story/story.module.css";
 
 export const metadata: Metadata = {
   title: "من نحن | بسطة",
@@ -20,14 +20,15 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <SiteShell>
-      <CompanyHero />
-      <CompanyIntro />
-      <CompanyServices />
-      <CompanyVisionMission />
-      <CompanyValues />
-      <CompanyEcosystem />
-      <CompanyClosing />
+      <div className={s.page} style={uiVars}>
+        <CompanyHero />
+        <CompanyFacts />
+        <CompanyIntro />
+        <CompanyServices />
+        <CompanyPrinciples />
+        <CompanyEcosystem />
+        <CompanyClosing />
+      </div>
     </SiteShell>
   );
 }
-

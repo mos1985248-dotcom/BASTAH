@@ -1,5 +1,5 @@
 // components/account/StatsRow.tsx
-import { t } from "@/theme";
+import s from "./account.module.css";
 
 export default function StatsRow({
   totalSpent,
@@ -20,18 +20,13 @@ export default function StatsRow({
   ];
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: t.spacing["2"] }} className="basita-account-stats">
-      {stats.map((s) => (
-        <div key={s.label} style={{ background: t.colors.white, borderRadius: t.radius.md, padding: "12px 8px", textAlign: "center", border: `1px solid ${t.colors.cream.border}` }}>
-          <div style={{ fontSize: t.typography.fontSize.lg, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>{s.value}</div>
-          <div style={{ fontSize: t.typography.fontSize.xs, color: t.colors.text.mid }}>{s.label}</div>
+    <div className={s.stats}>
+      {stats.map((st) => (
+        <div key={st.label} className={s.stat}>
+          <div className={s.statVal}>{st.value}</div>
+          <div className={s.statLbl}>{st.label}</div>
         </div>
       ))}
-      <style>{`
-        @media (max-width: 500px) {
-          .basita-account-stats { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-      `}</style>
     </div>
   );
 }

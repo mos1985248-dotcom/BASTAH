@@ -1,0 +1,52 @@
+/* components/dashboard/shipping/shipping.module.css — صفحة الشحن لدى التاجر. الألوان عبر --ui-* فقط.
+   يكمل forms.module.css (btnSm، btnPrimary، btnDanger، field، fieldWrap، err، tag). */
+.page { display: flex; flex-direction: column; gap: 18px; max-width: 1180px; margin: 0 auto; padding: 20px clamp(14px, 2.4vw, 28px) 40px; direction: rtl; }
+.head { display: flex; align-items: center; gap: 14px; }
+.headIcon { display: flex; flex: none; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); }
+.title { margin: 0; font-family: var(--font-amiri), "Amiri", serif; font-size: clamp(28px, 3.2vw, 36px); font-weight: 700; line-height: 1.3; color: var(--ui-green-deep); }
+.sub { margin: 2px 0 0; font-size: 15px; line-height: 1.8; color: var(--ui-ink-muted); }
+
+/* ───── المؤشرات ───── */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 12px; }
+.kpi { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 22px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.kpiIcon { display: flex; flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-sand); color: var(--ui-green-deep); }
+.kpiLabel { margin: 0 0 2px; font-size: 13.5px; color: var(--ui-ink-muted); }
+.kpiValue { margin: 0; font-size: 24px; font-weight: 700; line-height: 1.3; color: var(--ui-green-deep); }
+.note { display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 12px 16px; border-radius: 18px; border: 1px solid var(--ui-border); background: var(--ui-sand); font-size: 14px; line-height: 1.8; color: var(--ui-ink); }
+.note svg { flex: none; margin-top: 4px; color: var(--ui-kicker); }
+
+/* ───── اللوحات (عمودان) ───── */
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+@media (max-width: 1000px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.panel { overflow: hidden; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.panelHead { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 18px 20px; background: var(--ui-sand); border-bottom: 1px solid var(--ui-border); }
+.panelLead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.panelIcon { display: flex; flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); }
+.panelTitle { margin: 0; font-size: 18px; font-weight: 700; color: var(--ui-green-deep); }
+.panelSub { margin: 2px 0 0; font-size: 13.5px; line-height: 1.7; color: var(--ui-ink-muted); }
+.panelBody { display: flex; flex-direction: column; gap: 14px; padding: 18px 20px; }
+.group { display: flex; flex-direction: column; gap: 10px; }
+.groupTitle { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 13.5px; font-weight: 700; color: var(--ui-kicker); }
+.count { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: var(--ui-pill); background: var(--ui-sand); border: 1px solid var(--ui-border); font-size: 12.5px; color: var(--ui-ink); }
+
+/* ───── البطاقات (شركة / منطقة) ───── */
+.card { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 20px; border: 1px solid var(--ui-border); border-inline-start: 4px solid var(--ui-green); background: var(--ui-card); }
+.cardOff { border-inline-start-color: var(--ui-border); background: var(--ui-sand); }
+.cardAvail { border-inline-start-color: var(--ui-gold); }
+.cardTop { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 12px; }
+.lead { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.iconBox { display: flex; flex: none; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--ui-sand); border: 1px solid var(--ui-border); color: var(--ui-green-deep); }
+.name { margin: 0; font-size: 15.5px; font-weight: 700; color: var(--ui-ink); overflow-wrap: anywhere; }
+.meta { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin: 2px 0 0; font-size: 13px; color: var(--ui-ink-muted); }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 12px; border-radius: var(--ui-pill); background: var(--ui-sand); border: 1px solid var(--ui-border); font-size: 12.5px; color: var(--ui-ink); }
+.chipGold { background: color-mix(in srgb, var(--ui-gold) 18%, transparent); border-color: color-mix(in srgb, var(--ui-gold) 45%, transparent); font-weight: 700; }
+.chipGreen { background: color-mix(in srgb, var(--ui-green) 10%, transparent); border-color: color-mix(in srgb, var(--ui-green) 30%, transparent); color: var(--ui-green-deep); font-weight: 700; }
+
+/* ───── نموذج المنطقة ───── */
+.form { display: flex; flex-direction: column; gap: 14px; padding: 16px; border-radius: 20px; border: 1px dashed var(--ui-green); background: color-mix(in srgb, var(--ui-green) 5%, transparent); }
+.formGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+.tagsGap { margin-bottom: 8px; }
+.formActions { display: flex; flex-wrap: wrap; gap: 10px; }
+.formActions > button { flex: 1 1 140px; }

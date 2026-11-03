@@ -1,0 +1,99 @@
+/* components/account/account.module.css — حساب المشتري (الرئيسية والإعدادات). الألوان عبر --ui-* فقط.
+   كل مكوّن يستعملها يجب أن يكون تحت عنصر يضبط style={uiVars}. */
+.bg { background: var(--ui-sand); }
+.page { margin: 0 auto; padding: 20px 16px 72px; direction: rtl; }
+.narrow { max-width: 560px; margin: 0 auto; padding: 24px 16px 64px; direction: rtl; }
+.title { margin: 0 0 18px; font-size: clamp(26px, 3.2vw, 34px); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.state { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 56px 24px; text-align: center; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted); font-size: 15px; }
+.stateLink { display: inline-flex; align-items: center; gap: 6px; min-height: 46px; padding: 0 24px; border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white); font-weight: 600; text-decoration: none; }
+.stateLink:hover { background: var(--ui-green-hover); }
+
+/* ───── التخطيط ───── */
+.layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-areas: "side main" "help main"; gap: 20px; align-items: start; }
+.side { grid-area: side; min-width: 0; }
+.main { grid-area: main; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.helpArea { grid-area: help; }
+@media (max-width: 820px) {
+  .layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "side" "main" "help"; gap: 16px; }
+}
+
+/* ───── القائمة الجانبية (شريط أفقي على الجوال) ───── */
+.nav { display: flex; flex-direction: column; gap: 2px; padding: 10px; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.navLink, .logout { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 14px; border: 0; background: transparent; color: var(--ui-ink); font: inherit; font-size: 14.5px; text-decoration: none; text-align: start; cursor: pointer; }
+.navLink:hover { background: var(--ui-sand); color: var(--ui-green-deep); }
+.navLink svg { flex: none; color: var(--ui-green-deep); }
+.logout { width: 100%; margin-top: 6px; background: var(--ui-danger-bg); color: var(--ui-danger); }
+.navLink:focus-visible, .logout:focus-visible, .pill:focus-visible, .orderRow:focus-visible, .switch:focus-visible, .helpLink:focus-visible, .upload:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+@media (max-width: 820px) {
+  .nav { flex-direction: row; gap: 8px; padding: 8px; overflow-x: auto; border-radius: var(--ui-pill); scrollbar-width: none; }
+  .navLink, .logout { flex: none; width: auto; margin: 0; padding: 0 16px; white-space: nowrap; border: 1px solid var(--ui-border); border-radius: var(--ui-pill); }
+  .logout { border-color: transparent; }
+}
+
+/* ───── المساعدة ───── */
+.help { padding: 18px; text-align: center; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.helpTitle { margin: 0 0 4px; font-size: 16px; font-weight: 700; color: var(--ui-green-deep); }
+.helpText { margin: 0 0 12px; font-size: 13.5px; color: var(--ui-ink-muted); }
+.helpLink { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white); font-size: 14px; font-weight: 700; text-decoration: none; }
+.helpLink:hover { background: var(--ui-green-hover); }
+
+/* ───── البطاقة الرئيسية ───── */
+.hero { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding: 24px; border-radius: var(--ui-radius-card); background: linear-gradient(135deg, var(--ui-green-deep), var(--ui-green)); color: var(--ui-white); }
+.avatar { display: flex; flex: none; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: var(--ui-gold); color: var(--ui-ink); font-size: 26px; font-weight: 700; }
+.heroName { margin: 0 0 3px; font-size: clamp(20px, 2.6vw, 26px); font-weight: 700; line-height: 1.5; }
+.heroMail { margin: 0; font-size: 14px; opacity: 0.9; unicode-bidi: plaintext; overflow-wrap: anywhere; }
+
+/* ───── تبديل الحساب ───── */
+.role { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px 18px; border-radius: 22px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.roleLead { display: flex; align-items: center; gap: 10px; }
+.roleLead svg { flex: none; color: var(--ui-green-deep); }
+.roleTitle { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--ui-ink); }
+.roleErr { display: flex; align-items: center; gap: 5px; margin: 2px 0 0; font-size: 12.5px; color: var(--ui-danger); }
+.switch { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 18px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-sand); color: var(--ui-green-deep); font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+.switch:hover:not(:disabled) { border-color: var(--ui-green); }
+.switch:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ───── الإحصاءات وحالات الطلبات ───── */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.stat { padding: 14px 10px; text-align: center; border-radius: 20px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.stat svg { margin: 0 auto 4px; color: var(--ui-green-deep); }
+.statVal { font-size: 20px; font-weight: 700; color: var(--ui-green-deep); }
+.statLbl { font-size: 13px; color: var(--ui-ink-muted); }
+
+/* ───── الإجراءات السريعة ───── */
+.quick { display: flex; flex-wrap: wrap; gap: 10px; }
+.pill { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink); font-size: 14.5px; font-weight: 500; text-decoration: none; }
+.pill:hover { border-color: var(--ui-green); color: var(--ui-green-deep); }
+.pill svg { flex: none; color: var(--ui-green-deep); }
+
+/* ───── الطلبات والعناوين ───── */
+.h2 { margin: 0 0 12px; font-size: 20px; font-weight: 700; color: var(--ui-green-deep); }
+.rows { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.orderRow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 18px; border: 1px solid var(--ui-border); background: var(--ui-card); color: inherit; text-decoration: none; }
+.orderRow:hover { border-color: var(--ui-green); background: var(--ui-sand); }
+.rowBody { min-width: 0; }
+.rowTitle { margin: 0 0 2px; font-size: 15px; font-weight: 700; color: var(--ui-ink); }
+.rowMeta { margin: 0; font-size: 13px; color: var(--ui-ink-muted); overflow-wrap: anywhere; }
+.rowEnd { flex: none; text-align: end; }
+.total { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--ui-green-deep); }
+.badge { display: inline-block; padding: 2px 12px; border-radius: var(--ui-pill); font-size: 12.5px; font-weight: 700; }
+.addr { padding: 14px 16px; border-radius: 18px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.addrDefault { border-color: var(--ui-green); }
+.addrTag { font-size: 12.5px; font-weight: 700; color: var(--ui-green); }
+.note { margin: 0; font-size: 14px; color: var(--ui-ink-muted); }
+.error { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; color: var(--ui-danger); }
+
+/* ───── إعدادات الحساب ───── */
+.card { display: flex; flex-direction: column; gap: 20px; padding: 20px; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.field { display: block; }
+.hint { margin: 6px 0 0; font-size: 12.5px; color: var(--ui-ink-muted); }
+.ok { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; color: var(--ui-green); }
+.submit { width: 100%; min-height: 50px; }
+.stateBox { padding: 48px 0; }
+.avatarRow { display: flex; align-items: center; gap: 16px; }
+.avatarBig { display: flex; flex: none; align-items: center; justify-content: center; width: 80px; height: 80px; border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-sand) center / cover no-repeat; color: var(--ui-green-deep); font-size: 26px; font-weight: 700; }
+.upload { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+.upload:hover:not(:disabled) { background: var(--ui-sand); }
+.upload:disabled { opacity: 0.6; cursor: not-allowed; }
+.avatarHint { margin: 6px 0 0; font-size: 12.5px; color: var(--ui-ink-muted); }
+.avatarErr { display: flex; align-items: center; gap: 6px; margin: 4px 0 0; font-size: 13px; color: var(--ui-danger); }

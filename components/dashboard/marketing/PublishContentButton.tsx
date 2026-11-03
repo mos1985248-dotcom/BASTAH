@@ -6,7 +6,8 @@
 import { useEffect, useState } from "react";
 import { Send } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
+import f from "../forms.module.css";
+import s from "./marketing.module.css";
 
 export default function PublishContentButton({ contentId, status, onDone }: { contentId: string; status: string; onDone: () => void }) {
   const [canSend, setCanSend] = useState(false);
@@ -35,12 +36,12 @@ export default function PublishContentButton({ contentId, status, onDone }: { co
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-      <button onClick={send} disabled={busy} style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", background: t.colors.primary[800], color: t.colors.white, border: "none", borderRadius: t.radius.md, fontSize: 12, fontWeight: t.typography.fontWeight.bold, cursor: "pointer", opacity: busy ? 0.6 : 1 }}>
-        <Send size={12} strokeWidth={2} />
+    <div className={s.publish}>
+      <button type="button" onClick={send} disabled={busy} className={`${f.btnSm} ${f.btnPrimary}`}>
+        <Send size={13} strokeWidth={2} />
         {busy ? "جاري الإرسال..." : "إرسال للنشر"}
       </button>
-      {error && <span style={{ fontSize: 11, color: t.colors.semantic.danger }}>{error}</span>}
+      {error && <span className={`${f.err} ${s.err}`} role="alert">{error}</span>}
     </div>
   );
 }

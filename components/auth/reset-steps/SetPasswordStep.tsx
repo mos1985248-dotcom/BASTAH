@@ -1,10 +1,10 @@
 // components/auth/reset-steps/SetPasswordStep.tsx
 import { Lock, Check } from "lucide-react";
-import { t } from "@/theme";
 import AuthField from "../AuthField";
 import AuthButton from "../AuthButton";
 import AuthError from "../AuthError";
 import PasswordStrengthBar from "../PasswordStrengthBar";
+import s from "../auth.module.css";
 
 export default function SetPasswordStep({
   password,
@@ -24,67 +24,14 @@ export default function SetPasswordStep({
   onSubmit: () => void;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: t.spacing["4"],
-        direction: "rtl",
-      }}
-    >
-      {/* العنوان */}
-      <div
-        style={{
-          textAlign: "center",
-          marginBottom: t.spacing["1"],
-        }}
-      >
-        <div
-          style={{
-            width: 52,
-            height: 52,
-            margin: `0 auto ${t.spacing["3"]}`,
-            borderRadius: 16,
-            background: t.colors.primary[50],
-            border: `1px solid ${t.colors.primary[100]}`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Lock
-            size={26}
-            strokeWidth={1.8}
-            color={t.colors.primary[800]}
-          />
-        </div>
-
-        <h1
-          style={{
-            fontFamily: t.typography.fontFamily.heading,
-            margin: `0 0 ${t.spacing["2"]}`,
-            fontSize: t.typography.fontSize.xl,
-            fontWeight: t.typography.fontWeight.bold,
-            lineHeight: 1.4,
-            color: t.colors.primary[800],
-          }}
-        >
-          كلمة مرور جديدة
-        </h1>
-
-        <p
-          style={{
-            margin: 0,
-            fontSize: t.typography.fontSize.sm,
-            color: t.colors.text.mid,
-            lineHeight: t.typography.lineHeight.relaxed,
-          }}
-        >
-          أنشئ كلمة مرور قوية وآمنة لحسابك.
-        </p>
+    <div className={`${s.step} ${s.fullStep}`}>
+      <div className={s.stepIcon}>
+        <Lock size={26} strokeWidth={1.8} />
       </div>
 
-      {/* كلمة المرور الجديدة */}
+      <h1 className={s.stepTitle}>كلمة مرور جديدة</h1>
+      <p className={s.stepText}>أنشئ كلمة مرور قوية وآمنة لحسابك.</p>
+
       <div>
         <AuthField
           label="كلمة المرور الجديدة"
@@ -92,24 +39,22 @@ export default function SetPasswordStep({
           value={password}
           onChange={onPasswordChange}
           placeholder="8 أحرف أو أكثر"
+          autoComplete="new-password"
         />
-
         <PasswordStrengthBar password={password} />
       </div>
 
-      {/* تأكيد كلمة المرور */}
       <AuthField
         label="تأكيد كلمة المرور"
         type="password"
         value={confirm}
         onChange={onConfirmChange}
         placeholder="أعد كتابة كلمة المرور"
+        autoComplete="new-password"
       />
 
-      {/* الخطأ */}
       <AuthError message={error} />
 
-      {/* حفظ */}
       <AuthButton
         onClick={onSubmit}
         loading={loading}

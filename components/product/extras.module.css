@@ -1,0 +1,60 @@
+/* components/product/extras.module.css — الوصف والسياسات وبطاقة المتجر والشريط الثابت */
+.desc { max-width: 820px; }
+.descText { margin: 0 0 18px; font-size: 16px; line-height: 2; color: var(--ui-ink); white-space: pre-line; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+
+.policies { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.policy { padding: 20px 22px; border-radius: 22px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.policy svg { margin-bottom: 10px; color: var(--ui-kicker); }
+.policyTitle { margin: 0 0 4px; font-size: 16px; font-weight: 700; color: var(--ui-green-deep); }
+.policyText { margin: 0; font-size: 14px; line-height: 1.8; color: var(--ui-ink-muted); }
+
+/* ───── بطاقة المتجر ───── */
+.store { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 18px 20px; border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.storeLogo {
+  display: inline-flex; flex: none; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%;
+  border: 2px solid var(--ui-gold); background: var(--ui-sand) center / cover no-repeat; font-size: 24px; font-weight: 700; color: var(--ui-green-deep);
+}
+.storeBody { flex: 1 1 160px; min-width: 0; }
+.storeName { display: inline-flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 700; color: var(--ui-ink); text-decoration: none; }
+.storeName:hover { color: var(--ui-green); }
+.storeName svg { color: var(--ui-green); }
+.storeMeta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 2px; font-size: 13px; color: var(--ui-ink-muted); }
+.storeMeta svg { color: var(--ui-gold); }
+.storeActions { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border-radius: var(--ui-pill);
+  border: 1px solid var(--ui-green); background: transparent; color: var(--ui-green); font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+}
+.pill:hover:not(:disabled) { background: var(--ui-sand); }
+.pill:disabled { opacity: 0.6; cursor: not-allowed; }
+.pillOn { background: var(--ui-green); color: var(--ui-white); }
+.pillOn:hover:not(:disabled) { background: var(--ui-green-hover); }
+.pill:focus-visible, .storeName:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+
+/* ───── الشريط الثابت (الجوال فقط) ───── */
+.sticky { display: none; }
+@media (max-width: 900px) {
+  .sticky {
+    position: fixed; inset-inline: 0; bottom: 0; z-index: 60; display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--ui-card); border-top: 1px solid var(--ui-border);
+  }
+}
+.stickyBuy {
+  flex: 1; min-height: 48px; padding: 0 14px; border: 1px solid var(--ui-green); border-radius: var(--ui-pill);
+  background: var(--ui-green); color: var(--ui-white); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.stickyBuy:disabled { opacity: 0.55; cursor: not-allowed; }
+.stickyBuy:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.stickyError {
+  position: fixed; inset-inline: 12px; bottom: 82px; z-index: 61; padding: 10px 14px; border-radius: 14px;
+  background: var(--ui-danger-bg); color: var(--ui-danger); font-size: 13px; line-height: 1.7;
+}
+@media (min-width: 901px) { .stickyError { display: none; } }
+
+/* ───── صور التقييمات ───── */
+.reviewImages { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.reviewThumb { width: 72px; height: 72px; padding: 0; border-radius: 14px; border: 1px solid var(--ui-border); background: var(--ui-sand) center / cover no-repeat; cursor: pointer; }
+.reviewThumb:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.related { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
+@media (max-width: 767px) { .related { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }

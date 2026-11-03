@@ -1,0 +1,63 @@
+/* components/daftari/daftari.module.css — دفاتري. الألوان عبر --ui-* فقط */
+.page { max-width: 1360px; margin: 0 auto; padding: 20px 24px 40px; }
+.head { margin-bottom: 16px; }
+.title { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 28px; font-weight: 700; line-height: 1.4; color: var(--ui-green-deep); }
+.title svg { color: var(--ui-kicker); }
+.sub { margin: 2px 0 0; font-size: 14px; color: var(--ui-ink-muted); }
+.layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr); gap: 16px; align-items: start; }
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.sticky { position: sticky; top: 76px; }
+.panel { min-width: 0; overflow: hidden; border-radius: 20px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.panelHead { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--ui-border); background: var(--ui-sand); }
+.panelHead svg { color: var(--ui-kicker); }
+.panelTitle { margin: 0; font-size: 16px; font-weight: 700; color: var(--ui-green-deep); }
+.panelSub { margin: 1px 0 0; font-size: 12.5px; color: var(--ui-ink-muted); }
+.panelBody { display: flex; flex-direction: column; gap: 14px; padding: 18px; }
+.empty { margin: 0; padding: 32px 16px; text-align: center; font-size: 14px; color: var(--ui-ink-muted); }
+.state { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 40px auto; max-width: 480px; padding: 40px 24px; text-align: center; border-radius: 20px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted); }
+.state svg { color: var(--ui-kicker); }
+.cta { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 46px; padding: 0 22px; border-radius: var(--ui-pill); background: var(--ui-green); color: var(--ui-white); border: 0; font: inherit; font-size: 14.5px; font-weight: 700; text-decoration: none; cursor: pointer; }
+.cta:hover:not(:disabled) { background: var(--ui-green-hover); }
+.cta:disabled { opacity: 0.55; cursor: not-allowed; }
+.cta:focus-visible, .field:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.err { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 12px; background: var(--ui-danger-bg); color: var(--ui-danger); font-size: 13.5px; }
+.err svg { flex: none; margin-top: 3px; }
+
+/* ───── ملخص الشهر ───── */
+.sum { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.main { display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-radius: 20px; background: var(--ui-green-deep); color: var(--ui-white); border: 1px solid var(--ui-gold); }
+.mainIcon { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: var(--ui-green); color: var(--ui-gold); }
+.mainLabel { display: block; font-size: 13px; color: var(--ui-card); opacity: 0.88; }
+.mainValue { display: block; font-size: 32px; font-weight: 700; line-height: 1.3; color: var(--ui-white); }
+.mini { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 18px; border: 1px solid var(--ui-border); background: var(--ui-card); min-width: 0; }
+.miniIcon { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ui-sand); }
+.miniLabel { display: block; font-size: 12.5px; color: var(--ui-ink-muted); }
+.miniValue { display: block; font-size: 20px; font-weight: 700; }
+
+/* ───── نموذج القيد ───── */
+.fieldWrap { display: block; }
+.fieldLabel { display: block; margin-bottom: 6px; font-size: 13.5px; font-weight: 700; color: var(--ui-ink); }
+.field { width: 100%; min-height: 48px; padding: 0 14px; box-sizing: border-box; border-radius: 13px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink); font: inherit; font-size: 15px; direction: rtl; }
+.field:hover { border-color: var(--ui-green); }
+.field:focus { border-color: var(--ui-gold); box-shadow: var(--ui-shadow); outline: none; }
+.ltr { direction: ltr; text-align: left; }
+
+/* ───── القيود ───── */
+.list { margin: 0; padding: 0; list-style: none; }
+.row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto auto; align-items: center; gap: 14px; padding: 12px 18px; border-top: 1px solid var(--ui-border); }
+.list li:first-child .row { border-top: none; }
+.rowIcon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; }
+.desc { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14.5px; font-weight: 700; color: var(--ui-ink); }
+.meta { display: block; font-size: 12.5px; color: var(--ui-ink-muted); }
+.date { font-size: 13px; color: var(--ui-ink-muted); white-space: nowrap; }
+.amount { font-size: 15.5px; font-weight: 700; white-space: nowrap; text-align: end; }
+.amountNote { display: block; font-size: 11.5px; font-weight: 400; color: var(--ui-ink-muted); }
+
+@media (max-width: 1100px) { .layout { grid-template-columns: minmax(0, 1fr); } .sticky { position: static; } .sum { grid-template-columns: repeat(3, minmax(0, 1fr)); } .main { grid-column: 1 / -1; } }
+@media (max-width: 600px) {
+  .page { padding: 14px 12px 28px; }
+  .sum { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .mainValue { font-size: 28px; }
+  .row { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; padding: 12px 14px; }
+  .date { display: none; }
+}

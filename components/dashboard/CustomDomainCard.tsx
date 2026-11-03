@@ -3,14 +3,15 @@
 // (يدوياً، بعد التحقق من اشتراكه 99/199). إن كان الربط الآلي مفعَّلاً بالسيرفر
 // (VERCEL_API_TOKEN موجود)، يُضاف الدومين لمشروع Vercel فوراً وتُعرض سجلات
 // DNS الحقيقية وحالة الربط الحيّة. بدونه، تظهر تعليمات ثابتة كما كان سابقاً.
+// المنطق كما كان حرفياً؛ التغيير في الشكل والصياغة فقط.
 "use client";
-
 import { useEffect, useState } from "react";
 import { Globe, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import DomainStatusPanel from "./DomainStatusPanel";
 import type { DomainStatus } from "@/lib/domain-types";
+import s from "./forms.module.css";
 
 interface DomainResponse { customDomain: string | null; automation: boolean; status: DomainStatus | null }
 
@@ -32,19 +33,19 @@ export default function CustomDomainCard({
       .catch(() => {}); // الحفظ اليدوي بالنموذج يبقى متاحاً حتى لو تعذّرت القراءة الأولى
   }, [enabled]);
 
-  const card = { background: t.colors.white, borderRadius: t.radius.lg, border: `1px solid ${t.colors.cream.border}`, padding: t.spacing["5"], marginTop: t.spacing["5"] };
-
   if (!enabled) {
     return (
-      <div style={card}>
-        <p style={{ display: "flex", alignItems: "center", gap: 7, margin: 0, fontSize: 14, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
-          <Globe size={16} strokeWidth={1.8} />
-          الدومين المخصص
-        </p>
-        <p style={{ margin: `${t.spacing["2"]} 0 0`, fontSize: 12, color: t.colors.text.mid }}>
-          متاح لباقتَي بسطة انطلاق وبسطة ازدهار (99 و199 ر.س). تواصلي مع الدعم لتفعيله لمتجرك.
-        </p>
-      </div>
+      <section className={s.panel} style={uiVars} aria-labelledby="domain-title">
+        <div className={s.panelHead}>
+          <div className={s.itemLead}>
+            <span className={s.itemIcon}><Globe size={17} strokeWidth={1.7} aria-hidden="true" /></span>
+            <h2 id="domain-title" className={s.panelTitle}>الدومين المخصص</h2>
+          </div>
+        </div>
+        <div className={s.panelBody}>
+          <p className={s.help}>متاح لباقتَي بسطة انطلاق وبسطة ازدهار (99 و199 ر.س). تواصل مع الدعم لتفعيله لمتجرك.</p>
+        </div>
+      </section>
     );
   }
 
@@ -81,50 +82,46 @@ export default function CustomDomainCard({
   };
 
   return (
-    <div style={card}>
-      <p style={{ display: "flex", alignItems: "center", gap: 7, margin: 0, fontSize: 14, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
-        <Globe size={16} strokeWidth={1.8} />
-        الدومين المخصص
-      </p>
-
-      {automation ? (
-        <p style={{ margin: `${t.spacing["2"]} 0 ${t.spacing["3"]}`, fontSize: 12, color: t.colors.text.mid }}>
-          اكتبي دومينك واحفظي، وستظهر لك أدناه سجلات DNS المطلوبة وحالة الربط لحظياً.
-        </p>
-      ) : (
-        <p style={{ margin: `${t.spacing["2"]} 0 ${t.spacing["3"]}`, fontSize: 12, color: t.colors.text.mid }}>
-          بعد الحفظ، أضيفي في لوحة تحكم الدومين لديك سجلّ CNAME باسم <span dir="ltr">www</span> يشير إلى <span dir="ltr">cname.vercel-dns.com</span>، ثم تواصلي مع الدعم لإكمال الربط وإصدار الشهادة الأمنية.
-        </p>
-      )}
-
-      <input
-        value={value}
-        onChange={(e) => { setValue(e.target.value); setSaved(false); }}
-        placeholder="mystore.com"
-        dir="ltr"
-        style={{ width: "100%", padding: 11, border: `1px solid ${t.colors.cream.border}`, borderRadius: t.radius.md, fontSize: 14, boxSizing: "border-box", textAlign: "left" }}
-      />
-      {error && (
-        <p style={{ display: "flex", alignItems: "center", gap: 6, margin: `${t.spacing["2"]} 0 0`, fontSize: 12, color: t.colors.semantic.danger }}>
-          <AlertTriangle size={13} strokeWidth={1.8} />
-          {error}
-        </p>
-      )}
-      {saved && !automation && (
-        <p style={{ display: "flex", alignItems: "center", gap: 6, margin: `${t.spacing["2"]} 0 0`, fontSize: 12, color: t.colors.semantic.success }}>
-          <CheckCircle2 size={13} strokeWidth={1.8} />
-          تم الحفظ
-        </p>
-      )}
-      <button
-        onClick={save}
-        disabled={saving}
-        style={{ marginTop: t.spacing["3"], width: "100%", padding: 11, background: t.colors.primary[800], color: t.colors.white, border: "none", borderRadius: t.radius.md, fontSize: 13, fontWeight: t.typography.fontWeight.bold, cursor: saving ? "not-allowed" : "pointer" }}
-      >
-        {saving ? "جاري الحفظ..." : "حفظ الدومين"}
-      </button>
-
-      {automation && value.trim() && <DomainStatusPanel status={status} checking={checking} onCheck={check} />}
-    </div>
+    <section className={s.panel} style={uiVars} aria-labelledby="domain-title">
+      <div className={s.panelHead}>
+        <div className={s.itemLead}>
+          <span className={s.itemIcon} style={{ color: "var(--ui-green)" }}><Globe size={17} strokeWidth={1.7} aria-hidden="true" /></span>
+          <h2 id="domain-title" className={s.panelTitle}>الدومين المخصص</h2>
+        </div>
+      </div>
+      <div className={s.panelBody}>
+        {automation ? (
+          <p className={s.help}>اكتب دومينك واحفظ، وستظهر لك أدناه سجلات DNS المطلوبة وحالة الربط لحظياً.</p>
+        ) : (
+          <p className={s.help}>
+            بعد الحفظ، أضف في لوحة تحكم الدومين لديك سجلّ CNAME باسم <span dir="ltr">www</span> يشير إلى <span dir="ltr">cname.vercel-dns.com</span>، ثم تواصل مع الدعم لإكمال الربط وإصدار الشهادة الأمنية.
+          </p>
+        )}
+        <input
+          className={`${s.field} ${s.ltr}`}
+          value={value}
+          onChange={(e) => { setValue(e.target.value); setSaved(false); }}
+          placeholder="mystore.com"
+          dir="ltr"
+          aria-label="الدومين المخصص"
+        />
+        {error && (
+          <p className={s.err} role="alert">
+            <AlertTriangle size={13} strokeWidth={1.8} aria-hidden="true" />
+            {error}
+          </p>
+        )}
+        {saved && !automation && (
+          <p className={s.ok} role="status">
+            <CheckCircle2 size={14} strokeWidth={1.8} aria-hidden="true" />
+            تم الحفظ
+          </p>
+        )}
+        <button type="button" className={s.cta} onClick={save} disabled={saving}>
+          {saving ? "جاري الحفظ..." : "حفظ الدومين"}
+        </button>
+        {automation && value.trim() && <DomainStatusPanel status={status} checking={checking} onCheck={check} />}
+      </div>
+    </section>
   );
 }

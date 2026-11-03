@@ -1,7 +1,7 @@
 // components/admin/ui/DonutChart.tsx
 // SVG خالص بدون مكتبة رسوم بيانية (recharts غير مثبَّتة بالمشروع عمداً —
 // راجع تعليق package.json) — تجنّباً لإضافة حزمة لمخطط واحد بسيط.
-import { t } from "@/theme";
+import s from "../admin-ui.module.css";
 
 export interface DonutSlice {
   label: string;
@@ -10,7 +10,7 @@ export interface DonutSlice {
 }
 
 export default function DonutChart({ slices, centerLabel, centerValue }: { slices: DonutSlice[]; centerLabel: string; centerValue: number | string }) {
-  const total = slices.reduce((s, sl) => s + sl.value, 0);
+  const total = slices.reduce((sum, sl) => sum + sl.value, 0);
   const radius = 60;
   const stroke = 22;
   const circumference = 2 * Math.PI * radius;
@@ -25,10 +25,10 @@ export default function DonutChart({ slices, centerLabel, centerValue }: { slice
   });
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: t.spacing["5"], flexWrap: "wrap" }}>
-      <div style={{ position: "relative", width: 150, height: 150, flexShrink: 0 }}>
-        <svg width={150} height={150} viewBox="0 0 150 150" style={{ transform: "rotate(-90deg)" }}>
-          <circle cx={75} cy={75} r={radius} fill="none" stroke={t.colors.cream.border} strokeWidth={stroke} />
+    <div className={s.donut}>
+      <div className={s.donutBox}>
+        <svg className={s.donutSvg} width={150} height={150} viewBox="0 0 150 150" role="img" aria-label={`${centerLabel}: ${centerValue}`}>
+          <circle className={s.track} cx={75} cy={75} r={radius} fill="none" strokeWidth={stroke} />
           {segments.map((seg) => (
             <circle
               key={seg.label}
@@ -44,18 +44,19 @@ export default function DonutChart({ slices, centerLabel, centerValue }: { slice
             />
           ))}
         </svg>
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: t.typography.fontSize.xl, fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800] }}>{centerValue}</span>
-          <span style={{ fontSize: 10, color: t.colors.text.mid }}>{centerLabel}</span>
+        <div className={s.donutCenter}>
+          <span className={s.donutValue}>{centerValue}</span>
+          <span className={s.donutLabel}>{centerLabel}</span>
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1, minWidth: 140 }}>
+      <div className={s.legend}>
         {slices.map((sl) => (
-          <div key={sl.label} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: t.typography.fontSize.sm }}>
-            <span style={{ width: 10, height: 10, borderRadius: "50%", background: sl.color, flexShrink: 0 }} />
-            <span style={{ color: t.colors.text.dark, flex: 1 }}>{sl.label}</span>
-            <span style={{ color: t.colors.text.mid, fontSize: t.typography.fontSize.xs }}>
+          <div key={sl.label} className={s.legendRow}>
+            {/* لون الشريحة قيمة ديناميكية من المستدعي */}
+            <span className={s.swatch} style={{ background: sl.color }} />
+            <span className={s.legendName}>{sl.label}</span>
+            <span className={s.legendVal}>
               {sl.value} ({total > 0 ? Math.round((sl.value / total) * 100) : 0}٪)
             </span>
           </div>

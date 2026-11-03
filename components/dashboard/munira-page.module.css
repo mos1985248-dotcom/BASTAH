@@ -1,0 +1,4 @@
+/* components/dashboard/munira-page.module.css — نطاق صفحة منيرة فقط (كان <style> عاماً يتسرّب لكل الموقع). */
+.scope *, .scope *::before, .scope *::after { box-sizing: border-box; }
+.scope ::-webkit-scrollbar { width: 4px; }
+.scope ::-webkit-scrollbar-thumb { background: var(--ui-border); border-radius: 4px; }

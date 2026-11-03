@@ -1,13 +1,14 @@
 // app/checkout/page.tsx
+// المنطق (الجلب والمعاينة السعرية وإنشاء الطلب وتفريغ السلة والتحويل لـMoyasar) كما كان حرفياً؛
+// التغيير في العرض والصياغة فقط.
 "use client";
-
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import { useCurrentUser } from "../providers";
 import { useAddressBook } from "@/hooks/useAddressBook";
 import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import SiteShell from "@/components/layout/SiteShell";
 import AddressSelector from "@/components/shared/AddressSelector";
 import OrderSummary from "@/components/checkout/OrderSummary";
@@ -17,6 +18,8 @@ import CheckoutConfirmPanel from "@/components/checkout/CheckoutConfirmPanel";
 import TrustSidebar from "@/components/checkout/TrustSidebar";
 import { CartItemData } from "@/components/cart/types";
 import { CheckoutPreview } from "@/components/checkout/OrderPricingSummary";
+import { CheckoutEmpty, CheckoutLoading, CheckoutLogin, NoStore } from "@/components/checkout/CheckoutStates";
+import c from "@/components/checkout/checkout.module.css";
 
 export default function CheckoutPage() {
   return (
@@ -80,7 +83,7 @@ function CheckoutContent() {
   const handleConfirm = async () => {
     if (!storeId || items.length === 0) return;
     if (!isPickup && !addressBook.selectedAddressId) {
-      setPlaceError("اختاري عنوان شحن أولاً");
+      setPlaceError("اختر عنوان شحن أولاً");
       return;
     }
     if (!agreedToTerms) {
@@ -97,7 +100,7 @@ function CheckoutContent() {
         paymentMethod,
         fulfillmentMethod,
       });
-      // الطلب اتنشأ فعلياً بهذي اللحظة — نفضّي هالعناصر من السلة
+      // الطلب أُنشئ فعلياً في هذه اللحظة — نُفرّغ هذه العناصر من السلة
       await Promise.all(items.map((i) => api.delete(`/api/cart/${i.product.id}`).catch(() => {})));
       window.location.href = result.paymentUrl ?? `/orders/${result.orderId}`;
     } catch (err) {
@@ -107,113 +110,75 @@ function CheckoutContent() {
     }
   };
 
-  if (!storeId) {
-    return (
-      <SiteShell>
-        <p style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, textAlign: "center", padding: t.spacing["16"], color: t.colors.semantic.danger }}>
-          <AlertTriangle size={16} strokeWidth={1.8} />
-          لم يتم تحديد المتجر — ارجعي للسلة
-        </p>
-      </SiteShell>
-    );
-  }
-  if (userLoading || loading) {
-    return (
-      <SiteShell>
-        <p style={{ textAlign: "center", padding: t.spacing["16"], color: t.colors.text.mid }}>جاري التحميل...</p>
-      </SiteShell>
-    );
-  }
-  if (!user) {
-    return (
-      <SiteShell>
-        <div style={{ textAlign: "center", padding: t.spacing["16"] }}>
-          <p style={{ color: t.colors.text.mid, marginBottom: t.spacing["3"] }}>سجّلي دخولك لإتمام الدفع</p>
-          <a href={`/login?redirect=/checkout?store=${storeId}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: t.colors.gold[600], fontWeight: t.typography.fontWeight.bold }}>
-            تسجيل الدخول
-            <ArrowLeft size={15} strokeWidth={2} />
-          </a>
-        </div>
-      </SiteShell>
-    );
-  }
-  if (loadError || items.length === 0) {
-    return (
-      <SiteShell>
-        <p style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, textAlign: "center", padding: t.spacing["16"], color: t.colors.semantic.danger }}>
-          <AlertTriangle size={16} strokeWidth={1.8} />
-          {loadError ? "تعذّر تحميل السلة" : "لا توجد منتجات لهذا المتجر بسلتك"}
-        </p>
-      </SiteShell>
-    );
-  }
+  const shell = (children: React.ReactNode) => (
+    <SiteShell>
+      <div style={{ background: t.colors.heritage.sand }}>{children}</div>
+    </SiteShell>
+  );
+
+  if (!storeId) return shell(<NoStore />);
+  if (userLoading || loading) return shell(<CheckoutLoading />);
+  if (!user) return shell(<CheckoutLogin storeId={storeId} />);
+  if (loadError || items.length === 0) return shell(<CheckoutEmpty loadError={loadError} />);
 
   return (
     <SiteShell>
-      <CheckoutStepper current="payment" />
+      <div style={{ background: t.colors.heritage.sand }}>
+        <CheckoutStepper current="payment" />
+        <main className={c.page} style={{ ...uiVars, maxWidth: 1160 }}>
+          <h1 className={c.title} style={{ fontFamily: t.typography.fontFamily.display }}>إتمام الدفع</h1>
 
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: `0 ${t.spacing["5"]} ${t.spacing["10"]}` }}>
-        <h1 style={{ fontSize: t.typography.fontSize["2xl"], fontWeight: t.typography.fontWeight.bold, color: t.colors.primary[800], margin: `0 0 ${t.spacing["4"]}` }}>
-          إتمام الدفع
-        </h1>
-
-        <div className="basita-checkout-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.6fr 1fr", gap: t.spacing["5"], alignItems: "start" }}>
-          {/* العمود الأول (يمين بالـRTL): ملخص الطلب */}
-          <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["4"] }} className="basita-checkout-order">
-            <OrderSummary items={items} storeName={items[0].product.store.nameAr} preview={preview} previewLoading={previewLoading} />
-          </div>
-
-          {/* العمود الأوسط: العنوان + طريقة الدفع + التأكيد */}
-          <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["4"] }}>
-            {isPickup ? (
-              <div style={{ background: t.colors.cream.warm, borderRadius: t.radius.lg, padding: t.spacing["4"], fontSize: t.typography.fontSize.sm, color: t.colors.text.body }}>
-                اخترتِ الاستلام الشخصي من موقع التاجر — بيانات الموقع الدقيقة راح تظهر بصفحة طلبك بعد التأكيد، ما تحتاجين عنوان شحن.
-              </div>
-            ) : (
-              <AddressSelector
-                hasUser={!!user}
-                userLoading={userLoading}
-                addresses={addressBook.addresses}
-                selectedAddressId={addressBook.selectedAddressId}
-                onSelect={addressBook.setSelectedAddressId}
-                showForm={addressBook.showAddressForm}
-                onShowForm={() => addressBook.setShowAddressForm(true)}
-                form={addressBook.addrForm}
-                onFormChange={(k, v) => addressBook.setAddrForm((p) => ({ ...p, [k]: v }))}
-                onSave={addressBook.handleAddAddress}
+          <div className={c.grid}>
+            {/* العمود الرئيسي (يمين بالـRTL): العنوان + طريقة الدفع + التأكيد */}
+            <div className={c.main}>
+              {isPickup ? (
+                <p className={c.note}>
+                  اخترت الاستلام الشخصي من موقع التاجر — ستظهر بيانات الموقع الدقيقة في صفحة طلبك بعد التأكيد، ولا تحتاج إلى عنوان شحن.
+                </p>
+              ) : (
+                <AddressSelector
+                  hasUser={!!user}
+                  userLoading={userLoading}
+                  addresses={addressBook.addresses}
+                  selectedAddressId={addressBook.selectedAddressId}
+                  onSelect={addressBook.setSelectedAddressId}
+                  showForm={addressBook.showAddressForm}
+                  onShowForm={() => addressBook.setShowAddressForm(true)}
+                  form={addressBook.addrForm}
+                  onFormChange={(k, v) => addressBook.setAddrForm((p) => ({ ...p, [k]: v }))}
+                  onSave={addressBook.handleAddAddress}
+                />
+              )}
+              <PaymentMethodSelect
+                value={paymentMethod}
+                onChange={setPaymentMethod}
+                bankTransferAvailable={bankTransferAvailable}
+                pickupAvailable={pickupAvailable}
+                fulfillmentMethod={fulfillmentMethod}
+                onFulfillmentChange={setFulfillmentMethod}
               />
-            )}
+              <CheckoutConfirmPanel
+                agreedToTerms={agreedToTerms}
+                onAgreeChange={setAgreedToTerms}
+                placing={placing}
+                placeError={placeError}
+                paymentMethod={paymentMethod}
+                onConfirm={handleConfirm}
+              />
+            </div>
 
-            <PaymentMethodSelect
-              value={paymentMethod}
-              onChange={setPaymentMethod}
-              bankTransferAvailable={bankTransferAvailable}
-              pickupAvailable={pickupAvailable}
-              fulfillmentMethod={fulfillmentMethod}
-              onFulfillmentChange={setFulfillmentMethod}
-            />
-
-            <CheckoutConfirmPanel
-              agreedToTerms={agreedToTerms}
-              onAgreeChange={setAgreedToTerms}
-              placing={placing}
-              placeError={placeError}
-              paymentMethod={paymentMethod}
-              onConfirm={handleConfirm}
-            />
+            {/* العمود الجانبي: ملخص الطلب + الثقة والدعم */}
+            <div className={c.side}>
+              <div className={c.sideSummary}>
+                <OrderSummary items={items} storeName={items[0].product.store.nameAr} preview={preview} previewLoading={previewLoading} />
+              </div>
+              <div className={c.sideTrust}>
+                <TrustSidebar whatsapp={items[0].product.store.whatsapp} />
+              </div>
+            </div>
           </div>
-
-          {/* العمود الثالث: الثقة والدعم */}
-          <TrustSidebar whatsapp={items[0].product.store.whatsapp} />
-        </div>
+        </main>
       </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          .basita-checkout-grid { grid-template-columns: 1fr !important; }
-          .basita-checkout-order { order: -1; }
-        }
-      `}</style>
     </SiteShell>
   );
 }

@@ -4,7 +4,9 @@
 import { useState } from "react";
 import { Lock, Home } from "lucide-react";
 import { useCurrentUser } from "@/app/providers";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
+import LoadingState from "@/components/dashboard/ui/LoadingState";
+import s from "@/components/admin/admin.module.css";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 import AdminTopbar from "@/components/admin/layout/AdminTopbar";
 import AdminMobileNav from "@/components/admin/layout/AdminMobileNav";
@@ -19,25 +21,22 @@ import SettingsSection from "@/components/admin/sections/SettingsSection";
 import ShippingProvidersSection from "@/components/admin/sections/ShippingProvidersSection";
 import IntegrationsSection from "@/components/admin/sections/IntegrationsSection";
 
-// ⚠️ ملاحظة انتقالية: أقسام "نظرة عامة/المتاجر/المستخدمون/الدعم/المدونة/
-// سجل العمليات" لا تزال تستخدم مكوّناتها القديمة كما هي (تعمل فعلياً،
-// مربوطة بنفس الـAPIs) — لم يُعَد تصميمها بصرياً بعد بهذه الجولة، فقط
-// "إعدادات المنصة" الجديدة كلياً (مطلوبة تحديداً بهذه المرحلة). الشريط
-// الجانبي الجديد هو الحاوية المشتركة الوحيدة التي تغيّرت.
+// ⚠️ ملاحظة انتقالية: الهيكل (الشريط الجانبي والعلوي وتنقل الجوال) ومكتبة ui/ بالهوية الجديدة؛
+// أقسام المحتوى تُعاد تصميماً قسماً بعد قسم (تعمل كما هي ومربوطة بنفس الـAPIs).
 export default function AdminPage() {
   const { user, loading } = useCurrentUser();
   const [section, setSection] = useState<AdminSection>("overview");
 
   if (loading) {
-    return <p style={{ textAlign: "center", padding: t.spacing["10"], color: t.colors.text.mid }}>جاري التحميل...</p>;
+    return <LoadingState />;
   }
 
   if (!user || (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN")) {
     return (
-      <div style={{ textAlign: "center", padding: t.spacing["16"], direction: "rtl" }}>
-        <Lock size={44} strokeWidth={1.5} color={t.colors.text.light} />
-        <p style={{ color: t.colors.semantic.danger, fontSize: t.typography.fontSize.base, marginTop: t.spacing["3"] }}>غير مصرّح لك بالوصول</p>
-        <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: t.colors.gold[600] }}>
+      <div className={s.guard} style={uiVars}>
+        <Lock size={44} strokeWidth={1.5} />
+        <p className={s.guardText}>غير مصرّح لك بالوصول</p>
+        <a href="/" className={s.guardLink}>
           <Home size={14} strokeWidth={1.8} />
           الرئيسية
         </a>
@@ -46,13 +45,13 @@ export default function AdminPage() {
   }
 
   return (
-    <div style={{ background: t.colors.cream.bg, minHeight: "100vh", direction: "rtl", display: "flex" }}>
+    <div className={s.shell} style={uiVars}>
       <AdminSidebar active={section} onChange={setSection} ticketBadge={0} userName={user.name} />
 
-      <div style={{ flex: 1, minWidth: 0, paddingBottom: 70 }}>
+      <div className={s.main}>
         <AdminTopbar active={section} />
 
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: t.spacing["5"] }}>
+        <div className={s.content}>
           {section === "overview" && <AnalyticsTab />}
           {section === "stores" && <StoresTab />}
           {section === "support" && <TicketsTab />}

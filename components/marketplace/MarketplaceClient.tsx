@@ -1,18 +1,21 @@
 // components/marketplace/MarketplaceClient.tsx
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { X } from "lucide-react";
-import { api } from "@/lib/api-client";
 import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
 import SiteShell from "@/components/layout/SiteShell";
-import MarketplaceHero from "@/components/marketplace/MarketplaceHero";
-import SortBar from "@/components/marketplace/SortBar";
-import ProductGrid from "@/components/marketplace/ProductGrid";
-import Pagination from "@/components/marketplace/Pagination";
-import CategoryNav from "@/components/home/CategoryNav";
-import { MarketplaceProduct } from "@/components/marketplace/ProductCard";
+import type { HomeStore } from "@/components/home/StoreCard";
+import MarketplaceHero from "./MarketplaceHero";
+import MarketControls, { type MarketView } from "./MarketControls";
+import SortBar from "./SortBar";
+import ProductGrid from "./ProductGrid";
+import StoreGrid from "./StoreGrid";
+import Pagination from "./Pagination";
+import type { MarketplaceProduct } from "./ProductCard";
+import { useMarketData } from "./useMarketData";
+import s from "./market.module.css";
 
 export default function MarketplaceClient() {
   return (
@@ -24,75 +27,44 @@ export default function MarketplaceClient() {
 
 function MarketplaceContent() {
   const searchParams = useSearchParams();
-
-  const [products, setProducts] = useState<MarketplaceProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [view, setView] = useState<MarketView>(searchParams.get("view") === "stores" ? "stores" : "products");
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
+  const [term, setTerm] = useState(search); // البحث المعتمد: بعد توقّف الكتابة أو عند الإرسال
   const [category, setCategory] = useState(searchParams.get("category") ?? "");
   const [sort, setSort] = useState("popular");
-  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
-
-  const load = useCallback(async (page = 1) => {
-    setLoading(true);
-    setError("");
-    try {
-      const qs = new URLSearchParams({
-        page: String(page),
-        sort,
-        ...(search ? { search } : {}),
-        ...(category ? { category } : {}),
-      });
-      const data = await api.get<{ products: MarketplaceProduct[]; pagination: typeof pagination }>(
-        `/api/products?${qs.toString()}`
-      );
-      setProducts(data.products);
-      setPagination(data.pagination);
-    } catch (err: any) {
-      setError(err.message ?? "تعذّر تحميل المنتجات");
-    } finally {
-      setLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sort, search, category]);
 
   useEffect(() => {
-    load(1);
-  }, [load]);
+    const id = setTimeout(() => setTerm(search), 350);
+    return () => clearTimeout(id);
+  }, [search]);
+
+  const filters = { ...(term ? { search: term } : {}), ...(category ? { category } : {}) };
+  const products = useMarketData<MarketplaceProduct>("products", { sort, ...filters }, view === "products");
+  const stores = useMarketData<HomeStore>("stores", { limit: "12", ...filters }, view === "stores");
+  const active = view === "products" ? products : stores;
 
   return (
     <SiteShell>
-      <MarketplaceHero search={search} onSearchChange={setSearch} onSubmit={() => load(1)} />
+      <div style={{ background: t.colors.heritage.sand }}>
+        <MarketplaceHero search={search} onSearchChange={setSearch} onSubmit={() => setTerm(search)} />
 
-      <div id="categories">
-        <CategoryNav />
-      </div>
+        <div className={s.page} style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}>
+          <MarketControls view={view} onViewChange={setView} category={category} onCategoryChange={setCategory} />
 
-      <div style={{ maxWidth: t.layout.containerMaxWidth, margin: "0 auto", padding: t.spacing["6"] }}>
-        {category && (
-          <button
-            onClick={() => setCategory("")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              marginBottom: t.spacing["3"],
-              padding: "6px 14px",
-              borderRadius: t.radius.full,
-              border: `1px solid ${t.colors.primary[800]}`,
-              background: t.colors.primary[100],
-              color: t.colors.primary[800],
-              fontSize: t.typography.fontSize.xs,
-              cursor: "pointer",
-            }}
-          >
-            الفئة: {category}
-            <X size={12} strokeWidth={2.2} />
-          </button>
-        )}
-        <SortBar total={pagination.total} sort={sort} onSortChange={setSort} />
-        <ProductGrid products={products} loading={loading} error={error} />
-        <Pagination page={pagination.page} pages={pagination.pages} onChange={load} />
+          {view === "products" ? (
+            <>
+              <SortBar total={products.pagination.total} unit="منتج" sort={sort} onSortChange={setSort} />
+              <ProductGrid products={products.items} loading={products.loading} error={products.error} onRetry={() => products.load(1)} />
+            </>
+          ) : (
+            <>
+              <SortBar total={stores.pagination.total} unit="متجر" />
+              <StoreGrid stores={stores.items} loading={stores.loading} error={stores.error} onRetry={() => stores.load(1)} />
+            </>
+          )}
+
+          <Pagination page={active.pagination.page} pages={active.pagination.pages} onChange={active.load} />
+        </div>
       </div>
     </SiteShell>
   );

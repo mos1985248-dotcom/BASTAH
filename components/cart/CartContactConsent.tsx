@@ -1,11 +1,12 @@
 // components/cart/CartContactConsent.tsx
 // موافقة صريحة (غير مفعّلة افتراضياً) على مشاركة الاسم والجوال مع متجر واحد
 // لتذكير المشتري بسلته. تُسحب في أي وقت؛ السحب يسري على الإرسال التالي.
+// (نص الموافقة القانوني لم يُغيَّر؛ التغيير في الشكل فقط.)
 "use client";
-
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
-import { t } from "@/theme";
+import { uiVars } from "@/components/ui/vars";
+import c from "./cart.module.css";
 
 export default function CartContactConsent({ storeId, storeName }: { storeId: string; storeName: string }) {
   const [granted, setGranted] = useState(false);
@@ -29,19 +30,19 @@ export default function CartContactConsent({ storeId, storeName }: { storeId: st
       await api.post("/api/cart/contact-consent", { storeId, granted: next });
       setGranted(next);
     } catch {
-      setError("تعذّر حفظ اختيارك، حاولي مرة أخرى");
+      setError("تعذّر حفظ اختيارك، حاول مرة أخرى");
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <label style={{ display: "flex", alignItems: "flex-start", gap: 8, margin: `${t.spacing["2"]} 0 ${t.spacing["4"]}`, fontSize: 12, color: t.colors.text.mid, cursor: "pointer" }}>
-      <input type="checkbox" checked={granted} disabled={busy} onChange={(e) => toggle(e.target.checked)} style={{ marginTop: 2 }} />
+    <label className={c.consent} style={uiVars}>
+      <input type="checkbox" checked={granted} disabled={busy} onChange={(e) => toggle(e.target.checked)} />
       <span>
         أوافق على مشاركة اسمي ورقم جوالي مع بسطة ومتجر «{storeName}» وحده، ليتواصلا معي بخصوص سلتي إن لم أُكمل الطلب.
         يمكنني سحب الموافقة في أي وقت من هنا، ولن تُشارك بياناتي بعد السحب.
-        {error && <strong style={{ display: "block", color: t.colors.semantic.danger }}>{error}</strong>}
+        {error && <strong className={c.consentErr}>{error}</strong>}
       </span>
     </label>
   );

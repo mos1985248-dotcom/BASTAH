@@ -5,7 +5,7 @@
 // Next.js أثناء prerendering.
 
 import { Suspense } from "react";
-import LoadingState from "@/components/admin/ui/LoadingState";
+import LoadingState from "@/components/dashboard/ui/LoadingState";
 import SubscriptionReturnClient from "./SubscriptionReturnClient";
 
 export default function SubscriptionReturnPage() {

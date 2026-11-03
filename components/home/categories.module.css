@@ -1,0 +1,39 @@
+/* components/home/categories.module.css — الألوان عبر متغيرات --ui-* فقط */
+.section { margin: 0 auto; padding: 48px 16px 8px; direction: rtl; }
+.kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
+.kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
+.title { margin: 0 0 28px; font-size: clamp(34.5px, 4.6vw, 50.5px); font-weight: 700; line-height: 1.6; color: var(--ui-green-deep); }
+
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.tile {
+  display: flex; flex-direction: column; overflow: hidden;
+  border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card);
+  color: var(--ui-ink); text-decoration: none;
+  transition: border-color 0.25s var(--ui-ease), box-shadow 0.25s var(--ui-ease);
+}
+.tile:hover { border-color: var(--ui-gold); box-shadow: var(--ui-shadow); }
+.tile:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+
+.media { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; overflow: hidden; background: var(--ui-sand); }
+.photo { object-fit: cover; transition: transform 0.6s var(--ui-ease); }
+.tile:hover .photo { transform: scale(1.04); }
+.icon { color: var(--ui-kicker); }
+
+.row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 18px; }
+.label { font-size: 17px; font-weight: 700; line-height: 1.5; }
+.arrow { flex: none; color: var(--ui-green); transition: transform 0.2s var(--ui-ease); }
+.tile:hover .arrow, .tile:focus-visible .arrow { transform: translateX(-4px); }
+
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 767px) {
+  .section { padding: 36px 12px 4px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .tile { border-radius: 20px; }
+  .row { padding: 12px 14px; }
+  .label { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile, .photo, .arrow { transition: none; }
+  .tile:hover .photo, .tile:hover .arrow, .tile:focus-visible .arrow { transform: none; }
+}
+/* basita-font-scale: applied */

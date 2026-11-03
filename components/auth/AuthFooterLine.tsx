@@ -1,28 +1,11 @@
 // components/auth/AuthFooterLine.tsx
-import { t } from "@/theme";
+import s from "./auth.module.css";
 
-export default function AuthFooterLine({
-  prompt,
-  linkLabel,
-  href,
-}: {
-  prompt: string;
-  linkLabel: string;
-  href: string;
-}) {
+export default function AuthFooterLine({ prompt, linkLabel, href }: { prompt: string; linkLabel: string; href: string }) {
   return (
-    <p
-      style={{
-        textAlign: "center",
-        fontSize: t.typography.fontSize.sm,
-        color: t.colors.text.mid,
-        margin: 0,
-      }}
-    >
-      {prompt}{" "}
-      <a href={href} style={{ color: t.colors.gold[600], fontWeight: t.typography.fontWeight.bold, textDecoration: "none" }}>
-        {linkLabel}
-      </a>
+    <p className={s.foot}>
+      {prompt}
+      <a href={href}>{linkLabel}</a>
     </p>
   );
 }

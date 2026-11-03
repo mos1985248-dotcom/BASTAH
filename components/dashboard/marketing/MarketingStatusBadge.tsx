@@ -1,66 +1,14 @@
 // components/dashboard/marketing/MarketingStatusBadge.tsx
+import f from "../forms.module.css";
 
-import { t } from "@/theme";
-
-const STATUS_STYLE: Record<
-  string,
-  {
-    label: string;
-    color: string;
-    bg: string;
-  }
-> = {
-  DRAFT: {
-    label: "مسودة",
-    color: t.colors.semantic.warning,
-    bg: t.colors.semantic.warningBg,
-  },
-
-  PENDING_CONNECTION: {
-    label: "بانتظار الربط",
-    color: t.colors.text.mid,
-    bg: t.colors.cream.warm,
-  },
-
-  PUBLISHED: {
-    label: "أُرسل للنشر",
-    color: t.colors.semantic.success,
-    bg: t.colors.semantic.successBg,
-  },
-
-  FAILED: {
-    label: "فشل النشر",
-    color: t.colors.semantic.danger,
-    bg: t.colors.semantic.dangerBg,
-  },
+const STATUS: Record<string, { label: string; tone: "pillWarn" | "pillOff" | "pillOk" | "pillBad" }> = {
+  DRAFT: { label: "مسودة", tone: "pillWarn" },
+  PENDING_CONNECTION: { label: "بانتظار الربط", tone: "pillOff" },
+  PUBLISHED: { label: "أُرسل للنشر", tone: "pillOk" },
+  FAILED: { label: "فشل النشر", tone: "pillBad" },
 };
 
-export default function MarketingStatusBadge({
-  status,
-}: {
-  status: string;
-}) {
-  const current = STATUS_STYLE[status] ?? STATUS_STYLE.DRAFT;
-
-  return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-        minHeight: 26,
-        padding: "4px 10px",
-        borderRadius: t.radius.full,
-        background: current.bg,
-        color: current.color,
-        fontSize: t.typography.fontSize.xs,
-        fontWeight: t.typography.fontWeight.bold,
-        lineHeight: 1.4,
-        whiteSpace: "nowrap",
-      }}
-    >
-      {current.label}
-    </span>
-  );
+export default function MarketingStatusBadge({ status }: { status: string }) {
+  const current = STATUS[status] ?? STATUS.DRAFT;
+  return <span className={`${f.pill} ${f[current.tone]}`}>{current.label}</span>;
 }

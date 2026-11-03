@@ -6,7 +6,8 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart, RotateCcw, Send } from "lucide-react";
 import { api } from "@/lib/api-client";
-import { t } from "@/theme";
+import f from "../forms.module.css";
+import s from "./marketing.module.css";
 
 interface Recent { id: string; status: string; itemCount: number; cartValue: number; detectedAt: string; merchantEventSentAt: string | null; contact: { name: string; phone: string | null } | null }
 interface Stats {
@@ -15,13 +16,12 @@ interface Stats {
 }
 
 const STATUS_LABEL: Record<string, string> = { DETECTED: "بانتظار التذكير", REMINDED: "تم تذكير المشتري", RECOVERED: "تم الاسترداد" };
-const cardStyle: React.CSSProperties = { background: t.colors.white, borderRadius: t.radius.lg, border: `1px solid ${t.colors.cream.border}`, padding: t.spacing["4"] };
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ ...cardStyle, flex: 1, minWidth: 130 }}>
-      <p style={{ margin: 0, fontSize: 11, color: t.colors.text.mid }}>{label}</p>
-      <p style={{ margin: "4px 0 0", fontSize: 20, fontWeight: t.typography.fontWeight.bold, color: t.colors.gold[700] }}>{value}</p>
+    <div className={s.stat}>
+      <p className={s.statLbl}>{label}</p>
+      <p className={s.statGold}>{value}</p>
     </div>
   );
 }
@@ -35,46 +35,45 @@ export default function AbandonedCartsSection() {
   }, []);
 
   return (
-    <section>
-      <h2 style={{ display: "flex", alignItems: "center", gap: 7, margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.lg, color: t.colors.text.dark }}>
-        <ShoppingCart size={17} strokeWidth={1.8} />
+    <section className={s.sec}>
+      <h2 className={s.h2}>
+        <ShoppingCart size={18} strokeWidth={1.8} />
         السلات المتروكة
       </h2>
-      <p style={{ margin: `0 0 ${t.spacing["3"]}`, fontSize: 12, color: t.colors.text.mid }}>
-        سلة لم يُعدَّل فيها شيء ٦ ساعات فأكثر ولم يُنشأ بعدها طلب. نرسل للمشتري تذكيراً داخل التطبيق مرة واحدة أسبوعياً، وإن ربطتِ حساباً خارجياً واحداً على الأقل (من صفحة التكاملات) تُرسل بسطة حدث السلة المتروكة إلى نظام التكاملات المركزي. هوية المشتري (الاسم والجوال) لا تُرسل إلا إن وافق صراحةً، وتتوقف إن سحب موافقته.
+      <p className={s.lead}>
+        سلة لم يُعدَّل فيها شيء ٦ ساعات فأكثر ولم يُنشأ بعدها طلب. نرسل للمشتري تذكيراً داخل التطبيق مرة واحدة أسبوعياً، وإن ربطت حساباً خارجياً واحداً على الأقل (من صفحة التكاملات) تُرسل بسطة حدث السلة المتروكة إلى نظام التكاملات المركزي. هوية المشتري (الاسم والجوال) لا تُرسل إلا إن وافق صراحةً، وتتوقف إن سحب موافقته.
       </p>
 
-      {error && <p style={{ ...cardStyle, fontSize: 13, color: t.colors.semantic.danger }}>تعذّر تحميل السلات المتروكة</p>}
+      {error && <p className={f.err} role="alert">تعذّر تحميل السلات المتروكة</p>}
 
       {stats && stats.abandonedCount === 0 && (
-        <p style={{ ...cardStyle, textAlign: "center", color: t.colors.text.mid, fontSize: 13 }}>
-          غير متاح — لم تُرصد سلات متروكة بعد (يعمل الكشف مرة يومياً).
-        </p>
+        <p className={s.empty}>غير متاح — لم تُرصد سلات متروكة بعد (يعمل الكشف مرة يومياً).</p>
       )}
 
       {stats && stats.abandonedCount > 0 && (
         <>
-          <div style={{ display: "flex", gap: t.spacing["2"], flexWrap: "wrap", marginBottom: t.spacing["3"] }}>
+          <div className={s.wrapRow}>
             <Stat label={`سلات متروكة (${stats.windowDays} يوماً)`} value={String(stats.abandonedCount)} />
             <Stat label="قيمتها" value={`${stats.abandonedValue.toFixed(0)} ر.س`} />
             <Stat label="تم استردادها" value={`${stats.recoveredCount} (${stats.recoveredValue.toFixed(0)} ر.س)`} />
             <Stat label="نسبة الاسترداد" value={stats.recoveryRate === null ? "غير متاح" : `${stats.recoveryRate}%`} />
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: t.spacing["2"] }}>
+          <div className={s.list}>
             {stats.recent.map((r) => (
-              <div key={r.id} style={{ ...cardStyle, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                <div>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
+              <div key={r.id} className={s.card}>
+                <div className={s.cartTop}>
+                  <p className={s.cardTitle}>
                     {r.itemCount} منتج — {r.cartValue.toFixed(0)} ر.س
                   </p>
-                  <p style={{ display: "flex", alignItems: "center", gap: 8, margin: "2px 0 0", fontSize: 11, color: t.colors.text.light }}>
-                    {new Date(r.detectedAt).toLocaleDateString("ar-SA")}
-                    {r.merchantEventSentAt && <span style={{ display: "flex", alignItems: "center", gap: 3 }}><Send size={10} /> أُرسل لنظام التكاملات</span>}
-                    {r.contact && <span>وافق على التواصل: {r.contact.name}{r.contact.phone ? ` — ${r.contact.phone}` : ""}</span>}
-                    {r.status === "RECOVERED" && <span style={{ display: "flex", alignItems: "center", gap: 3 }}><RotateCcw size={10} /> مُستردّة</span>}
-                  </p>
+                  <span className={s.cartStatus}>{STATUS_LABEL[r.status] ?? r.status}</span>
                 </div>
-                <span style={{ fontSize: 11, color: t.colors.text.mid }}>{STATUS_LABEL[r.status] ?? r.status}</span>
+                <p className={s.cartMeta}>
+                  {/* تغيير: ميلادي (ar-SA وحده يعرض التاريخ الهجري) */}
+                  {new Date(r.detectedAt).toLocaleDateString("ar-SA-u-ca-gregory")}
+                  {r.merchantEventSentAt && <span><Send size={11} /> أُرسل لنظام التكاملات</span>}
+                  {r.contact && <span>وافق على التواصل: {r.contact.name}{r.contact.phone ? ` — ${r.contact.phone}` : ""}</span>}
+                  {r.status === "RECOVERED" && <span><RotateCcw size={11} /> مُستردّة</span>}
+                </p>
               </div>
             ))}
           </div>

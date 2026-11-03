@@ -2,6 +2,7 @@
 import { CheckCircle2, Clock3, AlertCircle, Archive } from "lucide-react";
 import { t } from "@/theme";
 
+import { ui } from "@/components/ui/css-vars";
 const STATUS_STYLE: Record<
   string,
   {
@@ -13,29 +14,29 @@ const STATUS_STYLE: Record<
 > = {
   ACTIVE: {
     label: "نشط",
-    color: t.colors.semantic.success,
-    bg: t.colors.semantic.successBg,
+    color: ui.green,
+    bg: ui.sand,
     Icon: CheckCircle2,
   },
 
   DRAFT: {
     label: "مسودة",
-    color: t.colors.semantic.warning,
-    bg: t.colors.semantic.warningBg,
+    color: ui.kicker,
+    bg: ui.sand,
     Icon: Clock3,
   },
 
   OUT_OF_STOCK: {
     label: "نفدت الكمية",
-    color: t.colors.semantic.danger,
-    bg: t.colors.semantic.dangerBg,
+    color: ui.danger,
+    bg: ui.dangerBg,
     Icon: AlertCircle,
   },
 
   ARCHIVED: {
     label: "مؤرشف",
-    color: t.colors.text.light,
-    bg: t.colors.cream.bg,
+    color: ui.inkMuted,
+    bg: ui.sand,
     Icon: Archive,
   },
 };

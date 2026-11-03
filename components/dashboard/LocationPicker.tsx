@@ -11,6 +11,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { MapPin, Map, AlertTriangle } from "lucide-react";
 import { t } from "@/theme";
 
+import { ui } from "@/components/ui/css-vars";
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 // مركز افتراضي عند عدم وجود موقع محفوظ.
@@ -65,7 +66,7 @@ export default function LocationPicker({
 
       const marker = new mapboxgl.Marker({
         draggable: true,
-        color: t.colors.primary[800],
+        color: ui.greenDeep,
       })
         .setLngLat(startCenter)
         .addTo(map);
@@ -142,14 +143,14 @@ export default function LocationPicker({
           minHeight: 220,
           padding: t.spacing["5"],
           borderRadius: 16,
-          border: `1px dashed ${t.colors.cream.border}`,
-          background: t.colors.cream.bg,
+          border: `1px dashed ${ui.border}`,
+          background: ui.sand,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           gap: 10,
-          color: t.colors.text.mid,
+          color: ui.inkMuted,
           fontSize: t.typography.fontSize.sm,
           lineHeight: t.typography.lineHeight.relaxed,
           textAlign: "center",
@@ -162,8 +163,8 @@ export default function LocationPicker({
             width: 46,
             height: 46,
             borderRadius: 14,
-            background: t.colors.white,
-            border: `1px solid ${t.colors.cream.border}`,
+            background: ui.card,
+            border: `1px solid ${ui.border}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -173,7 +174,7 @@ export default function LocationPicker({
           <MapPin
             size={22}
             strokeWidth={1.8}
-            color={t.colors.primary[800]}
+            color={ui.greenDeep}
           />
         </div>
 
@@ -185,7 +186,7 @@ export default function LocationPicker({
             fontFamily: t.typography.fontFamily.heading,
             fontSize: t.typography.fontSize.sm,
             fontWeight: t.typography.fontWeight.bold,
-            color: t.colors.primary[800],
+            color: ui.greenDeep,
           }}
         >
           <Map size={16} strokeWidth={1.8} />
@@ -195,7 +196,7 @@ export default function LocationPicker({
         <span
           style={{
             maxWidth: 440,
-            color: t.colors.text.mid,
+            color: ui.inkMuted,
             fontSize: t.typography.fontSize.xs,
           }}
         >
@@ -219,10 +220,10 @@ export default function LocationPicker({
           gap: 9,
           padding: t.spacing["4"],
           borderRadius: 13,
-          background: t.colors.semantic.dangerBg,
+          background: ui.dangerBg,
           border: "1px solid rgba(220,38,38,0.12)",
-          borderRight: `3px solid ${t.colors.semantic.danger}`,
-          color: t.colors.semantic.danger,
+          borderRight: `3px solid ${ui.danger}`,
+          color: ui.danger,
           fontSize: t.typography.fontSize.sm,
           lineHeight: t.typography.lineHeight.relaxed,
           direction: "rtl",
@@ -262,9 +263,9 @@ export default function LocationPicker({
           width: "100%",
           borderRadius: 16,
           overflow: "hidden",
-          border: `1px solid ${t.colors.cream.border}`,
+          border: `1px solid ${ui.border}`,
           boxShadow: "0 6px 18px rgba(67,48,29,0.06)",
-          background: t.colors.cream.warm,
+          background: ui.sand,
         }}
       />
 
@@ -274,7 +275,7 @@ export default function LocationPicker({
           alignItems: "center",
           gap: 7,
           marginTop: 8,
-          color: t.colors.text.mid,
+          color: ui.inkMuted,
           fontSize: t.typography.fontSize.xs,
           lineHeight: t.typography.lineHeight.relaxed,
         }}
@@ -282,7 +283,7 @@ export default function LocationPicker({
         <MapPin
           size={14}
           strokeWidth={1.8}
-          color={t.colors.gold[600]}
+          color={ui.gold}
         />
 
         <span>

@@ -8,10 +8,10 @@ import { t } from "@/theme";
 
 const TONES = {
   // أبيض ناصع — للأقسام الرئيسية ذات المحتوى البطاقي.
-  white: t.colors.cream.card,
+  white: t.colors.heritage.card,
 
   // أخضر فاتح جدًا من هوية بسطة — يستخدم لإبراز الأقسام الداعمة.
-  tint: t.colors.primary[50],
+  tint: t.colors.heritage.sand,
 
   // شفاف — يحافظ على خلفية الصفحة الطبيعية.
   transparent: "transparent",
@@ -33,7 +33,7 @@ export default function SectionBand({
       style={{
         background: TONES[tone],
         borderTop: showDivider
-          ? `1px solid ${t.colors.cream.borderLight}`
+          ? `1px solid ${t.colors.heritage.border}`
           : "none",
       }}
     >

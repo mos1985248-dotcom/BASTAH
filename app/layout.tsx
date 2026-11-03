@@ -1,6 +1,11 @@
 // app/layout.tsx
 import "./globals.css";
-import { IBM_Plex_Sans_Arabic, Noto_Kufi_Arabic } from "next/font/google";
+import {
+  IBM_Plex_Sans_Arabic,
+  Noto_Kufi_Arabic,
+  Aref_Ruqaa,
+  Amiri,
+} from "next/font/google";
 import { UserProvider } from "./providers";
 
 const plexArabic = IBM_Plex_Sans_Arabic({
@@ -14,6 +19,21 @@ const kufiArabic = Noto_Kufi_Arabic({
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-kufi-arabic",
+  display: "swap",
+});
+
+// خطان خطّيان للمقارنة على الرئيسية؛ يُحذف الخاسر بعد الاعتماد.
+const arefRuqaa = Aref_Ruqaa({
+  subsets: ["arabic"],
+  weight: ["400", "700"],
+  variable: "--font-aref-ruqaa",
+  display: "swap",
+});
+
+const amiri = Amiri({
+  subsets: ["arabic"],
+  weight: ["400", "700"],
+  variable: "--font-amiri",
   display: "swap",
 });
 
@@ -31,7 +51,7 @@ export default function RootLayout({
     <html
       lang="ar"
       dir="rtl"
-      className={`${plexArabic.variable} ${kufiArabic.variable}`}
+      className={`${plexArabic.variable} ${kufiArabic.variable} ${arefRuqaa.variable} ${amiri.variable}`}
     >
       <body>
         <UserProvider>{children}</UserProvider>

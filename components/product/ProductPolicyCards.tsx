@@ -1,184 +1,44 @@
 // components/product/ProductPolicyCards.tsx
-// امتداد حقيقي لإعدادات المتجر (Dashboard → Backend → Storefront → Product
-// Page) — كل قيمة من StorePublicInfo الحقيقي، ولا بطاقة تُعرض بدون بيانات.
+// كل قيمة من إعدادات المتجر الحقيقية، ولا بطاقة تُعرض بدون بيانات.
+import { CreditCard, RotateCcw, Truck, type LucideIcon } from "lucide-react";
+import { uiVars } from "@/components/ui/vars";
+import type { ProductDetail } from "./types";
+import s from "./extras.module.css";
 
-import { t } from "@/theme";
-import {
-  RotateCcw,
-  Truck,
-  CreditCard,
-  type LucideIcon,
-} from "lucide-react";
-import { ProductDetail } from "./types";
-
-export default function ProductPolicyCards({
-  product,
-}: {
-  product: ProductDetail;
-}) {
+export default function ProductPolicyCards({ product }: { product: ProductDetail }) {
   const info = product.store.publicInfo;
+  if (!info) return null;
 
-  const cards: {
-    Icon: LucideIcon;
-    title: string;
-    body: string | null;
-  }[] = [
-    {
+  const days = info.returnPolicyDays;
+  const cards: { Icon: LucideIcon; title: string; text: string }[] = [];
+  if (days !== undefined && days !== null) {
+    cards.push({
       Icon: RotateCcw,
       title: "سياسة الإرجاع",
-      body: info
-        ? `يمكنك إرجاع المنتج خلال ${info.returnPolicyDays} ${
-            info.returnPolicyDays === 1 ? "يوم" : "أيام"
-          } من الاستلام، بشرط أن يكون بحالته الأصلية.`
-        : null,
-    },
-    {
+      text: `يمكنك إرجاع المنتج خلال ${days} ${days === 1 ? "يوم" : "أيام"} من الاستلام، بشرط أن يكون بحالته الأصلية.`,
+    });
+  }
+  if (info.prepTimeDays || info.shippingCoverage) {
+    cards.push({
       Icon: Truck,
       title: "الشحن والتوصيل",
-      body: info
-        ? `تجهيز خلال ${info.prepTimeDays}${
-            info.deliveryPartner ? ` عبر ${info.deliveryPartner}` : ""
-          } — يشحن إلى ${info.shippingCoverage}.`
-        : null,
-    },
-    {
-      Icon: CreditCard,
-      title: "وسائل الدفع",
-      body: info?.paymentMethods?.length
-        ? info.paymentMethods.join(" · ")
-        : null,
-    },
-  ].filter((c) => c.body);
-
+      text: `تجهيز خلال ${info.prepTimeDays}${info.deliveryPartner ? ` عبر ${info.deliveryPartner}` : ""} — يشحن إلى ${info.shippingCoverage}.`,
+    });
+  }
+  if (info.paymentMethods?.length) {
+    cards.push({ Icon: CreditCard, title: "وسائل الدفع", text: info.paymentMethods.join(" · ") });
+  }
   if (cards.length === 0) return null;
 
   return (
-    <div
-      dir="rtl"
-      className="basita-product-policy-cards"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-        gap: t.spacing["2"],
-        marginTop: t.spacing["4"],
-      }}
-    >
-      {cards.map((c) => (
-        <div
-          key={c.title}
-          className="basita-product-policy-card"
-          style={{
-            position: "relative",
-            overflow: "hidden",
-            background: t.colors.white,
-            border: `1px solid ${t.colors.cream.border}`,
-            borderRadius: t.radius.lg,
-            padding: t.spacing["3"],
-            minHeight: 108,
-            boxShadow: "0 3px 12px rgba(25, 45, 35, 0.03)",
-            transition:
-              "transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease",
-          }}
-        >
-          {/* لمسة لونية بسيطة أعلى البطاقة */}
-          <span
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: 0,
-              insetInlineStart: 0,
-              width: 36,
-              height: 3,
-              borderRadius: "0 0 4px 0",
-              background: t.colors.gold[600],
-            }}
-          />
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: t.spacing["2"],
-              marginBottom: t.spacing["2"],
-            }}
-          >
-            <span
-              style={{
-                width: 32,
-                height: 32,
-                flexShrink: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: t.radius.md,
-                background: t.colors.primary[100],
-                color: t.colors.primary[800],
-              }}
-            >
-              <c.Icon size={15} strokeWidth={1.8} />
-            </span>
-
-            <p
-              style={{
-                margin: 0,
-                fontSize: t.typography.fontSize.xs,
-                fontWeight: t.typography.fontWeight.bold,
-                color: t.colors.primary[800],
-                lineHeight: 1.4,
-              }}
-            >
-              {c.title}
-            </p>
-          </div>
-
-          <p
-            style={{
-              margin: 0,
-              paddingInlineStart: 40,
-              fontSize: 12,
-              color: t.colors.text.mid,
-              lineHeight: 1.75,
-            }}
-          >
-            {c.body}
-          </p>
-        </div>
+    <ul className={s.policies} style={uiVars} aria-label="سياسات المتجر">
+      {cards.map(({ Icon, title, text }) => (
+        <li key={title} className={s.policy}>
+          <Icon size={22} strokeWidth={1.6} aria-hidden="true" />
+          <h3 className={s.policyTitle}>{title}</h3>
+          <p className={s.policyText}>{text}</p>
+        </li>
       ))}
-
-      <style>{`
-        .basita-product-policy-card:hover {
-          transform: translateY(-2px);
-          border-color: rgba(15, 61, 46, 0.14);
-          box-shadow: 0 8px 20px rgba(25, 45, 35, 0.065);
-        }
-
-        @media (max-width: 700px) {
-          .basita-product-policy-cards {
-            grid-template-columns: 1fr !important;
-            gap: ${t.spacing["2"]} !important;
-          }
-
-          .basita-product-policy-card {
-            min-height: auto !important;
-          }
-        }
-
-        @media (max-width: 420px) {
-          .basita-product-policy-card {
-            padding: ${t.spacing["3"]} !important;
-          }
-
-          .basita-product-policy-card p:last-child {
-            padding-inline-start: 0 !important;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .basita-product-policy-card {
-            transition: none !important;
-          }
-        }
-      `}</style>
-    </div>
+    </ul>
   );
 }

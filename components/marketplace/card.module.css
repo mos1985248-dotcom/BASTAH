@@ -1,0 +1,45 @@
+/* components/marketplace/card.module.css — الألوان عبر متغيرات --ui-* فقط */
+.wrap { position: relative; height: 100%; }
+.card {
+  display: flex; flex-direction: column; height: 100%; overflow: hidden;
+  border-radius: 20px; background: var(--ui-card); border: 1px solid var(--ui-border);
+  color: var(--ui-ink); text-decoration: none;
+  transition: border-color 0.25s var(--ui-ease), box-shadow 0.25s var(--ui-ease);
+}
+.card:hover { border-color: var(--ui-gold); box-shadow: var(--ui-shadow); }
+.card:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+
+.media {
+  position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 1;
+  background: var(--ui-sand) center / cover no-repeat; color: var(--ui-kicker);
+}
+.tags { position: absolute; top: 10px; inset-inline-start: 10px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.tag { padding: 4px 12px; border-radius: var(--ui-pill); background: var(--ui-gold); color: var(--ui-ink); font-size: 12px; font-weight: 700; }
+.tagSale { background: var(--ui-green-deep); color: var(--ui-white); }
+
+.body { display: flex; flex: 1; flex-direction: column; gap: 6px; padding: 14px 16px 16px; }
+.store { overflow: hidden; font-size: 13px; color: var(--ui-ink-muted); text-overflow: ellipsis; white-space: nowrap; }
+.name {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  min-height: 3.2em; font-size: 16px; font-weight: 700; line-height: 1.6;
+}
+.foot { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 6px; }
+.price { font-size: 18px; font-weight: 700; color: var(--ui-green-deep); }
+.price small { margin-inline-start: 4px; font-size: 13px; font-weight: 600; color: var(--ui-ink-muted); }
+.compare { margin-inline-start: 8px; font-size: 13px; font-weight: 400; color: var(--ui-ink-muted); text-decoration: line-through; }
+.rating { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--ui-ink-muted); }
+.rating svg { color: var(--ui-gold); }
+
+.fav {
+  position: absolute; top: 8px; inset-inline-end: 8px; display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; padding: 0; border-radius: 50%; border: 1px solid var(--ui-border);
+  background: var(--ui-card); color: var(--ui-ink-muted); cursor: pointer; z-index: 1;
+  transition: color 0.2s var(--ui-ease), border-color 0.2s var(--ui-ease);
+}
+.fav:hover { border-color: var(--ui-gold); color: var(--ui-ink); }
+.favOn { color: var(--ui-danger); }
+.fav:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+
+.skeleton { overflow: hidden; border-radius: 20px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+.skeletonBody { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 18px; }
+@media (prefers-reduced-motion: reduce) { .card, .fav { transition: none; } }

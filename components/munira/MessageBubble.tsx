@@ -7,6 +7,7 @@ import { t } from "@/theme";
 import { TypingIndicator } from "./TypingIndicator";
 import type { Message } from "@/hooks/useMuniraChat";
 
+import { ui } from "@/components/ui/css-vars";
 interface Props {
   message: Message;
   lang?: "rtl" | "ltr"; // auto-detected from content if not set
@@ -31,18 +32,18 @@ export function MessageBubble({ message }: Props) {
           height: 34,
           borderRadius: t.radius.full,
           flexShrink: 0,
-          background: isUser ? t.colors.cream.border : t.colors.primary[100],
+          background: isUser ? ui.border : ui.sand,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontSize: 14,
           userSelect: "none",
           overflow: "hidden",
-          border: isUser ? "none" : `1px solid ${t.colors.gold[400]}`,
+          border: isUser ? "none" : `1px solid ${ui.gold}`,
         }}
       >
         {isUser ? (
-          <User size={16} strokeWidth={1.8} color={t.colors.text.mid} />
+          <User size={16} strokeWidth={1.8} color={ui.inkMuted} />
         ) : (
           <div style={{ position: "relative", width: 34, height: 34 }}>
             <Image src="/images/munira-avatar.png" alt="منيرة" fill style={{ objectFit: "cover" }} />
@@ -55,9 +56,9 @@ export function MessageBubble({ message }: Props) {
           maxWidth: "78%",
           padding: isEmpty ? "8px 12px" : "12px 16px",
           borderRadius: isUser ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-          background: isUser ? t.colors.primary[800] : t.colors.white,
-          border: isUser ? "none" : `1px solid ${message.error ? t.colors.semantic.danger : t.colors.cream.border}`,
-          color: isUser ? t.colors.white : message.error ? t.colors.semantic.danger : t.colors.text.dark,
+          background: isUser ? ui.greenDeep : ui.card,
+          border: isUser ? "none" : `1px solid ${message.error ? ui.danger : ui.border}`,
+          color: isUser ? ui.card : message.error ? ui.danger : ui.ink,
           fontSize: t.typography.fontSize.sm,
           lineHeight: t.typography.lineHeight.relaxed,
           direction: dir,

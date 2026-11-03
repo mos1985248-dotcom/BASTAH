@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
   const { data: { user }, error: sessionErr } = await supabase.auth.getUser();
   if (sessionErr || !user) {
     return NextResponse.json(
-      { error: "رابط الاستعادة منتهي الصلاحية أو غير صحيح — اطلبي رابطاً جديداً" },
+      { error: "رابط الاستعادة منتهي الصلاحية أو غير صحيح — اطلب رابطاً جديداً" },
       { status: 401 }
     );
   }
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) {
     return NextResponse.json(
-      { error: "تعذّر تحديث كلمة المرور — حاولي مجدداً" },
+      { error: "تعذّر تحديث كلمة المرور — حاول مجدداً" },
       { status: 400 }
     );
   }

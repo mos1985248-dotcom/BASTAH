@@ -1,0 +1,81 @@
+/* components/layout/navctl.module.css — أزرار الترويسة: الأيقونات والحساب والبحث. لا ألوان مباشرة. */
+.icon {
+  position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; box-sizing: border-box;
+  border-radius: 50%; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-green-deep); padding: 0;
+  text-decoration: none; cursor: pointer;
+  transition: background-color 0.2s var(--ui-ease), border-color 0.2s var(--ui-ease), box-shadow 0.2s var(--ui-ease);
+}
+.icon:hover { background: var(--ui-sand); border-color: var(--ui-gold); box-shadow: var(--ui-shadow); }
+.icon:focus-visible, .login:focus-visible, .register:focus-visible, .account:focus-visible, .menuItem:focus-visible, .searchBtn:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
+.iconRow { display: flex; align-items: center; gap: 8px; }
+.count {
+  position: absolute; top: -4px; inset-inline-end: -4px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; border: 2px solid var(--ui-card);
+  background: var(--ui-danger); color: var(--ui-white); font-size: 10px; font-weight: 700; line-height: 1;
+}
+
+/* ───── الحساب ───── */
+.auth { position: relative; display: flex; align-items: center; gap: 8px; }
+.authLoading { width: 150px; height: 44px; border-radius: 999px; background: var(--ui-sand); }
+.login {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 0 16px; box-sizing: border-box;
+  border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--ui-green-deep); text-decoration: none; white-space: nowrap;
+  transition: background-color 0.2s var(--ui-ease);
+}
+.login:hover { background: var(--ui-sand); }
+.register {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 22px; box-sizing: border-box;
+  border-radius: 999px; background: var(--ui-green); color: var(--ui-white); font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap;
+  transition: background-color 0.2s var(--ui-ease);
+}
+.register:hover { background: var(--ui-green-hover); }
+.account {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 12px; box-sizing: border-box;
+  border-radius: 999px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background-color 0.2s var(--ui-ease), border-color 0.2s var(--ui-ease);
+}
+.account:hover { background: var(--ui-sand); border-color: var(--ui-gold); }
+.avatar { display: flex; flex: none; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ui-green-deep); color: var(--ui-gold); }
+.accountName { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chevron { transition: transform 0.16s var(--ui-ease); }
+.chevronOpen { transform: rotate(180deg); }
+.menu {
+  position: absolute; top: calc(100% + 10px); inset-inline-end: 0; z-index: 100; min-width: 220px; padding: 6px; overflow: hidden;
+  border-radius: 16px; border: 1px solid var(--ui-border); background: var(--ui-card); box-shadow: var(--ui-shadow);
+}
+.menuItem {
+  display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; padding: 11px 14px; border: 0; border-radius: 12px;
+  background: transparent; color: var(--ui-ink); font: inherit; font-size: 14px; font-weight: 500; text-align: start; text-decoration: none; cursor: pointer;
+}
+.menuItem:hover { background: var(--ui-sand); color: var(--ui-green-deep); }
+.logout:hover { color: var(--ui-danger); }
+
+/* ───── البحث ───── */
+.searchBox {
+  display: flex; align-items: center; width: 100%; max-width: 620px; min-height: 50px; padding: 4px; box-sizing: border-box;
+  border-radius: 999px; background: var(--ui-sand); border: 1px solid var(--ui-border);
+  transition: border-color 0.2s var(--ui-ease), box-shadow 0.2s var(--ui-ease), background-color 0.2s var(--ui-ease);
+}
+.searchBox:focus-within { border-color: var(--ui-gold); background: var(--ui-card); box-shadow: var(--ui-shadow); }
+.searchDark { background: var(--ui-white); border-color: var(--ui-gold); }
+.searchIcon { flex: none; margin-inline-start: 14px; color: var(--ui-kicker); }
+.searchInput {
+  flex: 1; min-width: 0; height: 42px; padding: 0 12px; box-sizing: border-box; border: 0; outline: 0; background: transparent;
+  color: var(--ui-ink); font: inherit; font-size: 14px; direction: rtl;
+}
+.searchInput::placeholder { color: var(--ui-ink-muted); opacity: 0.8; }
+.searchBtn {
+  display: flex; flex: none; align-items: center; justify-content: center; width: 42px; height: 42px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--ui-green-deep); color: var(--ui-white); cursor: pointer; transition: background-color 0.2s var(--ui-ease);
+}
+.searchBtn:hover { background: var(--ui-green); }
+
+@media (max-width: 767px) {
+  .login { padding: 0; width: 44px; border: 1px solid var(--ui-border); background: var(--ui-card); }
+  .loginText, .accountName, .chevron { display: none; }
+  .account { padding: 0; width: 44px; justify-content: center; }
+  .searchBox { min-height: 46px; }
+}
+@media (max-width: 340px) { .icon, .login, .account { width: 40px; height: 40px; min-height: 40px; } }
+@media (prefers-reduced-motion: reduce) { .icon, .login, .register, .account, .searchBox, .searchBtn, .chevron { transition: none; } }
