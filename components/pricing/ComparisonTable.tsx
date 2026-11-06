@@ -2,6 +2,7 @@
 // مقارنة تفصيلية بين الباقات. كل صف من حقل فعلي في SubscriptionPlanConfig (عبر GET /api/subscription/plans)،
 // فلا يظهر ما لا تنفّذه الباقة. الحقل الغائب يظهر «غير متوفر» لا قيمة مختلقة.
 import { Check, Minus } from "lucide-react";
+import type { CSSProperties } from "react";
 import type { PlanConfig } from "./plan-types";
 import p from "./pricing.module.css";
 
@@ -45,15 +46,20 @@ const ROWS: Row[] = [
 
 export default function ComparisonTable({ plans, billing }: { plans: PlanConfig[]; billing: "monthly" | "yearly" }) {
   const price = (pl: PlanConfig) =>
-    `${billing === "yearly" ? Math.round(pl.priceYearly / 12) : pl.priceMonthly} ريال / شهريًا`;
+    pl.priceMonthly === 0 ? "مجانًا" : `${billing === "yearly" ? Math.round(pl.priceYearly / 12) : pl.priceMonthly} ريال / شهريًا`;
 
   return (
     <section id="compare" className={`${p.section} ${p.compare}`} aria-labelledby="compare-title">
       <h2 id="compare-title" className={p.h2}>قارن الباقات بالتفصيل</h2>
       <p className={p.lead}>كل ما تشمله كل باقة في مكان واحد، لتختار ما يناسب متجرك.</p>
 
-      <div className={p.tableBox} tabIndex={0} role="region" aria-label="جدول مقارنة الباقات">
-        <table className={p.table}>
+      <p id="compare-scroll-hint" className={p.scrollHint}>اسحب الجدول أفقيًا لرؤية بقية الباقات</p>
+      <div className={p.tableBox} tabIndex={0} role="region" aria-label="جدول مقارنة الباقات" aria-describedby="compare-scroll-hint">
+        <table className={p.table} style={{ "--plan-count": plans.length } as CSSProperties}>
+          <colgroup>
+            <col className={p.featureCol} />
+            {plans.map((pl) => <col key={pl.plan} />)}
+          </colgroup>
           <thead>
             <tr>
               <th scope="col" className={p.corner}>الميزة</th>

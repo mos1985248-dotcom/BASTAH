@@ -20,3 +20,22 @@
 .yes { color: var(--ui-green); }
 .no { color: var(--ui-ink-muted); opacity: 0.55; }
 .val { font-weight: 600; }
+.scrollHint { display: none; }
+.tableBox:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; }
+@media (max-width: 767px) {
+  .band { margin-top: 20px; padding-bottom: 28px; }
+  .section { padding-inline: 12px; min-width: 0; }
+  .compare { margin-top: 20px; }
+  .h2, .lead { text-align: center; }
+  .h2 { font-size: 30px; line-height: 1.5; }
+  .lead { font-size: 14px; margin-bottom: 10px; }
+  .scrollHint { display: block; margin: 0 0 10px; text-align: center; font-size: 12px; line-height: 1.7; color: var(--ui-ink-muted); }
+  .tableBox { max-width: 100%; border-radius: 18px; overscroll-behavior-inline: contain; }
+  .table { width: calc(116px + var(--plan-count) * 112px); min-width: 100%; table-layout: fixed; font-size: 13px; }
+  .featureCol { width: 116px; }
+  .table th, .table td { padding: 12px 9px; line-height: 1.7; overflow-wrap: anywhere; }
+  .corner, .rowLabel { width: 116px; min-width: 0; font-size: 12px; box-shadow: -2px 0 0 var(--ui-border); }
+  .colName { font-size: 22px; }
+  .colPrice { font-size: 12px; line-height: 1.7; }
+  .groupRow th { position: sticky; inset-inline-start: 0; }
+}
