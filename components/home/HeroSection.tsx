@@ -12,6 +12,7 @@ export default function HeroSection({
 }) {
   return (
     <section
+      aria-labelledby="home-hero-heading"
       className={s.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >

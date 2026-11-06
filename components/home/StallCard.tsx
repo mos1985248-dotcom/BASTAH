@@ -56,7 +56,7 @@ export default function StallCard({ store, fluid }: { store: HomeStore; fluid?: 
           <span className={s.sceneGlow} aria-hidden="true" />
           <span className={s.woodSign}>
             <span className={s.name}>
-              {store.nameAr}
+              <span className={s.nameText}>{store.nameAr}</span>
               {store.isVerified && <BadgeCheck size={16} strokeWidth={1.9} className={s.verified} aria-label="متجر موثّق" />}
             </span>
           </span>
