@@ -59,5 +59,12 @@
   .inner { grid-template-columns: minmax(0, 1fr); gap: 32px; padding: 40px 16px 28px; }
   .brandName { font-size: 35px; }
 }
+@media (max-width: 767px) {
+  .form { max-width: 320px; min-height: 44px; padding: 2px; }
+  .mailIcon { width: 16px; height: 16px; margin-inline-start: 10px; }
+  .input { height: 40px; padding: 0 8px; font-size: 13px; }
+  .submit { min-height: 40px; padding: 0 14px; font-size: 12px; }
+  .sent { max-width: 320px; min-height: 44px; padding: 0 14px; font-size: 13px; }
+}
 @media (prefers-reduced-motion: reduce) { .submit { transition: none; } }
 /* basita-font-scale: applied */
