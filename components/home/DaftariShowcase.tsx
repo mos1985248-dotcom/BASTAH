@@ -20,11 +20,13 @@ export default function DaftariShowcase() {
     >
       <div className={s.grid}>
         <div className={s.copy}>
-          <p className={s.kicker}>أدوات تساعدك في إدارة متجرك</p>
-          <h2 id="daftari-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
-            دفاتري
-          </h2>
-          <p className={s.sub}>محاسبة بسيطة لمتجرك</p>
+          <div className={s.heading}>
+            <p className={s.kicker}>أدوات تساعدك في إدارة متجرك</p>
+            <h2 id="daftari-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
+              دفاتري
+            </h2>
+            <p className={s.sub}>محاسبة بسيطة لمتجرك</p>
+          </div>
           <p className={s.lead}>
             متابعة مبيعاتك ومصروفاتك وأرباحك بلا تعقيد محاسبي، لتبقى أرقام
             متجرك واضحة أمامك في كل وقت.
@@ -32,18 +34,20 @@ export default function DaftariShowcase() {
         </div>
 
         {/* صفحة دفتر: المزايا نفسها هي أسطر الدفتر، بلا أرقام مختلقة */}
-        <div className={s.ledger} role="list" aria-label="ما يتيحه دفاتري">
+        <div className={s.ledger}>
           <div className={s.binding} aria-hidden="true" />
           <p className={s.ledgerTitle} style={{ fontFamily: t.typography.fontFamily.display }} aria-hidden="true">
             دفتر المتجر
           </p>
-          {ENTRIES.map(({ Icon, label }) => (
-            <div key={label} role="listitem" className={s.entry}>
-              <Icon size={20} strokeWidth={1.7} aria-hidden="true" />
-              <span className={s.entryLabel}>{label}</span>
-              <span className={s.leader} aria-hidden="true" />
+          <div className={s.entries} role="list" aria-label="ما يتيحه دفاتري">
+            {ENTRIES.map(({ Icon, label }) => (
+              <div key={label} role="listitem" className={s.entry}>
+                <Icon size={20} strokeWidth={1.7} aria-hidden="true" />
+                <span className={s.entryLabel}>{label}</span>
+                <span className={s.leader} aria-hidden="true" />
             </div>
           ))}
+          </div>
         </div>
       </div>
 

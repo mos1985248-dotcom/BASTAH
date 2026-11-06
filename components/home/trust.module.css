@@ -1,22 +1,27 @@
-/* components/home/trust.module.css — الألوان عبر متغيرات --ui-* فقط */
+/* Four trust cards; local products and family support share one card. */
 .section { margin: 0 auto; padding: 20px 16px 0; direction: rtl; }
 .strip {
-  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none;
-  border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card);
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+  margin: 0; padding: 0; list-style: none;
 }
 .item {
-  display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 64px; padding: 0 12px;
-  font-size: 14px; font-weight: 600; color: var(--ui-ink);
+  display: flex; align-items: center; justify-content: center; gap: 12px; min-width: 0;
+  min-height: 84px; padding: 14px 12px; border: 1px solid var(--ui-border);
+  border-radius: 18px; background: var(--ui-card); color: var(--ui-ink);
 }
-.item svg { flex: none; color: var(--ui-kicker); }
-.item + .item { border-inline-start: 1px solid var(--ui-border); }
-
+.icon {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 42px; height: 42px; border-radius: 14px; background: var(--ui-sand); color: var(--ui-green-deep);
+}
+.text { min-width: 0; }
+.label { display: block; font-size: 14px; font-weight: 600; line-height: 1.7; }
+.detail { display: block; margin-top: 2px; font-size: 12px; line-height: 1.6; color: var(--ui-ink-muted); }
 @media (max-width: 767px) {
   .section { padding: 14px 12px 0; }
-  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); border-radius: 20px; overflow: hidden; }
-  .item { min-height: 56px; justify-content: flex-start; padding: 0 16px; border-top: 1px solid var(--ui-border); }
-  .item:nth-child(-n + 2) { border-top: none; }
-  .item + .item { border-inline-start: none; }
-  .item:nth-child(even) { border-inline-start: 1px solid var(--ui-border); }
-  .item:last-child { grid-column: 1 / -1; border-inline-start: none; }
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .item { flex-direction: column; gap: 8px; min-height: 116px; padding: 12px 8px; text-align: center; border-radius: 16px; }
+  .icon { width: 36px; height: 36px; border-radius: 12px; }
+  .icon svg { width: 20px; height: 20px; }
+  .label { font-size: 13px; }
+  .detail { font-size: 11px; margin-top: 1px; }
 }

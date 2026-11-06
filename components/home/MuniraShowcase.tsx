@@ -2,7 +2,6 @@
 import {
   BarChart3,
   ImageIcon,
-  MessageCircle,
   PenLine,
   Tag,
   type LucideIcon,
@@ -15,7 +14,6 @@ import s from "./munira.module.css";
 const CAPABILITIES: { Icon: LucideIcon; label: string }[] = [
   { Icon: BarChart3, label: "تحليل الأداء والمبيعات" },
   { Icon: ImageIcon, label: "تصميم صور احترافية" },
-  { Icon: MessageCircle, label: "الرد على العملاء بذكاء" },
   { Icon: PenLine, label: "كتابة وصف المنتجات" },
   { Icon: Tag, label: "كتابة أسماء المنتجات" },
 ];
@@ -23,16 +21,19 @@ const CAPABILITIES: { Icon: LucideIcon; label: string }[] = [
 export default function MuniraShowcase() {
   return (
     <section
+      aria-labelledby="munira-heading"
       className={s.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
       <div className={s.card}>
         <div className={s.copy}>
-          <p className={s.kicker}>مساعدتك الذكية</p>
-          <h2 className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
-            منيرة
-          </h2>
-          <p className={s.lead}>مساعدتك الذكية لإدارة متجرك وزيادة مبيعاتك</p>
+          <div className={s.intro}>
+            <p className={s.kicker}>مساعدتك الذكية</p>
+            <h2 id="munira-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
+              منيرة
+            </h2>
+            <p className={s.lead}>مساعدتك الذكية لإدارة متجرك وزيادة مبيعاتك</p>
+          </div>
 
           <ul className={s.chips}>
             {CAPABILITIES.map(({ Icon, label }) => (

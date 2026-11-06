@@ -1,32 +1,35 @@
 /* components/home/daftari.module.css — الألوان عبر متغيرات --ui-* فقط */
 .section { margin: 0 auto; padding: 64px 16px; direction: rtl; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: clamp(32px, 5vw, 72px); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; padding: clamp(20px, 3vw, 40px); border-radius: 32px; background: var(--ui-card); border: 1px solid var(--ui-border); }
+.copy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: center; gap: 32px; }
+.heading { min-width: 0; }
 
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
 .kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
 .title { margin: 0; font-size: clamp(46px, 5.75vw, 69px); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
-.sub { margin: 0 0 16px; font-size: 18px; font-weight: 600; color: var(--ui-ink); }
-.lead { margin: 0; max-width: 480px; font-size: 16px; line-height: 1.9; color: var(--ui-ink-muted); }
+.sub { margin: 0; font-size: 18px; font-weight: 600; color: var(--ui-ink); }
+.lead { margin: 0; min-width: 0; font-size: 16px; line-height: 1.9; color: var(--ui-ink-muted); }
 
 /* ───── صفحة الدفتر ───── */
 .ledger {
-  position: relative; width: 100%; max-width: 440px; justify-self: center; overflow: hidden;
-  padding: 0 0 8px; border-radius: 20px; background: var(--ui-card); border: 1px solid var(--ui-border); box-shadow: var(--ui-shadow);
+  position: relative; width: 100%; min-width: 0; overflow: hidden;
+  padding: 0; border-radius: 20px; background: var(--ui-card); border: 1px solid var(--ui-border); box-shadow: var(--ui-shadow);
 }
-.ledger::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 56px; width: 1px; background: var(--ui-gold); opacity: 0.55; }
+.entries { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.entry:nth-child(even) { border-inline-start: 1px solid var(--ui-border); }
 .binding {
   height: 30px; border-bottom: 1px solid var(--ui-border); background: var(--ui-sand);
   background-image: radial-gradient(circle 5px at 50% 50%, var(--ui-border) 98%, transparent);
   background-size: 30px 30px; background-repeat: repeat-x;
 }
-.ledgerTitle { margin: 0; padding: 18px 76px 10px 20px; font-size: 27.5px; font-weight: 700; color: var(--ui-green-deep); }
+.ledgerTitle { margin: 0; padding: 14px 24px; font-size: 27.5px; font-weight: 700; color: var(--ui-green-deep); }
 .entry {
-  position: relative; display: flex; align-items: center; gap: 14px; min-height: 60px; padding-inline: 18px 20px;
+  position: relative; display: flex; align-items: center; gap: 14px; min-width: 0; min-height: 76px; padding: 14px 24px;
   border-top: 1px solid var(--ui-border); color: var(--ui-ink);
 }
 .entry svg { flex: none; width: 20px; color: var(--ui-kicker); }
-.entryLabel { padding-inline-start: 22px; font-size: 16px; font-weight: 600; }
-.leader { flex: 1; align-self: flex-end; margin-bottom: 20px; border-bottom: 1px dotted var(--ui-border); }
+.entryLabel { font-size: 16px; font-weight: 600; }
+.leader { flex: 1; align-self: flex-end; margin-bottom: 9px; border-bottom: 1px dotted var(--ui-border); }
 
 /* ───── شريط بدون عمولات ───── */
 .band {
@@ -45,8 +48,18 @@
 
 @media (max-width: 899px) {
   .section { padding: 40px 12px; }
-  .grid { grid-template-columns: 1fr; gap: 28px; }
+  .grid { gap: 24px; border-radius: 24px; }
   .band { flex-direction: column; align-items: flex-start; border-radius: 24px; margin-top: 36px; }
   .bandCta { width: 100%; justify-content: center; }
 }
 /* basita-font-scale: applied */
+
+@media (max-width: 600px) {
+  .copy { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .lead { font-size: 14px; }
+  .entries { grid-template-columns: minmax(0, 1fr); }
+  .entry { min-height: 66px; padding: 12px 16px; gap: 12px; }
+  .entry:nth-child(even) { border-inline-start: none; }
+  .entryLabel { font-size: 14px; }
+  .ledgerTitle { padding: 12px 16px; font-size: 25px; }
+}
