@@ -120,6 +120,7 @@ export default function PricingCard({
 
       {/* مساحة ثابتة للشارة في جميع الباقات */}
       <div
+        className="basita-pricing-badge-row"
         style={{
           position: "relative",
           zIndex: 2,
@@ -179,6 +180,7 @@ export default function PricingCard({
         </h3>
 
         <div
+          className="basita-pricing-tagline"
           style={{
             minHeight: 48,
             marginBottom: t.spacing["4"],
@@ -499,7 +501,15 @@ export default function PricingCard({
         @media (max-width: 600px) {
           .basita-pricing-card {
             padding: ${t.spacing["5"]} !important;
+            text-align: center !important;
           }
+
+          .basita-pricing-badge-row { justify-content: center !important; }
+          .basita-pricing-card:not(.basita-pricing-card-highlighted) .basita-pricing-badge-row { display: none !important; }
+          .basita-pricing-tagline { min-height: 0 !important; margin-bottom: 12px !important; }
+          .basita-pricing-price > div { justify-content: center; }
+          .basita-pricing-feature { display: grid !important; grid-template-columns: 20px minmax(0, 1fr) 20px; }
+          .basita-pricing-feature > span:last-child { min-width: 0; overflow-wrap: anywhere; }
 
           .basita-pricing-card:hover {
             transform: none;

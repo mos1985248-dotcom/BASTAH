@@ -57,6 +57,9 @@ export default function PricingHeader({
             );
           })}
         </div>
+        <a href="#compare" className={styles.compareLink}>
+          مقارنة المزايا بالتفصيل <span aria-hidden="true">↓</span>
+        </a>
       </div>
     </section>
   );
