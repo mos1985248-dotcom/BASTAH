@@ -21,14 +21,6 @@ const ACTIVE_SOCIALS = SOCIAL_META.filter((s) =>
   Boolean(SOCIAL_LINKS[s.key]),
 );
 
-const PAYMENT_METHODS = [
-  "Visa",
-  "Mastercard",
-  "مدى",
-  "Apple Pay",
-  "STC Pay",
-];
-
 export default function FooterBottom() {
   return (
     <div className={styles.wrapper}>
@@ -37,15 +29,6 @@ export default function FooterBottom() {
         <span className={styles.copyright}>
           بسطة مارت © 2026 — جميع الحقوق محفوظة
         </span>
-
-        {/* وسائل الدفع */}
-        <div className={styles.payments} aria-label="وسائل الدفع المتاحة">
-          {PAYMENT_METHODS.map((method) => (
-            <span key={method} className={styles.payment}>
-              {method}
-            </span>
-          ))}
-        </div>
 
         {/* وسائل التواصل الرسمية */}
         {ACTIVE_SOCIALS.length > 0 && (

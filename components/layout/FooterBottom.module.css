@@ -1,12 +1,10 @@
 /* components/layout/FooterBottom.module.css — الشريط السفلي */
-.wrapper { position: relative; z-index: 1; border-top: 1px solid var(--ui-green); }
+.wrapper { position: relative; z-index: 1; border-top: 1px solid var(--ui-green); background: var(--ui-green-deep); }
 .inner {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; box-sizing: border-box;
-  max-width: 1200px; margin: 0 auto; padding: 18px 16px; padding-inline-end: calc(16px + var(--clear));
+  display: grid; justify-items: center; gap: 14px; box-sizing: border-box;
+  max-width: 1440px; margin: 0 auto; padding: 22px 16px;
 }
-.copyright { font-size: 13px; color: var(--ui-card); opacity: 0.85; }
-.payments { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.payment { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--ui-green); font-size: 12px; font-weight: 600; color: var(--ui-card); }
+.copyright { width: 100%; text-align: center; font-size: clamp(15px, 1.4vw, 18px); font-weight: 600; line-height: 1.8; color: var(--ui-card); }
 .socials { display: flex; align-items: center; gap: 10px; }
 .social {
   display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%;
@@ -16,6 +14,5 @@
 .social:focus-visible { outline: 2px solid var(--ui-white); outline-offset: 2px; }
 
 @media (max-width: 899px) {
-  .wrapper { background: color-mix(in srgb, var(--ui-green-deep) 78%, transparent); }
-  .inner { padding-inline-end: 16px; flex-direction: column; align-items: flex-start; }
+  .inner { padding: 18px 16px; }
 }

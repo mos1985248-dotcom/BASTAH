@@ -31,4 +31,12 @@
   .mark { width: 24%; }
   .row { grid-template-columns: 48px 1fr; }
 }
+@media (max-width: 767px) {
+  .copy { text-align: center; }
+  .kicker { justify-content: center; }
+  .lead { margin-inline: auto; }
+  /* Equal side columns keep the text centered while retaining the numbers. */
+  .row { grid-template-columns: 36px minmax(0, 1fr) 36px; text-align: center; }
+  .num { justify-self: center; }
+}
 /* basita-font-scale: applied */

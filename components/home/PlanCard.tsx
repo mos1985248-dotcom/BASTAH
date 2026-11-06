@@ -49,7 +49,7 @@ export default function PlanCard({ plan }: { plan: PlanConfig }) {
             ) : (
               <X size={18} strokeWidth={2} aria-hidden="true" />
             )}
-            {r.text}
+            <span>{r.text}</span>
           </li>
         ))}
       </ul>
