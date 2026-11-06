@@ -173,15 +173,8 @@
   .stall:hover { transform: none; }
 }
 
-/* Mobile: show two complete stalls side-by-side, retain horizontal swipe. */
+/* Compact mobile stall details. The lane grid is defined below. */
 @media (max-width: 767px) {
-  .lane { gap: 10px; padding: 8px 0 18px; scroll-snap-type: x mandatory; }
-  .lane > .stall, .lane > .skeleton, .lane > .endCard {
-    flex: 0 0 calc((100% - 10px) / 2);
-    width: calc((100% - 10px) / 2);
-    min-width: 0;
-    box-sizing: border-box;
-  }
   .stallRoof { height: 31px; border-radius: 10px 10px 2px 2px; background-size: 40px 100%; background-image: repeating-linear-gradient(90deg, var(--awning) 0 20px, #fff3d9 20px 40px); }
   .roofEdge { bottom: -7px; height: 12px; background: repeating-linear-gradient(90deg, var(--awning) 0 20px, #fff3d9 20px 40px); -webkit-mask: radial-gradient(ellipse 20px 12px at 20px 0, #000 99%, transparent 100%) left top / 40px 12px repeat-x; mask: radial-gradient(ellipse 20px 12px at 20px 0, #000 99%, transparent 100%) left top / 40px 12px repeat-x; }
   .stallFrame { border-radius: 0 0 12px 12px; }
@@ -258,6 +251,7 @@
 @media (max-width: 767px) {
   .lane {
     display: grid;
+    min-width: 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
     gap: 14px 10px;
@@ -288,5 +282,12 @@
   .lane > .endCard .endCta { align-self: center; }
   .arrows { display: none; }
   .stall:hover { transform: none; }
+  .lane .name { min-width: 0; max-width: 100%; gap: 3px; }
+  .lane .favorite { top: 2px; inset-inline-end: 6px; }
+  .lane .nameText {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    overflow: hidden; overflow-wrap: anywhere; min-width: 0;
+  }
+  .lane .meta > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 /* basita-font-scale: applied */
