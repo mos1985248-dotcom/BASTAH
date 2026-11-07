@@ -8,7 +8,7 @@ import s from "./stalls.module.css";
 
 const background = (url: string) => ({ backgroundImage: `url(${url})` });
 
-export default function StallCard({ store, fluid, reveal = false }: { store: HomeStore; fluid?: boolean; reveal?: boolean }) {
+export default function StallCard({ store, fluid, reveal = false, compact = false }: { store: HomeStore; fluid?: boolean; reveal?: boolean; compact?: boolean }) {
   const initial = store.nameAr.trim().charAt(0);
   const [favorite, setFavorite] = useState(false);
   useEffect(() => {
@@ -36,8 +36,16 @@ export default function StallCard({ store, fluid, reveal = false }: { store: Hom
     p.image ? [p.image] : p.imageUrl ? [p.imageUrl] : p.images?.slice(0, 1) ?? []
   ) ?? []).filter((url): url is string => typeof url === "string" && url.length > 0).slice(0, 3);
   const hasProducts = productImages.length > 0;
+  const nameSign = (
+    <span className={s.woodSign}>
+      <span className={s.name}>
+        <span className={s.nameText} title={compact ? store.nameAr : undefined}>{store.nameAr}</span>
+        {store.isVerified && <BadgeCheck size={16} strokeWidth={1.9} className={s.verified} aria-label="متجر موثّق" />}
+      </span>
+    </span>
+  );
   return (
-    <div className={`${s.stall} ${fluid ? s.fluid : ""}`} data-home-reveal={reveal ? "" : undefined}>
+    <div className={`${s.stall} ${fluid ? s.fluid : ""} ${compact ? s.compact : ""}`} data-home-reveal={reveal ? "" : undefined}>
       <button type="button" className={`${s.favorite} ${favorite ? s.favoriteActive : ""}`}
         onClick={toggleFavorite} aria-pressed={favorite}
         aria-label={favorite ? `إزالة ${store.nameAr} من المفضلة على هذا الجهاز` : `حفظ ${store.nameAr} في المفضلة على هذا الجهاز`}
@@ -54,12 +62,7 @@ export default function StallCard({ store, fluid, reveal = false }: { store: Hom
             {!store.coverImage && <span className={s.initialBig}>{initial}</span>}
           </span>
           <span className={s.sceneGlow} aria-hidden="true" />
-          <span className={s.woodSign}>
-            <span className={s.name}>
-              <span className={s.nameText}>{store.nameAr}</span>
-              {store.isVerified && <BadgeCheck size={16} strokeWidth={1.9} className={s.verified} aria-label="متجر موثّق" />}
-            </span>
-          </span>
+          {!compact && nameSign}
           {hasProducts && (
             <span className={s.sceneProducts} aria-hidden="true">
               {productImages.map((url, i) => (
@@ -69,15 +72,16 @@ export default function StallCard({ store, fluid, reveal = false }: { store: Hom
           )}
           <span className={s.counter} aria-hidden="true" />
         </span>
+        {compact && nameSign}
         <span className={s.info}>
           <span className={s.infoTop}>
             <span className={s.logo} style={store.logo ? background(store.logo) : undefined} aria-hidden="true">
               {!store.logo && <Store size={22} strokeWidth={1.7} />}
             </span>
-            <span className={s.meta}>
+            {(!compact || store.city) && <span className={s.meta}>
               <MapPin size={14} strokeWidth={1.9} aria-hidden="true" />
-              <span>{store.city}</span>
-            </span>
+              <span title={compact ? store.city : undefined}>{store.city}</span>
+            </span>}
             <span className={s.rating} aria-label={store.totalReviews > 0 ? `التقييم ${store.avgRating.toFixed(1)} من 5، ${store.totalReviews} تقييم` : "لا توجد تقييمات بعد"}>
               <Star size={14} fill={store.totalReviews > 0 ? "currentColor" : "none"} strokeWidth={1.5} aria-hidden="true" />
               {store.totalReviews > 0 ? `${store.avgRating.toFixed(1)} (${store.totalReviews})` : "جديد"}
