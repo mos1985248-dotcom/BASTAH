@@ -299,11 +299,13 @@
   .fluid .rating { grid-column: 2; justify-self: start; margin-inline-start: 0; }
   .fluid .enter { min-height: 40px; font-size: 12px; gap: 4px; }
 }
-/* Homepage catalog variant. Marketplace cards retain their existing dimensions. */
+/* Shared compact catalog variant for the homepage and marketplace. */
 .laneWrap { max-width: 1142px; margin-inline: auto; }
 .lane { gap: 18px; scroll-snap-type: x mandatory; }
 .lane > .skeleton { width: 270px; }
 .compact { width: 270px; min-height: 360px; }
+.compact.fluid { width: 100%; max-width: 100%; }
+.compact.fluid .infoTop { display: flex; }
 .compact .stallRoof { flex: none; height: 32px; margin-inline: 0; border-radius: 12px 12px 2px 2px; }
 .compact .roofEdge {
   bottom: -7px; height: 12px;
