@@ -35,3 +35,18 @@
 .more:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 2px; }
 
 @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+@media (max-width: 767px) {
+  .summary { padding: 20px; border-radius: 24px; }
+  .avgNum { font-size: 42px; }
+  .review { padding: 16px; border-radius: 20px; }
+  .reviewHead { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 4px 10px; }
+  .avatar { grid-row: 1 / span 2; align-self: start; width: 36px; height: 36px; }
+  .name { font-size: 14px; overflow-wrap: anywhere; }
+  .stars-sm { grid-column: 2; margin-inline-start: 0; }
+  .comment, .replyText, .about { overflow-wrap: anywhere; }
+  .comment { font-size: 14px; }
+  .reply { padding: 12px; }
+  .emptyState > div { padding: 24px 16px; border: 1px solid var(--ui-border); border-radius: 24px; background: var(--ui-card); gap: 8px; }
+  .emptyState h3 { font-size: 17px; line-height: 1.7; }
+  .emptyState p { font-size: 13px; line-height: 1.8; }
+}

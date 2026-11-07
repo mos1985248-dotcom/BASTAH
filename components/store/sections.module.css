@@ -27,9 +27,21 @@
 .closingCta:focus-visible { outline: 2px solid var(--ui-card); outline-offset: 3px; }
 
 @media (max-width: 767px) {
-  .section { padding: 36px 12px 4px; }
+  .section { padding: 28px 12px 4px; }
+  .section[id] { scroll-margin-top: 128px; }
+  .head { margin-bottom: 18px; }
+  .kicker { font-size: 13px; }
+  .sub { font-size: 14px; }
+  .rows { gap: 28px; }
+  .rowHead { align-items: flex-start; gap: 8px; }
+  .rowHead > div { min-width: 0; }
+  .rowTitle { font-size: 20px; }
+  .rowSub { font-size: 13px; line-height: 1.75; }
+  .count { font-size: 12px; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .closing { flex-direction: column; align-items: flex-start; border-radius: 24px; }
+  .closing { flex-direction: column; align-items: center; gap: 18px; padding: 22px 18px; border-radius: 24px; text-align: center; }
+  .closingTitle { font-size: 26px; line-height: 1.5; }
+  .closingText { font-size: 14px; }
   .closingCta { width: 100%; justify-content: center; }
 }
 /* basita-font-scale: applied */

@@ -33,10 +33,12 @@ export default function StoreReviewsSection({ store }: { store: StoreDetail }) {
       {firstLoad ? (
         <Skeleton height={260} radius="28px" />
       ) : reviews.length === 0 ? (
-        <EmptyState
-          title="لا توجد مراجعات معتمدة بعد"
-          description="يمكنك أن تكون أول من يقيّم المتجر بعد استلام طلبك."
-        />
+        <div className={s.emptyState}>
+          <EmptyState
+            title="لا توجد مراجعات معتمدة بعد"
+            description="يمكنك أن تكون أول من يقيّم المتجر بعد استلام طلبك."
+          />
+        </div>
       ) : (
         <div className={s.layout}>
           <ReviewsSummary avg={avg} total={total} distribution={data?.distribution} />
