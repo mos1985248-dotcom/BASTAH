@@ -12,7 +12,7 @@ const ITEMS: { Icon: LucideIcon; label: string }[] = [
 
 export default function ProductTrustBar() {
   return (
-    <ul className={s.trust} aria-label="مزايا التسوق في بسطة">
+    <ul className={s.trust} aria-label="مزايا التسوق في بسطة مارت">
       {ITEMS.map(({ Icon, label }) => (
         <li key={label} className={s.trustItem}>
           <Icon size={17} strokeWidth={1.7} aria-hidden="true" />

@@ -1,5 +1,6 @@
 // components/blog/BlogPostCard.tsx
 import { t } from "@/theme";
+import { formatPlatformCopy, platformAuthorName } from "@/lib/brand";
 
 export interface BlogPostSummary {
   id: string; titleAr: string; slug: string; excerptAr: string | null;
@@ -27,15 +28,15 @@ export default function BlogPostCard({ post }: { post: BlogPostSummary }) {
             {CATEGORY_LABEL[post.category] ?? post.category}
           </span>
           <h3 style={{ margin: `${t.spacing["1"]} 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.base, fontWeight: t.typography.fontWeight.bold, color: t.colors.text.dark }}>
-            {post.titleAr}
+            {formatPlatformCopy(post.titleAr)}
           </h3>
           {post.excerptAr && (
             <p style={{ margin: 0, fontSize: t.typography.fontSize.sm, color: t.colors.text.mid, lineHeight: t.typography.lineHeight.relaxed }}>
-              {post.excerptAr}
+              {formatPlatformCopy(post.excerptAr)}
             </p>
           )}
           <p style={{ margin: `${t.spacing["2"]} 0 0`, fontSize: t.typography.fontSize.xs, color: t.colors.text.light }}>
-            {post.authorName ?? "فريق بسطة"} {post.publishedAt && `· ${new Date(post.publishedAt).toLocaleDateString("ar-SA")}`}
+            {platformAuthorName(post.authorName)} {post.publishedAt && `· ${new Date(post.publishedAt).toLocaleDateString("ar-SA")}`}
           </p>
         </div>
       </div>

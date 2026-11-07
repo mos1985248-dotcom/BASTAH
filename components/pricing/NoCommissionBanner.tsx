@@ -12,7 +12,7 @@ const POINTS: { Icon: LucideIcon; title: string; desc: string }[] = [
   {
     Icon: Truck,
     title: "عمولة شحن ٣ ريال",
-    desc: "عمولة بسطة لكل شحنة عبر شركات الشحن الخارجية، بخلاف تكلفة الشحن",
+    desc: "عمولة بسطة مارت لكل شحنة عبر شركات الشحن الخارجية، بخلاف تكلفة الشحن",
   },
   {
     Icon: RotateCcw,
@@ -23,7 +23,7 @@ const POINTS: { Icon: LucideIcon; title: string; desc: string }[] = [
 
 export default function NoCommissionBanner() {
   return (
-    <section aria-label="مزايا الاشتراك في بسطة" className={s.section} style={uiVars}>
+    <section aria-label="مزايا الاشتراك في بسطة مارت" className={s.section} style={uiVars}>
       <div className={s.frame}>
         <div className={s.grid}>
           {POINTS.map(({ Icon, title, desc }) => (

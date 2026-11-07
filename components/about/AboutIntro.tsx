@@ -57,7 +57,7 @@ export default function AboutIntro() {
               </p>
 
               <p className={styles.highlight}>
-                من هنا بدأت بسطة.
+                من هنا بدأت بسطة مارت.
               </p>
 
               <p>

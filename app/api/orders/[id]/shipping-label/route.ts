@@ -53,7 +53,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     // ⚠️ البوليصة لشحن بسطة (مناديب) فقط — لا لشحنات الشركات الأخرى ولا الاستلام من المتجر
     if (order.shipments.length === 0) {
       return NextResponse.json(
-        { error: "هذا الطلب غير مُسنَد لمندوب بسطة للشحن — لا توجد بوليصة لطباعتها" },
+        { error: "هذا الطلب غير مُسنَد لمندوب بسطة مارت للشحن — لا توجد بوليصة لطباعتها" },
         { status: 400 }
       );
     }

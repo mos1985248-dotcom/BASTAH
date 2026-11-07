@@ -20,7 +20,7 @@ export default function AboutStoryPart1() {
           <div className={styles.storyImage}>
             <Image
               src="/images/story/story-part-1.jpg.jpg"
-              alt="بسطة وسوق محلي يعكس روح المنتجات المحلية"
+              alt="بسطة مارت وسوق محلي يعكس روح المنتجات المحلية"
               fill
               sizes="(max-width: 900px) 100vw, 48vw"
               style={{
@@ -40,12 +40,12 @@ export default function AboutStoryPart1() {
                 lineHeight: 1.5,
               }}
             >
-              لماذا &quot;بسطة&quot;؟
+              لماذا &quot;بسطة مارت&quot;؟
             </h2>
 
             <div className={styles.text}>
               <p>
-                اسم بسطة يحمل شيئًا من ذاكرتنا.
+                اسم بسطة مارت يحمل شيئًا من ذاكرتنا.
               </p>
 
               <p className={styles.strong}>
@@ -62,7 +62,7 @@ export default function AboutStoryPart1() {
               </p>
 
               <p className={styles.highlight}>
-                لذلك جاءت بسطة كسوق رقمي للمنتجات الشعبية ومنتجات الأسر
+                لذلك جاءت بسطة مارت كسوق رقمي للمنتجات الشعبية ومنتجات الأسر
                 المنتجة، لكن بروح مختلفة.
               </p>
             </div>
@@ -103,7 +103,7 @@ export default function AboutStoryPart1() {
               </p>
 
               <p className={styles.strong}>
-                ولهذا نمنح المتجر في بسطة مساحة أكبر من مجرد قائمة منتجات.
+                ولهذا نمنح المتجر في بسطة مارت مساحة أكبر من مجرد قائمة منتجات.
               </p>
 
               <p>

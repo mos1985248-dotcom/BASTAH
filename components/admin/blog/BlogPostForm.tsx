@@ -252,7 +252,7 @@ export default function BlogPostForm({
             }}
             value={form.authorName}
             onChange={(e) => onChange({ authorName: e.target.value })}
-            placeholder="فريق بسطة"
+            placeholder="فريق بسطة مارت"
           />
         </div>
       </div>

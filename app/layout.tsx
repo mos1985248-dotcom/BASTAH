@@ -1,5 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
+import type { Metadata } from "next";
 import {
   IBM_Plex_Sans_Arabic,
   Noto_Kufi_Arabic,
@@ -37,9 +38,17 @@ const amiri = Amiri({
   display: "swap",
 });
 
-export const metadata = {
-  title: "بسطة | Basita",
-  description: "منصة سعودية للحرف اليدوية والأسر المنتجة",
+export const metadata: Metadata = {
+  title: "بسطة مارت | سوق الأسر المنتجة السعودية",
+  description: "بسطة مارت سوق سعودي يجمع منتجات الأسر المنتجة والحرفيين، بأصالة الصنعة السعودية وروح الأسواق التراثية.",
+  applicationName: "بسطة مارت",
+  openGraph: {
+    siteName: "بسطة مارت",
+    title: "بسطة مارت | سوق الأسر المنتجة السعودية",
+    description: "بسطة مارت سوق سعودي يجمع منتجات الأسر المنتجة والحرفيين، بأصالة الصنعة السعودية وروح الأسواق التراثية.",
+    locale: "ar_SA",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

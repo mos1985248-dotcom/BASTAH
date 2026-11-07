@@ -29,7 +29,7 @@ export default function PlansSection() {
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
       <div className={s.header}>
-        <p className={s.kicker}>باقات بسطة</p>
+        <p className={s.kicker}>باقات بسطة مارت</p>
         <h2 id="plans-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
           باقات تناسب كل أسرة منتجة
         </h2>

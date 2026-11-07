@@ -45,7 +45,7 @@ export default function AboutStoreLife() {
 
             <div className={styles.text}>
               <p>
-                لهذا لا ننظر إلى متاجر بسطة على أنها متشابهة.
+                لهذا لا ننظر إلى متاجر بسطة مارت على أنها متشابهة.
               </p>
 
               <p>
@@ -69,7 +69,7 @@ export default function AboutStoreLife() {
               </p>
 
               <p>
-                وهنا يأتي دور المحتوى في بسطة.
+                وهنا يأتي دور المحتوى في بسطة مارت.
               </p>
 
               <p>

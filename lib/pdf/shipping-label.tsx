@@ -79,7 +79,7 @@ export function ShippingLabelDocument({ data }: { data: ShippingLabelData }) {
         <View style={styles.headerRow}>
           <Image src={data.qrDataUrl} style={{ width: 52, height: 52 }} />
           <View style={{ alignItems: "flex-end" }}>
-            <Text style={styles.brand}>بسطة</Text>
+            <Text style={styles.brand}>بسطة مارت</Text>
             <ArabicText style={styles.storeLine}>
               {data.storeCity ? `${data.storeName} — ${data.storeCity}` : data.storeName}
             </ArabicText>

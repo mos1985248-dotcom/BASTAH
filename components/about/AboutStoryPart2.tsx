@@ -46,7 +46,7 @@ export default function AboutStoryPart2() {
 
             <div className={styles.text}>
               <p className={styles.highlight}>
-                دعم الأسرة المنتجة هو روح بسطة.
+                دعم الأسرة المنتجة هو روح بسطة مارت.
               </p>
 
               <p>
@@ -111,7 +111,7 @@ export default function AboutStoryPart2() {
               </p>
 
               <p className={styles.strong}>
-                بسطة تريد أن تكون واحدة من المساحات التي يلتقي فيها التراث
+                بسطة مارت تريد أن تكون واحدة من المساحات التي يلتقي فيها التراث
                 بالسوق الحديث.
               </p>
 

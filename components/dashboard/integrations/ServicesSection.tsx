@@ -12,7 +12,7 @@ export default function ServicesSection({ services }: { services: ServiceView[] 
       {services.length === 0 ? (
         <p className={s.notice}>
           <AlertTriangle size={14} strokeWidth={1.8} />
-          لم تُفعِّل إدارة بسطة أي خدمة تكامل بعد. يمكنك حفظ حساباتك الآن وستعمل الخدمات فور تفعيلها.
+          لم تُفعِّل إدارة بسطة مارت أي خدمة تكامل بعد. يمكنك حفظ حساباتك الآن وستعمل الخدمات فور تفعيلها.
         </p>
       ) : (
         <div className={f.stackCol}>

@@ -60,7 +60,7 @@ export default function AdminHeader({ userName }: AdminHeaderProps) {
               lineHeight: 1.4,
             }}
           >
-            لوحة إدارة بسطة
+            لوحة إدارة بسطة مارت
           </h1>
 
           <p

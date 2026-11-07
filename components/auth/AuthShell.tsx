@@ -10,12 +10,12 @@ const SCENES = {
   heritage: {
     src: "/images/story/story-heritage.jpg.jpg",
     kicker: "من قلب السوق السعودي",
-    headline: "أهلاً بعودتك إلى بسطة",
+    headline: "أهلاً بعودتك إلى بسطة مارت",
     lead: "سوق الأسر المنتجة السعودية: منتجات أصيلة بأيدي أصحابها، وتجربة تسوق سهلة.",
   },
   souq: {
     src: "/images/story/story-hero.jpg.jpg",
-    kicker: "انضم إلى بسطة",
+    kicker: "انضم إلى بسطة مارت",
     headline: "ابدأ رحلتك في سوق الأسر المنتجة",
     lead: "افتح متجرك أو تسوّق من بيوت منتجة سعودية، واحجز لك مكاناً في السوق.",
   },

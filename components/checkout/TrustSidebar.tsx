@@ -7,7 +7,7 @@ import { uiVars } from "@/components/ui/vars";
 import s from "./summary.module.css";
 
 const TRUST_ITEMS: { Icon: LucideIcon; title: string; body: string }[] = [
-  { Icon: Lock, title: "دفع آمن", body: "تتم عملية الدفع عبر بوابة دفع مرخّصة، ولا تمر بيانات بطاقتك بمنصة بسطة" },
+  { Icon: Lock, title: "دفع آمن", body: "تتم عملية الدفع عبر بوابة دفع مرخّصة، ولا تمر بيانات بطاقتك بمنصة بسطة مارت" },
   { Icon: ShieldCheck, title: "خصوصية بياناتك", body: "نشارك بيانات طلبك مع المتجر وشركة الشحن فقط لإتمام الطلب" },
   { Icon: RotateCcw, title: "الاسترجاع", body: "استرجاع سهل حسب سياسة كل متجر" },
 ];

@@ -118,10 +118,10 @@ export async function applyMoyasarSubscriptionPaymentStatus(
 }
 
 const PLAN_LABELS_AR: Record<SubscriptionPlan, string> = {
-  FREE: "بسطة بداية",
-  STARTER: "بسطة نمو",
-  GROWTH: "بسطة انطلاق",
-  PRO: "بسطة ازدهار",
+  FREE: "بسطة مارت بداية",
+  STARTER: "بسطة مارت نمو",
+  GROWTH: "بسطة مارت انطلاق",
+  PRO: "بسطة مارت ازدهار",
 };
 
 async function notifyPaymentOutcome(params: {

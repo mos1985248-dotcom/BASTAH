@@ -102,7 +102,7 @@ export default function CompanyHero() {
               letterSpacing: "-0.025em",
             }}
           >
-            بسطة تجمع الإبداع المحلي
+            بسطة مارت تجمع الإبداع المحلي
             <span
               style={{
                 display: "block",

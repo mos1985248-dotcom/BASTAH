@@ -19,7 +19,7 @@ export default function AboutClosing() {
         <div className={styles.image}>
           <Image
             src="/images/story/story-closing.jpg.jpg"
-            alt="مشهد ختامي يعكس روح بسطة والأسواق المحلية"
+            alt="مشهد ختامي يعكس روح بسطة مارت والأسواق المحلية"
             fill
             sizes="(max-width: 900px) 100vw, 1180px"
             style={{
@@ -30,7 +30,7 @@ export default function AboutClosing() {
 
         {/* النص */}
         <div className={styles.intro}>
-          <p className={styles.eyebrow}>هذه هي بسطة</p>
+          <p className={styles.eyebrow}>هذه هي بسطة مارت</p>
 
           <h2
             style={{
@@ -41,12 +41,12 @@ export default function AboutClosing() {
               lineHeight: 1.5,
             }}
           >
-            هذه هي بسطة
+            هذه هي بسطة مارت
           </h2>
 
           <div className={styles.text}>
             <p>
-              بسطة ليست مجرد مكان لبيع المنتجات، بل مساحة رقمية تحمل شيئًا من
+              بسطة مارت ليست مجرد مكان لبيع المنتجات، بل مساحة رقمية تحمل شيئًا من
               روح الأسواق القديمة، حيث القرب، والحكاية، والثقة.
             </p>
 
@@ -70,7 +70,7 @@ export default function AboutClosing() {
 
         {/* الخاتمة المختصرة */}
         <div className={styles.finalCard}>
-          <p className={styles.brand}>بسطة</p>
+          <p className={styles.brand}>بسطة مارت</p>
 
           <p className={styles.subtitle}>
             دعم الأسرة المنتجة.

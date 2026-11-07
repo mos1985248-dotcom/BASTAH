@@ -56,7 +56,7 @@ export default function StoryBlogCTARow({ showStartStore }: { showStartStore: bo
               ابدأ متجرك مجانًا
             </h3>
             <p className={s.text}>
-              انضم إلى الأسر المنتجة على بسطة وابدأ رحلتك في بيع منتجاتك
+              انضم إلى الأسر المنتجة على بسطة مارت وابدأ رحلتك في بيع منتجاتك
               والوصول إلى عملاء جدد.
             </p>
             <span className={s.startCta}>ابدأ مجانًا</span>

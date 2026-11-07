@@ -16,7 +16,7 @@ export interface SubscriptionInvoice {
   vatAmount?: number | null;
 }
 
-export const PLAN_NAMES_AR: Record<string, string> = { FREE: "بسطة بداية", STARTER: "بسطة نمو", GROWTH: "بسطة انطلاق", PRO: "بسطة ازدهار" };
+export const PLAN_NAMES_AR: Record<string, string> = { FREE: "بسطة مارت بداية", STARTER: "بسطة مارت نمو", GROWTH: "بسطة مارت انطلاق", PRO: "بسطة مارت ازدهار" };
 export const INVOICE_STATUS: Record<string, { label: string; tone: "ok" | "warn" | "bad" | "off" }> = {
   PAID: { label: "مدفوعة", tone: "ok" },
   PENDING: { label: "بانتظار الدفع", tone: "warn" },

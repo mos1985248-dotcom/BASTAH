@@ -43,7 +43,7 @@ export default function CustomDomainCard({
           </div>
         </div>
         <div className={s.panelBody}>
-          <p className={s.help}>متاح لباقتَي بسطة انطلاق وبسطة ازدهار (99 و199 ر.س). تواصل مع الدعم لتفعيله لمتجرك.</p>
+          <p className={s.help}>متاح لباقتَي بسطة مارت انطلاق وبسطة مارت ازدهار (99 و199 ر.س). تواصل مع الدعم لتفعيله لمتجرك.</p>
         </div>
       </section>
     );

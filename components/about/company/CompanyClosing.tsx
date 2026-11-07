@@ -22,7 +22,7 @@ export default function CompanyClosing() {
         <div className={styles.closingImage}>
           <Image
             src="/images/about/company-closing.jpg"
-            alt="مساحة عمل لمشروع محلي في بسطة"
+            alt="مساحة عمل لمشروع محلي في بسطة مارت"
             fill
             sizes="(max-width: 900px) 100vw, 50vw"
             style={{
@@ -40,7 +40,7 @@ export default function CompanyClosing() {
               fontWeight: t.typography.fontWeight.bold,
             }}
           >
-            بسطة
+            بسطة مارت
           </p>
 
           <h2
@@ -64,7 +64,7 @@ export default function CompanyClosing() {
               lineHeight: 2,
             }}
           >
-            اكتشف المنتجات والمتاجر على بسطة، أو ابدأ حضورك الرقمي وأنشئ متجرك
+            اكتشف المنتجات والمتاجر على بسطة مارت، أو ابدأ حضورك الرقمي وأنشئ متجرك
             الخاص.
           </p>
 

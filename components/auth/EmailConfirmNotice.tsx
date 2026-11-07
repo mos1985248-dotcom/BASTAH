@@ -19,7 +19,7 @@ export default function EmailConfirmNotice({ email }: { email: string }) {
           <strong>{email}</strong>
         </p>
 
-        <p className={s.stepText}>افتح الرابط في البريد الإلكتروني ثم عد إلى بسطة لتسجيل الدخول.</p>
+        <p className={s.stepText}>افتح الرابط في البريد الإلكتروني ثم عد إلى بسطة مارت لتسجيل الدخول.</p>
 
         <a href="/login" className={s.btn}>
           الذهاب إلى تسجيل الدخول

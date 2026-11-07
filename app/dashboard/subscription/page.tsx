@@ -2,6 +2,7 @@
 // المنطق (جلب GET /api/subscription وحالات الاشتراك) كما كان حرفياً؛ التغيير في التخطيط والعرض.
 // سجل الفواتير صار قسماً بارزاً بجدول كامل (المرجع، الفترة، المبلغ، تاريخ الإصدار والدفع، الحالة) وإيصال لكل فاتورة مدفوعة.
 "use client";
+import { formatPlatformCopy } from "@/lib/brand";
 import { useEffect, useState } from "react";
 import { uiVars } from "@/components/ui/vars";
 import LoadingState from "@/components/dashboard/ui/LoadingState";
@@ -62,7 +63,7 @@ export default function SubscriptionPage() {
   const { subscription, invoices } = data;
   const status = STATUS_LABELS[subscription.status] ?? STATUS_LABELS.ACTIVE;
   const needsAttention = subscription.status === "GRACE_PERIOD" || subscription.status === "SUSPENDED" || subscription.status === "EXPIRED";
-  const planName = data.planConfig?.nameAr ?? PLAN_NAMES_AR[subscription.plan] ?? subscription.plan;
+  const planName = formatPlatformCopy(data.planConfig?.nameAr ?? PLAN_NAMES_AR[subscription.plan] ?? subscription.plan);
 
   return wrap(
     <>

@@ -21,9 +21,9 @@ export default function WhyBasita() {
     >
       <div className={s.grid}>
         <div className={s.copy}>
-          <p className={s.kicker}>بسطة للأسر المنتجة</p>
+          <p className={s.kicker}>بسطة مارت للأسر المنتجة</p>
           <h2 id="why-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
-            لماذا بسطة؟
+            لماذا بسطة مارت؟
           </h2>
           <p className={s.lead}>
             كل ما تحتاجه الأسرة المنتجة لتبيع، تنمو، وتوصل منتجاتها لعملاء أكثر.

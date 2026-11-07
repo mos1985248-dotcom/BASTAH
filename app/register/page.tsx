@@ -98,7 +98,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthShell title="إنشاء حساب جديد" subtitle="انضم إلى بسطة — سوق الأسر المنتجة السعودية" scene="souq">
+    <AuthShell title="إنشاء حساب جديد" subtitle="انضم إلى بسطة مارت — سوق الأسر المنتجة السعودية" scene="souq">
       <div className={s.stack}>
         <RoleSelect value={form.role} onChange={(v) => set("role", v)} />
 

@@ -34,7 +34,7 @@ export default function AboutTech() {
             <div className={styles.text}>
               <p>
                 نحن نستخدم التقنية، والذكاء الاصطناعي، والمحتوى الرقمي، ليس
-                لمجرد أن نقول إن بسطة منصة تقنية.
+                لمجرد أن نقول إن بسطة مارت منصة تقنية.
               </p>
 
               <p className={styles.highlight}>

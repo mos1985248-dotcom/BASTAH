@@ -6,7 +6,7 @@ import s from "./nav.module.css";
 const ITEMS: { Icon: LucideIcon; label: string; optional?: boolean }[] = [
   { Icon: Heart, label: "دعم الأسر المنتجة", optional: true },
   { Icon: Truck, label: "الشحن لكل مناطق المملكة" },
-  { Icon: Smartphone, label: "تطبيق بسطة", optional: true },
+  { Icon: Smartphone, label: "تطبيق بسطة مارت", optional: true },
 ];
 
 export default function NavTopBar() {

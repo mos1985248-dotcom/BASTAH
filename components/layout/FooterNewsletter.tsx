@@ -23,7 +23,7 @@ export default function FooterNewsletter() {
   return (
     <section aria-labelledby="newsletter-title">
       <h2 id="newsletter-title" className={s.newsTitle}>انضم إلى نشرتنا البريدية</h2>
-      <p className={s.newsText}>عروض جديدة ومنتجات مميزة وأخبار بسطة تصلك أولًا.</p>
+      <p className={s.newsText}>عروض جديدة ومنتجات مميزة وأخبار بسطة مارت تصلك أولًا.</p>
 
       {sent ? (
         <div className={s.sent} role="status">

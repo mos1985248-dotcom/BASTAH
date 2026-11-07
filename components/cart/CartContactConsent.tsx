@@ -40,7 +40,7 @@ export default function CartContactConsent({ storeId, storeName }: { storeId: st
     <label className={c.consent} style={uiVars}>
       <input type="checkbox" checked={granted} disabled={busy} onChange={(e) => toggle(e.target.checked)} />
       <span>
-        أوافق على مشاركة اسمي ورقم جوالي مع بسطة ومتجر «{storeName}» وحده، ليتواصلا معي بخصوص سلتي إن لم أُكمل الطلب.
+        أوافق على مشاركة اسمي ورقم جوالي مع بسطة مارت ومتجر «{storeName}» وحده، ليتواصلا معي بخصوص سلتي إن لم أُكمل الطلب.
         يمكنني سحب الموافقة في أي وقت من هنا، ولن تُشارك بياناتي بعد السحب.
         {error && <strong className={c.consentErr}>{error}</strong>}
       </span>

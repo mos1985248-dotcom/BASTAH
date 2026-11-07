@@ -45,7 +45,7 @@ export default function PaymentGatewayForm({ onConnected }: { onConnected: () =>
       <div className={s.panelHead}>
         <div>
           <h2 id="gw-form-title" className={s.panelTitle}>ربط حساب Moyasar</h2>
-          <p className={s.panelSub}>كل عملية دفع إلكتروني تمر مباشرة بحسابك أنت، وليس بحساب بسطة</p>
+          <p className={s.panelSub}>كل عملية دفع إلكتروني تمر مباشرة بحسابك أنت، وليس بحساب بسطة مارت</p>
         </div>
       </div>
       <div className={s.panelBody}>

@@ -107,14 +107,22 @@
 
 /* ───── قائمة الجوال والتابلت ───── */
 .drawer {
+  max-height: calc(100dvh - 114px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 8px 12px 12px;
   border-bottom: 1px solid var(--ui-border);
   background: var(--ui-card);
+  box-shadow: 0 12px 22px color-mix(in srgb, var(--ui-green-deep) 9%, transparent);
 }
 
 .drawerInner {
   max-width: var(--nav-max);
   margin: 0 auto;
-  padding: 8px 16px 16px;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--ui-gold) 45%, var(--ui-border));
+  border-radius: 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -125,30 +133,40 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 48px;
-  padding: 0 14px;
+  gap: 10px;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
   border-radius: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--ui-ink);
+  font-family: var(--font-amiri), "Amiri", serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ui-green-deep);
   text-decoration: none;
 }
 
-.drawerLink:hover,
-.drawerLink:focus-visible {
+.drawerLink:hover:not(.drawerActive) {
   background: var(--ui-sand);
-  outline: none;
 }
+.drawerLink:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 1px; }
+.drawerLink svg { flex: none; color: var(--ui-kicker); }
+.drawerLabel { flex: 1; min-width: 0; }
+.drawerLink .drawerArrow { color: var(--ui-ink-muted); opacity: 0.65; }
 
 .drawerActive {
-  background: var(--ui-sand);
-  color: var(--ui-green-deep);
-  box-shadow: inset 3px 0 0 var(--ui-gold);
+  background: var(--ui-green-deep);
+  color: var(--ui-white);
+  border-color: var(--ui-gold);
 }
+.drawerActive svg, .drawerActive .drawerArrow { color: var(--ui-gold); opacity: 1; }
+.drawerShortcuts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.drawerShortcuts .drawerLink { justify-content: center; gap: 8px; min-height: 44px; padding-inline: 6px; font-size: 19px; }
+.drawerShortcuts .drawerLink:not(.drawerActive) { background: var(--ui-sand); border-color: var(--ui-border); }
 
 .drawerSep {
   height: 1px;
-  margin: 6px 0;
+  margin: 5px 8px;
   background: var(--ui-border);
 }
 

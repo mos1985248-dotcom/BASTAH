@@ -39,7 +39,7 @@ export default function DaftariDashboardCard({ plan }: { plan: string }) {
       <div className={s.cardBody}>
         {!hasAccess && (
           <p className={s.muted} style={{ margin: 0 }}>
-            متاحة من باقة بسطة نمو فما فوق — تتبّع مبيعاتك ومصروفاتك وأرباحك بسهولة
+            متاحة من باقة بسطة مارت نمو فما فوق — تتبّع مبيعاتك ومصروفاتك وأرباحك بسهولة
           </p>
         )}
         {hasAccess && loading && <p className={s.muted} style={{ margin: 0 }} role="status">جاري التحميل...</p>}

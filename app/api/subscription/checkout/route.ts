@@ -9,6 +9,7 @@
 // هذا قرار تصميم اتخذته بغياب أي منطق proration مصمَّم مسبقاً — لا استرداد
 // جزئي، ولا احتساب فرق تلقائي؛ التخفيض يُطبَّق مباشرة على السعر الحالي.
 
+import { formatPlatformCopy } from "@/lib/brand";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireActiveStore, AuthError } from "@/lib/auth";
@@ -116,7 +117,7 @@ export async function POST(req: NextRequest) {
       const moyasarInvoice = await createMoyasarInvoice({
         secretKey: process.env.PLATFORM_MOYASAR_SECRET_KEY,
         amountHalalas: toHalalas(amount),
-        description: `اشتراك بسطة — ${planConfig.nameAr} (${billingCycle === "yearly" ? "سنوي" : "شهري"}) — متجر ${subscription.store.nameAr}`,
+        description: `اشتراك بسطة مارت — ${formatPlatformCopy(planConfig.nameAr)} (${billingCycle === "yearly" ? "سنوي" : "شهري"}) — متجر ${subscription.store.nameAr}`,
         successUrl: `${appUrl}/dashboard/subscription/return?invoiceId=${invoice.id}`,
         metadata: { subscriptionInvoiceId: invoice.id, storeId, userId: user.id },
       });

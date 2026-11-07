@@ -57,7 +57,7 @@ export default function PaymentGatewayPage() {
           <div className={s.panelBody}>
             <p className={s.note}>
               <ShieldCheck size={15} strokeWidth={1.8} aria-hidden="true" />
-              بسطة لا تخزّن ولا ترى بيانات بطاقة عميلك أبداً — الدفع يتم بالكامل عبر صفحة Moyasar المستضافة.
+              بسطة مارت لا تخزّن ولا ترى بيانات بطاقة عميلك أبداً — الدفع يتم بالكامل عبر صفحة Moyasar المستضافة.
             </p>
             <ol className={s.help} style={{ margin: 0, paddingInlineStart: 20, lineHeight: 2.2 }}>
               <li>أدخل المفتاحين العلني والسري من حساب Moyasar الخاص بمتجرك.</li>

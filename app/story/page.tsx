@@ -10,9 +10,9 @@ import { BLOCKS_BEFORE, BLOCKS_AFTER } from "@/components/story/story-content";
 import s from "@/components/story/story.module.css";
 
 export const metadata: Metadata = {
-  title: "قصتنا | بسطة",
+  title: "قصتنا | بسطة مارت",
   description:
-    "تعرف على قصة بسطة، من روح البسطات والأسواق المحلية إلى تجربة رقمية تجمع المنتجات والأسر المنتجة في مكان واحد.",
+    "تعرف على قصة بسطة مارت، من روح البسطات والأسواق المحلية إلى تجربة رقمية تجمع المنتجات والأسر المنتجة في مكان واحد.",
 };
 
 export default function StoryPage() {
