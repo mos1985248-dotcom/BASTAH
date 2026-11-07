@@ -282,12 +282,21 @@
   .lane > .endCard .endCta { align-self: center; }
   .arrows { display: none; }
   .stall:hover { transform: none; }
-  .lane .name { min-width: 0; max-width: 100%; gap: 3px; }
-  .lane .favorite { top: 2px; inset-inline-end: 6px; }
-  .lane .nameText {
+  .lane .name, .fluid .name { min-width: 0; max-width: 100%; gap: 3px; }
+  .lane .favorite, .fluid .favorite { top: 2px; inset-inline-end: 6px; }
+  .lane .nameText, .fluid .nameText {
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
     overflow: hidden; overflow-wrap: anywhere; min-width: 0;
   }
-  .lane .meta > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lane .meta > span, .fluid .meta > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Marketplace cards must fit their grid track, including narrow phones. */
+  .fluid { width: 100%; max-width: 100%; min-width: 0; }
+  .fluid .stallScene { height: clamp(144px, 38vw, 168px); }
+  .fluid .woodSign { max-width: calc(100% - 10px); padding-inline: 11px; }
+  .fluid .infoTop { display: grid; grid-template-columns: 29px minmax(0, 1fr); gap: 4px 6px; }
+  .fluid .logo { grid-row: span 2; align-self: center; }
+  .fluid .meta, .fluid .rating { font-size: 11px; }
+  .fluid .rating { grid-column: 2; justify-self: start; margin-inline-start: 0; }
+  .fluid .enter { min-height: 40px; font-size: 12px; gap: 4px; }
 }
 /* basita-font-scale: applied */
