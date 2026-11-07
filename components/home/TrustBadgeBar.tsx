@@ -18,9 +18,9 @@ export default function TrustBadgeBar() {
       className={s.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
-      <ul className={s.strip}>
+      <ul className={s.strip} data-home-reveal-group>
         {BADGES.map(({ Icon, label, detail }) => (
-          <li key={label} className={s.item}>
+          <li key={label} className={s.item} data-home-reveal>
             <span className={s.icon}>
               <Icon size={22} strokeWidth={1.7} aria-hidden="true" />
             </span>

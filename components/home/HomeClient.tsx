@@ -14,9 +14,12 @@ import FeaturedStores from "@/components/home/FeaturedStores";
 import WhyBasita from "@/components/home/WhyBasita";
 import SectionBand from "@/components/home/SectionBand";
 import { t } from "@/theme";
+import useHomeScrollReveal from "./useHomeScrollReveal";
+import reveal from "./homeReveal.module.css";
 
 export default function HomeClient() {
   const { user, loading } = useCurrentUser();
+  const revealRef = useHomeScrollReveal();
 
   // زر "ابدأ متجرك" يظهر فقط للزائر أو المشتري بدون متجر —
   // التاجر عنده متجر أصلاً
@@ -25,7 +28,7 @@ export default function HomeClient() {
 
   return (
     <SiteShell>
-      <div style={{ background: t.colors.heritage.sand }}>
+      <div ref={revealRef} className={reveal.scope} style={{ background: t.colors.heritage.sand }}>
       {/* رحلة المتسوّق أولاً */}
       <HeroSection showStartStore={showStartStore} />
 

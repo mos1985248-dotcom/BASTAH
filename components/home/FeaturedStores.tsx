@@ -72,7 +72,7 @@ export default function FeaturedStores() {
                   </div>
                 </div>
               ))
-            : stores.map((store) => <StallCard key={store.id} store={store} />)}
+            : stores.map((store) => <StallCard key={store.id} store={store} reveal />)}
 
           {!loading && (
             <div className={s.endCard}>
