@@ -25,7 +25,7 @@ export default function RequestStep({
       </div>
 
       <h1 className={s.stepTitle}>استعادة كلمة المرور</h1>
-      <p className={s.stepText}>أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.</p>
+      <p className={s.stepText}>أدخل بريدك الإلكتروني لاستعادة الوصول إلى حسابك</p>
 
       <AuthField
         label="البريد الإلكتروني"
@@ -52,7 +52,7 @@ export default function RequestStep({
       />
 
       <a href="/login" className={s.back}>
-        تذكرت كلمة المرور؟ تسجيل الدخول
+        العودة لتسجيل الدخول
       </a>
     </div>
   );

@@ -22,6 +22,8 @@ export default function SentStep({ email, onResend }: { email: string; onResend:
       <button type="button" onClick={onResend} className={s.btn}>
         إعادة إرسال رابط الاستعادة
       </button>
+
+      <a href="/login" className={s.back}>العودة لتسجيل الدخول</a>
     </div>
   );
 }

@@ -82,8 +82,6 @@ export default function LoginClient() {
             <AuthError message={error} />
 
             <AuthButton onClick={handleSubmit} loading={loading} idleLabel="تسجيل الدخول" loadingLabel="جاري تسجيل الدخول..." />
-
-            <AuthFooterLine prompt="نسيت كلمة المرور؟" linkLabel="استعادة" href="/reset-password" />
           </>
         ) : (
           <>
@@ -92,7 +90,10 @@ export default function LoginClient() {
           </>
         )}
 
-        <AuthFooterLine prompt="ليس لديك حساب؟" linkLabel="إنشاء حساب" href="/register" />
+        <div className={s.footerLinks}>
+          {method === "email" && <AuthFooterLine prompt="نسيت كلمة المرور؟" linkLabel="استعادة" href="/reset-password" />}
+          <AuthFooterLine prompt="ليس لديك حساب؟" linkLabel="إنشاء حساب" href="/register" />
+        </div>
       </div>
     </AuthShell>
   );
