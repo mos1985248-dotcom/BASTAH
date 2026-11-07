@@ -1,14 +1,13 @@
 // قائمة الجوال والتابلت: الروابط الحالية مع تمييز قسم السوق النشط.
 "use client";
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { BookOpen, ChevronLeft, Grid2X2, Heart, Home, Newspaper, ShoppingCart, Store, Tags } from "lucide-react";
-import { NAV_LINKS, isNavActive } from "./NavLinks";
+import { NAV_LINKS, isNavActive, useNavHash } from "./NavLinks";
 import s from "./nav.module.css";
 
 const ICONS = {
   "/": Home,
-  "/marketplace?view=stores": Store,
+  "/marketplace?view=stores#stores": Store,
   "/marketplace#categories": Grid2X2,
   "/offers": Tags,
   "/blog": Newspaper,
@@ -16,22 +15,12 @@ const ICONS = {
 };
 
 export function isMobileNavActive(pathname: string, href: string, hash: string) {
-  if (href.startsWith("/marketplace")) {
-    if (!pathname.startsWith("/marketplace")) return false;
-    return href.includes("#categories") ? hash === "#categories" : hash !== "#categories";
-  }
-  return isNavActive(pathname, href);
+  return isNavActive(pathname, href, hash);
 }
 
 export default function MobileNav({ onNavigate }: { onNavigate: () => void }) {
   const pathname = usePathname();
-  const [hash, setHash] = useState("");
-  useEffect(() => {
-    const update = () => setHash(window.location.hash);
-    update();
-    window.addEventListener("hashchange", update);
-    return () => window.removeEventListener("hashchange", update);
-  }, [pathname]);
+  const hash = useNavHash();
   return (
     <div className={s.drawer} id="mobile-nav">
       <nav className={s.drawerInner} aria-label="قائمة التنقل">

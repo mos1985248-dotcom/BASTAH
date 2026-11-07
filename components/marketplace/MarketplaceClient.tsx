@@ -57,10 +57,13 @@ function MarketplaceContent() {
               <ProductGrid products={products.items} loading={products.loading} error={products.error} onRetry={() => products.load(1)} />
             </>
           ) : (
-            <>
+            <section id="stores" aria-labelledby="market-stores-heading" className={s.storesSection}>
+              <h2 id="market-stores-heading" className={s.storesTitle} style={{ fontFamily: t.typography.fontFamily.display }}>
+                ممشى البسطات
+              </h2>
               <SortBar total={stores.pagination.total} unit="متجر" />
               <StoreGrid stores={stores.items} loading={stores.loading} error={stores.error} onRetry={() => stores.load(1)} />
-            </>
+            </section>
           )}
 
           <Pagination page={active.pagination.page} pages={active.pagination.pages} onChange={active.load} />
