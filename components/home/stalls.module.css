@@ -300,8 +300,10 @@
   .fluid .enter { min-height: 40px; font-size: 12px; gap: 4px; }
 }
 /* Homepage catalog variant. Marketplace cards retain their existing dimensions. */
-.lane { gap: 18px; }
+.laneWrap { max-width: 1142px; margin-inline: auto; }
+.lane { gap: 18px; scroll-snap-type: x mandatory; }
 .lane > .skeleton { width: 270px; }
+.lane > .endCard { width: 270px; }
 .compact { width: 270px; min-height: 360px; }
 .compact .stallRoof { flex: none; height: 32px; margin-inline: 0; border-radius: 12px 12px 2px 2px; }
 .compact .roofEdge {
@@ -342,7 +344,11 @@
 .compact .favorite:hover, .compact .favoriteActive { background: transparent; }
 .compact .favorite:hover::before, .compact .favoriteActive::before { background: #fff4f5; }
 
+/* Whole-card resting positions: two tablet cards, then three/four on wider screens. */
+@media (min-width: 768px) and (max-width: 1023px) { .laneWrap { max-width: 566px; } }
+@media (min-width: 1024px) and (max-width: 1279px) { .laneWrap { max-width: 854px; } }
 @media (max-width: 767px) {
+  .laneWrap { max-width: none; margin-inline: 0; }
   .lane { gap: 10px 8px; }
   .lane > .skeleton { width: 100%; }
   .compact { min-height: 270px; }
