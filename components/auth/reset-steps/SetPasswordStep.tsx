@@ -32,7 +32,7 @@ export default function SetPasswordStep({
       <h1 className={s.stepTitle}>كلمة مرور جديدة</h1>
       <p className={s.stepText}>أنشئ كلمة مرور قوية وآمنة لحسابك.</p>
 
-      <div>
+      <div className={s.passwordGroup}>
         <AuthField
           label="كلمة المرور الجديدة"
           type="password"
