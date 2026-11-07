@@ -54,23 +54,24 @@ export default function AuthShell({
         <Image src={view.src} alt="" fill priority sizes="(max-width: 900px) 100vw, 50vw" className={s.asideImg} />
         <div className={s.shade} />
 
-        <div className={s.asideTop}>
-          <a href="/" className={s.brand} tabIndex={-1}>
-            <span className={s.logoBox}>
-              <Image src="/images/logo-icon.png" alt="" width={36} height={36} />
-            </span>
-            <span>
-              <span className={s.brandName}>بسطة</span>
-              <span className={s.brandTag}>منصة الأسر المنتجة السعودية</span>
-            </span>
-          </a>
-        </div>
-
         <div className={s.asideBottom}>
           <span className={s.kicker}>{view.kicker}</span>
           <h2 className={s.headline}>{view.headline}</h2>
           <p className={s.lead}>{view.lead}</p>
         </div>
+
+        <div className={s.brandRow}>
+          <a href="/" className={s.brand} tabIndex={-1}>
+            <span className={s.logoBox}>
+              <Image src="/images/logo-icon.png" alt="" width={36} height={36} />
+            </span>
+            <span>
+              <span className={s.brandName}>بسطة مارت</span>
+              <span className={s.brandTag}>منصة الأسر المنتجة السعودية</span>
+            </span>
+          </a>
+        </div>
+
       </aside>
     </div>
   );

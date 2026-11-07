@@ -23,12 +23,13 @@
 .inner > * { min-width: 0; }
 
 /* ───── الهوية ───── */
-.brandHead { display: flex; align-items: center; gap: 14px; }
+.brandHead { display: flex; align-items: center; gap: 10px; }
 .logoMark {
-  display: flex; flex: none; align-items: center; justify-content: center; width: 56px; height: 56px; overflow: hidden;
-  border-radius: 14px; background: var(--ui-card); border: 1px solid var(--ui-gold);
+  composes: logoMark from "./nav.module.css";
 }
-.brandName { margin: 0; font-family: var(--font-amiri), "Amiri", serif; font-size: 39.5px; font-weight: 700; line-height: 1.2; color: var(--ui-white); }
+.brandName { composes: brandName from "./nav.module.css"; margin: 0; }
+.footer .logoMark { border-color: var(--ui-gold); }
+.footer .brandName { color: var(--ui-white); }
 .brandTag { margin: 2px 0 0; font-size: 13px; color: var(--ui-card); opacity: 0.85; }
 .brandText { margin: 18px 0 0; max-width: 440px; font-size: 14.5px; line-height: 2; color: var(--ui-card); opacity: 0.88; }
 
@@ -57,7 +58,6 @@
     -webkit-mask-composite: source-over; mask-composite: add;
   }
   .inner { grid-template-columns: minmax(0, 1fr); gap: 32px; padding: 40px 16px 28px; }
-  .brandName { font-size: 35px; }
 }
 @media (max-width: 767px) {
   .form { max-width: 320px; min-height: 44px; padding: 2px; }

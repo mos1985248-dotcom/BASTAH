@@ -55,7 +55,7 @@ export default function StoreGrid({
   return walkway(
     <div className={s.storeGrid}>
       {stores.map((store) => (
-        <StallCard key={store.id} store={store} fluid />
+        <StallCard key={store.id} store={store} fluid compact />
       ))}
     </div>,
   );
