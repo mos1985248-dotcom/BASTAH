@@ -1,7 +1,8 @@
 /* components/layout/footer.module.css — إطار الفوتر والصورة الزخرفية والهوية والنشرة. الألوان عبر --ui-* فقط */
 .footer {
+  --footer-max: 1440px; /* Same content width as Navbar. */
   --art: clamp(300px, 36vw, 640px);
-  --clear: max(0px, calc(var(--art) - max(0px, (100vw - 1200px) / 2)));
+  --clear: max(0px, calc(var(--art) - max(0px, (100vw - var(--footer-max)) / 2)));
   position: relative; overflow: hidden; margin-top: 64px; direction: rtl;
   background: var(--ui-green-deep); color: var(--ui-card); border-top: 1px solid var(--ui-gold);
 }
@@ -17,7 +18,7 @@
 
 .inner {
   position: relative; z-index: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 48px; box-sizing: border-box;
-  max-width: 1200px; margin: 0 auto; padding: 56px 16px 40px; padding-inline-end: calc(16px + var(--clear));
+  max-width: var(--footer-max); margin: 0 auto; padding: 56px 16px 40px; padding-inline-end: calc(16px + var(--clear));
 }
 .links { grid-column: 1 / -1; }
 .inner > * { min-width: 0; }
