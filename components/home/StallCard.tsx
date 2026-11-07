@@ -8,7 +8,7 @@ import s from "./stalls.module.css";
 
 const background = (url: string) => ({ backgroundImage: `url(${url})` });
 
-export default function StallCard({ store, fluid }: { store: HomeStore; fluid?: boolean }) {
+export default function StallCard({ store, fluid, reveal = false }: { store: HomeStore; fluid?: boolean; reveal?: boolean }) {
   const initial = store.nameAr.trim().charAt(0);
   const [favorite, setFavorite] = useState(false);
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function StallCard({ store, fluid }: { store: HomeStore; fluid?: 
   ) ?? []).filter((url): url is string => typeof url === "string" && url.length > 0).slice(0, 3);
   const hasProducts = productImages.length > 0;
   return (
-    <div className={`${s.stall} ${fluid ? s.fluid : ""}`}>
+    <div className={`${s.stall} ${fluid ? s.fluid : ""}`} data-home-reveal={reveal ? "" : undefined}>
       <button type="button" className={`${s.favorite} ${favorite ? s.favoriteActive : ""}`}
         onClick={toggleFavorite} aria-pressed={favorite}
         aria-label={favorite ? `إزالة ${store.nameAr} من المفضلة على هذا الجهاز` : `حفظ ${store.nameAr} في المفضلة على هذا الجهاز`}

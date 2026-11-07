@@ -41,11 +41,11 @@ export default function CategoryNav() {
         تسوّق حسب الفئة
       </h2>
 
-      <div className={s.grid}>
+      <div className={s.grid} data-home-reveal-group>
         {CATEGORIES.map(({ slug, label, Icon, href }) => {
           const photo = homeImages.categories[slug];
           return (
-            <a key={label} href={href ?? `/marketplace?category=${slug}`} className={s.tile}>
+            <a key={label} href={href ?? `/marketplace?category=${slug}`} className={s.tile} data-home-reveal>
               <span className={s.media}>
                 {photo ? (
                   <Image

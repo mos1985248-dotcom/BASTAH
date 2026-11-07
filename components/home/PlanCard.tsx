@@ -22,7 +22,7 @@ export default function PlanCard({ plan }: { plan: PlanConfig }) {
   ];
 
   return (
-    <article className={`${s.card} ${featured ? s.featured : ""}`}>
+    <article className={`${s.card} ${featured ? s.featured : ""}`} data-home-reveal>
       {featured && <span className={s.badge}>{plan.badgeAr}</span>}
 
       <h3 className={s.name} style={{ fontFamily: t.typography.fontFamily.display }}>

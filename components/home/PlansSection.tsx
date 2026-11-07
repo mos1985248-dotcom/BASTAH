@@ -36,9 +36,9 @@ export default function PlansSection() {
         <p className={s.sub}>بدون عمولة على مبيعاتك مهما كانت باقتك — رسوم اشتراك ثابتة فقط</p>
       </div>
 
-      <div className={s.grid}>
+      <div className={s.grid} data-home-reveal-group>
         {plans === null
-          ? Array.from({ length: 3 }, (_, i) => (
+          ? Array.from({ length: 4 }, (_, i) => (
               <div key={i} className={s.skeleton}>
                 <Skeleton height={26} width="45%" />
                 <Skeleton height={48} width="60%" />

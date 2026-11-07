@@ -18,7 +18,7 @@ export default function StoreLane({ children }: { children: ReactNode }) {
 
   return (
     <div className={s.laneWrap}>
-      <div ref={ref} className={s.lane} tabIndex={0} role="group" aria-label="بسطات السوق">
+      <div ref={ref} className={s.lane} tabIndex={0} role="group" aria-label="بسطات السوق" data-home-reveal-group>
         {children}
       </div>
       <div className={s.arrows}>
