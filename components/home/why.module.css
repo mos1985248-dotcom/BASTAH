@@ -1,6 +1,9 @@
 /* components/home/why.module.css — الألوان عبر متغيرات --ui-* فقط */
 .section { margin: 0 auto; padding: 64px 16px; direction: rtl; }
-.grid { display: grid; grid-template-columns: 1.1fr 0.9fr; align-items: center; gap: clamp(32px, 5vw, 72px); }
+.grid {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: center; gap: clamp(32px, 5vw, 72px);
+  padding: clamp(20px, 3vw, 40px); border: 1px solid var(--ui-border); border-radius: 32px;
+}
 
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
 .kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
@@ -26,7 +29,7 @@
 
 @media (max-width: 899px) {
   .section { padding: 40px 12px; }
-  .grid { grid-template-columns: 1fr; gap: 28px; }
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 28px; border-radius: 24px; }
   .visual { order: -1; aspect-ratio: 16 / 10; border-radius: 24px; }
   .mark { width: 24%; }
   .row { grid-template-columns: 48px 1fr; }

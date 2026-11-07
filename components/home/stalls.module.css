@@ -300,8 +300,8 @@
   .fluid .enter { min-height: 40px; font-size: 12px; gap: 4px; }
 }
 /* Shared compact catalog variant for the homepage and marketplace. */
-.laneWrap { max-width: 1142px; margin-inline: auto; }
-.lane { gap: 18px; scroll-snap-type: x mandatory; }
+.laneWrap { max-width: none; margin-inline: auto; }
+.lane { gap: 18px; padding-inline: 0; align-items: stretch; scroll-snap-type: x mandatory; }
 .lane > .skeleton { width: 270px; }
 .compact { width: 270px; min-height: 360px; }
 .compact.fluid { width: 100%; max-width: 100%; }
@@ -345,13 +345,17 @@
 .compact .favorite:hover, .compact .favoriteActive { background: transparent; }
 .compact .favorite:hover::before, .compact .favoriteActive::before { background: #fff4f5; }
 
-/* Whole-card resting positions: two tablet cards, then three/four on wider screens. */
-@media (min-width: 768px) { .lane > .endCard { width: 270px; } }
-@media (min-width: 768px) and (max-width: 1023px) { .laneWrap { max-width: 566px; } }
-@media (min-width: 1024px) and (max-width: 1279px) { .laneWrap { max-width: 854px; } }
+/* Fill the same content width as the other homepage sections. */
+@media (min-width: 768px) {
+  .lane { --lane-card-width: calc((100% - 54px) / 4); }
+  .lane > .compact, .lane > .endCard, .lane > .skeleton { width: var(--lane-card-width); }
+  .lane > .endCard { min-height: 360px; margin-top: 0; }
+}
+@media (min-width: 768px) and (max-width: 1023px) { .lane { --lane-card-width: calc((100% - 18px) / 2); } }
+@media (min-width: 1024px) and (max-width: 1279px) { .lane { --lane-card-width: calc((100% - 36px) / 3); } }
 @media (max-width: 767px) {
   .laneWrap { max-width: none; margin-inline: 0; }
-  .lane { gap: 10px 8px; scroll-snap-type: none; }
+  .lane { gap: 12px; scroll-snap-type: none; }
   .lane > .skeleton { width: 100%; }
   .compact { min-height: 270px; }
   .compact .stallRoof { height: 24px; border-radius: 9px 9px 2px 2px; }

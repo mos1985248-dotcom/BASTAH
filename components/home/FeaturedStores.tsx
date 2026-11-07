@@ -41,7 +41,7 @@ export default function FeaturedStores() {
           </h2>
           <p className={s.sub}>اكتشف بسطات الأسر المنتجة ومنتجات سعودية أصيلة</p>
         </div>
-        <a href="/marketplace?view=stores" className={s.all}>كل البسطات</a>
+        <a href="/marketplace?view=stores#stores" className={s.all}>كل البسطات</a>
       </div>
 
       {error && (
@@ -78,7 +78,7 @@ export default function FeaturedStores() {
             <div className={s.endCard}>
               <h3 className={s.endTitle}>اكتشف متاجر تستحق الثقة</h3>
               <p className={s.endText}>جودة، أصالة، وتاريخ من شغف الأسر السعودية</p>
-              <a href="/marketplace?view=stores" className={s.endCta}>تصفّح جميع المتاجر</a>
+              <a href="/marketplace?view=stores#stores" className={s.endCta}>تصفّح جميع المتاجر</a>
             </div>
           )}
         </StoreLane>
