@@ -14,7 +14,7 @@ const BADGES: { Icon: LucideIcon; label: string; detail?: string }[] = [
 export default function TrustBadgeBar() {
   return (
     <section
-      aria-label="مزايا التسوّق في بسطة"
+      aria-label="مزايا التسوّق في بسطة مارت"
       className={s.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >

@@ -16,7 +16,7 @@ export default function MarketplaceHero({
   return (
     <section className={s.heroWrap} style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}>
       <div className={s.hero}>
-        <p className={s.heroKicker}>سوق بسطة</p>
+        <p className={s.heroKicker}>سوق بسطة مارت</p>
         <h1 className={s.heroTitle} style={{ fontFamily: t.typography.fontFamily.display }}>
           تسوّق من بيوت سعودية
         </h1>

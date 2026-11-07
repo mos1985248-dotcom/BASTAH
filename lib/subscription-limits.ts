@@ -128,7 +128,7 @@ export async function assertHasMuniraAccess(storeId: string): Promise<void> {
 
   if (!planConfig?.hasAIFeatures) {
     throw new PlanLimitError(
-      "منيرة غير متاحة في باقتك الحالية — رقّي لباقة بسطة انطلاق أو بسطة ازدهار لتفعيلها"
+      "منيرة غير متاحة في باقتك الحالية — رقّي لباقة بسطة مارت انطلاق أو بسطة مارت ازدهار لتفعيلها"
     );
   }
 }

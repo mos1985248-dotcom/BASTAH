@@ -24,9 +24,9 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
     if (outcome.status === "skipped") {
       const messages = {
         unknown_event: "حدث غير مسموح",
-        event_disabled: "خدمة النشر غير مفعّلة من إدارة بسطة",
+        event_disabled: "خدمة النشر غير مفعّلة من إدارة بسطة مارت",
         payload_too_large: "المحتوى كبير جداً",
-        no_provider: "الربط المركزي غير مفعّل من إدارة بسطة بعد",
+        no_provider: "الربط المركزي غير مفعّل من إدارة بسطة مارت بعد",
         no_accounts: "أضيفي حساباً خارجياً واحداً على الأقل أولاً",
       } as const;
       const status = outcome.reason === "no_accounts" || outcome.reason === "payload_too_large" ? 400 : 503;

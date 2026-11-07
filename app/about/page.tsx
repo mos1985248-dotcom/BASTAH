@@ -12,9 +12,9 @@ import CompanyClosing from "@/components/company/CompanyClosing";
 import s from "@/components/story/story.module.css";
 
 export const metadata: Metadata = {
-  title: "من نحن | بسطة",
+  title: "من نحن | بسطة مارت",
   description:
-    "تعرف على بسطة، منصة رقمية تساعد الأسر المنتجة وأصحاب المشاريع المحلية على عرض منتجاتهم وإدارة متاجرهم والوصول إلى عملائهم.",
+    "تعرف على بسطة مارت، منصة رقمية تساعد الأسر المنتجة وأصحاب المشاريع المحلية على عرض منتجاتهم وإدارة متاجرهم والوصول إلى عملائهم.",
 };
 
 export default function AboutPage() {

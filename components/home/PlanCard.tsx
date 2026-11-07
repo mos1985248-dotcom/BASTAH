@@ -2,6 +2,7 @@
 import { Check, X } from "lucide-react";
 import type { PlanConfig } from "@/components/pricing/plan-types";
 import { t } from "@/theme";
+import { formatPlatformCopy } from "@/lib/brand";
 import s from "./plans.module.css";
 
 export default function PlanCard({ plan }: { plan: PlanConfig }) {
@@ -23,12 +24,12 @@ export default function PlanCard({ plan }: { plan: PlanConfig }) {
 
   return (
     <article className={`${s.card} ${featured ? s.featured : ""}`} data-home-reveal>
-      {featured && <span className={s.badge}>{plan.badgeAr}</span>}
+      {plan.badgeAr && <span className={s.badge}>{formatPlatformCopy(plan.badgeAr)}</span>}
 
       <h3 className={s.name} style={{ fontFamily: t.typography.fontFamily.display }}>
-        {plan.nameAr}
+        {formatPlatformCopy(plan.nameAr)}
       </h3>
-      {plan.taglineAr && <p className={s.tagline}>{plan.taglineAr}</p>}
+      {plan.taglineAr && <p className={s.tagline}>{formatPlatformCopy(plan.taglineAr)}</p>}
 
       <p className={s.price}>
         {plan.priceMonthly === 0 ? (
@@ -54,7 +55,7 @@ export default function PlanCard({ plan }: { plan: PlanConfig }) {
         ))}
       </ul>
 
-      <a href="/pricing" className={s.cta} aria-label={`اختيار باقة ${plan.nameAr}`}>
+      <a href="/pricing" className={s.cta} aria-label={`اختيار باقة ${formatPlatformCopy(plan.nameAr)}`}>
         {featured ? "ابدأ الآن" : "اختيار الباقة"}
       </a>
     </article>

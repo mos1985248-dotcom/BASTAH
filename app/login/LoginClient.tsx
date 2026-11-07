@@ -58,7 +58,7 @@ export default function LoginClient() {
   };
 
   return (
-    <AuthShell title="تسجيل الدخول" subtitle="أهلاً بك مجدداً في بسطة" scene="heritage">
+    <AuthShell title="تسجيل الدخول" subtitle="أهلاً بك مجدداً في بسطة مارت" scene="heritage">
       <div className={s.stack}>
         <GoogleButton label="المتابعة باستخدام Google" next={safeRedirect(redirectTo)} />
 

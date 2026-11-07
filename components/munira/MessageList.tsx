@@ -46,7 +46,7 @@ export function MessageList({ messages, streaming, error, onSuggestion, onRetry 
             مرحباً! أنا منيرة
           </p>
           <p style={{ fontSize: t.typography.fontSize.sm, color: ui.inkMuted, margin: "0 0 24px", lineHeight: t.typography.lineHeight.relaxed }}>
-            مساعدتك الذكية في بسطة — تسوّق، متجر، ترجمة، وأكثر
+            مساعدتك الذكية في بسطة مارت — تسوّق، متجر، ترجمة، وأكثر
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: t.spacing["3"], justifyContent: "center", maxWidth: 480, margin: "0 auto" }}>
             {SUGGESTIONS.map((s) => (

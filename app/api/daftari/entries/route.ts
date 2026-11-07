@@ -19,7 +19,7 @@ const createEntrySchema = z.object({
 async function requireStarterOrAbove(storeId: string) {
   const sub = await prisma.storeSubscription.findUnique({ where: { storeId }, select: { plan: true } });
   if (!sub || sub.plan === "FREE") {
-    throw new AuthError("دفاتري متاحة من باقة بسطة نمو فما فوق — رقّي باقتك لاستخدامها", 403);
+    throw new AuthError("دفاتري متاحة من باقة بسطة مارت نمو فما فوق — رقّي باقتك لاستخدامها", 403);
   }
 }
 

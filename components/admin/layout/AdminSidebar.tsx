@@ -34,7 +34,7 @@ export default function AdminSidebar({
           <ShieldCheck size={22} strokeWidth={1.8} />
         </div>
         <div>
-          <p className={s.brandName}>بسطة</p>
+          <p className={s.brandName}>بسطة مارت</p>
           <p className={s.brandSub}>لوحة إدارة المنصة</p>
         </div>
       </div>

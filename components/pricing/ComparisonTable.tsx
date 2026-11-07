@@ -1,6 +1,7 @@
 // components/pricing/ComparisonTable.tsx
 // مقارنة تفصيلية بين الباقات. كل صف من حقل فعلي في SubscriptionPlanConfig (عبر GET /api/subscription/plans)،
 // فلا يظهر ما لا تنفّذه الباقة. الحقل الغائب يظهر «غير متوفر» لا قيمة مختلقة.
+import { formatPlatformCopy } from "@/lib/brand";
 import { Check, Minus } from "lucide-react";
 import type { CSSProperties } from "react";
 import type { PlanConfig } from "./plan-types";
@@ -33,10 +34,10 @@ const ROWS: Row[] = [
   { kind: "flag", label: "دومين مخصص", get: (pl) => pl.hasCustomDomain },
   { kind: "flag", label: "بوابة دفع إلكتروني", get: (pl) => pl.hasPaymentGateway },
   { kind: "flag", label: "أكواد خصم مخصصة", get: (pl) => pl.hasDiscountCodes },
-  { kind: "flag", label: "إزالة شعار «مدعوم من بسطة»", get: (pl) => pl.hasRemoveBranding },
+  { kind: "flag", label: "إزالة شعار «مدعوم من بسطة مارت»", get: (pl) => pl.hasRemoveBranding },
   { kind: "value", label: "التقارير", get: (pl) => (pl.reportsLevel ? REPORTS[pl.reportsLevel] ?? "—" : "—") },
   { kind: "group", label: "الظهور والثقة" },
-  { kind: "flag", label: "ظهور مميّز في بسطة", get: (pl) => pl.hasFeaturedListing },
+  { kind: "flag", label: "ظهور مميّز في بسطة مارت", get: (pl) => pl.hasFeaturedListing },
   { kind: "flag", label: "أولوية في نتائج البحث", get: (pl) => pl.hasPrioritySearch },
   { kind: "flag", label: "توثيق المتجر", get: (pl) => pl.hasVerifiedBadge },
   { kind: "group", label: "الدعم" },
@@ -65,7 +66,7 @@ export default function ComparisonTable({ plans, billing }: { plans: PlanConfig[
               <th scope="col" className={p.corner}>الميزة</th>
               {plans.map((pl) => (
                 <th key={pl.plan} scope="col" className={`${p.colHead} ${pl.badgeAr ? p.hotCol : ""}`}>
-                  <span className={p.colName}>{pl.nameAr}</span>
+                  <span className={p.colName}>{formatPlatformCopy(pl.nameAr)}</span>
                   <span className={p.colPrice}>{price(pl)}</span>
                 </th>
               ))}

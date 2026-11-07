@@ -14,15 +14,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 
   if (!product) {
-    return { title: "المنتج غير موجود | بسطة" };
+    return { title: "المنتج غير موجود | بسطة مارت" };
   }
 
-  const description = product.shortDescAr ?? `${product.nameAr} من ${product.store.nameAr} — ${product.price} ر.س، منصة بسطة`;
+  const description = product.shortDescAr ?? `${product.nameAr} من ${product.store.nameAr} — ${product.price} ر.س، منصة بسطة مارت`;
 
   return {
-    title: `${product.nameAr} | ${product.store.nameAr} | بسطة`,
+    title: `${product.nameAr} | ${product.store.nameAr} | بسطة مارت`,
     description,
     openGraph: {
+      siteName: "بسطة مارت",
       title: product.nameAr,
       description,
       images: product.mainImage ? [product.mainImage] : undefined,

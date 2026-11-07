@@ -14,7 +14,7 @@ export default function AdminTopbar({ active }: { active: AdminSection }) {
       )}
 
       <div>
-        <p className={s.topKicker}>لوحة إدارة بسطة</p>
+        <p className={s.topKicker}>لوحة إدارة بسطة مارت</p>
         <h1 className={s.topTitle}>{section?.label}</h1>
       </div>
     </div>

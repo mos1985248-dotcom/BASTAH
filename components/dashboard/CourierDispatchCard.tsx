@@ -51,7 +51,7 @@ export default function CourierDispatchCard({ orderId, onDone }: { orderId: stri
   return (
     <section className={`${f.panel} ${s.card}`}>
       <header className={f.panelHead}>
-        <h3 className={f.panelTitle}>الشحن عبر مندوب بسطة</h3>
+        <h3 className={f.panelTitle}>الشحن عبر مندوب بسطة مارت</h3>
         <Truck size={18} strokeWidth={1.8} aria-hidden="true" />
       </header>
 

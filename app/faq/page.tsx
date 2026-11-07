@@ -7,9 +7,9 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { t } from "@/theme";
 
 export const metadata: Metadata = {
-  title: "الأسئلة الشائعة | بسطة",
+  title: "الأسئلة الشائعة | بسطة مارت",
   description:
-    "إجابات عن الاشتراكات والباقات والشحن ومنيرة وغيرها من الأسئلة الشائعة في بسطة.",
+    "إجابات عن الاشتراكات والباقات والشحن ومنيرة وغيرها من الأسئلة الشائعة في بسطة مارت.",
 };
 
 export default function FAQPage() {
@@ -74,7 +74,7 @@ export default function FAQPage() {
               lineHeight: 1.8,
             }}
           >
-            إجابات مختصرة عن باقات بسطة، الاشتراك، الشحن والخدمات المتاحة
+            إجابات مختصرة عن باقات بسطة مارت، الاشتراك، الشحن والخدمات المتاحة
             لمتجرك.
           </p>
         </section>

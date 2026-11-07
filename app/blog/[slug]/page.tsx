@@ -5,6 +5,7 @@
 // مع صفحات تعتمد client-side fetching.
 
 import type { Metadata } from "next";
+import { formatPlatformCopy } from "@/lib/brand";
 import { prisma } from "@/lib/prisma";
 import BlogPostClient from "@/components/blog/BlogPostClient";
 
@@ -19,16 +20,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 
   if (!post || !post.isPublished) {
-    return { title: "المقال غير موجود | بسطة" };
+    return { title: "المقال غير موجود | بسطة مارت" };
   }
 
-  const description = post.excerptAr ?? "مقال من مدونة بسطة — منصة الأسر المنتجة السعودية";
+  const description = formatPlatformCopy(post.excerptAr ?? "مقال من مدونة بسطة مارت — منصة الأسر المنتجة السعودية");
 
   return {
-    title: `${post.titleAr} | مدونة بسطة`,
+    title: `${formatPlatformCopy(post.titleAr)} | مدونة بسطة مارت`,
     description,
     openGraph: {
-      title: post.titleAr,
+      siteName: "بسطة مارت",
+      title: formatPlatformCopy(post.titleAr),
       description,
       images: post.coverImage ? [post.coverImage] : undefined,
       type: "article",

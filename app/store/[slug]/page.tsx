@@ -14,15 +14,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 
   if (!store) {
-    return { title: "المتجر غير موجود | بسطة" };
+    return { title: "المتجر غير موجود | بسطة مارت" };
   }
 
-  const description = store.shortDesc ?? `${store.nameAr} — متجر سعودي من ${store.city} على منصة بسطة`;
+  const description = store.shortDesc ?? `${store.nameAr} — متجر سعودي من ${store.city} على منصة بسطة مارت`;
 
   return {
-    title: `${store.nameAr} | بسطة`,
+    title: `${store.nameAr} | بسطة مارت`,
     description,
     openGraph: {
+      siteName: "بسطة مارت",
       title: store.nameAr,
       description,
       images: store.coverImage ? [store.coverImage] : store.logo ? [store.logo] : undefined,

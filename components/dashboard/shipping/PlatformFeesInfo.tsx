@@ -9,7 +9,7 @@ import ShipKpi from "./ShipKpi";
 export default function PlatformFeesInfo({ basitaShippingFee, codFee }: { basitaShippingFee: number; codFee: number }) {
   return (
     <>
-      <ShipKpi icon={Truck} label="رسوم بسطة التشغيلية" value={`${basitaShippingFee} ر.س`} />
+      <ShipKpi icon={Truck} label="رسوم بسطة مارت التشغيلية" value={`${basitaShippingFee} ر.س`} />
       <ShipKpi icon={Banknote} label="رسوم الدفع عند الاستلام" value={`${codFee} ر.س`} />
     </>
   );

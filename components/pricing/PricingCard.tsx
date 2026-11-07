@@ -9,6 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { t } from "@/theme";
+import { formatPlatformCopy } from "@/lib/brand";
 import type { PlanConfig } from "./plan-types";
 import { useCurrentUser } from "@/app/providers";
 
@@ -153,7 +154,7 @@ export default function PricingCard({
               aria-hidden="true"
             />
 
-            {plan.badgeAr}
+            {formatPlatformCopy(plan.badgeAr)}
           </span>
         )}
       </div>
@@ -176,7 +177,7 @@ export default function PricingCard({
             lineHeight: 1.4,
           }}
         >
-          {plan.nameAr}
+          {formatPlatformCopy(plan.nameAr)}
         </h3>
 
         <div
@@ -198,7 +199,7 @@ export default function PricingCard({
                 lineHeight: 1.7,
               }}
             >
-              {plan.taglineAr}
+              {formatPlatformCopy(plan.taglineAr)}
             </p>
           )}
         </div>
@@ -452,7 +453,7 @@ export default function PricingCard({
               />
             </span>
 
-            <span>{feature}</span>
+            <span>{formatPlatformCopy(feature)}</span>
           </div>
         ))}
       </div>

@@ -24,7 +24,7 @@ export default function OffersPage() {
           العروض والكوبونات
         </h1>
         <p style={{ fontSize: t.typography.fontSize.sm, color: t.colors.text.mid, marginBottom: t.spacing["6"] }}>
-          أكواد خصم فعّالة من متاجر بسطة — استخدميها عند إتمام الطلب
+          أكواد خصم فعّالة من متاجر بسطة مارت — استخدميها عند إتمام الطلب
         </p>
 
         {loading && <p style={{ color: t.colors.text.mid }}>جاري التحميل...</p>}

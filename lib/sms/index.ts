@@ -20,7 +20,7 @@ export class SmsNotConfiguredError extends Error {
 const PROVIDERS: Record<string, () => SmsProvider> = {};
 
 export function otpMessage(otp: string): string {
-  return `رمز التحقق الخاص بك في بسطة: ${otp}\nلا تشاركه مع أحد.`;
+  return `رمز التحقق الخاص بك في بسطة مارت: ${otp}\nلا تشاركه مع أحد.`;
 }
 
 export async function sendOtpSms(to: string, otp: string): Promise<void> {

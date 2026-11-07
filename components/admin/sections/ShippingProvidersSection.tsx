@@ -74,7 +74,7 @@ export default function ShippingProvidersSection() {
 
       <section>
         <h3 style={{ margin: `0 0 ${t.spacing["2"]}`, fontSize: t.typography.fontSize.base, color: t.colors.text.dark }}>
-          مناديب بسطة للشحن (لكل مدينة)
+          مناديب بسطة مارت للشحن (لكل مدينة)
         </h3>
         <p style={{ margin: `0 0 ${t.spacing["3"]}`, fontSize: 12, color: t.colors.text.mid, maxWidth: 640 }}>
           التاجر يختار مندوب مدينة المشتري من صفحة الطلب ويرسله له عبر واتساب برسالة جاهزة.

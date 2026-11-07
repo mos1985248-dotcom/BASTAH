@@ -7,7 +7,7 @@ import LoginClient from "./LoginClient";
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<AuthShell title="تسجيل الدخول" subtitle="أهلاً بك مجدداً في بسطة" scene="heritage"><div /></AuthShell>}>
+    <Suspense fallback={<AuthShell title="تسجيل الدخول" subtitle="أهلاً بك مجدداً في بسطة مارت" scene="heritage"><div /></AuthShell>}>
       <LoginClient />
     </Suspense>
   );

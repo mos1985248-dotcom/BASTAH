@@ -34,7 +34,7 @@ export default function FooterBottom() {
         {ACTIVE_SOCIALS.length > 0 && (
           <div
             className={styles.socials}
-            aria-label="حسابات بسطة على وسائل التواصل"
+            aria-label="حسابات بسطة مارت على وسائل التواصل"
           >
             {ACTIVE_SOCIALS.map((s) => (
               <a

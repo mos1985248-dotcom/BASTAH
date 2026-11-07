@@ -242,7 +242,7 @@ export default function UsersTab() {
                 color: t.colors.text.mid,
               }}
             >
-              إدارة حسابات مستخدمي بسطة
+              إدارة حسابات مستخدمي بسطة مارت
             </p>
           </div>
         </div>

@@ -48,7 +48,7 @@ export default function CompanyEcosystem() {
           <div className={styles.ecosystemImage}>
             <Image
               src="/images/about/company-ecosystem.jpg"
-              alt="منظومة بسطة التي تربط أصحاب المشاريع بالعملاء والمجتمع المحلي"
+              alt="منظومة بسطة مارت التي تربط أصحاب المشاريع بالعملاء والمجتمع المحلي"
               fill
               sizes="(max-width: 900px) 100vw, 45vw"
               style={{
@@ -72,7 +72,7 @@ export default function CompanyEcosystem() {
                   fontWeight: t.typography.fontWeight.bold,
                 }}
               >
-                منظومة بسطة
+                منظومة بسطة مارت
               </p>
 
               <h2
@@ -84,7 +84,7 @@ export default function CompanyEcosystem() {
                   lineHeight: 1.5,
                 }}
               >
-                بسطة تربط المشروع بالعميل
+                بسطة مارت تربط المشروع بالعميل
               </h2>
 
               <p
@@ -95,7 +95,7 @@ export default function CompanyEcosystem() {
                   lineHeight: 2,
                 }}
               >
-                من إنشاء المتجر وعرض المنتجات، إلى اكتشافها وشرائها، تجمع بسطة
+                من إنشاء المتجر وعرض المنتجات، إلى اكتشافها وشرائها، تجمع بسطة مارت
                 أطراف التجربة في مساحة رقمية واحدة.
               </p>
             </div>

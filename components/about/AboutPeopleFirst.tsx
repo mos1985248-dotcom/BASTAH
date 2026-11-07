@@ -42,7 +42,7 @@ export default function AboutPeopleFirst() {
                 lineHeight: 1.5,
               }}
             >
-              بسطة تبدأ من الناس
+              بسطة مارت تبدأ من الناس
             </h2>
 
             <div className={styles.text}>
@@ -65,7 +65,7 @@ export default function AboutPeopleFirst() {
               </p>
 
               <p>
-                لأن أفضل نسخة من بسطة لن تأتي من التخمين.
+                لأن أفضل نسخة من بسطة مارت لن تأتي من التخمين.
               </p>
 
               <p className={styles.finalStatement}>
