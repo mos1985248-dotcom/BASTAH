@@ -299,4 +299,76 @@
   .fluid .rating { grid-column: 2; justify-self: start; margin-inline-start: 0; }
   .fluid .enter { min-height: 40px; font-size: 12px; gap: 4px; }
 }
+/* Homepage catalog variant. Marketplace cards retain their existing dimensions. */
+.lane { gap: 18px; }
+.lane > .skeleton { width: 270px; }
+.compact { width: 270px; min-height: 360px; }
+.compact .stallRoof { flex: none; height: 32px; margin-inline: 0; border-radius: 12px 12px 2px 2px; }
+.compact .roofEdge {
+  bottom: -7px; height: 12px;
+  -webkit-mask: radial-gradient(ellipse 30px 12px at 30px 0, #000 99%, transparent 100%) left top / 60px 12px repeat-x;
+  mask: radial-gradient(ellipse 30px 12px at 30px 0, #000 99%, transparent 100%) left top / 60px 12px repeat-x;
+}
+.compact .stallScene { flex: none; height: 160px; border-inline-width: 7px; }
+.compact .stallScene::before, .compact .stallScene::after { width: 4px; }
+.compact .counter { height: 12px; border-top-width: 3px; }
+.compact .woodSign {
+  position: relative; top: auto; left: auto; right: auto; transform: none; flex: none; align-self: center;
+  width: calc(100% - 20px); max-width: calc(100% - 20px); min-height: 34px; margin-top: -2px;
+  padding: 3px 12px; border-width: 1px;
+}
+.compact .woodSign::before, .compact .woodSign::after { top: -10px; height: 9px; }
+.compact .name { width: 100%; min-width: 0; gap: 4px; font-size: 18px; line-height: 1.5; }
+.compact .nameText {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  min-width: 0; overflow: hidden; overflow-wrap: anywhere;
+}
+.compact .info { min-width: 0; padding: 12px; gap: 5px; }
+.compact .infoTop { min-width: 0; min-height: 24px; flex-wrap: nowrap; gap: 5px; }
+.compact .logo { width: 24px; height: 24px; }
+.compact .logo svg { width: 16px; height: 16px; }
+.compact .meta { flex: 1; min-width: 0; font-size: 12px; }
+.compact .meta > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.compact .rating { flex: none; margin-inline-start: auto; font-size: 12px; white-space: nowrap; }
+.compact .desc { min-height: 39px; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.compact .enter { min-height: 40px; padding: 8px 10px; gap: 6px; font-size: 13px; line-height: 1.5; }
+.compact .enter svg { flex: none; width: 15px; height: 15px; }
+.compact .sceneProducts { inset-inline: 12px; bottom: 12px; height: 50px; gap: 7px; }
+.compact .sceneProduct { width: 28%; max-width: 56px; }
+/* A 32px visual circle inside an independent 44px touch target. */
+.compact .favorite { top: 36px; inset-inline-end: 4px; width: 44px; height: 44px; border: 0; background: transparent; box-shadow: none; }
+.compact .favorite::before { content: ""; position: absolute; inset: 6px; border: 1px solid #e2d3bb; border-radius: 50%; background: #fffaf2f0; box-shadow: 0 2px 8px #2c1d1538; }
+.compact .favorite svg { position: relative; }
+.compact .favorite:hover, .compact .favoriteActive { background: transparent; }
+.compact .favorite:hover::before, .compact .favoriteActive::before { background: #fff4f5; }
+
+@media (max-width: 767px) {
+  .lane { gap: 10px 8px; }
+  .lane > .skeleton { width: 100%; }
+  .compact { min-height: 270px; }
+  .compact .stallRoof { height: 24px; border-radius: 9px 9px 2px 2px; }
+  .compact .roofEdge {
+    bottom: -6px; height: 10px;
+    -webkit-mask: radial-gradient(ellipse 20px 10px at 20px 0, #000 99%, transparent 100%) left top / 40px 10px repeat-x;
+    mask: radial-gradient(ellipse 20px 10px at 20px 0, #000 99%, transparent 100%) left top / 40px 10px repeat-x;
+  }
+  .compact .stallScene { height: 114px; border-inline-width: 4px; }
+  .compact .stallScene::before, .compact .stallScene::after { width: 3px; }
+  .compact .counter { height: 9px; border-top-width: 3px; }
+  .compact .woodSign { width: calc(100% - 12px); max-width: calc(100% - 12px); min-height: 28px; padding: 3px 8px; }
+  .compact .name { gap: 3px; font-size: 14.5px; line-height: 1.5; }
+  .compact .info { padding: 8px; gap: 4px; }
+  .compact .infoTop { min-height: 20px; gap: 4px; }
+  .compact .logo { width: 20px; height: 20px; }
+  .compact .logo svg { width: 13px; height: 13px; }
+  .compact .meta, .compact .rating { font-size: 10.5px; gap: 2px; }
+  .compact .meta svg, .compact .rating svg { width: 11px; height: 11px; }
+  .compact .desc { min-height: 33.35px; font-size: 11.5px; line-height: 1.45; }
+  .compact .enter { min-height: 34px; padding: 6px; gap: 4px; font-size: 12px; line-height: 1.5; }
+  .compact .enter svg { width: 14px; height: 14px; }
+  .compact .sceneProducts { inset-inline: 5px; bottom: 8px; height: 32px; gap: 4px; }
+  .compact .sceneProduct { max-width: 34px; border-width: 2px; }
+  .compact .favorite { top: 26px; inset-inline-end: 2px; }
+  .compact .favorite svg { width: 16px; height: 16px; }
+}
 /* basita-font-scale: applied */
