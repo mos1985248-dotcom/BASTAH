@@ -7,8 +7,11 @@ import { requireUser, AuthError } from "@/lib/auth";
 import { assertHasMuniraAccess } from "@/lib/subscription-limits";
 import { checkAiRateLimit } from "@/lib/rate-limit";
 import { sanitizeUserInput } from "@/lib/munira/security";
-import { callAI } from "@/lib/ai/provider";
+import { freeAnswer, freeUnavailable } from "@/lib/munira/free-router";
+import { redactPrompt } from "@/lib/munira/context";
 import { formatZodError } from "@/lib/validation";
+
+export const maxDuration = 60;
 
 const translateSchema = z.object({
   title:       z.string().trim().min(1).max(200),
@@ -55,14 +58,16 @@ export async function POST(req: NextRequest) {
 ${description ? `الوصف: ${description}` : ""}
 ${tags?.length ? `الوسوم: ${tags.join(", ")}` : ""}`;
 
-    const text = await callAI({
-      prompt,
-      userId: user.id,
-      storeId: user.store.id,
-      route: "/api/ai/translate",
-      feature: "translate",
-      maxTokens: 1024,
-    });
+    let text: string;
+    try {
+      ({ text } = await freeAnswer({
+        system: "أرجع الترجمة التجارية بالنسق المطلوب فقط.",
+        messages: [{ role: "user", content: redactPrompt(prompt) }],
+        maxTokens: 650,
+      }, { userId: user.id, storeId: user.store.id, route: "/api/ai/translate", feature: "translate" }));
+    } catch {
+      return NextResponse.json({ error: freeUnavailable }, { status: 503 });
+    }
 
     let result: { title?: string; description?: string; tags?: string[] };
     try {

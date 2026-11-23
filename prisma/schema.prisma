@@ -416,6 +416,9 @@ model SubscriptionPlanConfig {
   hasPrioritySupport Boolean          @default(false) // أولوية الدعم
   hasAIFeatures      Boolean          @default(true)  // الوصول لمنيرة AI — false في FREE/STARTER، true في GROWTH/PRO
 
+  muniraMonthlyMessages Int @default(0)
+  muniraTrialMessages   Int @default(0)
+
   // قائمة المميزات للعرض
   featuresAr         String[]         @default([])
 
@@ -2115,4 +2118,37 @@ model ProductPricing {
   updatedAt        DateTime @updatedAt
 
   @@map("product_pricing")
+}
+
+model MuniraModel {
+  id            String   @id @default(cuid())
+  provider      String
+  model         String
+  apiKeyEnc     String
+  priority      Int      @default(100)
+  enabled       Boolean  @default(false)
+  lastCheckedAt DateTime?
+  freeVerified  Boolean  @default(false)
+  lastError     String?
+  updatedAt     DateTime @updatedAt
+
+  @@unique([provider, model])
+  @@map("munira_models")
+}
+
+model MuniraRequest {
+  scope        String
+  requestId    String
+  inputHash    String
+  quotaWindow  String
+  state        String
+  lease        String
+  expiresAt    DateTime
+  sessionId    String?
+  response     String?
+  updatedAt    DateTime @updatedAt
+
+  @@id([scope, requestId])
+  @@index([scope, quotaWindow, state, expiresAt])
+  @@map("munira_requests")
 }

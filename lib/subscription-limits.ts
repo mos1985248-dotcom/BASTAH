@@ -105,9 +105,7 @@ export async function getProductUsage(storeId: string) {
 }
 
 /**
- * بوّابة الوصول لمنيرة AI — FREE و STARTER ممنوعتان، GROWTH و PRO مسموح.
- * لا يوجد API حقيقي لمنيرة في هذا المشروع بعد (راجع ملاحظة في نهاية
- * README) — هذه الدالة جاهزة لاستدعائها فور بناء أول route حقيقي لها.
+ * بوّابة ميزات منيرة. حصة رسائل الدردشة منفصلة وتُحجز في قاعدة البيانات.
  */
 export async function assertHasMuniraAccess(storeId: string): Promise<void> {
   const subscription = await prisma.storeSubscription.findUnique({
@@ -128,7 +126,7 @@ export async function assertHasMuniraAccess(storeId: string): Promise<void> {
 
   if (!planConfig?.hasAIFeatures) {
     throw new PlanLimitError(
-      "منيرة غير متاحة في باقتك الحالية — رقّي لباقة بسطة مارت انطلاق أو بسطة مارت ازدهار لتفعيلها"
+      "منيرة غير متاحة في باقتك الحالية."
     );
   }
 }

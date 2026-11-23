@@ -3,7 +3,6 @@
 
 import { useState, useCallback, useRef } from "react";
 import { sendMessage, transcribeVoice } from "@/services/munira-client";
-import type { APIMessage } from "@/services/munira-client";
 
 export type MessageRole = "user" | "assistant";
 export interface Message {
@@ -33,18 +32,9 @@ export function useMuniraChat(options: Options = {}) {
   // ── helpers ──────────────────────────────────────────────
   const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
-  const apiHistory = useCallback(
-    (msgs: Message[]): APIMessage[] =>
-      msgs.filter((m) => !m.error && !m.pending).slice(-20).map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
-    []
-  );
-
   // ── core send ─────────────────────────────────────────────
   const _stream = useCallback(
-    async (text: string, historySnapshot: Message[]) => {
+    async (text: string, requestId: string) => {
       setError(null);
       setStreaming(true);
 
@@ -55,10 +45,9 @@ export function useMuniraChat(options: Options = {}) {
       abortRef.current = controller;
 
       try {
-        const history = [...apiHistory(historySnapshot), { role: "user" as const, content: text }];
-
         for await (const chunk of sendMessage({
-          messages: history,
+          messages: [{ role: "user", content: text }],
+          requestId,
           sessionId: sessionIdRef.current,
           userType: options.userType ?? "guest",
           preferredLanguage: options.preferredLanguage,
@@ -116,35 +105,31 @@ export function useMuniraChat(options: Options = {}) {
         setStreaming(false);
       }
     },
-    [apiHistory, options]
+    [options]
   );
 
   // ── public: send text ─────────────────────────────────────
   const send = useCallback(
     (text: string) => {
-      if (!text.trim() || streaming) return;
-      const userMsg: Message = { id: uid(), role: "user", content: text.trim() };
-      // Optimistic: add user message immediately before awaiting stream
-      setMessages((prev) => {
-        const next = [...prev, userMsg];
-        _stream(text.trim(), next);
-        return next;
-      });
+      if (!text.trim() || abortRef.current) return;
+      const userMsg: Message = { id: crypto.randomUUID(), role: "user", content: text.trim() };
+      setMessages(prev => [...prev, userMsg]);
+      void _stream(userMsg.content, userMsg.id);
     },
-    [streaming, _stream]
+    [_stream]
   );
 
   // ── public: retry last failed message ────────────────────
   const retry = useCallback(() => {
     // Find last user message, remove last assistant error, re-stream
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
-    if (!lastUser) return;
+    if (!lastUser || abortRef.current) return;
     const withoutLastAssistant = messages.filter(
       (m, i) => !(m.error && m.role === "assistant" && i === messages.length - 1)
     );
     setMessages(withoutLastAssistant);
     setError(null);
-    _stream(lastUser.content, withoutLastAssistant.filter((m) => m.id !== lastUser.id));
+    void _stream(lastUser.content, lastUser.id);
   }, [messages, _stream]);
 
   // ── public: voice recording ───────────────────────────────
