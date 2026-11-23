@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { AlertTriangle, ChevronRight } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
+import ProductPricingCalculator from "@/components/dashboard/pricing/ProductPricingCalculator";
+import { calculatePricing, type PricingInput } from "@/lib/pricing/product-pricing";
 import { uiVars } from "@/components/ui/vars";
 import ImageManagerCard from "@/components/dashboard/product-edit/ImageManagerCard";
 import DetailsFormCard from "@/components/dashboard/product-edit/DetailsFormCard";
@@ -17,10 +19,22 @@ interface ProductDetail {
   status: string; productImages: EditProductImage[]; variants?: EditVariant[];
 }
 
+interface SavedPricing {
+  input: PricingInput;
+  updatedAt: string;
+}
+
 export default function EditProductPage() {
   const { id } = useParams<{ id: string }>();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  return <ProductEditor key={id} id={id} />;
+}
 
+function ProductEditor({ id }: { id: string }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [savedPricing, setSavedPricing] = useState<SavedPricing | null>(null);
+  const [pricing, setPricing] = useState<PricingInput | null>(null);
+  const [vatRate, setVatRate] = useState<string | null>(null);
+  const [pricingError, setPricingError] = useState("");
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [form, setForm] = useState({ nameAr: "", nameEn: "", price: "", quantity: "", shortDescAr: "", shortDescEn: "" });
   const [loading, setLoading] = useState(true);
@@ -35,12 +49,12 @@ export default function EditProductPage() {
     setError
   );
 
-  const load = () => {
+  const load = (updateForm = false) => {
     api
       .get<{ product: ProductDetail }>(`/api/products/${id}`)
       .then(({ product }) => {
         setProduct(product);
-        setForm({
+        if (updateForm) setForm({
           nameAr: product.nameAr,
           nameEn: (product as any).nameEn ?? "",
           price: String(product.price),
@@ -53,18 +67,34 @@ export default function EditProductPage() {
       .finally(() => setLoading(false));
   };
 
+  const loadPricing = () => {
+    setPricingError("");
+    api.get<{ pricing: SavedPricing | null; vatRate: string }>(`/api/products/${id}/pricing`)
+      .then(({ pricing, vatRate }) => {
+        setSavedPricing(pricing);
+        setVatRate(vatRate);
+      })
+      .catch((err) => setPricingError(err instanceof ApiError ? err.message : "تعذّر تحميل بيانات التسعير"));
+  };
+
   useEffect(() => {
-    load();
+    load(true);
+    loadPricing();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const hasVariants = (product?.variants?.length ?? 0) > 0;
 
   const saveDetails = async () => {
+    if (pricing && "error" in calculatePricing(pricing, form.price)) {
+      setError("صحّح مدخلات حاسبة التسعير أو تجاهل تغييراتها قبل الحفظ.");
+      return;
+    }
     setSavingDetails(true);
     setError("");
     try {
       await api.patch(`/api/products/${id}`, {
+        pricing: pricing ?? undefined,
         nameAr: form.nameAr,
         nameEn: form.nameEn || undefined,
         price: Number(form.price),
@@ -72,6 +102,11 @@ export default function EditProductPage() {
         shortDescAr: form.shortDescAr || undefined,
         shortDescEn: form.shortDescEn || undefined,
       });
+      if (pricing) {
+        setSavedPricing({ input: pricing, updatedAt: savedPricing?.updatedAt ?? "" });
+        loadPricing();
+        setPricing(null);
+      }
       load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "تعذّر حفظ التعديلات");
@@ -177,7 +212,22 @@ export default function EditProductPage() {
             onSave={saveDetails}
             saving={savingDetails}
             quantityLocked={hasVariants}
-          />
+          >
+            {vatRate !== null && <ProductPricingCalculator
+              vatRate={vatRate}
+              value={pricing ?? savedPricing?.input ?? null}
+              savedAt={savedPricing?.updatedAt}
+              onChange={setPricing}
+              price={form.price}
+              onPrice={v => setForm(p => ({ ...p, price: v }))}
+              disabled={savingDetails}
+              dirty={pricing !== null}
+            />}
+            {pricingError && <div>
+              <p className={s.err} role="alert">{pricingError}</p>
+              <button type="button" className={`${s.cta} ${s.ghost}`} onClick={loadPricing}>إعادة تحميل التسعير</button>
+            </div>}
+          </DetailsFormCard>
           <VariantsCard productId={id} variants={product.variants ?? []} basePrice={product.price} onSaved={load} />
         </div>
         <div className={`${s.col} ${s.sticky}`}>

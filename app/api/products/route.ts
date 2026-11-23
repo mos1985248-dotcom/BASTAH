@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { pricingRecord, productPricingSchema } from "@/lib/pricing/storage";
 import { requireActiveStore, requireUser, AuthError } from "@/lib/auth";
 import { assertCanAddProduct, PlanLimitError, GOOD_STANDING_STATUSES } from "@/lib/subscription-limits";
 import { createProductSchema, listProductsQuerySchema, formatZodError } from "@/lib/validation";
@@ -126,18 +127,23 @@ export async function POST(req: NextRequest) {
     await assertCanAddProduct(storeId);
 
     const body = await req.json();
+    const pricing = productPricingSchema.optional().safeParse(body?.pricing);
+    if (!pricing.success) {
+      return NextResponse.json({ error: formatZodError(pricing.error) }, { status: 400 });
+    }
     const parsed = createProductSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     }
     const data = parsed.data;
+    const record = pricing.data ? pricingRecord(pricing.data) : undefined;
 
     const baseSlug = data.nameAr.trim().replace(/\s+/g, "-").slice(0, 60);
     const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 7)}`;
 
     const [product] = await prisma.$transaction([
       prisma.product.create({
-        data: { ...data, storeId, slug },
+        data: { ...data, storeId, slug, ...(record && { pricing: { create: record } }) },
         select: { id: true, nameAr: true, slug: true, status: true, price: true },
       }),
       prisma.store.update({ where: { id: storeId }, data: { totalProducts: { increment: 1 } } }),

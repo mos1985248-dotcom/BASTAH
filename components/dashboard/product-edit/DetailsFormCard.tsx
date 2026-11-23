@@ -17,7 +17,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export default function DetailsFormCard({
-  form, onChange, onTranslate, translating, onSave, saving, quantityLocked,
+  form, onChange, onTranslate, translating, onSave, saving, quantityLocked, children,
 }: {
   form: FormState;
   onChange: (k: keyof FormState, v: string) => void;
@@ -26,6 +26,7 @@ export default function DetailsFormCard({
   onSave: () => void;
   saving: boolean;
   quantityLocked?: boolean;
+  children?: React.ReactNode;
 }) {
   return (
     <section className={s.panel} style={uiVars} aria-labelledby="pe-details">
@@ -67,6 +68,7 @@ export default function DetailsFormCard({
           </Field>
         </div>
 
+        {children}
         <button type="button" className={s.cta} onClick={onSave} disabled={saving}>
           {saving ? "جاري الحفظ..." : "حفظ التعديلات"}
         </button>

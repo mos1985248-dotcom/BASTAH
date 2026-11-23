@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { pricingRecord, productPricingSchema } from "@/lib/pricing/storage";
 import { requireUser, getCurrentUser, AuthError } from "@/lib/auth";
 import { updateProductSchema, formatZodError } from "@/lib/validation";
 import { isSubscriptionInGoodStanding } from "@/lib/subscription-limits";
@@ -67,8 +68,9 @@ export async function GET(req: NextRequest, { params }: Params) {
 
     // لا نُسرّب userId للاستجابة العامة — كان مطلوباً فقط للتحقق أعلاه
     const { userId: _omit, subscription, ...storePublic } = product.store;
+    const { costPrice: _privateCost, ...publicProduct } = product;
     const responseProduct = {
-      ...product,
+      ...publicProduct,
       store: { ...storePublic, isFollowing },
       ...(isOwnerOrAdmin && !subscriptionOk
         ? { subscriptionWarning: "اشتراك متجرك غير فعّال حالياً — هذا المنتج مخفي عن الزوّار حتى تجديد الباقة" }
@@ -113,10 +115,19 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (!allowed) return NextResponse.json({ error: "لا تملكين صلاحية تعديل هذا المنتج" }, { status: 403 });
 
     const body = await req.json();
+    const pricing = productPricingSchema.optional().safeParse(body?.pricing);
+    if (!pricing.success) {
+      return NextResponse.json({ error: formatZodError(pricing.error) }, { status: 400 });
+    }
     const parsed = updateProductSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     }
+
+    if (pricing.data && (user.role !== "SELLER" || user.store?.id !== product.storeId)) {
+      return NextResponse.json({ error: "بيانات التسعير متاحة للتاجر مالك المنتج فقط" }, { status: 403 });
+    }
+    const record = pricing.data ? pricingRecord(pricing.data) : undefined;
 
     // ⚠️ منتج له متغيرات: كميته = مجموع كميات متغيراته ويُديرها /variants فقط — نتجاهل quantity هنا
     const data = { ...parsed.data };
@@ -125,8 +136,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     }
 
     const updated = await prisma.product.update({
-      where: { id: params.id },
-      data,
+      where: record ? { id: params.id, storeId: product.storeId, store: { userId: user.id } } : { id: params.id },
+      data: { ...data, ...(record && { pricing: { upsert: { create: record, update: record } } }) },
       select: { id: true, nameAr: true, slug: true, status: true, price: true, quantity: true },
     });
 

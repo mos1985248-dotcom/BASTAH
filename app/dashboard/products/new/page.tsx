@@ -8,6 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, ChevronRight } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
+import ProductPricingCalculator from "@/components/dashboard/pricing/ProductPricingCalculator";
+import { calculatePricing, type PricingInput } from "@/lib/pricing/product-pricing";
 import { uiVars } from "@/components/ui/vars";
 import { DashboardField, DashboardTextarea } from "@/components/dashboard/DashboardField";
 import NewImagesPicker from "@/components/dashboard/product-new/NewImagesPicker";
@@ -19,12 +21,23 @@ import s from "@/components/dashboard/forms.module.css";
 export default function AddProductPage() {
   const router = useRouter();
   const [form, setForm] = useState({ nameAr: "", price: "", quantity: "", shortDescAr: "" });
+  const [vatRate, setVatRate] = useState<string | null>(null);
+  const [vatError, setVatError] = useState("");
+  const [pricing, setPricing] = useState<PricingInput | null>(null);
   const [images, setImages] = useState<PendingImage[]>([]);
   // بعد إنشاء المنتج فعلاً: إعادة المحاولة (لو فشل رفع صورة) لا تُنشئه مرة ثانية
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [upgradeRequired, setUpgradeRequired] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const loadVat = () => {
+    setVatError("");
+    api.get<{ vatRate: string }>("/api/products/pricing-context")
+      .then(result => setVatRate(result.vatRate))
+      .catch(() => setVatError("تعذّر تحميل إعداد الضريبة للحاسبة."));
+  };
+  useEffect(loadVat, []);
 
   const imagesRef = useRef(images);
   imagesRef.current = images;
@@ -65,6 +78,10 @@ export default function AddProductPage() {
       setError("اسم المنتج والسعر مطلوبان");
       return;
     }
+    if (!createdId && pricing && "error" in calculatePricing(pricing, form.price)) {
+      setError("صحّح مدخلات حاسبة التسعير أو تجاهل تغييراتها قبل الحفظ.");
+      return;
+    }
     setLoading(true);
     setError("");
     setUpgradeRequired(false);
@@ -72,6 +89,7 @@ export default function AddProductPage() {
       let productId = createdId;
       if (!productId) {
         const { product } = await api.post<{ product: { id: string } }>("/api/products", {
+          pricing: pricing ?? undefined,
           nameAr: form.nameAr,
           price: Number(form.price),
           quantity: Number(form.quantity || 0),
@@ -130,6 +148,11 @@ export default function AddProductPage() {
               <DashboardTextarea label="وصف مختصر" value={form.shortDescAr} onChange={(v) => set("shortDescAr", v)} />
             </fieldset>
           </section>
+          {vatRate !== null && <ProductPricingCalculator vatRate={vatRate} value={pricing} onChange={setPricing} price={form.price} onPrice={v => set("price", v)} disabled={!!createdId || loading} dirty={pricing !== null} />}
+          {vatError && <div>
+            <p className={s.err} role="alert">{vatError}</p>
+            <button type="button" className={`${s.cta} ${s.ghost}`} onClick={loadVat}>إعادة تحميل التسعير</button>
+          </div>}
         </div>
 
         <div className={`${s.col} ${s.sticky}`}>
