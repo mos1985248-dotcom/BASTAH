@@ -16,7 +16,7 @@ import s from "@/components/dashboard/forms.module.css";
 
 interface ProductDetail {
   id: string; nameAr: string; price: number; quantity: number; shortDescAr: string | null;
-  status: string; productImages: EditProductImage[]; variants?: EditVariant[];
+  categoryId: string | null; status: string; productImages: EditProductImage[]; variants?: EditVariant[];
 }
 
 interface SavedPricing {
@@ -213,7 +213,9 @@ function ProductEditor({ id }: { id: string }) {
             saving={savingDetails}
             quantityLocked={hasVariants}
           >
-            {vatRate !== null && <ProductPricingCalculator
+            <ProductPricingCalculator
+              productName={form.nameAr}
+              categoryId={product.categoryId}
               vatRate={vatRate}
               value={pricing ?? savedPricing?.input ?? null}
               savedAt={savedPricing?.updatedAt}
@@ -222,7 +224,7 @@ function ProductEditor({ id }: { id: string }) {
               onPrice={v => setForm(p => ({ ...p, price: v }))}
               disabled={savingDetails}
               dirty={pricing !== null}
-            />}
+            />
             {pricingError && <div>
               <p className={s.err} role="alert">{pricingError}</p>
               <button type="button" className={`${s.cta} ${s.ghost}`} onClick={loadPricing}>إعادة تحميل التسعير</button>

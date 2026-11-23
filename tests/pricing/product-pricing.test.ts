@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { calculatePricing, emptyPricing, formatMinor, withStoreVat, type PricingInput } from "../../lib/pricing/product-pricing";
+import { calculatePricing, calculatePricingTiers, emptyPricing, formatMinor, withStoreVat, type PricingInput } from "../../lib/pricing/product-pricing";
 import { pricingRecord, productPricingSchema } from "../../lib/pricing/storage";
 
 function result(overrides: Partial<PricingInput>, current = "") {
@@ -93,4 +93,19 @@ test("retains checkout's before-tax product price in either tax display mode", (
   assert.equal(formatMinor(value.suggested!.gross), "115.00");
   assert.equal(formatMinor(value.current!.profit), "25.00");
   assert.equal(withStoreVat(input, "0").vatMode, "none");
+});
+
+test("suggests three financial scenarios around the merchant’s target", () => {
+  const tiers = calculatePricingTiers({ ...emptyPricing, materials: "70", vatRate: "15", vatMode: "inclusive" });
+  assert.deepEqual(tiers.map(tier => [tier.id, formatMinor(tier.quote.net)]), [
+    ["economy", "87.50"], ["balanced", "93.33"], ["premium", "100.00"],
+  ]);
+  assert.equal(formatMinor(tiers[2].quote.gross), "115.00");
+  assert.equal(calculatePricingTiers({ ...emptyPricing, targetMargin: "100", materials: "70" }).length, 0);
+});
+
+test("avoids economic losses caused by marketing rounding", () => {
+  const tiers = calculatePricingTiers({ ...emptyPricing, materials: "20.01", targetMargin: "0", rounding: "whole" });
+  assert.equal(formatMinor(tiers[0].quote.net), "21.00");
+  assert.ok(tiers.every(tier => tier.quote.profit >= BigInt(0)));
 });

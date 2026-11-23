@@ -148,7 +148,7 @@ export default function AddProductPage() {
               <DashboardTextarea label="وصف مختصر" value={form.shortDescAr} onChange={(v) => set("shortDescAr", v)} />
             </fieldset>
           </section>
-          {vatRate !== null && <ProductPricingCalculator vatRate={vatRate} value={pricing} onChange={setPricing} price={form.price} onPrice={v => set("price", v)} disabled={!!createdId || loading} dirty={pricing !== null} />}
+          <ProductPricingCalculator productName={form.nameAr} vatRate={vatRate} value={pricing} onChange={setPricing} price={form.price} onPrice={v => set("price", v)} disabled={!!createdId || loading} dirty={pricing !== null} />
           {vatError && <div>
             <p className={s.err} role="alert">{vatError}</p>
             <button type="button" className={`${s.cta} ${s.ghost}`} onClick={loadVat}>إعادة تحميل التسعير</button>

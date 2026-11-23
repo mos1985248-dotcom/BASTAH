@@ -27,3 +27,33 @@
   .metrics { grid-template-columns: minmax(0, 1fr); }
   .toggle { flex-wrap: wrap; }
 }
+
+.toggle .calculatorIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #a74408;
+  color: #fff;
+}
+.tierSection, .market { display: grid; gap: 8px; }
+.tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(145px, 100%), 1fr)); gap: 10px; }
+.tier {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #e8c7a9;
+  border-radius: 12px;
+  background: #fffaf3;
+  color: #472e21;
+}
+.tier[data-balanced="true"] { border-color: #a74408; background: #fff1e0; }
+.tier h4 { font-weight: 700; }
+.tier strong { width: fit-content; color: #93400c; overflow-wrap: anywhere; }
+.tier span { font-size: .83rem; }
+.tier button { padding-inline: 8px; }
+.market { padding: 12px; border: 1px solid #e8c7a9; border-radius: 12px; }
