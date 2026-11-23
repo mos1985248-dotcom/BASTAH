@@ -117,3 +117,30 @@ export function calculatePricing(input: PricingInput, current: string, priceBasi
   const suggested = metrics(price);
   return { productCost, cost, suggested, current: currentResult, difference: currentResult ? price - currentResult.price : null };
 }
+
+export function calculatePricingTiers(input: PricingInput) {
+  const targetBasis = decimalMinor(input.targetMargin, 10_000);
+  const paymentBasis = decimalMinor(input.paymentRate || "0", 10_000);
+  const commissionBasis = decimalMinor(input.commissionRate || "0", 10_000);
+  if (targetBasis === null || paymentBasis === null || commissionBasis === null) return [];
+  const target = Number(targetBasis);
+  const fees = Number(paymentBasis + commissionBasis);
+  if (target + fees >= 10_000) return [];
+  const margin = (points: number) => formatMinor(BigInt(points));
+  const options = [
+    { id: "economy", label: "اقتصادي", target: Math.max(0, target - 500) },
+    { id: "balanced", label: "متوازن", target },
+    { id: "premium", label: "مميز", target: Math.min(9999 - fees, target + 500) },
+  ] as const;
+  return options.flatMap(({ id, label, target }) => {
+    const scenario = { ...input, targetMargin: margin(target) };
+    const result = calculatePricing(scenario, "", "beforeVat");
+    if ("error" in result || !result.suggested) return [];
+    // A marketing rounding step can round a low-margin scenario to a loss.
+    const adjusted = result.suggested.profit < BigInt(0)
+      ? calculatePricing({ ...scenario, roundUp: true }, "", "beforeVat")
+      : result;
+    if ("error" in adjusted || !adjusted.suggested) return [];
+    return [{ id, label, quote: adjusted.suggested }];
+  });
+}

@@ -1,10 +1,11 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Calculator, ChevronDown } from "lucide-react";
 import {
-  calculatePricing, emptyPricing, fixedFees, formatMinor, productCosts, variableFees, withStoreVat, type PricingInput,
+  calculatePricing, calculatePricingTiers, emptyPricing, fixedFees, formatMinor, productCosts, variableFees, withStoreVat, type PricingInput,
 } from "@/lib/pricing/product-pricing";
+import { marketPriceDirection, type MarketBand } from "@/lib/pricing/market";
 import { DashboardField } from "../DashboardField";
 import form from "../forms.module.css";
 import s from "./pricing.module.css";
@@ -19,29 +20,60 @@ interface Props {
   savedAt?: string;
   disabled?: boolean;
   dirty?: boolean;
-  vatRate: string;
+  vatRate: string | null;
+  productName: string;
+  categoryId?: string | null;
 }
 
-export default function ProductPricingCalculator({ value, onChange, price, onPrice, savedAt, disabled, dirty, vatRate }: Props) {
+export default function ProductPricingCalculator({ value, onChange, price, onPrice, savedAt, disabled, dirty, vatRate, productName, categoryId }: Props) {
   const id = useId();
   const [open, setOpen] = useState(false);
-  const input = withStoreVat(value ?? emptyPricing, vatRate);
+  const [comparison, setComparison] = useState<{ name: string; categoryId?: string | null; band: MarketBand | null } | null>(null);
+  const name = productName.trim();
+  useEffect(() => {
+    if (!open || name.length < 5 || vatRate === null) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch("/api/products/pricing-market", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, categoryId: categoryId ?? undefined }),
+          signal: controller.signal,
+        });
+        if (response.ok) {
+          const { band } = await response.json() as { band: MarketBand | null };
+          if (!controller.signal.aborted) setComparison({ name, categoryId, band });
+        }
+      } catch {
+        // The calculator is usable independently of market data.
+      }
+    }, 600);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [categoryId, name, open, vatRate]);
+
+  const input = withStoreVat(value ?? emptyPricing, vatRate ?? "0");
   const set = <K extends keyof PricingInput>(key: K, next: PricingInput[K]) => onChange({ ...input, [key]: next });
   const result = calculatePricing(input, price, "beforeVat");
   const valid = "error" in result ? null : result;
   const suggested = valid?.suggested;
   const current = valid?.current;
+  const tiers = suggested ? calculatePricingTiers(input) : [];
+  const band = comparison?.name === name && comparison.categoryId === categoryId ? comparison.band : null;
+  const comparePrice = current?.net ?? suggested?.net;
+  const direction = comparePrice === undefined ? null : marketPriceDirection(comparePrice, band);
   const isInclusive = input.vatMode === "inclusive";
 
   return (
     <section className={form.panel} dir="rtl" aria-labelledby={id}>
       <div className={form.panelHead}>
         <button type="button" className={s.toggle} aria-expanded={open} aria-controls={`${id}-details`} onClick={() => setOpen(!open)}>
-          <span id={id}><Calculator size={20} aria-hidden="true" />حاسبة تسعير المنتج</span>
+          <span id={id}><span className={s.calculatorIcon}><Calculator size={23} strokeWidth={2.2} aria-hidden="true" /></span>حاسبة تسعير المنتج</span>
           <span>{open ? "إخفاء التفاصيل" : "إظهار التفاصيل"}<ChevronDown size={16} aria-hidden="true" /></span>
         </button>
       </div>
-      {open && (
+      {open && vatRate === null && <p className={form.panelBody} role="status">إعداد الضريبة للحاسبة غير متاح حاليًا.</p>}
+      {open && vatRate !== null && (
         <fieldset disabled={disabled} id={`${id}-details`} className={`${form.panelBody} ${s.body}`}>
           <p className={form.sub}>احسب تكلفة منتجك وحدد سعر بيع يحقق لك الربح المناسب.</p>
           <h3>تكلفة المنتج للوحدة (ر.س)</h3>
@@ -108,6 +140,25 @@ export default function ProductPricingCalculator({ value, onChange, price, onPri
             )}
             {suggested?.belowTarget && <p className={s.warning}>الهامش بعد التقريب أقل من المستهدف.</p>}
             {suggested && <label className={s.check}><input type="checkbox" checked={input.roundUp} onChange={e => set("roundUp", e.target.checked)} />التقريب للأعلى للحفاظ على الهامش</label>}
+          </div>}
+          {tiers.length > 0 && <section className={s.tierSection} aria-label="خيارات السعر">
+            <h3>خيارات السعر</h3>
+            <p className={form.sub}>المتوازن يستخدم هامشك المستهدف. الاقتصادي أقل بخمس نقاط مئوية، والمميز أعلى بخمس نقاط ضمن حدود الرسوم والتقريب.</p>
+            <div className={s.tiers}>
+              {tiers.map(({ id, label, quote }) => (
+                <article key={id} className={s.tier} data-balanced={id === "balanced"}>
+                  <h4>{label}</h4>
+                  <strong dir="ltr">{money(isInclusive ? quote.gross : quote.net)}</strong>
+                  <span>ربح الوحدة <bdi>{money(quote.profit)}</bdi></span>
+                  <span>الهامش <bdi>{quote.margin === null ? "—" : `${formatMinor(quote.margin)}%`}</bdi></span>
+                  <button type="button" className={`${form.cta} ${form.ghost}`} onClick={() => onPrice(formatMinor(quote.net))}>اعتماد السعر {label}</button>
+                </article>
+              ))}
+            </div>
+          </section>}
+          {band && comparePrice !== undefined && <div className={s.market} aria-live="polite">
+            <p>أسعار مبيعات مشابهة في بسطة خلال آخر 90 يومًا، قبل الضريبة: <bdi>{money(BigInt(band.lowerMinor))} – {money(BigInt(band.upperMinor))}</bdi></p>
+            {direction && <p className={s.warning}>{current ? "السعر في الحقل" : "السعر المتوازن"} {direction === "high" ? "أعلى بكثير" : "أقل بكثير"} من نطاق المبيعات المشابهة.</p>}
           </div>}
           {suggested && <button type="button" className={`${form.cta} ${s.apply}`} onClick={() => onPrice(formatMinor(suggested.net))}>اعتماد السعر المقترح</button>}
           {dirty && <button type="button" className={`${form.cta} ${form.ghost}`} onClick={() => onChange(null)}>تجاهل تغييرات الحاسبة</button>}
