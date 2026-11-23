@@ -8,6 +8,7 @@ import {
   Plug,
   Newspaper,
   Settings,
+  Bot,
   Store,
   Truck,
   Users,
@@ -17,6 +18,7 @@ import {
 export type AdminSection =
   | "overview"
   | "finance"
+  | "munira"
   | "stores"
   | "users"
   | "support"
@@ -76,6 +78,7 @@ export const ADMIN_SECTIONS: {
     label: "التكاملات",
     Icon: Plug,
   },
+  { id: "munira", label: "مزودات منيرة", Icon: Bot },
   {
     id: "audit",
     label: "سجل العمليات",

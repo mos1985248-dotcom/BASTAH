@@ -26,11 +26,17 @@ export interface TranscribeResult {
  */
 export async function* sendMessage(params: {
   messages: APIMessage[];
+  requestId: string;
   sessionId: string | null;
   userType: string;
   preferredLanguage?: string;
   signal?: AbortSignal;
 }): AsyncGenerator<StreamChunk> {
+  let guestToken = sessionStorage.getItem("basita-munira-guest");
+  if (!guestToken) {
+    guestToken = crypto.randomUUID();
+    sessionStorage.setItem("basita-munira-guest", guestToken);
+  }
   const res = await fetch("/api/ai/chat", {
     method: "POST",
     headers: {
@@ -39,6 +45,8 @@ export async function* sendMessage(params: {
     },
     body: JSON.stringify({
       messages: params.messages,
+      requestId: params.requestId,
+      guestToken,
       sessionId: params.sessionId,
       preferredLanguage: params.preferredLanguage,
     }),

@@ -19,6 +19,8 @@ async function main() {
     // ─────────────────────────────────────────────────────────
     {
       plan: SubscriptionPlan.FREE,
+      muniraMonthlyMessages: 0,
+      muniraTrialMessages: 0,
       nameAr: "بسطة بداية",
       nameEn: "Basita Free",
       taglineAr: "خطوتك الأولى للسوق",
@@ -62,6 +64,8 @@ async function main() {
     // ─────────────────────────────────────────────────────────
     {
       plan: SubscriptionPlan.STARTER,
+      muniraMonthlyMessages: 0,
+      muniraTrialMessages: 5,
       nameAr: "بسطة نمو",
       nameEn: "Basita Starter",
       taglineAr: "خلِّ بسَطتك تكبر",
@@ -88,7 +92,7 @@ async function main() {
 
       hasChatSupport: true,
       hasPrioritySupport: false,
-      hasAIFeatures: false,    // ❌ منيرة غير مفعّلة
+      hasAIFeatures: true,
 
       featuresAr: [
         "جميع ميزات الباقة المجانية",
@@ -106,6 +110,8 @@ async function main() {
     // ─────────────────────────────────────────────────────────
     {
       plan: SubscriptionPlan.GROWTH,
+      muniraMonthlyMessages: 100,
+      muniraTrialMessages: 0,
       nameAr: "بسطة انطلاق",
       nameEn: "Basita Growth",
       taglineAr: "وسّع حضورك في السوق",
@@ -152,6 +158,8 @@ async function main() {
     // ─────────────────────────────────────────────────────────
     {
       plan: SubscriptionPlan.PRO,
+      muniraMonthlyMessages: 200,
+      muniraTrialMessages: 0,
       nameAr: "بسطة ازدهار",
       nameEn: "Basita Pro",
       taglineAr: "انطلق نحو آفاق أكبر",

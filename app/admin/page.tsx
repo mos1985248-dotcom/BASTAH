@@ -20,6 +20,7 @@ import AuditTab from "@/components/admin/AuditTab";
 import SettingsSection from "@/components/admin/sections/SettingsSection";
 import ShippingProvidersSection from "@/components/admin/sections/ShippingProvidersSection";
 import IntegrationsSection from "@/components/admin/sections/IntegrationsSection";
+import MuniraProviders from "@/components/admin/munira/MuniraProviders";
 import FinanceSection from "@/components/admin/finance/FinanceSection";
 
 // ⚠️ ملاحظة انتقالية: الهيكل (الشريط الجانبي والعلوي وتنقل الجوال) ومكتبة ui/ بالهوية الجديدة؛
@@ -55,6 +56,7 @@ export default function AdminPage() {
         <div className={s.content}>
           {section === "overview" && <AnalyticsTab />}
           {section === "finance" && <FinanceSection />}
+          {section === "munira" && <MuniraProviders />}
           {section === "stores" && <StoresTab />}
           {section === "support" && <TicketsTab />}
           {section === "users" && <UsersTab />}
