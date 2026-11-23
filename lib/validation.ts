@@ -295,11 +295,15 @@ export const updateOrderStatusSchema = z.object({
 
 // ── Marketing (القسم ٣ — بنية فقط) ──────────────────────
 export const createMarketingContentSchema = z.object({
+  kind: z.enum(["product_description", "social_post", "headline"]).optional(),
+  body: z.string().trim().min(1).max(4000).optional(),
   title: z.string().trim().min(2, "العنوان مطلوب").max(150),
   videoUrl: z.string().trim().url("رابط الفيديو غير صحيح").optional(),
 });
 
 export const createAdCampaignSchema = z.object({
+  objective: z.string().trim().min(1).max(300).optional(),
+  content: z.string().trim().min(1).max(4000).optional(),
   name: z.string().trim().min(2, "اسم الحملة مطلوب").max(100),
   budget: z.coerce.number().positive("الميزانية يجب أن تكون أكبر من صفر").max(1_000_000),
 });

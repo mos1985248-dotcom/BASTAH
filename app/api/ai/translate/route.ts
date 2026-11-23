@@ -1,10 +1,11 @@
+import { createHash, randomUUID } from "node:crypto";
+import { reserveMessage, releaseMessage, completeMessage, MuniraRequestError } from "@/lib/munira/quota";
 // app/api/ai/translate/route.ts
 // ترجمة تجارية — لا يستورد Anthropic مباشرة، يمرّ عبر lib/ai/provider.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireUser, AuthError } from "@/lib/auth";
-import { assertHasMuniraAccess } from "@/lib/subscription-limits";
 import { checkAiRateLimit } from "@/lib/rate-limit";
 import { sanitizeUserInput } from "@/lib/munira/security";
 import { freeAnswer, freeUnavailable } from "@/lib/munira/free-router";
@@ -25,8 +26,6 @@ export async function POST(req: NextRequest) {
   try {
     const user = await requireUser();
     if (!user.store) return NextResponse.json({ error: "هذه الخدمة للبائعين فقط" }, { status: 403 });
-
-    await assertHasMuniraAccess(user.store.id);
 
     const { allowed } = await checkAiRateLimit("seller", `translate:${user.id}`);
     if (!allowed) return NextResponse.json({ error: "وصلتِ للحد اليومي من طلبات الترجمة" }, { status: 429 });
@@ -58,6 +57,9 @@ export async function POST(req: NextRequest) {
 ${description ? `الوصف: ${description}` : ""}
 ${tags?.length ? `الوسوم: ${tags.join(", ")}` : ""}`;
 
+    const ticket = { scope: `store:${user.store.id}`, requestId: `translate:${randomUUID()}` };
+    const reserved = await reserveMessage({ ...ticket, storeId: user.store.id, inputHash: createHash("sha256").update(prompt).digest("hex") });
+    if (!reserved.lease) return NextResponse.json({ error: "تعذّر حجز الترجمة." }, { status: 409 });
     let text: string;
     try {
       ({ text } = await freeAnswer({
@@ -66,23 +68,21 @@ ${tags?.length ? `الوسوم: ${tags.join(", ")}` : ""}`;
         maxTokens: 650,
       }, { userId: user.id, storeId: user.store.id, route: "/api/ai/translate", feature: "translate" }));
     } catch {
+      await releaseMessage(ticket, reserved.lease);
       return NextResponse.json({ error: freeUnavailable }, { status: 503 });
     }
-
-    let result: { title?: string; description?: string; tags?: string[] };
+    const output = z.object({ title: z.string(), description: z.string().optional(), tags: z.array(z.string()).optional() });
     try {
-      result = JSON.parse(text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim());
-    } catch {
+      const result = output.parse(JSON.parse(text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim()));
+      await completeMessage(ticket, reserved.lease, JSON.stringify(result), async () => ticket.requestId);
+      return NextResponse.json({ title: result.title, description: result.description ?? description, tags: result.tags ?? tags });
+    } catch (error) {
+      await releaseMessage(ticket, reserved.lease);
+      if (error instanceof MuniraRequestError) throw error;
       return NextResponse.json({ error: "تعذّر معالجة استجابة الترجمة" }, { status: 502 });
     }
-
-    return NextResponse.json({
-      title:       result.title       ?? title,
-      description: result.description ?? description,
-      tags:        result.tags        ?? tags,
-    });
   } catch (err) {
-    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    if (err instanceof AuthError || err instanceof MuniraRequestError) return NextResponse.json({ error: err.message }, { status: err.status });
     console.error("[translate-error]", err);
     return NextResponse.json({ error: "حدث خطأ غير متوقع" }, { status: 500 });
   }

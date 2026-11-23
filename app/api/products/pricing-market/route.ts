@@ -1,6 +1,7 @@
+import { requireStoreFeature } from "@/lib/feature-access";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { AuthError, requireActiveStore } from "@/lib/auth";
+import { AuthError } from "@/lib/auth";
 import { comparableMarket } from "@/lib/pricing/market";
 import { prisma } from "@/lib/prisma";
 
@@ -8,7 +9,7 @@ const input = z.object({ name: z.string().trim().min(5).max(150), categoryId: z.
 
 export async function POST(request: Request) {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("pricing");
     const body = input.safeParse(await request.json().catch(() => null));
     if (!body.success) return NextResponse.json({ band: null });
 

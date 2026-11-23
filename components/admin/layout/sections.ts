@@ -19,6 +19,7 @@ export type AdminSection =
   | "overview"
   | "finance"
   | "munira"
+  | "entitlements"
   | "stores"
   | "users"
   | "support"
@@ -79,6 +80,7 @@ export const ADMIN_SECTIONS: {
     Icon: Plug,
   },
   { id: "munira", label: "مزودات منيرة", Icon: Bot },
+  { id: "entitlements", label: "إدارة المميزات والصلاحيات", Icon: Settings },
   {
     id: "audit",
     label: "سجل العمليات",

@@ -1,3 +1,4 @@
+import { getFeature, resolveFeature } from "./entitlements";
 // lib/subscription-limits.ts
 // التحقق من حدود الباقة قبل أي عملية مقيَّدة (إضافة منتج، الوصول لمنيرة، ...).
 //
@@ -10,7 +11,7 @@
 // "هل الاشتراك في وضع صحي (paid/good standing) أم لا".
 
 import { prisma } from "./prisma";
-import type { SubscriptionStatus } from "@prisma/client";
+import type { Prisma, SubscriptionStatus } from "@prisma/client";
 
 export class PlanLimitError extends Error {
   constructor(message: string, public upgradeRequired = true) {
@@ -33,37 +34,13 @@ export function isSubscriptionInGoodStanding(status: SubscriptionStatus): boolea
 }
 
 /** يتحقق أن المتجر يستطيع إضافة منتج جديد حسب باقته الحالية */
-export async function assertCanAddProduct(storeId: string): Promise<void> {
-  const subscription = await prisma.storeSubscription.findUnique({
-    where: { storeId },
-  });
+export async function assertCanAddProduct(storeId: string, db: Prisma.TransactionClient = prisma): Promise<void> {
+  const feature = await resolveFeature(db, storeId, "products");
+  if (!feature.allowed) throw new PlanLimitError("إضافة المنتجات غير متاحة لمتجرك.", false);
+  const maxProducts = feature.limit;
+  if (maxProducts === null) return;
 
-  if (!subscription) {
-    throw new PlanLimitError("لا يوجد اشتراك فعّال لهذا المتجر");
-  }
-
-  if (!isSubscriptionInGoodStanding(subscription.status)) {
-    throw new PlanLimitError(
-      "اشتراكك غير فعّال حالياً (معلّق/منتهي) — جدّدي الباقة لاستعادة إضافة المنتجات",
-      false
-    );
-  }
-
-  // حد مخصّص يدوياً من الأدمن يتجاوز حد الباقة الافتراضي
-  const maxProducts =
-    subscription.customMaxProducts ??
-    (
-      await prisma.subscriptionPlanConfig.findUnique({
-        where: { plan: subscription.plan },
-        select: { maxProducts: true },
-      })
-    )?.maxProducts;
-
-  if (maxProducts === null || maxProducts === undefined) {
-    return; // null = غير محدود (باقة برو)
-  }
-
-  const currentCount = await prisma.product.count({
+  const currentCount = await db.product.count({
     where: { storeId, status: { not: "ARCHIVED" } },
   });
 
@@ -76,31 +53,20 @@ export async function assertCanAddProduct(storeId: string): Promise<void> {
 
 /** يرجع معلومات الاستخدام الحالي (لعرضها في شريط تقدّم بلوحة التاجر) */
 export async function getProductUsage(storeId: string) {
-  const subscription = await prisma.storeSubscription.findUnique({
-    where: { storeId },
-  });
-  if (!subscription) return null;
-
-  const planConfig = await prisma.subscriptionPlanConfig.findUnique({
-    where: { plan: subscription.plan },
-    select: { maxProducts: true, nameAr: true, hasAIFeatures: true },
-  });
-
-  const currentCount = await prisma.product.count({
-    where: { storeId, status: { not: "ARCHIVED" } },
-  });
-
-  const maxProducts = subscription.customMaxProducts ?? planConfig?.maxProducts ?? null;
-
+  const [products, munira, currentCount] = await Promise.all([
+    getFeature(storeId, "products"),
+    getFeature(storeId, "munira"),
+    prisma.product.count({ where: { storeId, status: { not: "ARCHIVED" } } }),
+  ]);
   return {
-    planName: planConfig?.nameAr ?? subscription.plan,
+    planName: products.planName,
     currentCount,
-    maxProducts, // null = غير محدود
-    isUnlimited: maxProducts === null,
-    percentUsed: maxProducts ? Math.min(100, Math.round((currentCount / maxProducts) * 100)) : 0,
-    hasMuniraAccess: planConfig?.hasAIFeatures ?? false,
-    subscriptionStatus: subscription.status,
-    isInGoodStanding: isSubscriptionInGoodStanding(subscription.status),
+    maxProducts: products.limit,
+    isUnlimited: products.limit === null,
+    percentUsed: products.limit ? Math.min(100, Math.round(currentCount / products.limit * 100)) : 0,
+    hasMuniraAccess: munira.allowed,
+    subscriptionStatus: products.active ? "ACTIVE" : "EXPIRED",
+    isInGoodStanding: products.active,
   };
 }
 
@@ -108,25 +74,7 @@ export async function getProductUsage(storeId: string) {
  * بوّابة ميزات منيرة. حصة رسائل الدردشة منفصلة وتُحجز في قاعدة البيانات.
  */
 export async function assertHasMuniraAccess(storeId: string): Promise<void> {
-  const subscription = await prisma.storeSubscription.findUnique({
-    where: { storeId },
-    select: { plan: true, status: true },
-  });
-  if (!subscription) {
-    throw new PlanLimitError("لا يوجد اشتراك فعّال لهذا المتجر");
-  }
-  if (!isSubscriptionInGoodStanding(subscription.status)) {
-    throw new PlanLimitError("اشتراكك غير فعّال حالياً — جدّدي الباقة لاستخدام منيرة", false);
-  }
-
-  const planConfig = await prisma.subscriptionPlanConfig.findUnique({
-    where: { plan: subscription.plan },
-    select: { hasAIFeatures: true },
-  });
-
-  if (!planConfig?.hasAIFeatures) {
-    throw new PlanLimitError(
-      "منيرة غير متاحة في باقتك الحالية."
-    );
+  if (!(await getFeature(storeId, "munira")).allowed) {
+    throw new PlanLimitError("منيرة غير متاحة في باقتك الحالية.");
   }
 }

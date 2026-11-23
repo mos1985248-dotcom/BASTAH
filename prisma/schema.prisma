@@ -228,6 +228,7 @@ model User {
 // ======================================================
 
 model Store {
+  featureOverrides StoreFeatureOverride[]
   id              String      @id @default(cuid())
   userId          String      @unique
   user            User        @relation(fields: [userId], references: [id], onDelete: Restrict)
@@ -1706,6 +1707,8 @@ enum MarketingContentStatus {
 }
 
 model MarketingContent {
+  body String?
+  kind String?
   id            String                 @id @default(cuid())
   storeId       String
   store         Store                  @relation(fields: [storeId], references: [id], onDelete: Cascade)
@@ -1741,6 +1744,9 @@ enum AdCampaignStatus {
 }
 
 model AdCampaign {
+  objective String?
+  content String?
+  archivedAt DateTime?
   id        String           @id @default(cuid())
   storeId   String
   store     Store            @relation(fields: [storeId], references: [id], onDelete: Cascade)
@@ -1865,6 +1871,7 @@ enum AbandonedCartStatus {
 }
 
 model AbandonedCart {
+  reminderAttempts CartReminderAttempt[]
   id             String              @id @default(cuid())
   userId         String
   user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -2151,4 +2158,74 @@ model MuniraRequest {
   @@id([scope, requestId])
   @@index([scope, quotaWindow, state, expiresAt])
   @@map("munira_requests")
+}
+
+model PlatformFeature {
+  key       String @id
+  label     String
+  enabled   Boolean @default(true)
+  plans     PlanFeature[]
+  overrides StoreFeatureOverride[]
+
+  @@map("platform_features")
+}
+
+model PlanFeature {
+  featureKey String
+  feature    PlatformFeature @relation(fields: [featureKey], references: [key], onDelete: Cascade)
+  plan       SubscriptionPlan
+  enabled    Boolean
+  limit      Int?
+
+  @@id([featureKey, plan])
+  @@map("plan_features")
+}
+
+model StoreFeatureOverride {
+  featureKey String
+  feature    PlatformFeature @relation(fields: [featureKey], references: [key], onDelete: Cascade)
+  storeId    String
+  store      Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  enabled    Boolean
+  limit      Int?
+  startsAt   DateTime
+  endsAt     DateTime?
+
+  @@id([storeId, featureKey])
+  @@map("store_feature_overrides")
+}
+
+model FeatureChange {
+  id        String @id @default(cuid())
+  actorId   String
+  action    String
+  details   Json
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("feature_changes")
+}
+
+model LaunchPromotion {
+  seat      Int @id
+  storeId   String @unique
+  merchantId String @unique
+  identityHash String @unique
+  startsAt DateTime
+  endsAt   DateTime
+  grantedBy String
+
+  @@map("launch_promotions")
+}
+
+model CartReminderAttempt {
+  id String @id @default(cuid())
+  cartId String
+  cart AbandonedCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cartUpdatedAt DateTime
+  status String
+  createdAt DateTime @default(now())
+
+  @@index([cartId, cartUpdatedAt, createdAt])
+  @@map("cart_reminder_attempts")
 }

@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { FeatureGate, useStoreFeatures } from "@/components/dashboard/marketing/FeatureGate";
 import { Plug } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import LoadingState from "@/components/dashboard/ui/LoadingState";
@@ -16,6 +17,8 @@ import f from "@/components/dashboard/forms.module.css";
 import s from "@/components/dashboard/integrations/integrations.module.css";
 
 export default function IntegrationsPage() {
+  const { features, error: permissionError } = useStoreFeatures();
+  const allowed = features?.social?.allowed;
   const [data, setData] = useState<MerchantIntegrations | null>(null);
   const [error, setError] = useState("");
 
@@ -23,7 +26,10 @@ export default function IntegrationsPage() {
     setError("");
     api.get<MerchantIntegrations>("/api/stores/marketing-links").then(setData).catch((err) => setError(err instanceof ApiError ? err.message : "تعذّر تحميل التكاملات"));
   };
-  useEffect(load, []);
+  useEffect(() => { if (allowed) load(); }, [allowed]);
+
+  if (permissionError) return <ErrorState message={permissionError} />;
+  if (!allowed) return <div className={f.page} style={uiVars}><FeatureGate access={features?.social} title="التكاملات الاجتماعية" description="أدر روابط حساباتك الخارجية والخدمات التي تتيحها الإدارة.">{null}</FeatureGate></div>;
 
   if (error) return <div className={f.page} style={uiVars}><ErrorState message={error} onRetry={load} /></div>;
   if (!data) return <div className={f.page} style={uiVars}><LoadingState /></div>;

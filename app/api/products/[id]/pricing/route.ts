@@ -1,5 +1,6 @@
+import { requireStoreFeature } from "@/lib/feature-access";
 import { NextResponse } from "next/server";
-import { AuthError, requireRole } from "@/lib/auth";
+import { AuthError } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { VAT_RATE } from "@/lib/tax";
 import { readPricingInputs } from "@/lib/pricing/storage";
@@ -8,9 +9,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET(_request: Request, { params }: { params: { id: string } }) {
   try {
-    const user = await requireRole("SELLER");
+    const { storeId } = await requireStoreFeature("pricing");
     const product = await prisma.product.findFirst({
-      where: { id: params.id, store: { userId: user.id } },
+      where: { id: params.id, storeId },
       select: {
         pricing: { select: { inputs: true, updatedAt: true } },
         store: { select: { subscription: { select: { hasTaxNumber: true } } } },

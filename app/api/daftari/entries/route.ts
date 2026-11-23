@@ -1,3 +1,4 @@
+import { assertStoreFeature } from "@/lib/feature-access";
 // app/api/daftari/entries/route.ts
 // ⚠️ Endpoint جديد بالكامل — يفعّل موديل DaftariEntry الموجود أصلاً بدون
 // أي كود يكتب فيه سابقاً. مقصود بسيط عمداً: تسجيل يدوي فقط (SALE تلقائي
@@ -16,18 +17,11 @@ const createEntrySchema = z.object({
   note: z.string().trim().max(300).optional(),
 });
 
-async function requireStarterOrAbove(storeId: string) {
-  const sub = await prisma.storeSubscription.findUnique({ where: { storeId }, select: { plan: true } });
-  if (!sub || sub.plan === "FREE") {
-    throw new AuthError("دفاتري متاحة من باقة بسطة مارت نمو فما فوق — رقّي باقتك لاستخدامها", 403);
-  }
-}
-
 export async function GET(req: NextRequest) {
   try {
     const user = await requireUser();
     if (!user.store) return NextResponse.json({ error: "لا يوجد متجر مرتبط بحسابك" }, { status: 403 });
-    await requireStarterOrAbove(user.store.id);
+    await assertStoreFeature(user.store.id, "daftari");
 
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, Number(searchParams.get("page") ?? 1));
@@ -67,7 +61,7 @@ export async function POST(req: NextRequest) {
   try {
     const user = await requireUser();
     if (!user.store) return NextResponse.json({ error: "لا يوجد متجر مرتبط بحسابك" }, { status: 403 });
-    await requireStarterOrAbove(user.store.id);
+    await assertStoreFeature(user.store.id, "daftari");
 
     const parsed = createEntrySchema.safeParse(await req.json());
     if (!parsed.success) return NextResponse.json({ error: "بيانات غير صالحة" }, { status: 400 });

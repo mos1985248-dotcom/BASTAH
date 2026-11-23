@@ -1,10 +1,11 @@
+import { requireStoreFeature } from "@/lib/feature-access";
 // app/api/stores/marketing-links/route.ts — مسار قديم الاسم محفوظ للتوافق؛ هو واجهة
 // «التكاملات» للتاجر: يربط حساباته الخارجية بأنواع فعّلتها الإدارة فقط. لا مفاتيح
 // ولا ويب هوك — التوجيه والمزوّدون من اختصاص الإدارة (lib/integrations).
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requireActiveStore, AuthError } from "@/lib/auth";
+import { AuthError } from "@/lib/auth";
 import { validateAccountUrl } from "@/lib/integrations/account-types";
 import { getDisabledAccountTypes } from "@/lib/integrations/config";
 import { getMerchantView } from "@/lib/integrations/merchant-view";
@@ -13,7 +14,7 @@ const bodySchema = z.object({ platform: z.string().trim().min(2).max(20), url: z
 
 export async function GET() {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("social");
     return NextResponse.json(await getMerchantView(storeId));
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
@@ -24,7 +25,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("social");
     const parsed = bodySchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) return NextResponse.json({ error: "أدخلي نوع الحساب والرابط" }, { status: 400 });
 

@@ -21,6 +21,7 @@ import SettingsSection from "@/components/admin/sections/SettingsSection";
 import ShippingProvidersSection from "@/components/admin/sections/ShippingProvidersSection";
 import IntegrationsSection from "@/components/admin/sections/IntegrationsSection";
 import MuniraProviders from "@/components/admin/munira/MuniraProviders";
+import EntitlementsAdmin from "@/components/admin/entitlements/EntitlementsAdmin";
 import FinanceSection from "@/components/admin/finance/FinanceSection";
 
 // ⚠️ ملاحظة انتقالية: الهيكل (الشريط الجانبي والعلوي وتنقل الجوال) ومكتبة ui/ بالهوية الجديدة؛
@@ -57,6 +58,7 @@ export default function AdminPage() {
           {section === "overview" && <AnalyticsTab />}
           {section === "finance" && <FinanceSection />}
           {section === "munira" && <MuniraProviders />}
+          {section === "entitlements" && <EntitlementsAdmin />}
           {section === "stores" && <StoresTab />}
           {section === "support" && <TicketsTab />}
           {section === "users" && <UsersTab />}

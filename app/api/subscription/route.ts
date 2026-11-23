@@ -28,7 +28,10 @@ export async function GET() {
 
     const planConfig = await prisma.subscriptionPlanConfig.findUnique({ where: { plan: subscription.plan } });
 
+    const promotion = await prisma.launchPromotion.findUnique({ where: { storeId }, select: { startsAt: true, endsAt: true } });
+
     return NextResponse.json({
+      promotion,
       subscription: {
         plan: subscription.plan,
         status: subscription.status,

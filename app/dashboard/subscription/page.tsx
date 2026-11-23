@@ -24,6 +24,7 @@ interface SubscriptionData {
     suspendedAt: string | null;
     pricePerMonth: number;
   };
+  promotion: { startsAt: string; endsAt: string } | null;
   planConfig: { nameAr: string } | null;
   invoices: SubscriptionInvoice[];
   store: { customDomain: string | null; customDomainEnabled: boolean };
@@ -74,6 +75,11 @@ export default function SubscriptionPage() {
         </div>
       </div>
 
+      {data.promotion && subscription.plan === "FREE" && <p role="status">
+        {Date.parse(data.promotion.endsAt) > Date.now()
+          ? `عرض انطلاق المجاني نشط حتى ${new Date(data.promotion.endsAt).toLocaleDateString("ar-SA-u-ca-gregory")}.`
+          : "انتهى عرض انطلاق المجاني. اختر باقة للاشتراك واستعادة مميزاتها."}
+      </p>}
       <div className={s.layoutPlan}>
         <div className={s.gPlan}>
           <PlanSummaryCard

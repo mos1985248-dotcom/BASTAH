@@ -1,5 +1,6 @@
+import { requireStoreFeature } from "@/lib/feature-access";
 import { NextResponse } from "next/server";
-import { AuthError, requireActiveStore } from "@/lib/auth";
+import { AuthError } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { VAT_RATE } from "@/lib/tax";
 
@@ -7,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("pricing");
     const subscription = await prisma.storeSubscription.findUnique({
       where: { storeId },
       select: { hasTaxNumber: true },

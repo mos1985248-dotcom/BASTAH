@@ -1,11 +1,12 @@
+import { requireStoreFeature } from "@/lib/feature-access";
 // app/api/stores/marketing-links/[platform]/route.ts — إلغاء ربط منصة
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireActiveStore, AuthError } from "@/lib/auth";
+import { AuthError } from "@/lib/auth";
 
 export async function DELETE(_req: Request, { params }: { params: { platform: string } }) {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("social");
     await prisma.storeMarketingLink.deleteMany({ where: { storeId, platform: params.platform } });
     return NextResponse.json({ ok: true });
   } catch (err) {

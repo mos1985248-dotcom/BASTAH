@@ -1,3 +1,4 @@
+import { requireStoreFeature } from "@/lib/feature-access";
 // app/api/marketing/content/[id]/metrics/route.ts
 // يرجع المقاييس الحقيقية المخزَّنة بقاعدة البيانات — كلها صفر حالياً لعدم
 // وجود Provider مربوط بعد، وهذا متوقع وصحيح (ليس عطلاً). لا مزامنة هنا
@@ -5,11 +6,11 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireActiveStore, AuthError } from "@/lib/auth";
+import { AuthError } from "@/lib/auth";
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("marketing_content");
 
     const content = await prisma.marketingContent.findUnique({
       where: { id: params.id },
