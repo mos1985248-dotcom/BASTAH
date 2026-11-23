@@ -3,6 +3,7 @@
 import {
   ClipboardList,
   Headset,
+  Landmark,
   LayoutDashboard,
   Plug,
   Newspaper,
@@ -15,6 +16,7 @@ import {
 
 export type AdminSection =
   | "overview"
+  | "finance"
   | "stores"
   | "users"
   | "support"
@@ -33,6 +35,11 @@ export const ADMIN_SECTIONS: {
     id: "overview",
     label: "نظرة عامة",
     Icon: LayoutDashboard,
+  },
+  {
+    id: "finance",
+    label: "المركز المالي",
+    Icon: Landmark,
   },
   {
     id: "stores",

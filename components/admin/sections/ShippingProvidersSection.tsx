@@ -15,8 +15,9 @@ import CustomProviderCard, { CustomProvider } from "@/components/admin/shipping/
 import AddCustomProviderForm from "@/components/admin/shipping/AddCustomProviderForm";
 import CouriersManager from "@/components/admin/shipping/CouriersManager";
 import CourierShipmentsList from "@/components/admin/shipping/CourierShipmentsList";
+import ShippingWithDues from "@/components/admin/finance/ShippingWithDues";
 
-export default function ShippingProvidersSection() {
+function ShippingProvidersContent() {
   const [platformCarriers, setPlatformCarriers] = useState<PlatformCarrier[] | null>(null);
   const [customProviders, setCustomProviders] = useState<CustomProvider[] | null>(null);
   const [error, setError] = useState("");
@@ -89,5 +90,14 @@ export default function ShippingProvidersSection() {
         <CourierShipmentsList />
       </section>
     </div>
+  );
+}
+
+// المركز المالي: تبويب «مستحقات المناديب» داخل قسم الشحن (المحتوى الأصلي كما هو في التبويب الأول)
+export default function ShippingProvidersSection() {
+  return (
+    <ShippingWithDues>
+      <ShippingProvidersContent />
+    </ShippingWithDues>
   );
 }
