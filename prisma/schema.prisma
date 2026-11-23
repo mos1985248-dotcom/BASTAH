@@ -697,6 +697,7 @@ model Product {
   wishlistItems   WishlistItem[]
   cartItems       CartItem[]
   daftariCost     DaftariProductCost?
+  pricing         ProductPricing?
   productImages   ProductImage[]
   analyticsEvents AnalyticsEvent[]
 
@@ -2101,4 +2102,17 @@ model AiProviderInvoice {
   @@index([provider, periodStart])
   @@index([paidAt])
   @@map("ai_provider_invoices")
+}
+
+
+/// Merchant-only cost inputs. Historical orders keep their existing snapshots.
+model ProductPricing {
+  productId        String   @id
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  inputs           Json
+  productCostMinor Int
+  unitCostMinor    Int
+  updatedAt        DateTime @updatedAt
+
+  @@map("product_pricing")
 }
