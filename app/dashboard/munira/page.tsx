@@ -5,6 +5,7 @@
 
 import { useCallback } from "react";
 import { useMuniraChat } from "@/hooks/useMuniraChat";
+import MuniraQuota from "@/components/dashboard/MuniraQuota";
 import { ChatWindow } from "@/components/munira/ChatWindow";
 import { useCurrentUser } from "@/app/providers";
 import { uiVars } from "@/components/ui/vars";
@@ -45,6 +46,7 @@ export default function MuniraPage() {
         onStopRecording={stopRecording}
         onCancel={handleCancel}
         userName={user?.name}
+        accessory={role === "seller" && user?.store && <MuniraQuota key={user.store.id} streaming={streaming} />}
       />
     </div>
   );

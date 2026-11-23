@@ -15,6 +15,20 @@ export function quotaWindow(monthly: number, trial: number, now: Date) {
   return { key: `${year}-${month}`, limit: monthly };
 }
 
+export async function getStoreQuota(db: Prisma.TransactionClient, storeId: string, now: Date) {
+  const subscription = await db.storeSubscription.findUnique({
+    where: { storeId }, select: { plan: true, status: true, store: { select: { status: true } } },
+  });
+  if (!subscription) throw new MuniraRequestError("لا يوجد اشتراك مرتبط بمتجرك.", 403);
+  const plan = await db.subscriptionPlanConfig.findUnique({
+    where: { plan: subscription.plan },
+    select: { nameAr: true, muniraMonthlyMessages: true, muniraTrialMessages: true },
+  });
+  const quota = quotaWindow(plan?.muniraMonthlyMessages ?? 0, plan?.muniraTrialMessages ?? 0, now);
+  const active = subscription.store.status === "ACTIVE" && isSubscriptionInGoodStanding(subscription.status);
+  return { ...quota, active, planName: plan?.nameAr ?? subscription.plan };
+}
+
 type Ticket = { scope: string; requestId: string };
 type Reservation = Ticket & { inputHash: string; storeId?: string };
 const duration = 180_000;
@@ -36,15 +50,8 @@ export function reserveMessage(ticket: Reservation) {
 
     let window = "unmetered";
     if (ticket.storeId) {
-      const subscription = await tx.storeSubscription.findUnique({ where: { storeId: ticket.storeId }, select: { plan: true, status: true, store: { select: { status: true } } } });
-      if (!subscription || subscription.store.status !== "ACTIVE" || !isSubscriptionInGoodStanding(subscription.status)) {
-        throw new MuniraRequestError("اشتراك المتجر غير متاح لاستخدام منيرة.", 403);
-      }
-      const plan = await tx.subscriptionPlanConfig.findUnique({
-        where: { plan: subscription.plan },
-        select: { muniraMonthlyMessages: true, muniraTrialMessages: true },
-      });
-      const quota = quotaWindow(plan?.muniraMonthlyMessages ?? 0, plan?.muniraTrialMessages ?? 0, now);
+      const quota = await getStoreQuota(tx, ticket.storeId, now);
+      if (!quota.active) throw new MuniraRequestError("اشتراك المتجر غير متاح لاستخدام منيرة.", 403);
       if (quota.limit <= 0) throw new MuniraRequestError("باقتك الحالية لا تتضمن رسائل منيرة.", 403);
       window = quota.key;
       const used = await tx.muniraRequest.count({ where: {
