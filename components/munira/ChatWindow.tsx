@@ -20,12 +20,13 @@ interface Props {
   onStopRecording: () => void;
   onCancel: () => void;
   userName?: string;
+  accessory?: React.ReactNode;
 }
 
 export function ChatWindow({
   messages, streaming, recording, error,
   onSend, onRetry, onClear,
-  onStartRecording, onStopRecording, onCancel,
+  onStartRecording, onStopRecording, onCancel, accessory,
 }: Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", maxWidth: 920, marginLeft: "auto", marginRight: "auto", background: ui.sand, borderInline: `1px solid ${ui.border}`, direction: "rtl" }}>
@@ -73,6 +74,8 @@ export function ChatWindow({
           </button>
         )}
       </div>
+
+      {accessory}
 
       <MessageList messages={messages} streaming={streaming} error={error} onSuggestion={onSend} onRetry={onRetry} />
 
