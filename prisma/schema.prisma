@@ -121,6 +121,17 @@ enum AuditAction {
   PAYOUT_PROCESSED
   SHIPPING_PROVIDER_ADDED
   MARKETING_HUB_CONFIGURED
+  FINANCE_EXPENSE_CREATED
+  FINANCE_EXPENSE_UPDATED
+  FINANCE_EXPENSE_VOIDED
+  FINANCE_SETTLEMENT_RECORDED
+  FINANCE_SETTLEMENT_REVERSED
+  FINANCE_REFUND_RECORDED
+  FINANCE_REFUND_REVERSED
+  FINANCE_COD_TERMS_UPDATED
+  FINANCE_AI_INVOICE_RECORDED
+  FINANCE_SETTINGS_UPDATED
+  COURIER_ASSIGNED
 }
 
 enum TicketStatus {
@@ -807,6 +818,9 @@ model Order {
   shippingRates   ShippingRate[]
   attribution     OrderAttribution?
   analyticsEvents AnalyticsEvent[]
+  // المركز المالي: حصة شركة الشحن من رسم COD ولقطة شروطها وقت إنشاء الطلب (لا تتأثر بتعديل الإعدادات لاحقاً)
+  codCarrierShare Decimal?  @db.Decimal(10, 2)
+  codShareTerms   Json?
 
   @@index([storeId, status])
   @@index([buyerId, createdAt])
@@ -1236,6 +1250,18 @@ model AIUsage {
   errorMessage String? // رسالة الخطأ لو success=false
 
   createdAt   DateTime @default(now())
+  // المركز المالي: تتبع تكلفة دقيق لكل استدعاء
+  planAtCall                 SubscriptionPlan?
+  providerRequestId          String?
+  requestKey                 String?           @unique
+  cachedInputTokens          Int               @default(0)
+  inputPriceUsdPerMTok       Decimal?          @db.Decimal(12, 6)
+  outputPriceUsdPerMTok      Decimal?          @db.Decimal(12, 6)
+  cachedInputPriceUsdPerMTok Decimal?          @db.Decimal(12, 6)
+  costUsd                    Decimal?          @db.Decimal(14, 6)
+  costStatus                 FinAiCostStatus   @default(LEGACY)
+  isRetry                    Boolean           @default(false)
+  retryOfId                  String?
 
   @@index([userId, createdAt])
   @@index([storeId, feature])
@@ -1893,4 +1919,186 @@ model StoreMarketingLink {
   @@unique([storeId, platform])
   @@index([storeId])
   @@map("store_marketing_links")
+}
+
+// ===== FINANCE ADDENDUM (المركز المالي) =====
+// جداول جديدة بالكامل (لا تعدّل جداولك). بلا علاقات FK نحو نماذجك الموجودة عمداً لتفادي أي تعارض مع نسختك.
+
+enum FinExpenseCategory {
+  ESTABLISHMENT
+  OPERATIONS
+  AI
+  SALARIES
+}
+
+enum FinExpenseKind {
+  FIXED
+  VARIABLE
+}
+
+enum FinExpenseStatus {
+  PAID
+  UNPAID
+}
+
+enum FinSettlementKind {
+  COURIER_PAYOUT
+  COMMISSION_RECEIPT
+  LOCAL_DELIVERY_RECEIPT
+  COD_SHARE_RECEIPT
+  OTHER
+}
+
+enum FinCodShareBasis {
+  FIXED_ONLY
+  ORDER_TOTAL
+  COD_FEE
+}
+
+enum FinAiCostStatus {
+  COMPLETE
+  INCOMPLETE
+  LEGACY
+}
+
+enum FinAiInvoiceKind {
+  USAGE_INVOICE
+  PREPAID_TOPUP
+}
+
+/// مصروفات المنصة (يدوية). التصحيح بالإلغاء الناعم voidedAt + سجل تدقيق، لا بالحذف.
+model PlatformExpense {
+  id          String             @id @default(cuid())
+  category    FinExpenseCategory
+  description String
+  amount      Decimal            @db.Decimal(12, 2)
+  currency    String             @default("SAR")
+  vatAmount   Decimal?           @db.Decimal(12, 2)
+  expenseDate DateTime
+  paidAt      DateTime?
+  status      FinExpenseStatus   @default(UNPAID)
+  kind        FinExpenseKind     @default(FIXED)
+  reference   String?
+  note        String?
+  voidedAt    DateTime?
+  voidReason  String?
+  createdById String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([expenseDate])
+  @@index([paidAt])
+  @@index([category, expenseDate])
+  @@map("platform_expenses")
+}
+
+/// سجل تسويات موحَّد: دفعات المناديب + تحصيلات بسطة (عمولات/توصيل/COD). تسجيل ومتابعة فقط — لا تحويلات فعلية.
+/// المبلغ دائماً موجب؛ التصحيح بقيد عكسي (isReversal + reversalOfId) لا بالحذف.
+model FinanceSettlement {
+  id             String            @id @default(cuid())
+  kind           FinSettlementKind
+  partyType      String // COURIER | CARRIER | MERCHANT | OTHER
+  partyRef       String // courierId | رمز الناقل | storeId
+  amount         Decimal           @db.Decimal(12, 2)
+  settledAt      DateTime
+  method         String?
+  reference      String?
+  note           String?
+  isReversal     Boolean           @default(false)
+  reversalOfId   String?           @unique
+  idempotencyKey String            @unique
+  createdById    String
+  createdAt      DateTime          @default(now())
+  allocations    FinanceSettlementAllocation[]
+
+  @@index([kind, settledAt])
+  @@index([partyType, partyRef])
+  @@map("finance_settlements")
+}
+
+model FinanceSettlementAllocation {
+  id           String            @id @default(cuid())
+  settlementId String
+  settlement   FinanceSettlement @relation(fields: [settlementId], references: [id], onDelete: Cascade)
+  shipmentId   String?
+  orderId      String?
+  amount       Decimal           @db.Decimal(12, 2)
+
+  @@index([settlementId])
+  @@index([shipmentId])
+  @@map("finance_settlement_allocations")
+}
+
+/// سجل إسناد الشحنة لمندوب بقيمها التاريخية وقت الإسناد. الإسناد الفعّال = supersededAt فارغ.
+model CourierAssignment {
+  id                  String    @id @default(cuid())
+  shipmentId          String
+  courierId           String
+  wageSnapshot        Decimal?  @db.Decimal(10, 2)
+  deliveryFeeSnapshot Decimal?  @db.Decimal(10, 2)
+  directCostSnapshot  Decimal?  @db.Decimal(10, 2)
+  assignedAt          DateTime  @default(now())
+  supersededAt        DateTime?
+  supersededReason    String?
+  createdById         String?
+
+  @@index([shipmentId])
+  @@index([courierId])
+  @@map("courier_assignments")
+}
+
+/// شروط حصة الناقل من رسم COD لكل ناقل، بنسخ زمنية (effectiveFrom). غياب الصف = «إعداد التكلفة ناقص».
+model CarrierCodTerms {
+  id           String            @id @default(cuid())
+  carrierKey   String // ARAMEX | SPL | CUSTOM:<id> | COURIER:<id> | LOCAL
+  fixedShare   Decimal?          @db.Decimal(10, 2)
+  percentShare Decimal?          @db.Decimal(6, 3)
+  percentBasis FinCodShareBasis?
+  effectiveFrom DateTime
+  createdById  String
+  createdAt    DateTime          @default(now())
+
+  @@index([carrierKey, effectiveFrom])
+  @@map("carrier_cod_terms")
+}
+
+/// استرداد اشتراكات (جزئي/كامل). حدث مالي موثّق مستقل عن تغيير حالة الفاتورة.
+model SubscriptionRefund {
+  id             String   @id @default(cuid())
+  invoiceId      String
+  amount         Decimal  @db.Decimal(12, 2)
+  refundedAt     DateTime
+  reference      String?
+  note           String?
+  isReversal     Boolean  @default(false)
+  reversalOfId   String?  @unique
+  idempotencyKey String   @unique
+  createdById    String
+  createdAt      DateTime @default(now())
+
+  @@index([invoiceId])
+  @@index([refundedAt])
+  @@map("subscription_refunds")
+}
+
+/// فاتورة/مدفوعات مزوّد الذكاء الاصطناعي الموثَّقة (للمطابقة مع AIUsage). الدولار بعملته الأصلية.
+model AiProviderInvoice {
+  id              String           @id @default(cuid())
+  provider        String
+  kind            FinAiInvoiceKind
+  periodStart     DateTime?
+  periodEnd       DateTime?
+  amountUsd       Decimal          @db.Decimal(14, 4)
+  fxRateSarPerUsd Decimal?         @db.Decimal(10, 5)
+  fxRateDate      DateTime?
+  fxSource        String?
+  paidAt          DateTime?
+  reference       String?
+  note            String?
+  createdById     String
+  createdAt       DateTime         @default(now())
+
+  @@index([provider, periodStart])
+  @@index([paidAt])
+  @@map("ai_provider_invoices")
 }

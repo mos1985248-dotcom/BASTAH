@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { snapshotCodShare, snapshotCourierAssignment } from "@/lib/finance/snapshots";
 import { requireActiveStore, AuthError } from "@/lib/auth";
 import { dispatchCourierSchema, formatZodError } from "@/lib/validation";
 import { buildCourierMessage, buildWhatsAppUrl, COURIER_CARRIER_LABEL } from "@/lib/couriers";
@@ -89,13 +90,18 @@ export async function POST(req: NextRequest, { params }: Params) {
       if (existing) {
         await tx.shipment.update({ where: { id: existing.id }, data: { courierId: courier.id, carrier: COURIER_CARRIER_LABEL } });
         await tx.shipmentEvent.create({ data: { shipmentId: existing.id, status: existing.status, note: `أُسندت الشحنة إلى ${courier.name}` } });
+        // المركز المالي: تثبيت القيم التاريخية وقت الإسناد (إعادة الإسناد تُنهي السابق ولا تضاعف المستحق)
+        await snapshotCourierAssignment(tx, { shipmentId: existing.id, courierId: courier.id, reason: "إعادة إسناد" });
+        await snapshotCodShare(tx, order.id, "LOCAL");
       } else {
-        await tx.shipment.create({
+        const createdShipment = await tx.shipment.create({
           data: {
             orderId: order.id, courierId: courier.id, carrier: COURIER_CARRIER_LABEL, status: "PENDING",
             events: { create: { status: "PENDING", note: `أُسندت الشحنة إلى ${courier.name}` } },
           },
         });
+        await snapshotCourierAssignment(tx, { shipmentId: createdShipment.id, courierId: courier.id });
+        await snapshotCodShare(tx, order.id, "LOCAL");
       }
     });
 

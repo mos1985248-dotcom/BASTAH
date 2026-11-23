@@ -39,18 +39,36 @@ export async function logAIUsage(params: {
   durationMs?: number;
   success?: boolean;
   errorMessage?: string;
+  // المركز المالي (اختيارية): معرّف طلب المزوّد، التوكنات المخزنة مؤقتاً، مفتاح منع التكرار، وإعادة المحاولة
+  providerRequestId?: string;
+  cachedInputTokens?: number;
+  requestKey?: string;
+  isRetry?: boolean;
+  retryOfId?: string;
 }) {
   const totalTokens = params.inputTokens + params.outputTokens;
   const estimatedCostUsd = estimateCost(params.model, params.inputTokens, params.outputTokens);
-  prisma.aIUsage.create({
-    data: {
-      ...params,
-      totalTokens,
-      estimatedCostUsd,
-      success: params.success ?? true,
-      errorMessage: params.errorMessage ?? null,
-    },
-  }).catch((err) => console.error("[ai-usage-log-failed]", err));
+  // المركز المالي: لقطة السعر وقت الاستدعاء + حالة التكلفة. سعر غير معروف = INCOMPLETE (لا صفر ولا تقدير).
+  // الاستدعاء الفاشل يُسجَّل أيضاً (قد يفوتره المزوّد)، والتقسيم بحسب المتجر والباقة والميزة.
+  const pricing = COST_PER_1M[params.model];
+  const tokenPriced = !!pricing && params.model !== "whisper-1";
+  (async () => {
+    const sub = params.storeId ? await prisma.storeSubscription.findUnique({ where: { storeId: params.storeId }, select: { plan: true } }) : null;
+    await prisma.aIUsage.create({
+      data: {
+        ...params,
+        totalTokens,
+        estimatedCostUsd,
+        success: params.success ?? true,
+        errorMessage: params.errorMessage ?? null,
+        planAtCall: sub?.plan ?? null,
+        inputPriceUsdPerMTok: tokenPriced ? pricing.input : null,
+        outputPriceUsdPerMTok: tokenPriced ? pricing.output : null,
+        costUsd: tokenPriced ? estimatedCostUsd : null,
+        costStatus: tokenPriced ? "COMPLETE" : "INCOMPLETE",
+      },
+    });
+  })().catch((err) => console.error("[ai-usage-log-failed]", err));
 }
 
 // ── Chat Stream Interface ─────────────────────────────────

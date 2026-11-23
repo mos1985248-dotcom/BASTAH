@@ -20,6 +20,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { snapshotCodShare } from "@/lib/finance/snapshots";
 import { requireUser, AuthError } from "@/lib/auth";
 import { checkoutSchema, formatZodError } from "@/lib/validation";
 import { reserveStock, releaseStock, InsufficientStockError } from "@/lib/inventory";
@@ -195,6 +196,11 @@ export async function POST(req: NextRequest) {
 
       if (shippingRateLogId) {
         await tx.shippingRate.update({ where: { id: shippingRateLogId }, data: { orderId: newOrder.id } });
+        // المركز المالي: تثبيت حصة الناقل من رسم COD وقت الطلب بحسب شروطه السارية (لا يتأثر القديم بتعديل الإعدادات)
+        const chosenRate = await tx.shippingRate.findUnique({ where: { id: shippingRateLogId }, select: { carrier: true } });
+        if (chosenRate && codFee > 0) {
+          await snapshotCodShare(tx, newOrder.id, String(chosenRate.carrier));
+        }
       }
 
       return newOrder;
