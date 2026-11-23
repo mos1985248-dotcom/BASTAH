@@ -1,6 +1,7 @@
 // lib/integrations/engine.ts — تركيب المحرك مع قاعدة البيانات. مصادر الأحداث
 // تستورد من هنا emitIntegrationEvent فقط.
 
+import { getFeature } from "@/lib/entitlements";
 import { prisma } from "@/lib/prisma";
 import { createEngine, type EngineDeps } from "./engine-core";
 import { getDisabledAccountTypes, getProviderCredentials, getRouting } from "./config";
@@ -24,6 +25,7 @@ const deps: EngineDeps = {
   getRouting,
   resolveProvider: resolveConfiguredProvider,
   async getStoreContext(storeId) {
+    if (!(await getFeature(storeId, "social")).allowed) return null;
     // العزل: كل الاستعلامات مقيّدة بـstoreId الممرَّر من الخادم (لا من العميل)
     const [store, links, disabled] = await Promise.all([
       prisma.store.findUnique({ where: { id: storeId }, select: { id: true, nameAr: true, slug: true } }),

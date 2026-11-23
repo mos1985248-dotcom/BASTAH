@@ -1,3 +1,4 @@
+import { assertStoreFeature } from "@/lib/feature-access";
 // app/api/products/[id]/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
@@ -127,6 +128,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (pricing.data && (user.role !== "SELLER" || user.store?.id !== product.storeId)) {
       return NextResponse.json({ error: "بيانات التسعير متاحة للتاجر مالك المنتج فقط" }, { status: 403 });
     }
+    if (pricing.data) await assertStoreFeature(product.storeId, "pricing");
     const record = pricing.data ? pricingRecord(pricing.data) : undefined;
 
     // ⚠️ منتج له متغيرات: كميته = مجموع كميات متغيراته ويُديرها /variants فقط — نتجاهل quantity هنا

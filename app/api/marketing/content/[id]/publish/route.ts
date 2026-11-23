@@ -1,24 +1,21 @@
-// app/api/marketing/content/[id]/publish/route.ts
-// إرسال محتوى للنشر عبر نظام التكاملات المركزي (إجراء صريح من التاجر). هذا المسار
-// أحد مصادر الحدث content.publish وليس شرطاً له: أي مصدر محتوى آخر يستطيع إطلاقه.
-// PUBLISHED = استلمته منظومة الإدارة (2xx) — النشر الفعلي تتولاه أتمتة الإدارة.
-// FAILED عند الرفض/الفشل ويمكن إعادة المحاولة.
+import { requireStoreFeature, assertStoreFeature } from "@/lib/feature-access";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireActiveStore, AuthError } from "@/lib/auth";
+import { AuthError } from "@/lib/auth";
 import { emitIntegrationEvent } from "@/lib/integrations/engine";
 
 export async function POST(_req: Request, { params }: { params: { id: string } }) {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("marketing_content");
 
+    await assertStoreFeature(storeId, "social");
     const content = await prisma.marketingContent.findFirst({ where: { id: params.id, storeId } });
     if (!content) return NextResponse.json({ error: "المحتوى غير موجود" }, { status: 404 });
-    if (content.status === "PUBLISHED") return NextResponse.json({ error: "هذا المحتوى أُرسل مسبقاً" }, { status: 409 });
+    if (content.status === "PUBLISHED" || content.status === "PENDING_CONNECTION") return NextResponse.json({ error: "هذا المحتوى أُرسل مسبقاً" }, { status: 409 });
 
     const outcome = await emitIntegrationEvent({
       type: "content.publish", source: "marketing-content", storeId,
-      data: { contentId: content.id, title: content.title, videoUrl: content.videoUrl ?? null },
+      data: { contentId: content.id, title: content.title, body: content.body, kind: content.kind, videoUrl: content.videoUrl ?? null },
     });
 
     if (outcome.status === "skipped") {
@@ -36,7 +33,7 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
 
     const updated = await prisma.marketingContent.update({
       where: { id: content.id },
-      data: { status: delivered ? "PUBLISHED" : "FAILED", providerName: outcome.results.filter((r) => r.ok).map((r) => r.provider).join(",") || null },
+      data: { status: delivered ? "PENDING_CONNECTION" : "FAILED", providerName: outcome.results.filter((r) => r.ok).map((r) => r.provider).join(",") || null },
       include: { metric: true },
     });
     if (!delivered) return NextResponse.json({ error: "تعذّر الإرسال، حاولي لاحقاً", content: updated }, { status: 502 });

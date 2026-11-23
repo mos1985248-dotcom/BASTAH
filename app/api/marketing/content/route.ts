@@ -1,3 +1,4 @@
+import { requireStoreFeature } from "@/lib/feature-access";
 // app/api/marketing/content/route.ts
 // بنية فقط (القسم ٣) — لا يوجد أي استدعاء شبكي خارجي بهذا الملف. كل
 // محتوى يُنشأ بحالة DRAFT دائماً (لا نقبل status من العميل إطلاقاً)،
@@ -5,13 +6,13 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireActiveStore, AuthError } from "@/lib/auth";
+import { AuthError } from "@/lib/auth";
 import { createMarketingContentSchema, formatZodError } from "@/lib/validation";
 
 // ── POST — إنشاء مسودة محتوى (DRAFT دائماً) ──
 export async function POST(req: NextRequest) {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("marketing_content");
 
     const body = await req.json();
     const parsed = createMarketingContentSchema.safeParse(body);
@@ -23,6 +24,8 @@ export async function POST(req: NextRequest) {
       data: {
         storeId,
         title: parsed.data.title,
+        kind: parsed.data.kind,
+        body: parsed.data.body,
         videoUrl: parsed.data.videoUrl ?? null,
         status: "DRAFT", // لا نقبل حالة من العميل — DRAFT دائماً بهذه المرحلة
         providerName: null, // "غير محدد" حتى يُربط Provider فعلي لاحقاً
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
 // ── GET — قائمة محتوى المتجر ──
 export async function GET() {
   try {
-    const { storeId } = await requireActiveStore();
+    const { storeId } = await requireStoreFeature("marketing_content");
 
     const content = await prisma.marketingContent.findMany({
       where: { storeId },

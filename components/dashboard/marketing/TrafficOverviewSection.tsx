@@ -12,11 +12,11 @@ import ErrorState from "@/components/dashboard/ui/ErrorState";
 import s from "./marketing.module.css";
 
 interface Overview {
-  views: number; productClicks: number; addToCart: number; checkoutStarted: number;
-  orders: number; revenue: number; conversionRate: number;
+  views: number; productClicks: number; addToCart: number | null; checkoutStarted: number;
+  orders: number; revenue: number | null; conversionRate: number | null;
 }
 interface SourceRow { source: string; visits: number; orders: number; revenue: number }
-interface Response { overview: Overview; sources: SourceRow[] }
+interface Response { advanced: boolean; topProducts: { name: string; visits: number }[]; overview: Overview; sources: SourceRow[] }
 
 const RANGES: { key: string; label: string }[] = [
   { key: "today", label: "اليوم" },
@@ -45,9 +45,9 @@ export default function TrafficOverviewSection() {
   const cards = data
     ? [
         { label: "المشاهدات", value: data.overview.views, Icon: Eye },
-        { label: "أُضيف للسلة", value: data.overview.addToCart, Icon: ShoppingCart },
+        ...(data.overview.addToCart === null ? [] : [{ label: "أُضيف للسلة", value: data.overview.addToCart, Icon: ShoppingCart }]),
         { label: "الطلبات", value: data.overview.orders, Icon: Receipt },
-        { label: "نسبة التحويل", value: `${data.overview.conversionRate}%`, Icon: TrendingUp },
+        ...(data.overview.conversionRate === null ? [] : [{ label: "نسبة التحويل", value: `${data.overview.conversionRate}%`, Icon: TrendingUp }]),
       ]
     : [];
 
@@ -55,7 +55,7 @@ export default function TrafficOverviewSection() {
     <section className={s.sec}>
       <div className={s.head}>
         <h2 className={s.h2}>نظرة عامة</h2>
-        <div className={s.ranges} role="group" aria-label="الفترة">
+        {data?.advanced && <div className={s.ranges} role="group" aria-label="الفترة">
           {RANGES.map((r) => (
             <button
               key={r.key}
@@ -67,7 +67,7 @@ export default function TrafficOverviewSection() {
               {r.label}
             </button>
           ))}
-        </div>
+        </div>}
       </div>
 
       {error && <ErrorState message={error} onRetry={() => load(range)} />}
@@ -83,12 +83,15 @@ export default function TrafficOverviewSection() {
                 <p className={s.statLbl}>{c.label}</p>
               </div>
             ))}
-            <div className={`${s.stat} ${s.statSand}`}>
+            {data.overview.revenue !== null && <div className={`${s.stat} ${s.statSand}`}>
               <p className={s.statVal}>{data.overview.revenue.toFixed(0)} ر.س</p>
               <p className={s.statLbl}>الإيراد المحصَّل</p>
-            </div>
+            </div>}
           </div>
 
+          {data.advanced && <>
+          <h3 className={s.h3}>المنتجات الأكثر زيارة</h3>
+          {data.topProducts.length ? <ul>{data.topProducts.map((product, index) => <li key={index}>{product.name} · {product.visits}</li>)}</ul> : <p className={s.empty}>لا زيارات مسجّلة لهذه الفترة.</p>}
           <h3 className={s.h3}>مصادر الزيارات</h3>
           {data.sources.length === 0 ? (
             <p className={s.empty}>لا بيانات بعد لهذه الفترة.</p>
@@ -115,6 +118,7 @@ export default function TrafficOverviewSection() {
               </table>
             </div>
           )}
+          </>}
         </>
       )}
     </section>

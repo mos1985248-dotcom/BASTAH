@@ -1,3 +1,4 @@
+import { assertStoreFeature } from "@/lib/feature-access";
 // app/api/products/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
@@ -123,9 +124,6 @@ export async function POST(req: NextRequest) {
   try {
     const { storeId } = await requireActiveStore();
 
-    // ✅ يرمي PlanLimitError قبل أي كتابة لو تجاوز حدود باقته
-    await assertCanAddProduct(storeId);
-
     const body = await req.json();
     const pricing = productPricingSchema.optional().safeParse(body?.pricing);
     if (!pricing.success) {
@@ -136,18 +134,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     }
     const data = parsed.data;
+    if (pricing.data) await assertStoreFeature(storeId, "pricing");
     const record = pricing.data ? pricingRecord(pricing.data) : undefined;
 
     const baseSlug = data.nameAr.trim().replace(/\s+/g, "-").slice(0, 60);
     const slug = `${baseSlug}-${Math.random().toString(36).slice(2, 7)}`;
 
-    const [product] = await prisma.$transaction([
-      prisma.product.create({
+    const product = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM stores WHERE id = ${storeId} FOR UPDATE`;
+      await assertCanAddProduct(storeId, tx);
+      const created = await tx.product.create({
         data: { ...data, storeId, slug, ...(record && { pricing: { create: record } }) },
         select: { id: true, nameAr: true, slug: true, status: true, price: true },
-      }),
-      prisma.store.update({ where: { id: storeId }, data: { totalProducts: { increment: 1 } } }),
-    ]);
+      });
+      await tx.store.update({ where: { id: storeId }, data: { totalProducts: { increment: 1 } } });
+      return created;
+    });
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (err) {

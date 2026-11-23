@@ -6,6 +6,7 @@ export interface ConversionMetric {
   lastSyncedAt: string | null;
 }
 export interface MarketingContentRow {
+  body?: string | null;
   id: string;
   title: string;
   videoUrl: string | null;
@@ -15,6 +16,9 @@ export interface MarketingContentRow {
   metric: ConversionMetric | null;
 }
 export interface AdCampaignRow {
+  objective?: string | null;
+  content?: string | null;
+  archivedAt?: string | null;
   id: string;
   name: string;
   budget: number;

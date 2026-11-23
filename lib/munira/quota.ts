@@ -1,7 +1,7 @@
+import { resolveFeature } from "@/lib/entitlements";
 import { randomUUID } from "node:crypto";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { isSubscriptionInGoodStanding } from "@/lib/subscription-limits";
 
 export class MuniraRequestError extends Error {
   constructor(message: string, public status: number) { super(message); }
@@ -16,17 +16,10 @@ export function quotaWindow(monthly: number, trial: number, now: Date) {
 }
 
 export async function getStoreQuota(db: Prisma.TransactionClient, storeId: string, now: Date) {
-  const subscription = await db.storeSubscription.findUnique({
-    where: { storeId }, select: { plan: true, status: true, store: { select: { status: true } } },
-  });
-  if (!subscription) throw new MuniraRequestError("لا يوجد اشتراك مرتبط بمتجرك.", 403);
-  const plan = await db.subscriptionPlanConfig.findUnique({
-    where: { plan: subscription.plan },
-    select: { nameAr: true, muniraMonthlyMessages: true, muniraTrialMessages: true },
-  });
-  const quota = quotaWindow(plan?.muniraMonthlyMessages ?? 0, plan?.muniraTrialMessages ?? 0, now);
-  const active = subscription.store.status === "ACTIVE" && isSubscriptionInGoodStanding(subscription.status);
-  return { ...quota, active, planName: plan?.nameAr ?? subscription.plan };
+  const feature = await resolveFeature(db, storeId, "munira", now);
+  const limit = feature.allowed ? feature.limit ?? 0 : 0;
+  const quota = quotaWindow(feature.trialMessages > 0 ? 0 : limit, feature.trialMessages > 0 ? limit : 0, now);
+  return { ...quota, active: feature.active, planName: feature.planName };
 }
 
 type Ticket = { scope: string; requestId: string };

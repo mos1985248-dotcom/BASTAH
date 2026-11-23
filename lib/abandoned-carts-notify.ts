@@ -1,85 +1,67 @@
-// lib/abandoned-carts-notify.ts
-// إرسال التذكيرات للسجلات DETECTED: (1) إشعار داخل التطبيق للمشتري،
-// (2) حدث cart.abandoned عبر محرك التكاملات (يتحكم به توجيه الإدارة؛ للمتاجر التي ربطت حساباً).
-// ⚠️ خصوصية: حدث التاجر مجهول الهوية افتراضياً (لا اسم/جوال/إيميل). فقط إن
-// وُجدت موافقة صريحة سارية من المشتري لهذا المتجر بالذات (CartContactConsent،
-// revokedAt = null وقت الإرسال) يُضاف customer {name, phone} — لا إيميل أبداً.
-
 import { prisma } from "@/lib/prisma";
-import { createNotification } from "@/lib/notifications";
-import { emitIntegrationEvent } from "@/lib/integrations/engine";
+import { resolveFeature } from "@/lib/entitlements";
 
-export interface NotifySummary { reminded: number; merchantEvents: number }
-
-export async function sendAbandonedCartReminders(now = new Date()): Promise<NotifySummary> {
-  const pending = await prisma.abandonedCart.findMany({
-    where: { status: "DETECTED" },
-    include: { store: { select: { nameAr: true } } },
-    take: 300,
-  });
-  const summary: NotifySummary = { reminded: 0, merchantEvents: 0 };
-
-  for (const rec of pending) {
-    // حارس ذرّي: من يربح هذا التحديث هو الوحيد الذي يرسل (تشغيلان متزامنان لا يكرّران التذكير)
-    const claim = await prisma.abandonedCart.updateMany({
-      where: { id: rec.id, status: "DETECTED" },
-      data: { status: "REMINDED", remindedAt: now },
-    });
-    if (claim.count !== 1) continue;
-
-    try {
-      await createNotification({
-        userId: rec.userId,
-        type: "SYSTEM",
-        titleAr: "منتجاتك بانتظارك في السلة",
-        bodyAr: `لديك ${rec.itemCount} منتج من متجر "${rec.store.nameAr}" في سلتك. يمكنك إكمال طلبك في أي وقت.`,
-        data: { abandonedCartId: rec.id, href: "/cart" },
+export async function remindAbandonedCart(id: string, storeId: string, now = new Date()) {
+  try {
+    return await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM abandoned_carts WHERE id = ${id} AND "storeId" = ${storeId} FOR UPDATE`;
+      const cart = await tx.abandonedCart.findFirst({
+        where: { id, storeId, status: { in: ["DETECTED", "REMINDED"] } },
+        include: { store: { select: { nameAr: true } } },
       });
-      summary.reminded++;
-    } catch {
-      // فشل الإشعار: نُرجع السجل ليُعاد المحاولة بالدورة القادمة
-      await prisma.abandonedCart.updateMany({ where: { id: rec.id, status: "REMINDED" }, data: { status: "DETECTED", remindedAt: null } });
-      continue;
-    }
-
-    if (await sendMerchantEvent(rec, now)) summary.merchantEvents++;
+      if (!cart) return false;
+      const [access, reminder] = await Promise.all([
+        resolveFeature(tx, storeId, "abandoned_carts", now), resolveFeature(tx, storeId, "cart_reminders", now),
+      ]);
+      if (!access.allowed || !reminder.allowed) return false;
+      const consent = await tx.$queryRaw<{ id: string }[]>`
+        SELECT id FROM cart_contact_consents
+        WHERE "userId" = ${cart.userId} AND "storeId" = ${storeId} AND "revokedAt" IS NULL FOR UPDATE
+      `;
+      if (!consent.length) return false;
+      const order = await tx.order.findFirst({
+        where: { buyerId: cart.userId, storeId, createdAt: { gte: cart.cartUpdatedAt }, status: { notIn: ["CANCELLED", "REFUNDED"] } },
+        select: { id: true },
+      });
+      if (order) return false;
+      const since = new Date(now.getTime() - 7 * 86_400_000);
+      const sent = await tx.cartReminderAttempt.count({
+        where: { cartId: id, cartUpdatedAt: cart.cartUpdatedAt, status: "SENT" },
+      });
+      const historical = sent || (cart.remindedAt ? 1 : 0);
+      if (historical >= (reminder.limit ?? 1) || (cart.remindedAt && cart.remindedAt > since)) return false;
+      await tx.notification.create({ data: {
+        userId: cart.userId, type: "SYSTEM", titleAr: "منتجاتك بانتظارك في السلة",
+        bodyAr: `لديك ${cart.itemCount} منتج من متجر "${cart.store.nameAr}" في سلتك.`,
+        data: { abandonedCartId: id, href: "/cart" },
+      } });
+      await tx.abandonedCart.update({ where: { id }, data: { status: "REMINDED", remindedAt: now } });
+      await tx.cartReminderAttempt.create({ data: { cartId: id, cartUpdatedAt: cart.cartUpdatedAt, status: "SENT" } });
+      return true;
+    });
+  } catch (error) {
+    const cart = await prisma.abandonedCart.findFirst({ where: { id, storeId }, select: { cartUpdatedAt: true } });
+    if (cart) await prisma.cartReminderAttempt.create({ data: { cartId: id, ...cart, status: "FAILED" } });
+    throw error;
   }
-  return summary;
 }
 
-async function sendMerchantEvent(
-  rec: { id: string; storeId: string; userId: string; itemCount: number; cartValue: number; cartUpdatedAt: Date },
-  now: Date,
-): Promise<boolean> {
-  // متجر بلا حساب خارجي مربوط = لم يوافق على التكاملات: لا نحمّل بيانات السلة ولا الموافقة أصلاً
-  // (المحرك يتحقق أيضاً؛ هذا الفحص المسبق يمنع تحميل بيانات شخصية بلا حاجة)
-  if ((await prisma.storeMarketingLink.count({ where: { storeId: rec.storeId } })) === 0) return false;
-
-  const items = await prisma.cartItem.findMany({
-    where: { userId: rec.userId, product: { storeId: rec.storeId, status: "ACTIVE" } },
-    include: { product: { select: { id: true, nameAr: true, price: true } }, variant: { select: { price: true } } },
-  });
-  const consent = await prisma.cartContactConsent.findUnique({
-    where: { userId_storeId: { userId: rec.userId, storeId: rec.storeId } },
-    include: { user: { select: { name: true, phone: true } } },
-  });
-  const customer = consent && consent.revokedAt === null
-    ? { name: consent.user.name, phone: consent.user.phone ?? null }
-    : null;
-
-  const data = {
-    cartId: rec.id,
-    contactConsent: customer !== null,
-    ...(customer ? { customer } : {}),
-    currency: "SAR",
-    itemCount: rec.itemCount,
-    cartValue: rec.cartValue,
-    idleHours: Math.round((now.getTime() - rec.cartUpdatedAt.getTime()) / 3_600_000),
-    items: items.map((i) => ({ productId: i.product.id, name: i.product.nameAr, quantity: i.quantity, unitPrice: i.variant?.price ?? i.product.price })),
-  };
-
-  const outcome = await emitIntegrationEvent({ type: "cart.abandoned", source: "cart-recovery", storeId: rec.storeId, data });
-  const sent = outcome.status === "delivered" || outcome.status === "partial";
-  if (sent) await prisma.abandonedCart.update({ where: { id: rec.id }, data: { merchantEventSentAt: now } });
-  return sent;
+export async function sendAbandonedCartReminders(now = new Date()) {
+  const pending = await prisma.$queryRaw<{ id: string; storeId: string }[]>`
+    SELECT cart.id, cart."storeId" FROM abandoned_carts cart
+    JOIN cart_contact_consents consent
+      ON consent."storeId" = cart."storeId" AND consent."userId" = cart."userId"
+    WHERE cart.status = 'DETECTED' AND consent."revokedAt" IS NULL
+      AND cart."cartUpdatedAt" >= ${new Date(now.getTime() - 7 * 86_400_000)}
+    ORDER BY cart."detectedAt" DESC LIMIT 300
+  `;
+  let reminded = 0;
+  for (const cart of pending) {
+    try {
+      if (await remindAbandonedCart(cart.id, cart.storeId, now)) reminded++;
+    } catch {
+      console.error("[abandoned-carts] Reminder transaction failed");
+    }
+  }
+  return { reminded, merchantEvents: 0 };
 }

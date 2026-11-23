@@ -9,7 +9,7 @@ import { api } from "@/lib/api-client";
 import f from "../forms.module.css";
 import s from "./marketing.module.css";
 
-interface Recent { id: string; status: string; itemCount: number; cartValue: number; detectedAt: string; merchantEventSentAt: string | null; contact: { name: string; phone: string | null } | null }
+interface Recent { items: { name: string; quantity: number }[]; id: string; status: string; itemCount: number; cartValue: number; detectedAt: string; merchantEventSentAt: string | null; contact: { name: string; phone: string | null } | null }
 interface Stats {
   windowDays: number; abandonedCount: number; abandonedValue: number;
   recoveredCount: number; recoveredValue: number; recoveryRate: number | null; recent: Recent[];
@@ -30,9 +30,22 @@ export default function AbandonedCartsSection() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState(false);
 
-  useEffect(() => {
-    api.get<Stats>("/api/marketing/abandoned-carts").then(setStats).catch(() => setError(true));
-  }, []);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState("");
+  const load = () => api.get<Stats>("/api/marketing/abandoned-carts").then(setStats).catch(() => setError(true));
+  useEffect(() => { void load(); }, []);
+
+  async function remind(id: string) {
+    setBusy(id);
+    setFeedback("");
+    try {
+      await api.post("/api/marketing/abandoned-carts", { id });
+      setFeedback("أُرسل تذكير داخل بسطة.");
+      await load();
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "تعذّر إرسال التذكير.");
+    } finally { setBusy(null); }
+  }
 
   return (
     <section className={s.sec}>
@@ -41,9 +54,10 @@ export default function AbandonedCartsSection() {
         السلات المتروكة
       </h2>
       <p className={s.lead}>
-        سلة لم يُعدَّل فيها شيء ٦ ساعات فأكثر ولم يُنشأ بعدها طلب. نرسل للمشتري تذكيراً داخل التطبيق مرة واحدة أسبوعياً، وإن ربطت حساباً خارجياً واحداً على الأقل (من صفحة التكاملات) تُرسل بسطة مارت حدث السلة المتروكة إلى نظام التكاملات المركزي. هوية المشتري (الاسم والجوال) لا تُرسل إلا إن وافق صراحةً، وتتوقف إن سحب موافقته.
+        تُرصد السلة بعد ست ساعات من آخر تعديل. تصل التذكيرات داخل بسطة للعملاء الذين وافقوا على استقبالها.
       </p>
 
+      {feedback && <p role="status">{feedback}</p>}
       {error && <p className={f.err} role="alert">تعذّر تحميل السلات المتروكة</p>}
 
       {stats && stats.abandonedCount === 0 && (
@@ -67,6 +81,8 @@ export default function AbandonedCartsSection() {
                   </p>
                   <span className={s.cartStatus}>{STATUS_LABEL[r.status] ?? r.status}</span>
                 </div>
+                {r.items.length > 0 && <ul>{r.items.map((item, index) => <li key={index}>{item.name} × {item.quantity}</li>)}</ul>}
+                {r.status !== "RECOVERED" && r.contact && <button type="button" disabled={busy !== null} onClick={() => remind(r.id)}>إرسال تذكير</button>}
                 <p className={s.cartMeta}>
                   {/* تغيير: ميلادي (ar-SA وحده يعرض التاريخ الهجري) */}
                   {new Date(r.detectedAt).toLocaleDateString("ar-SA-u-ca-gregory")}

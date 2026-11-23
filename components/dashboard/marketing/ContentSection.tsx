@@ -22,6 +22,8 @@ function Metric({ icon: Icon, label, value }: { icon: typeof Eye; label: string;
 
 export default function ContentSection({ content, onChanged }: { content: MarketingContentRow[]; onChanged: () => void }) {
   const [showForm, setShowForm] = useState(false);
+  const [body, setBody] = useState("");
+  const [kind, setKind] = useState("product_description");
   const [title, setTitle] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [saving, setSaving] = useState(false);
@@ -31,8 +33,9 @@ export default function ContentSection({ content, onChanged }: { content: Market
     setSaving(true);
     setError("");
     try {
-      await api.post("/api/marketing/content", { title, videoUrl: videoUrl || undefined });
+      await api.post("/api/marketing/content", { title, body: body || undefined, kind, videoUrl: videoUrl || undefined });
       setTitle("");
+      setBody("");
       setVideoUrl("");
       setShowForm(false);
       onChanged();
@@ -66,6 +69,13 @@ export default function ContentSection({ content, onChanged }: { content: Market
             <span className={f.fieldLabel}>رابط الفيديو (اختياري)</span>
             <input value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://..." dir="ltr" className={`${f.field} ${f.ltr}`} />
           </label>
+          <label className={f.fieldWrap}><span className={f.fieldLabel}>نوع النص</span>
+            <select className={f.field} value={kind} onChange={event => setKind(event.target.value)}>
+              <option value="product_description">وصف منتج</option><option value="social_post">منشور</option><option value="headline">عنوان</option>
+            </select>
+          </label>
+          <label className={f.fieldWrap}><span className={f.fieldLabel}>النص</span><textarea className={f.field} value={body} maxLength={4000} onChange={event => setBody(event.target.value)} /></label>
+          <a href="/dashboard/munira">صياغة النص مع منيرة ضمن حصة الرسائل</a>
           {error && (
             <p className={f.err} role="alert">
               <AlertTriangle size={14} strokeWidth={1.8} />
@@ -88,6 +98,7 @@ export default function ContentSection({ content, onChanged }: { content: Market
                 <p className={s.cardTitle}>{c.title}</p>
                 <MarketingStatusBadge status={c.status} />
               </div>
+              {c.body && <p>{c.body}</p>}
               <p className={s.cardMeta}>{c.providerName ?? "غير مربوط بأي منصة بعد"}</p>
               <PublishContentButton contentId={c.id} status={c.status} onDone={onChanged} />
               <div className={s.metrics}>
