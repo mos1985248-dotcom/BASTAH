@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import type { Prisma } from "@prisma/client";
 import { test } from "node:test";
 import { prisma } from "../../lib/prisma";
 import { launchExpiry, grantLaunchPromotion } from "../../lib/launch-promotion";
@@ -10,6 +11,25 @@ import { remindAbandonedCart } from "../../lib/abandoned-carts-notify";
 
 test("promotion expires after three calendar months, clamped to the final day", () => {
   assert.equal(launchExpiry(new Date("2026-11-30T14:30:00Z")).toISOString(), "2027-02-28T14:30:00.000Z");
+});
+
+test("expired monthly subscriptions retain their displayed allowance while sending is blocked", async () => {
+  const endDate = new Date("2026-11-17T16:18:22Z");
+  const db = {
+    storeSubscription: { findUnique: async () => ({ plan: "GROWTH", status: "ACTIVE", endDate, store: { status: "ACTIVE" } }) },
+    subscriptionPlanConfig: { findUnique: async () => ({ nameAr: "بسطة انطلاق", muniraTrialMessages: 0, muniraMonthlyMessages: 100 }) },
+    platformFeature: { findUnique: async () => null },
+    storeFeatureOverride: { findUnique: async () => null },
+    launchPromotion: { findUnique: async () => null },
+  } as unknown as Prisma.TransactionClient;
+
+  const quota = await getStoreQuota(db, "test", new Date("2026-11-24T12:00:00Z"));
+  assert.deepEqual(quota, {
+    key: "2026-11", planLimit: 100, limit: 0, allowed: false, active: false, expired: true, planName: "بسطة انطلاق",
+  });
+  const beforeExpiry = await getStoreQuota(db, "test", new Date(endDate.getTime() - 1));
+  assert.equal(beforeExpiry.limit, 100);
+  assert.equal(beforeExpiry.allowed, true);
 });
 
 test("plan access, promotion caps and cart consent on an isolated PostgreSQL database", {
@@ -82,7 +102,12 @@ test("plan access, promotion caps and cart consent on an isolated PostgreSQL dat
     assert.equal(recovered.status, "RECOVERED");
     assert.equal(recovered.recoveredOrderId, order.id);
     assert.equal(await remindAbandonedCart(cart.id, growth), false);
-    await prisma.storeSubscription.update({ where: { storeId: growth }, data: { status: "EXPIRED" } });
+    await prisma.storeSubscription.update({ where: { storeId: growth }, data: { endDate: new Date(Date.now() - 1000) } });
+    const expiredQuota = await getStoreQuota(prisma, growth, new Date());
+    assert.equal(expiredQuota.planLimit, 100);
+    assert.equal(expiredQuota.limit, 0);
+    assert.equal(expiredQuota.expired, true);
+    assert.equal(expiredQuota.allowed, false);
     assert.equal((await resolveFeature(prisma, growth, "abandoned_carts")).allowed, false);
     assert.equal(await prisma.abandonedCart.count({ where: { id: cart.id } }), 1);
 

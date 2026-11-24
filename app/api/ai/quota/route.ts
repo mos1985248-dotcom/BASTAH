@@ -24,7 +24,9 @@ export async function GET() {
     });
     return NextResponse.json({
       planName: quota.planName, period: quota.key === "trial" ? "trial" : "monthly",
-      limit: quota.limit, used, remaining: Math.max(0, quota.limit - used), active: quota.active,
+      limit: quota.planLimit, used, remaining: Math.max(0, quota.planLimit - used),
+      active: quota.active, expired: quota.expired, available: quota.allowed ? Math.max(0, quota.limit - used) : 0,
+      allowed: quota.allowed,
       plans,
     }, { headers });
   } catch (error) {
