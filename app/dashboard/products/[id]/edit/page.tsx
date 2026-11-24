@@ -9,15 +9,18 @@ import { calculatePricing, type PricingInput } from "@/lib/pricing/product-prici
 import { uiVars } from "@/components/ui/vars";
 import ImageManagerCard from "@/components/dashboard/product-edit/ImageManagerCard";
 import DetailsFormCard from "@/components/dashboard/product-edit/DetailsFormCard";
+import StockReceiptsCard from "@/components/dashboard/product-edit/StockReceiptsCard";
 import VariantsCard, { EditVariant } from "@/components/dashboard/product-edit/VariantsCard";
 import { useProductTranslate } from "@/hooks/useProductTranslate";
 import { EditProductImage } from "@/components/dashboard/product-edit/ProductImageTile";
 import s from "@/components/dashboard/forms.module.css";
 
 interface ProductDetail {
-  id: string; nameAr: string; price: number; quantity: number; shortDescAr: string | null;
+  id: string; nameAr: string; price: number; quantity: number; trackInventory: boolean; shortDescAr: string | null;
   categoryId: string | null; status: string; productImages: EditProductImage[]; variants?: EditVariant[];
 }
+
+const emptyVariants: EditVariant[] = [];
 
 interface SavedPricing {
   input: PricingInput;
@@ -30,6 +33,7 @@ export default function EditProductPage() {
 }
 
 function ProductEditor({ id }: { id: string }) {
+  const lastLoadedQuantity = useRef("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [savedPricing, setSavedPricing] = useState<SavedPricing | null>(null);
   const [pricing, setPricing] = useState<PricingInput | null>(null);
@@ -54,6 +58,11 @@ function ProductEditor({ id }: { id: string }) {
       .get<{ product: ProductDetail }>(`/api/products/${id}`)
       .then(({ product }) => {
         setProduct(product);
+        const previousQuantity = lastLoadedQuantity.current;
+        const currentQuantity = String(product.quantity);
+        lastLoadedQuantity.current = currentQuantity;
+        if (!updateForm) setForm(current => current.quantity === previousQuantity
+          ? { ...current, quantity: currentQuantity } : current);
         if (updateForm) setForm({
           nameAr: product.nameAr,
           nameEn: (product as any).nameEn ?? "",
@@ -98,7 +107,7 @@ function ProductEditor({ id }: { id: string }) {
         nameAr: form.nameAr,
         nameEn: form.nameEn || undefined,
         price: Number(form.price),
-        quantity: hasVariants ? undefined : Number(form.quantity),
+        quantity: hasVariants || form.quantity === lastLoadedQuantity.current ? undefined : Number(form.quantity),
         shortDescAr: form.shortDescAr || undefined,
         shortDescEn: form.shortDescEn || undefined,
       });
@@ -230,7 +239,9 @@ function ProductEditor({ id }: { id: string }) {
               <button type="button" className={`${s.cta} ${s.ghost}`} onClick={loadPricing}>إعادة تحميل التسعير</button>
             </div>}
           </DetailsFormCard>
-          <VariantsCard productId={id} variants={product.variants ?? []} basePrice={product.price} onSaved={load} />
+          <StockReceiptsCard productId={id} variants={product.variants ?? emptyVariants} quantity={product.quantity}
+            canReceive={product.trackInventory && product.status !== "ARCHIVED"} onSaved={load} />
+          <VariantsCard productId={id} variants={product.variants ?? emptyVariants} basePrice={product.price} onSaved={load} />
         </div>
         <div className={`${s.col} ${s.sticky}`}>
           <ImageManagerCard
