@@ -4,17 +4,52 @@ import { createServer } from "node:http";
 import { test } from "node:test";
 import sharp from "sharp";
 import { prisma } from "../../lib/prisma";
-import { imageBudget, imageProviders, isVerifiedFreeImageAccount, reservedNeurons } from "../../lib/munira/image-provider";
+import { imageBudget, imageProviders, inspectCloudflareBilling, isVerifiedFreeImageAccount, reservedNeurons, CloudflareDiagnosticError } from "../../lib/munira/image-provider";
 import { fluxModel } from "../../lib/munira/image-options";
 import { generateStudioImage, imageQuota, imageSettingsKey, ownedStudioImage, studioFile } from "../../lib/munira/image-studio";
 
 test("image generation requires explicit and unambiguous zero-cost Workers billing evidence", () => {
   const free = { price: 0, state: "Paid", rate_plan: { id: "workers_free" } };
   assert.equal(isVerifiedFreeImageAccount({ success: true, result: [free] }), true);
+  const provisioned = { price: "0.00", state: "Provisioned", rate_plan: { public_name: "Cloudflare Workers Free" } };
+  assert.equal(isVerifiedFreeImageAccount({ success: true, result: [provisioned] }), true);
+  assert.equal(inspectCloudflareBilling({ success: true, result: [{}] }).code, "BILLING_PAID_OR_AMBIGUOUS");
+  assert.equal(inspectCloudflareBilling({ success: true, result: [free, { state: "Paid" }] }).code, "BILLING_PAID_OR_AMBIGUOUS");
+  assert.equal(inspectCloudflareBilling({ success: true, result: [] }).code, "BILLING_UNVERIFIED");
+  assert.equal(inspectCloudflareBilling({ success: true, result: {} }).code, "UNEXPECTED_RESPONSE");
   assert.equal(isVerifiedFreeImageAccount({ success: true, result: [] }), false);
   assert.equal(isVerifiedFreeImageAccount({ success: true, result: [{ ...free, state: "Trial" }] }), false);
   assert.equal(isVerifiedFreeImageAccount({ success: true, result: [free, { ...free, price: 5 }] }), false);
   assert.equal(isVerifiedFreeImageAccount({ success: true, result: [free, { ...free, rate_plan: { id: "workers_paid" } }] }), false);
+});
+
+test("Cloudflare verification classifies HTTP errors without exposing secret material", async t => {
+  const oldAccount = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const oldToken = process.env.CLOUDFLARE_API_TOKEN;
+  const account = "a".repeat(32);
+  const secret = "test-only-token";
+  process.env.CLOUDFLARE_ACCOUNT_ID = account;
+  process.env.CLOUDFLARE_API_TOKEN = secret;
+  t.after(() => {
+    if (oldAccount === undefined) delete process.env.CLOUDFLARE_ACCOUNT_ID;
+    else process.env.CLOUDFLARE_ACCOUNT_ID = oldAccount;
+    if (oldToken === undefined) delete process.env.CLOUDFLARE_API_TOKEN;
+    else process.env.CLOUDFLARE_API_TOKEN = oldToken;
+  });
+  const logger = t.mock.method(console, "warn", () => {});
+  let status = 403;
+  t.mock.method(globalThis, "fetch", async () => Response.json({ errors: [{ code: 10000, message: secret }] }, { status }));
+  for (const [value, code] of [[401, "AUTH_INVALID"], [403, "PERMISSION_DENIED"], [404, "ACCOUNT_NOT_FOUND"], [429, "HTTP_429"]] as const) {
+    status = value;
+    await assert.rejects(imageProviders.cloudflare.verify(), (error: unknown) => {
+      assert.ok(error instanceof CloudflareDiagnosticError);
+      assert.deepEqual(error.diagnostic, { code, httpStatus: value, providerCodes: [10000] });
+      return true;
+    });
+  }
+  const logged = JSON.stringify(logger.mock.calls.map(call => call.arguments));
+  assert.match(logged, /MUNIRA-CLOUDFLARE/);
+  assert.ok(!logged.includes(secret) && !logged.includes(account));
 });
 
 test("isolated studio processes 50 merchants with a shared ceiling and separate quota", {
@@ -46,7 +81,7 @@ test("isolated studio processes 50 merchants with a shared ceiling and separate 
   const provider = imageProviders.cloudflare;
   const original = { ...provider };
   let calls = 0;
-  provider.verify = async () => {};
+  provider.verify = async () => ({ code: "VERIFIED_FREE" });
   provider.generate = async (_, prompt) => {
     calls++;
     if (prompt.includes("اختبار الفشل")) throw new Error("HTTP_429");

@@ -8,7 +8,7 @@ import { quotaWindow } from "./quota";
 import { redactPrompt } from "./context";
 import { sanitizeUserInput } from "./security";
 import { fluxModel, imageKinds, imageSizes } from "./image-options";
-import { busyImageMessage, imageBudget, imageProviders, reservedNeurons } from "./image-provider";
+import { busyImageMessage, imageBudget, imageProviders, logCloudflare, reservedNeurons, safeCloudflareDiagnostic } from "./image-provider";
 
 export const imageSettingsKey = "munira.image-studio";
 export const studioBucket = "munira-private";
@@ -102,7 +102,10 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
     const budget = await tx.muniraImage.aggregate({
       where: { provider: model.provider, createdAt: { gte: new Date(now.getTime() - 86_400_000) } }, _sum: { neurons: true },
     });
-    if ((budget._sum.neurons ?? 0) + reservedNeurons > imageBudget) throw new AuthError(busyImageMessage, 429);
+    if ((budget._sum.neurons ?? 0) + reservedNeurons > imageBudget) {
+      logCloudflare("budget", { code: "HTTP_429" });
+      throw new AuthError(busyImageMessage, 429);
+    }
     const row = await tx.muniraImage.create({ data: {
       ...key, inputHash, window, day, plan: access?.plan, provider: model.provider, model: model.model,
       state: "PENDING", neurons: reservedNeurons,
@@ -122,9 +125,12 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
     }
     dispatched = true;
     const image = await provider.generate(model.model, `${imageKinds[input.kind]}. ${clean}`, input.size);
-    const storage = studioStorage();
-    const { error } = await storage.upload(objectPath, image.buffer, { contentType: "image/webp", upsert: false });
-    if (error) throw new Error("STORAGE_FAILURE");
+    try {
+      const { error } = await studioStorage().upload(objectPath, image.buffer, { contentType: "image/webp", upsert: false });
+      if (error) throw error;
+    } catch {
+      throw new Error("STORAGE_FAILURE");
+    }
     uploaded = true;
     await prisma.muniraImage.update({ where: { id: reservation.id }, data: {
       state: "COMPLETE", objectPath, estimatedNeurons: image.estimatedNeurons,
@@ -132,8 +138,12 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
     return reservation.id;
   } catch (failure) {
     if (uploaded) await studioStorage().remove([objectPath]).catch(() => {});
-    const message = failure instanceof Error && /^(HTTP_429|STORAGE_FAILURE|INVALID_IMAGE|LARGE_RESPONSE|LARGE_IMAGE|KEYS_MISSING|BILLING_UNVERIFIED|STUDIO_DISABLED)$/.test(failure.message) ? failure.message : "GENERATION_FAILED";
-    await prisma.muniraImage.update({ where: { id: reservation.id }, data: { state: "FAILED", error: message, ...(!dispatched && { neurons: 0 }) } });
+    const localFailure = failure instanceof Error && /^(HTTP_429|STORAGE_FAILURE|INVALID_IMAGE|LARGE_RESPONSE|LARGE_IMAGE|STUDIO_DISABLED)$/.test(failure.message)
+      ? failure.message as "HTTP_429" | "STORAGE_FAILURE" | "INVALID_IMAGE" | "LARGE_RESPONSE" | "LARGE_IMAGE" | "STUDIO_DISABLED"
+      : dispatched ? "GENERATION_FAILED" : "UNEXPECTED_RESPONSE";
+    const diagnostic = safeCloudflareDiagnostic(failure, localFailure);
+    if (dispatched) logCloudflare(diagnostic.code === "STORAGE_FAILURE" ? "storage" : "generation", diagnostic);
+    await prisma.muniraImage.update({ where: { id: reservation.id }, data: { state: "FAILED", error: diagnostic.code, ...(!dispatched && { neurons: 0 }) } });
     throw new AuthError(busyImageMessage, 503);
   }
 }

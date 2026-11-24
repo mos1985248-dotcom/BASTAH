@@ -2,7 +2,7 @@ import { z } from "zod";
 import { AuthError, authErrorResponse, requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { generateStudioImage, imageConfigSchema, imageInput, imageSettingsKey, studioSettings } from "@/lib/munira/image-studio";
-import { imageBudget, imageProviders } from "@/lib/munira/image-provider";
+import { cloudflareCodes, imageBudget, imageProviders, safeCloudflareDiagnostic, type CloudflareDiagnostic } from "@/lib/munira/image-provider";
 import { planOrder } from "@/lib/feature-catalog";
 
 export const dynamic = "force-dynamic";
@@ -15,11 +15,38 @@ const input = z.discriminatedUnion("action", [
   z.object({ action: z.literal("test"), model: z.string().max(160), image: imageInput }),
 ]);
 
+const diagnosticsKey = "munira.image-studio.cloudflare-check";
+const diagnosticSchema = z.object({
+  checkedAt: z.string().datetime(),
+  code: z.enum(cloudflareCodes),
+  httpStatus: z.number().int().min(100).max(599).optional(),
+  providerCodes: z.array(z.number().int().nonnegative().max(999999)).max(20).optional(),
+  evidence: z.object({ subscriptions: z.number(), workersRows: z.number(), freeActive: z.number(), contradictory: z.number() }).optional(),
+});
+
+async function checkCloudflare() {
+  let result: CloudflareDiagnostic;
+  try { result = await imageProviders.cloudflare.verify(); }
+  catch (error) { result = safeCloudflareDiagnostic(error, "UNEXPECTED_RESPONSE"); }
+  const check = { ...result, checkedAt: new Date().toISOString() };
+  const value = JSON.stringify(check);
+  await prisma.platformSetting.upsert({ where: { key: diagnosticsKey },
+    create: { key: diagnosticsKey, value, type: "json" }, update: { value } });
+  return check;
+}
+
+async function latestCloudflareCheck() {
+  const row = await prisma.platformSetting.findUnique({ where: { key: diagnosticsKey }, select: { value: true } });
+  if (!row) return null;
+  try { return diagnosticSchema.parse(JSON.parse(row.value)); }
+  catch { return null; }
+}
+
 export async function GET() {
   try {
     await requireRole("ADMIN", "SUPER_ADMIN");
     const day = new Date().toISOString().slice(0, 10);
-    const [settings, plans, today, month, usage, reserves] = await Promise.all([
+    const [settings, plans, today, month, usage, reserves, cloudflareCheck] = await Promise.all([
       studioSettings(),
       prisma.subscriptionPlanConfig.findMany({
         select: { plan: true, nameAr: true, muniraMonthlyImages: true }, orderBy: { sortOrder: "asc" },
@@ -33,13 +60,14 @@ export async function GET() {
       prisma.muniraImage.aggregate({
         where: { provider: "cloudflare", createdAt: { gte: new Date(Date.now() - 86_400_000) } }, _sum: { neurons: true },
       }),
+      latestCloudflareCheck(),
     ]);
     const lastFailure = await prisma.muniraImage.findFirst({
       where: { state: "FAILED" }, select: { model: true, error: true, createdAt: true }, orderBy: { createdAt: "desc" },
     });
     const storeIds = [...new Set(usage.filter(row => row.scope.startsWith("store:")).map(row => row.scope.slice(6)))];
     const stores = await prisma.store.findMany({ where: { id: { in: storeIds } }, select: { id: true, nameAr: true } });
-    return Response.json({ settings, plans, today, month, usage, stores, lastFailure, paidBudgetUsd: 0,
+    return Response.json({ settings, plans, today, month, usage, stores, lastFailure, cloudflareCheck, paidBudgetUsd: 0,
       reserved: reserves._sum.neurons ?? 0, dayBudget: imageBudget,
     }, { headers });
   } catch (error) { return authErrorResponse(error); }
@@ -52,12 +80,8 @@ export async function POST(req: Request) {
     if (!parsed.success) throw new AuthError("تحقق من الحقول المدخلة.", 400);
     const data = parsed.data;
     if (data.action === "verify") {
-      try { await imageProviders.cloudflare.verify(); }
-      catch (error) {
-        const reason = error instanceof Error && error.message === "KEYS_MISSING" ? "KEYS_MISSING" : "BILLING_UNVERIFIED";
-        return Response.json({ ok: false, reason }, { headers });
-      }
-      return Response.json({ ok: true }, { headers });
+      const check = await checkCloudflare();
+      return Response.json({ ok: check.code === "VERIFIED_FREE", check }, { headers });
     }
     if (data.action === "test") {
       const id = await generateStudioImage(`admin:${user.id}`, data.image, undefined, data.model);
@@ -73,8 +97,8 @@ export async function POST(req: Request) {
       const settings = imageConfigSchema.safeParse(data.settings);
       if (!settings.success) throw new AuthError("إعدادات النموذج غير صالحة.", 400);
       if (settings.data.enabled) {
-        try { await imageProviders.cloudflare.verify(); }
-        catch { throw new AuthError("تعذّر التحقق من خطة Cloudflare المجانية.", 409); }
+        const check = await checkCloudflare();
+        if (check.code !== "VERIFIED_FREE") return Response.json({ ok: false, check }, { headers });
       }
       const value = JSON.stringify(settings.data);
       await prisma.$transaction(async tx => {

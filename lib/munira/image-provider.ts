@@ -6,34 +6,95 @@ export const imageBudget = 8000;
 export const reservedNeurons = 1000;
 export const busyImageMessage = "استوديو منيرة مشغول حاليًا، يمكنك المحاولة لاحقًا. لم يتم خصم أي صورة من رصيدك";
 const steps = 4;
-const freePlans = new Set(["free", "workers_free", "workers-free", "workers free"]);
+const freePlans = new Set(["workers free", "cloudflare workers free", "workers free plan"]);
+const liveStates = new Set(["paid", "provisioned", "active"]);
 const subscription = z.object({
-  price: z.number().finite().nonnegative(),
-  state: z.string(),
-  rate_plan: z.object({ id: z.string().optional(), public_name: z.string().optional() }),
+  price: z.union([z.number().finite().nonnegative(), z.string().regex(/^\d+(?:\.\d+)?$/).transform(Number)]).optional().nullable(),
+  state: z.string().optional().nullable(),
+  rate_plan: z.object({ id: z.string().optional().nullable(), public_name: z.string().optional().nullable() }).optional().nullable(),
 });
-const billingResponse = z.object({ success: z.literal(true), result: z.array(subscription).min(1) });
+const billingResponse = z.object({ success: z.literal(true), result: z.array(subscription) });
 const generationResponse = z.object({ success: z.literal(true), result: z.object({ image: z.string().min(4).max(6_000_000) }) });
+const errorEnvelope = z.object({ errors: z.array(z.object({ code: z.number().int().nonnegative().max(999999) })).max(20).optional() });
 
-export function isVerifiedFreeImageAccount(payload: unknown) {
-  const parsed = billingResponse.safeParse(payload);
-  if (!parsed.success) return false;
-  const rows = parsed.data.result;
-  return rows.some(row => row.state.toLowerCase() === "paid" && row.price === 0 &&
-    [row.rate_plan.id, row.rate_plan.public_name].some(value => value && /workers/.test(value.toLowerCase()) && freePlans.has(value.toLowerCase()))) &&
-    rows.every(row => row.price === 0 &&
-      ![row.rate_plan.id, row.rate_plan.public_name].some(value => value && /workers.*(paid|unbound|bundled|standard)|(^|_)workers($|_)/i.test(value) && !freePlans.has(value.toLowerCase())));
+export const cloudflareCodes = [
+  "VERIFIED_FREE", "KEYS_MISSING", "ACCOUNT_INVALID", "AUTH_INVALID", "PERMISSION_DENIED",
+  "ACCOUNT_NOT_FOUND", "NETWORK_FAILURE", "UNEXPECTED_RESPONSE", "BILLING_UNVERIFIED",
+  "BILLING_PAID_OR_AMBIGUOUS", "HTTP_429", "GENERATION_FAILED", "STORAGE_FAILURE",
+  "INVALID_IMAGE", "LARGE_RESPONSE", "LARGE_IMAGE", "STUDIO_DISABLED",
+] as const;
+export type CloudflareCode = typeof cloudflareCodes[number];
+export type CloudflareDiagnostic = {
+  code: CloudflareCode; httpStatus?: number; providerCodes?: number[];
+  evidence?: { subscriptions: number; workersRows: number; freeActive: number; contradictory: number };
+};
+
+export class CloudflareDiagnosticError extends Error {
+  constructor(public diagnostic: CloudflareDiagnostic) { super(diagnostic.code); }
 }
 
-function accountRequest(path: string, init?: RequestInit) {
-  const account = process.env.CLOUDFLARE_ACCOUNT_ID;
-  const key = process.env.CLOUDFLARE_API_TOKEN;
-  if (!account || !/^[a-f0-9]{32}$/i.test(account) || !key) throw new Error("KEYS_MISSING");
-  return fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/${path}`, {
-    ...init, cache: "no-store", redirect: "error",
-    headers: { Authorization: `Bearer ${key}`, Accept: "application/json", "Content-Type": "application/json" },
-    signal: AbortSignal.timeout(init?.method === "POST" ? 42000 : 7000),
-  });
+export function logCloudflare(stage: "billing" | "generation" | "storage" | "budget", detail: CloudflareDiagnostic) {
+  const write = detail.code === "VERIFIED_FREE" ? console.info : console.warn;
+  write("[MUNIRA-CLOUDFLARE]", { stage, code: detail.code, httpStatus: detail.httpStatus, providerCodes: detail.providerCodes, evidence: detail.evidence });
+}
+
+function normalize(value: string | null | undefined) {
+  return value?.trim().toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ") ?? "";
+}
+
+export function inspectCloudflareBilling(payload: unknown): CloudflareDiagnostic {
+  const parsed = billingResponse.safeParse(payload);
+  if (!parsed.success) return { code: "UNEXPECTED_RESPONSE" };
+  let workersRows = 0, freeActive = 0, contradictory = 0;
+  for (const row of parsed.data.result) {
+    const labels = [normalize(row.rate_plan?.id), normalize(row.rate_plan?.public_name)].filter(Boolean);
+    const workerLabels = labels.filter(label => /\bworkers?\b/.test(label));
+    if (workerLabels.length) workersRows++;
+    const explicitlyFree = workerLabels.some(label => freePlans.has(label));
+    const otherWorkersPlan = workerLabels.some(label => !freePlans.has(label));
+    const knownPrice = typeof row.price === "number" && Number.isFinite(row.price);
+    if (!knownPrice || row.price !== 0 || !labels.length || otherWorkersPlan) contradictory++;
+    if (explicitlyFree && !otherWorkersPlan && row.price === 0 && liveStates.has(normalize(row.state))) freeActive++;
+  }
+  return {
+    code: contradictory ? "BILLING_PAID_OR_AMBIGUOUS" : freeActive ? "VERIFIED_FREE" : "BILLING_UNVERIFIED",
+    evidence: { subscriptions: parsed.data.result.length, workersRows, freeActive, contradictory },
+  };
+}
+
+export function isVerifiedFreeImageAccount(payload: unknown) {
+  return inspectCloudflareBilling(payload).code === "VERIFIED_FREE";
+}
+
+async function accountRequest(path: string, init?: RequestInit) {
+  const account = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
+  const key = process.env.CLOUDFLARE_API_TOKEN?.trim();
+  if (!account || !key) throw new CloudflareDiagnosticError({ code: "KEYS_MISSING" });
+  if (!/^[a-f0-9]{32}$/i.test(account)) throw new CloudflareDiagnosticError({ code: "ACCOUNT_INVALID" });
+  try {
+    return await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/${path}`, {
+      ...init, cache: "no-store", redirect: "error",
+      headers: { Authorization: `Bearer ${key}`, Accept: "application/json", "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(init?.method === "POST" ? 42000 : 7000),
+    });
+  } catch { throw new CloudflareDiagnosticError({ code: "NETWORK_FAILURE" }); }
+}
+
+async function responseDiagnostic(response: Response, fallback: CloudflareCode): Promise<CloudflareDiagnostic> {
+  let providerCodes: number[] = [];
+  try {
+    const result = errorEnvelope.safeParse(JSON.parse((await readBounded(response.body, 32_000)).toString()));
+    if (result.success) providerCodes = result.data.errors?.map(error => error.code) ?? [];
+  } catch { /* Ignore untrusted errors and keep the HTTP classification. */ }
+  const code = response.status === 401 ? "AUTH_INVALID"
+    : response.status === 403 ? "PERMISSION_DENIED"
+    : response.status === 404 ? "ACCOUNT_NOT_FOUND"
+    : response.status === 429 ? "HTTP_429" : fallback;
+  return { code, httpStatus: response.status, providerCodes };
+}
+
+export function safeCloudflareDiagnostic(error: unknown, fallback: CloudflareCode): CloudflareDiagnostic {
+  return error instanceof CloudflareDiagnosticError ? error.diagnostic : { code: fallback };
 }
 
 export async function readBounded(body: ReadableStream<Uint8Array> | null, maxBytes: number) {
@@ -61,17 +122,23 @@ export const imageProviders = {
   cloudflare: {
     models: [fluxModel] as readonly string[],
     async verify() {
-      const response = await accountRequest("subscriptions");
-      if (!response.ok || !isVerifiedFreeImageAccount(JSON.parse((await readBounded(response.body, 256_000)).toString()))) {
-        throw new Error("BILLING_UNVERIFIED");
-      }
+      let result: CloudflareDiagnostic;
+      try {
+        const response = await accountRequest("subscriptions");
+        result = response.ok
+          ? { ...inspectCloudflareBilling(JSON.parse((await readBounded(response.body, 256_000)).toString())), httpStatus: response.status }
+          : await responseDiagnostic(response, "UNEXPECTED_RESPONSE");
+      } catch (error) { result = safeCloudflareDiagnostic(error, "UNEXPECTED_RESPONSE"); }
+      logCloudflare("billing", result);
+      if (result.code !== "VERIFIED_FREE") throw new CloudflareDiagnosticError(result);
+      return result;
     },
     async generate(model: string, prompt: string, size: ImageSize) {
       if (model !== fluxModel) throw new Error("UNSUPPORTED_MODEL");
       const response = await accountRequest(`ai/run/${model}`, {
         method: "POST", body: JSON.stringify({ prompt, steps }),
       });
-      if (!response.ok) throw new Error(response.status === 429 ? "HTTP_429" : "PROVIDER_FAILURE");
+      if (!response.ok) throw new CloudflareDiagnosticError(await responseDiagnostic(response, "GENERATION_FAILED"));
       const payload = generationResponse.parse(JSON.parse((await readBounded(response.body, 6_100_000)).toString()));
       const original = Buffer.from(payload.result.image, "base64");
       const image = sharp(original, { limitInputPixels: 4_194_304, failOn: "error" });
