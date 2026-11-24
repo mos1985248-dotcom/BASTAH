@@ -15,7 +15,8 @@ export async function effectivePlan(db: Prisma.TransactionClient, storeId: strin
     (subscription.status === "TRIAL" && !!subscription.trialEndsAt && subscription.trialEndsAt <= now) ||
     (subscription.status === "GRACE_PERIOD" && !!subscription.gracePeriodEndsAt && subscription.gracePeriodEndsAt <= now)
   );
-  const active = !!subscription && !expired && subscription.store.status === "ACTIVE" &&
+  const storeActive = subscription?.store.status === "ACTIVE";
+  const active = !!subscription && !expired && storeActive &&
     (subscription.status === "ACTIVE" || subscription.status === "TRIAL" || subscription.status === "GRACE_PERIOD");
   let plan = subscription?.plan ?? "FREE";
   const hasPromotion = !!promotion && promotion.startsAt <= now && promotion.endsAt > now;
@@ -25,7 +26,7 @@ export async function effectivePlan(db: Prisma.TransactionClient, storeId: strin
     !!subscription.gracePeriodEndsAt && subscription.gracePeriodEndsAt <= now);
   const retainedMuniraThrough = subscription?.store.status === "ACTIVE" && paidThrough && paidThrough <= now &&
     (endedNaturally || subscription.status === "GRACE_PERIOD") ? paidThrough : null;
-  return { plan, active, expired, retainedMuniraThrough, customMaxProducts: subscription?.customMaxProducts, promotion: hasPromotion ? promotion : null };
+  return { plan, active, storeActive, expired, retainedMuniraThrough, customMaxProducts: subscription?.customMaxProducts, promotion: hasPromotion ? promotion : null };
 }
 
 export async function resolveFeature(db: Prisma.TransactionClient, storeId: string, featureKey: string, now = new Date()) {
@@ -51,14 +52,16 @@ export async function resolveFeature(db: Prisma.TransactionClient, storeId: stri
   if (featureKey === "cart_reminders") defaultLimit = 1;
 
   const enabled = activeOverride?.enabled ?? rule?.enabled ?? defaultEnabled;
-  const reason = !subscription.active ? "inactive_subscription" : feature?.enabled === false ? "disabled_on_platform"
+  const eligible = featureKey === "pricing" ? subscription.storeActive : subscription.active;
+  const reason = !eligible ? (featureKey === "pricing" ? "inactive_store" : "inactive_subscription")
+    : feature?.enabled === false ? "disabled_on_platform"
     : activeOverride ? "store_exception" : "plan";
   const requiredPlan = planOrder.find(candidate => {
     const candidateRule = feature?.plans.find(row => row.plan === candidate);
     return candidateRule?.enabled ?? (!!defaults && planOrder.indexOf(candidate) >= defaults[1]);
   }) ?? null;
   return {
-    allowed: subscription.active && feature?.enabled !== false && enabled,
+    allowed: eligible && feature?.enabled !== false && enabled,
     retainedMuniraThrough: featureKey === "munira" && feature?.enabled !== false && enabled
       ? subscription.retainedMuniraThrough : null,
     limit: activeOverride?.limit ?? (rule ? rule.limit : defaultLimit),

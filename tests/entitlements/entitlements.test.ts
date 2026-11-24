@@ -35,6 +35,29 @@ test("expired monthly subscriptions keep the last earned window without receivin
   assert.equal(beforeExpiry.allowed, true);
 });
 
+test("pricing is available on all plans and after expiry for active stores", async () => {
+  const now = new Date("2026-11-24T12:00:00Z");
+  for (const plan of ["FREE", "STARTER", "GROWTH", "PRO"] as const) {
+    const subscription = { plan, status: "EXPIRED", store: { status: "ACTIVE" } };
+    const feature = { enabled: true, plans: [] };
+    const db = {
+      storeSubscription: { findUnique: async () => subscription },
+      subscriptionPlanConfig: { findUnique: async () => null },
+      platformFeature: { findUnique: async () => feature },
+      storeFeatureOverride: { findUnique: async () => null },
+      launchPromotion: { findUnique: async () => null },
+    } as unknown as Prisma.TransactionClient;
+
+    assert.equal((await resolveFeature(db, "test", "pricing", now)).allowed, true);
+    assert.equal((await resolveFeature(db, "test", "products", now)).allowed, false);
+    feature.enabled = false;
+    assert.equal((await resolveFeature(db, "test", "pricing", now)).allowed, false);
+    feature.enabled = true;
+    subscription.store.status = "SUSPENDED";
+    assert.equal((await resolveFeature(db, "test", "pricing", now)).allowed, false);
+  }
+});
+
 test("plan access, promotion caps and cart consent on an isolated PostgreSQL database", {
   skip: process.env.RUN_BASTAH_ENTITLEMENTS_INTEGRATION !== "1",
 }, async () => {
