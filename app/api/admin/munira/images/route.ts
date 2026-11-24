@@ -1,7 +1,8 @@
+import { fluxModel } from "@/lib/munira/image-options";
 import { z } from "zod";
 import { AuthError, authErrorResponse, requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateStudioImage, imageConfigSchema, imageInput, imageSettingsKey, studioSettings } from "@/lib/munira/image-studio";
+import { generateStudioImage, imageConfigSchema, imageInput, imageSettingsKey, oneTimeImageTestKey, studioSettings } from "@/lib/munira/image-studio";
 import { cloudflareCodes, imageBudget, imageProviders, safeCloudflareDiagnostic, type CloudflareDiagnostic } from "@/lib/munira/image-provider";
 import { planOrder } from "@/lib/feature-catalog";
 
@@ -12,6 +13,8 @@ const input = z.discriminatedUnion("action", [
   z.object({ action: z.literal("settings"), settings: z.unknown() }),
   z.object({ action: z.literal("quota"), plan: z.enum(planOrder), limit: z.number().int().min(0).max(1000) }),
   z.object({ action: z.literal("verify") }),
+  z.object({ action: z.literal("one_time_test"), accountId: z.string().trim().regex(/^[a-f0-9]{32}$/i),
+    confirmedFree: z.literal(true), image: imageInput }),
   z.object({ action: z.literal("test"), model: z.string().max(160), image: imageInput }),
 ]);
 
@@ -46,7 +49,7 @@ export async function GET() {
   try {
     await requireRole("ADMIN", "SUPER_ADMIN");
     const day = new Date().toISOString().slice(0, 10);
-    const [settings, plans, today, month, usage, reserves, cloudflareCheck] = await Promise.all([
+    const [settings, plans, today, month, usage, reserves, cloudflareCheck, oneTimeTest] = await Promise.all([
       studioSettings(),
       prisma.subscriptionPlanConfig.findMany({
         select: { plan: true, nameAr: true, muniraMonthlyImages: true }, orderBy: { sortOrder: "asc" },
@@ -61,13 +64,14 @@ export async function GET() {
         where: { provider: "cloudflare", createdAt: { gte: new Date(Date.now() - 86_400_000) } }, _sum: { neurons: true },
       }),
       latestCloudflareCheck(),
+      prisma.platformSetting.findUnique({ where: { key: oneTimeImageTestKey }, select: { key: true } }),
     ]);
     const lastFailure = await prisma.muniraImage.findFirst({
       where: { state: "FAILED" }, select: { model: true, error: true, createdAt: true }, orderBy: { createdAt: "desc" },
     });
     const storeIds = [...new Set(usage.filter(row => row.scope.startsWith("store:")).map(row => row.scope.slice(6)))];
     const stores = await prisma.store.findMany({ where: { id: { in: storeIds } }, select: { id: true, nameAr: true } });
-    return Response.json({ settings, plans, today, month, usage, stores, lastFailure, cloudflareCheck, paidBudgetUsd: 0,
+    return Response.json({ settings, plans, today, month, usage, stores, lastFailure, cloudflareCheck, oneTimeTestUsed: Boolean(oneTimeTest), paidBudgetUsd: 0,
       reserved: reserves._sum.neurons ?? 0, dayBudget: imageBudget,
     }, { headers });
   } catch (error) { return authErrorResponse(error); }
@@ -82,6 +86,11 @@ export async function POST(req: Request) {
     if (data.action === "verify") {
       const check = await checkCloudflare();
       return Response.json({ ok: check.code === "VERIFIED_FREE", check }, { headers });
+    }
+    if (data.action === "one_time_test") {
+      const id = await generateStudioImage(`admin:${user.id}`, data.image, undefined, fluxModel,
+        { adminId: user.id, accountId: data.accountId });
+      return Response.json({ ok: true, id }, { headers });
     }
     if (data.action === "test") {
       const id = await generateStudioImage(`admin:${user.id}`, data.image, undefined, data.model);

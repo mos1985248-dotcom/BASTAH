@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { prisma } from "../../lib/prisma";
 import { imageBudget, imageProviders, inspectCloudflareBilling, isVerifiedFreeImageAccount, reservedNeurons, CloudflareDiagnosticError } from "../../lib/munira/image-provider";
 import { fluxModel } from "../../lib/munira/image-options";
-import { generateStudioImage, imageQuota, imageSettingsKey, ownedStudioImage, studioFile } from "../../lib/munira/image-studio";
+import { acceptsManualFreeEvidence, generateStudioImage, imageQuota, imageSettingsKey, oneTimeImageTestKey, ownedStudioImage, studioFile } from "../../lib/munira/image-studio";
 
 test("image generation requires explicit and unambiguous zero-cost Workers billing evidence", () => {
   const free = { price: 0, state: "Paid", rate_plan: { id: "workers_free" } };
@@ -81,6 +81,15 @@ test("Cloudflare 9106 distinguishes an active token rejected by billing without 
   assert.ok(paths.slice(1).every(path => path.endsWith("/tokens/verify")));
   active = false;
   await assert.rejects(imageProviders.cloudflare.verify(), { message: "TOKEN_UNVERIFIED" });
+});
+
+test("manual confirmation is limited to a successful response with zero subscriptions", () => {
+  assert.equal(acceptsManualFreeEvidence({ code: "BILLING_UNVERIFIED", httpStatus: 200,
+    evidence: { subscriptions: 0, workersRows: 0, freeActive: 0, contradictory: 0 } }), true);
+  for (const code of ["TOKEN_UNVERIFIED", "BILLING_PAID_OR_AMBIGUOUS", "NETWORK_FAILURE"] as const) {
+    assert.equal(acceptsManualFreeEvidence({ code, httpStatus: 200,
+      evidence: { subscriptions: 0, workersRows: 0, freeActive: 0, contradictory: 0 } }), false);
+  }
 });
 
 test("isolated studio processes 50 merchants with a shared ceiling and separate quota", {
@@ -163,6 +172,31 @@ test("isolated studio processes 50 merchants with a shared ceiling and separate 
     assert.equal(successes.length, imageBudget / reservedNeurons - 2);
     assert.equal(calls, imageBudget / reservedNeurons);
     assert.equal(await prisma.muniraRequest.count(), chatCount);
+    await prisma.muniraImage.updateMany({ where: { scope: { in: scopes } }, data: { createdAt: new Date(Date.now() - 90_000_000) } });
+    await prisma.platformSetting.delete({ where: { key: imageSettingsKey } });
+    const admin = fixture + "-admin";
+    const adminScope = "admin:" + admin;
+    scopes.push(adminScope);
+    const oldAccountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+    const accountId = "a".repeat(32);
+    process.env.CLOUDFLARE_ACCOUNT_ID = accountId;
+    try {
+      provider.verify = async () => { throw new CloudflareDiagnosticError({ code: "BILLING_UNVERIFIED", httpStatus: 200,
+        evidence: { subscriptions: 0, workersRows: 0, freeActive: 0, contradictory: 0 } }); };
+      await assert.rejects(generateStudioImage(adminScope, request(), undefined, fluxModel,
+        { adminId: admin, accountId: "b".repeat(32) }), { status: 400 });
+      const trials = await Promise.allSettled([request(), request()].map(input =>
+        generateStudioImage(adminScope, input, undefined, fluxModel, { adminId: admin, accountId })));
+      assert.equal(trials.filter(item => item.status === "fulfilled").length, 1);
+      assert.equal(calls, imageBudget / reservedNeurons + 1);
+      assert.equal(await prisma.platformSetting.count({ where: { key: imageSettingsKey } }), 0);
+      await assert.rejects(run(4), { status: 503 });
+    } finally {
+      if (oldAccountId === undefined) delete process.env.CLOUDFLARE_ACCOUNT_ID;
+      else process.env.CLOUDFLARE_ACCOUNT_ID = oldAccountId;
+      await prisma.featureChange.deleteMany({ where: { actorId: admin } });
+      await prisma.platformSetting.deleteMany({ where: { key: oneTimeImageTestKey } });
+    }
   } finally {
     Object.assign(provider, original);
     await prisma.muniraImage.deleteMany({ where: { scope: { in: scopes } } });
