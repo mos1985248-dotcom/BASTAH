@@ -81,3 +81,6 @@
 
 @media (max-width: 900px) { .panel { padding: 20px; border-radius: 24px; } .price { font-size: 34px; } }
 @media (prefers-reduced-motion: reduce) { .iconBtn, .variant, .qtyBtn, .btn { transition: none; } }
+
+.stockActions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; margin-top: 6px; }
+.stockActions .stock { margin-top: 0; }

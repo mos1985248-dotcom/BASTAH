@@ -1,5 +1,6 @@
 // components/product/ProductDetailClient.tsx
 "use client";
+import { useCurrentUser } from "@/app/providers";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
@@ -23,6 +24,7 @@ import type { ProductDetail } from "./types";
 import s from "./product.module.css";
 
 export default function ProductDetailClient() {
+  const { user } = useCurrentUser();
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -90,6 +92,8 @@ export default function ProductDetailClient() {
               <ProductInfo product={product} isFavorite={purchase.isFavorite} onToggleFavorite={purchase.toggleFavorite} />
               <ProductPurchasePanel
                 product={product}
+                canRestock={user?.role === "SELLER" && user.store?.id === product.store.id &&
+                  user.store.status !== "SUSPENDED" && product.trackInventory && product.status !== "ARCHIVED"}
                 selectedVariant={purchase.selectedVariant}
                 onSelectVariant={purchase.setSelectedVariantId}
                 qty={purchase.qty}
