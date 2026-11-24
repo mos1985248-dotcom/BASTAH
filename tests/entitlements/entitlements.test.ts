@@ -13,7 +13,7 @@ test("promotion expires after three calendar months, clamped to the final day", 
   assert.equal(launchExpiry(new Date("2026-11-30T14:30:00Z")).toISOString(), "2027-02-28T14:30:00.000Z");
 });
 
-test("expired monthly subscriptions retain their displayed allowance while sending is blocked", async () => {
+test("expired monthly subscriptions keep the last earned window without receiving a new quota", async () => {
   const endDate = new Date("2026-11-17T16:18:22Z");
   const db = {
     storeSubscription: { findUnique: async () => ({ plan: "GROWTH", status: "ACTIVE", endDate, store: { status: "ACTIVE" } }) },
@@ -25,8 +25,11 @@ test("expired monthly subscriptions retain their displayed allowance while sendi
 
   const quota = await getStoreQuota(db, "test", new Date("2026-11-24T12:00:00Z"));
   assert.deepEqual(quota, {
-    key: "2026-11", planLimit: 100, limit: 0, allowed: false, active: false, expired: true, planName: "بسطة انطلاق",
+    key: "2026-11", planLimit: 100, limit: 100, allowed: true, retained: true, active: false, expired: true, planName: "بسطة انطلاق",
   });
+  const afterMonth = await getStoreQuota(db, "test", new Date("2026-12-03T12:00:00Z"));
+  assert.equal(afterMonth.key, "2026-11");
+  assert.equal(afterMonth.limit, 100);
   const beforeExpiry = await getStoreQuota(db, "test", new Date(endDate.getTime() - 1));
   assert.equal(beforeExpiry.limit, 100);
   assert.equal(beforeExpiry.allowed, true);
@@ -105,9 +108,9 @@ test("plan access, promotion caps and cart consent on an isolated PostgreSQL dat
     await prisma.storeSubscription.update({ where: { storeId: growth }, data: { endDate: new Date(Date.now() - 1000) } });
     const expiredQuota = await getStoreQuota(prisma, growth, new Date());
     assert.equal(expiredQuota.planLimit, 100);
-    assert.equal(expiredQuota.limit, 0);
+    assert.equal(expiredQuota.limit, 100);
     assert.equal(expiredQuota.expired, true);
-    assert.equal(expiredQuota.allowed, false);
+    assert.equal(expiredQuota.allowed, true);
     assert.equal((await resolveFeature(prisma, growth, "abandoned_carts")).allowed, false);
     assert.equal(await prisma.abandonedCart.count({ where: { id: cart.id } }), 1);
 

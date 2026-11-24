@@ -18,10 +18,14 @@ export function quotaWindow(monthly: number, trial: number, now: Date) {
 export async function getStoreQuota(db: Prisma.TransactionClient, storeId: string, now: Date) {
   const feature = await resolveFeature(db, storeId, "munira", now);
   const planLimit = feature.limit ?? 0;
-  const quota = quotaWindow(feature.trialMessages > 0 ? 0 : planLimit, feature.trialMessages > 0 ? planLimit : 0, now);
+  const retained = feature.retainedMuniraThrough;
+  // The subscription end is exclusive. At a month boundary the last earned balance belongs to the previous month.
+  const windowDate = retained ? new Date(retained.getTime() - 1) : now;
+  const quota = quotaWindow(feature.trialMessages > 0 ? 0 : planLimit, feature.trialMessages > 0 ? planLimit : 0, windowDate);
+  const allowed = feature.allowed || retained !== null;
   return {
-    key: quota.key, planLimit, limit: feature.allowed ? quota.limit : 0,
-    allowed: feature.allowed, active: feature.active, expired: feature.expired, planName: feature.planName,
+    key: quota.key, planLimit, limit: allowed ? quota.limit : 0,
+    allowed, retained: retained !== null, active: feature.active, expired: feature.expired, planName: feature.planName,
   };
 }
 
@@ -47,14 +51,14 @@ export function reserveMessage(ticket: Reservation) {
     let window = "unmetered";
     if (ticket.storeId) {
       const quota = await getStoreQuota(tx, ticket.storeId, now);
-      if (!quota.active) throw new MuniraRequestError("اشتراك المتجر غير متاح لاستخدام منيرة.", 403);
+      if (!quota.allowed && !quota.active) throw new MuniraRequestError("اشتراك المتجر غير متاح لاستخدام منيرة.", 403);
       if (quota.limit <= 0) throw new MuniraRequestError("باقتك الحالية لا تتضمن رسائل منيرة.", 403);
       window = quota.key;
       const used = await tx.muniraRequest.count({ where: {
         scope: key.scope, quotaWindow: window,
         OR: [{ state: "COMPLETE" }, { state: "PENDING", expiresAt: { gt: now } }],
       } });
-      if (used >= quota.limit) throw new MuniraRequestError(window === "trial" ? "استهلكت رسائل منيرة التجريبية." : "استهلكت حصة منيرة لهذا الشهر.", 429);
+      if (used >= quota.limit) throw new MuniraRequestError(quota.retained ? "استُهلك رصيد منيرة المتبقي." : window === "trial" ? "استهلكت رسائل منيرة التجريبية." : "استهلكت حصة منيرة لهذا الشهر.", 429);
     }
 
     const lease = randomUUID();
