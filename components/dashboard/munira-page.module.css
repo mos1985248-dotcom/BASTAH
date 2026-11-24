@@ -22,3 +22,5 @@
 .quotaNumbers dd { font-size: 1rem; font-variant-numeric: tabular-nums; }
 .quotaPlans { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 6px; padding-block-start: 6px; }
 .quotaPlans li { display: grid; gap: 2px; }
+
+.quotaProgress { width: 100%; accent-color: var(--ui-green); }

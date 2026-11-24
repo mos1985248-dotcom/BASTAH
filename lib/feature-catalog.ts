@@ -4,6 +4,7 @@ export const featureCatalog = {
   pricing: ["محرك التسعير", 0],
   daftari: ["دفاتري", 1],
   munira: ["منيرة", 1],
+  munira_images: ["توليد الصور مع منيرة", 2],
   abandoned_carts: ["السلات المتروكة", 2],
   traffic: ["إحصاءات الزيارات", 0],
   traffic_advanced: ["إحصاءات الزيارات المتقدمة", 2],

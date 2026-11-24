@@ -12,6 +12,7 @@ import ProductPricingCalculator from "@/components/dashboard/pricing/ProductPric
 import { calculatePricing, type PricingInput } from "@/lib/pricing/product-pricing";
 import { uiVars } from "@/components/ui/vars";
 import { DashboardField, DashboardTextarea } from "@/components/dashboard/DashboardField";
+import { MuniraImageButton } from "@/components/dashboard/MuniraImageStudio";
 import NewImagesPicker from "@/components/dashboard/product-new/NewImagesPicker";
 import {
   MAX_PRODUCT_IMAGES, validateImageFile, uploadImagesSequentially, type PendingImage,
@@ -159,6 +160,8 @@ export default function AddProductPage() {
           <section className={s.panel} aria-labelledby="np-images">
             <div className={s.panelHead}><h2 id="np-images" className={s.panelTitle}>الصور</h2></div>
             <div className={s.panelBody}>
+              <MuniraImageButton prompt={[form.nameAr, form.shortDescAr].filter(Boolean).join(". ")}
+                disabled={loading || images.length >= MAX_PRODUCT_IMAGES} onUse={file => handlePick([file])} />
               <NewImagesPicker images={images} disabled={loading} onPick={handlePick} onRemove={handleRemove} onMakeCover={handleMakeCover} />
             </div>
           </section>

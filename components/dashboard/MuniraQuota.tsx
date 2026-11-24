@@ -56,6 +56,7 @@ export default function MuniraQuota({ streaming }: { streaming: boolean }) {
           <div><dt>{quota.allowed ? "المتبقي" : "غير مستخدم"}</dt><dd>{quota.remaining}</dd></div>
         </dl>
         {quota.retained && <p>يمكنك استخدام الرصيد المتبقي من آخر حصة. تبدأ حصة جديدة بعد تجديد الاشتراك.</p>}
+        {quota.limit > 0 && <progress className={s.quotaProgress} aria-label="استهلاك حصة المحادثات" max={quota.limit} value={Math.min(quota.used, quota.limit)} />}
         {!quota.active && !quota.allowed && <p>
           إرسال رسائل جديدة يتطلب اشتراكًا نشطًا. <Link href="/dashboard/subscription">عرض الاشتراك</Link>
         </p>}
