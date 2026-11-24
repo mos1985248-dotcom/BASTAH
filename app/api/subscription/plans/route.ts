@@ -7,6 +7,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// Fetch database-backed plans when requested, after the environment is provisioned.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const plans = await prisma.subscriptionPlanConfig.findMany({
     where: { isActive: true },
