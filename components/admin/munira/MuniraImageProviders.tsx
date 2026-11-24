@@ -34,6 +34,7 @@ type Snapshot = {
   usage: { scope: string; plan: string | null; provider: string; model: string; state: string; _count: number;
     _sum: { estimatedNeurons: number | null; measuredNeurons: number | null } }[];
   cloudflareCheck: Check | null;
+  oneTimeTestUsed: boolean;
   lastFailure: { model: string; error: string | null; createdAt: string } | null;
 };
 const path = "/api/admin/munira/images";
@@ -44,6 +45,8 @@ export default function MuniraImageProviders() {
   const [status, setStatus] = useState("");
   const [sample, setSample] = useState("");
   const [testPrompt, setTestPrompt] = useState("صورة تسويقية لتمور في عبوة بسيطة على خلفية بيضاء");
+  const [accountId, setAccountId] = useState("");
+  const [confirmedFree, setConfirmedFree] = useState(false);
   const [busy, setBusy] = useState(false);
   async function refresh() {
     const data = await api.get<Snapshot>(path);
@@ -66,7 +69,10 @@ export default function MuniraImageProviders() {
         setStatus(response.ok ? "نجحت العملية." : "تعذّرت العملية.");
       }
       if (reload) await refresh();
-    } catch (error) { setStatus(error instanceof Error ? error.message : "تعذّرت العملية."); }
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "تعذّرت العملية.");
+      if (reload) await refresh().catch(() => {});
+    }
     finally { setBusy(false); }
   }
 
@@ -121,6 +127,22 @@ export default function MuniraImageProviders() {
         </section>;
       })}
       <button className={f.btnSm} type="button" disabled={busy} onClick={() => action({ action: "settings", settings }, true)}>حفظ إعدادات النماذج</button>
+      <section className={s.quota} aria-label="اختبار صورة لمرة واحدة">
+        <strong>اختبار صورة لمرة واحدة</strong>
+        {state.oneTimeTestUsed ? <p>استُخدمت محاولة الاختبار الوحيدة.</p> : <>
+          <label className={f.fieldWrap}><span className={f.fieldLabel}>معرّف الحساب للتحقق</span>
+            <input className={f.field} dir="ltr" value={accountId} maxLength={32} onChange={event => setAccountId(event.target.value)} />
+          </label>
+          <label><input type="checkbox" checked={confirmedFree} onChange={event => setConfirmedFree(event.target.checked)} />
+            {" "}تحققت الآن أن الحساب على Workers Free وحالته Active في لوحة Cloudflare.
+          </label>
+          <button type="button" className={f.btnSm} disabled={busy || !confirmedFree || !/^[a-f0-9]{32}$/i.test(accountId) || testPrompt.trim().length < 3}
+            onClick={() => action({ action: "one_time_test", accountId, confirmedFree: true,
+              image: { requestId: crypto.randomUUID(), prompt: testPrompt, kind: "product", size: "square" } }, true)}>
+            توليد صورة اختبار واحدة
+          </button>
+        </>}
+      </section>
       {sample && <div className={s.preview}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={`${path}/${sample}`} alt="صورة الاختبار المولدة" />

@@ -53,7 +53,20 @@ export async function imageQuota(storeId: string, now = new Date()) {
   return { allowed: access.allowed && limit > 0, limit, used, remaining: Math.max(0, limit - used), resetAt, requiredPlan: access.requiredPlan };
 }
 
-export async function generateStudioImage(scope: string, input: ImageInput, storeId?: string, testModel?: string) {
+export const oneTimeImageTestKey = "munira.image-studio.one-time-test";
+
+export function acceptsManualFreeEvidence(diagnostic: ReturnType<typeof safeCloudflareDiagnostic>) {
+  return diagnostic.code === "BILLING_UNVERIFIED" && diagnostic.httpStatus === 200 &&
+    diagnostic.evidence?.subscriptions === 0;
+}
+
+export async function generateStudioImage(scope: string, input: ImageInput, storeId?: string, testModel?: string,
+  manualTest?: { adminId: string; accountId: string }) {
+  const manualDeadline = Date.now() + 60_000;
+  if (manualTest && (storeId || scope !== `admin:${manualTest.adminId}` || testModel !== fluxModel ||
+      manualTest.accountId.toLowerCase() !== process.env.CLOUDFLARE_ACCOUNT_ID?.trim().toLowerCase())) {
+    throw new AuthError("معرّف الحساب لا يطابق حساب Cloudflare في بيئة النشر.", 400);
+  }
   const clean = redactPrompt(input.prompt);
   const inputHash = createHash("sha256").update(JSON.stringify([input.prompt, input.kind, input.size, testModel ?? null])).digest("hex");
   if (!sanitizeUserInput(clean).safe || clean.length > 800 ||
@@ -70,7 +83,8 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
   const previous = await replay();
   if (previous) return previous;
   const settings = await studioSettings();
-  const model = settings.enabled
+  if (manualTest && settings.enabled) throw new AuthError("أوقف الاستوديو قبل الاختبار الإداري.", 409);
+  const model = manualTest ? { provider: "cloudflare" as const, model: fluxModel } : settings.enabled
     ? testModel ? settings.models.find(row => row.model === testModel)
       : settings.models.filter(row => row.enabled).sort((a, b) => a.priority - b.priority)[0]
     : undefined;
@@ -106,6 +120,15 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
       logCloudflare("budget", { code: "HTTP_429" });
       throw new AuthError(busyImageMessage, 429);
     }
+    if (manualTest) {
+      const used = await tx.platformSetting.findUnique({ where: { key: oneTimeImageTestKey }, select: { key: true } });
+      if (used) throw new AuthError("استُخدم الاختبار الإداري المخصص لمرة واحدة.", 409);
+      await tx.platformSetting.create({ data: { key: oneTimeImageTestKey, value: now.toISOString(), type: "string" } });
+      await tx.featureChange.create({ data: {
+        actorId: manualTest.adminId, action: "munira_one_time_free_image_test",
+        details: { requestId: input.requestId, model: fluxModel, confirmedFreeInDashboard: true },
+      } });
+    }
     const row = await tx.muniraImage.create({ data: {
       ...key, inputHash, window, day, plan: access?.plan, provider: model.provider, model: model.model,
       state: "PENDING", neurons: reservedNeurons,
@@ -118,10 +141,18 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
   let uploaded = false;
   let dispatched = false;
   try {
-    await provider.verify();
-    const latest = await studioSettings();
-    if (!latest.enabled || !latest.models.some(row => row.model === model.model && row.provider === model.provider && (row.enabled || testModel))) {
-      throw new Error("STUDIO_DISABLED");
+    try { await provider.verify(); }
+    catch (error) {
+      if (!manualTest || !acceptsManualFreeEvidence(safeCloudflareDiagnostic(error, "UNEXPECTED_RESPONSE"))) throw error;
+      logCloudflare("billing", { code: "MANUAL_FREE_TEST" });
+    }
+    if (manualTest) {
+      if (Date.now() >= manualDeadline || (await studioSettings()).enabled) throw new Error("STUDIO_DISABLED");
+    } else {
+      const latest = await studioSettings();
+      if (!latest.enabled || !latest.models.some(row => row.model === model.model && row.provider === model.provider && (row.enabled || testModel))) {
+        throw new Error("STUDIO_DISABLED");
+      }
     }
     dispatched = true;
     const image = await provider.generate(model.model, `${imageKinds[input.kind]}. ${clean}`, input.size);

@@ -18,7 +18,7 @@ const generationResponse = z.object({ success: z.literal(true), result: z.object
 const errorEnvelope = z.object({ errors: z.array(z.object({ code: z.number().int().nonnegative().max(999999) })).max(20).optional() });
 
 export const cloudflareCodes = [
-  "VERIFIED_FREE", "KEYS_MISSING", "ACCOUNT_INVALID", "AUTH_INVALID", "PERMISSION_DENIED",
+  "VERIFIED_FREE", "MANUAL_FREE_TEST", "KEYS_MISSING", "ACCOUNT_INVALID", "AUTH_INVALID", "PERMISSION_DENIED",
   "ACCOUNT_NOT_FOUND", "BILLING_AUTH_REJECTED", "TOKEN_UNVERIFIED", "NETWORK_FAILURE", "UNEXPECTED_RESPONSE", "BILLING_UNVERIFIED",
   "BILLING_PAID_OR_AMBIGUOUS", "HTTP_429", "GENERATION_FAILED", "STORAGE_FAILURE",
   "INVALID_IMAGE", "LARGE_RESPONSE", "LARGE_IMAGE", "STUDIO_DISABLED",
