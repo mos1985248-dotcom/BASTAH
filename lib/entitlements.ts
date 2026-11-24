@@ -9,15 +9,18 @@ export async function effectivePlan(db: Prisma.TransactionClient, storeId: strin
     }),
     db.launchPromotion.findUnique({ where: { storeId } }),
   ]);
-  const active = !!subscription && subscription.store.status === "ACTIVE" && (
-    (subscription.status === "ACTIVE" && (subscription.plan === "FREE" || !subscription.endDate || subscription.endDate > now)) ||
-    (subscription.status === "TRIAL" && (!subscription.trialEndsAt || subscription.trialEndsAt > now)) ||
-    (subscription.status === "GRACE_PERIOD" && (!subscription.gracePeriodEndsAt || subscription.gracePeriodEndsAt > now))
+  const expired = !!subscription && (
+    subscription.status === "EXPIRED" ||
+    (subscription.status === "ACTIVE" && subscription.plan !== "FREE" && !!subscription.endDate && subscription.endDate <= now) ||
+    (subscription.status === "TRIAL" && !!subscription.trialEndsAt && subscription.trialEndsAt <= now) ||
+    (subscription.status === "GRACE_PERIOD" && !!subscription.gracePeriodEndsAt && subscription.gracePeriodEndsAt <= now)
   );
+  const active = !!subscription && !expired && subscription.store.status === "ACTIVE" &&
+    (subscription.status === "ACTIVE" || subscription.status === "TRIAL" || subscription.status === "GRACE_PERIOD");
   let plan = subscription?.plan ?? "FREE";
   const hasPromotion = !!promotion && promotion.startsAt <= now && promotion.endsAt > now;
   if (active && hasPromotion && planOrder.indexOf(plan) < planOrder.indexOf("GROWTH")) plan = "GROWTH";
-  return { plan, active, customMaxProducts: subscription?.customMaxProducts, promotion: hasPromotion ? promotion : null };
+  return { plan, active, expired, customMaxProducts: subscription?.customMaxProducts, promotion: hasPromotion ? promotion : null };
 }
 
 export async function resolveFeature(db: Prisma.TransactionClient, storeId: string, featureKey: string, now = new Date()) {
@@ -52,7 +55,7 @@ export async function resolveFeature(db: Prisma.TransactionClient, storeId: stri
   return {
     allowed: subscription.active && feature?.enabled !== false && enabled,
     limit: activeOverride?.limit ?? (rule ? rule.limit : defaultLimit),
-    plan, reason, requiredPlan, active: subscription.active,
+    plan, reason, requiredPlan, active: subscription.active, expired: subscription.expired,
     trialMessages: config?.muniraTrialMessages ?? 0,
     planName: config?.nameAr ?? plan,
   };

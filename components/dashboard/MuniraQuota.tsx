@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import s from "./munira-page.module.css";
 
@@ -7,6 +8,8 @@ type Quota = {
   planName: string;
   period: "trial" | "monthly";
   active: boolean;
+  expired: boolean;
+  allowed: boolean;
   limit: number;
   used: number;
   remaining: number;
@@ -44,13 +47,17 @@ export default function MuniraQuota({ streaming }: { streaming: boolean }) {
       {quota && <>
         <div className={s.quotaHeading}>
           <h2>{quota.planName}</h2>
-          <span>{!quota.active ? "الاشتراك غير نشط" : quota.period === "trial" ? "تجربة لمرة واحدة" : "الحصة الشهرية"}</span>
+          <span>{quota.expired ? "انتهت مدة الاشتراك" : !quota.active ? "الاشتراك غير نشط" : quota.period === "trial" ? "تجربة لمرة واحدة" : "الحصة الشهرية"}</span>
         </div>
         <dl className={s.quotaNumbers} aria-live="polite">
           <div><dt>حصة الباقة</dt><dd>{quota.limit}</dd></div>
           <div><dt>المستهلك</dt><dd>{quota.used}</dd></div>
-          <div><dt>المتبقي</dt><dd>{quota.remaining}</dd></div>
+          <div><dt>{quota.allowed ? "المتبقي" : "غير مستخدم"}</dt><dd>{quota.remaining}</dd></div>
         </dl>
+        {!quota.active && <p>
+          إرسال رسائل جديدة يتطلب اشتراكًا نشطًا. <Link href="/dashboard/subscription">عرض الاشتراك</Link>
+        </p>}
+        {quota.active && !quota.allowed && quota.limit > 0 && <p>إرسال رسائل جديدة غير متاح حاليًا.</p>}
         <details>
           <summary>حصص جميع الباقات</summary>
           <ul className={s.quotaPlans}>

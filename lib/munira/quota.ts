@@ -17,9 +17,12 @@ export function quotaWindow(monthly: number, trial: number, now: Date) {
 
 export async function getStoreQuota(db: Prisma.TransactionClient, storeId: string, now: Date) {
   const feature = await resolveFeature(db, storeId, "munira", now);
-  const limit = feature.allowed ? feature.limit ?? 0 : 0;
-  const quota = quotaWindow(feature.trialMessages > 0 ? 0 : limit, feature.trialMessages > 0 ? limit : 0, now);
-  return { ...quota, active: feature.active, planName: feature.planName };
+  const planLimit = feature.limit ?? 0;
+  const quota = quotaWindow(feature.trialMessages > 0 ? 0 : planLimit, feature.trialMessages > 0 ? planLimit : 0, now);
+  return {
+    key: quota.key, planLimit, limit: feature.allowed ? quota.limit : 0,
+    allowed: feature.allowed, active: feature.active, expired: feature.expired, planName: feature.planName,
+  };
 }
 
 type Ticket = { scope: string; requestId: string };
