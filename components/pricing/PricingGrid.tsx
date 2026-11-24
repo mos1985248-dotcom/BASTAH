@@ -1,5 +1,4 @@
 
-import { t } from "@/theme";
 import PricingCard from "./PricingCard";
 import type { PlanConfig } from "./plan-types";
 import styles from "./PricingGrid.module.css";

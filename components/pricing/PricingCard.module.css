@@ -1,0 +1,94 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: clamp(16px, 2vw, 24px);
+  border: 1px solid var(--ui-border);
+  border-radius: 20px;
+  background: var(--ui-white);
+  color: var(--ui-ink);
+  box-shadow: 0 6px 20px rgb(24 47 39 / 6%);
+  text-align: start;
+}
+
+.card[data-highlighted="true"] {
+  border-color: var(--ui-green);
+  box-shadow: 0 8px 24px rgb(24 47 39 / 10%);
+}
+
+.header { min-block-size: 118px; }
+.badgeSlot { min-block-size: 34px; }
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--ui-green-soft, var(--ui-sand));
+  color: var(--ui-green-deep);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.header h3 {
+  margin: 0 0 4px;
+  color: var(--ui-green-deep);
+  font-family: var(--font-amiri), "Amiri", serif;
+  font-size: clamp(25px, 2.2vw, 30px);
+  line-height: 1.3;
+}
+.header p, .price p { margin: 0; }
+.header p, .price span { color: var(--ui-ink-muted); font-size: 14px; }
+.price {
+  min-block-size: 66px;
+  padding: 12px 0;
+  border-block: 1px solid var(--ui-border);
+}
+.price > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.price strong {
+  color: var(--ui-green-deep);
+  font-size: clamp(32px, 3vw, 42px);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.price p { margin-block-start: 6px; color: var(--ui-green-deep); font-size: 12px; }
+
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 46px;
+  padding: 8px 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  background: var(--ui-white);
+  color: var(--ui-green-deep);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.action:hover:not(:disabled) { background: var(--ui-sand); }
+.action:focus-visible { outline: 2px solid var(--ui-green); outline-offset: 3px; }
+.action:disabled { opacity: .65; cursor: wait; }
+.card[data-highlighted="true"] .action { background: var(--ui-green-deep); color: var(--ui-white); }
+.card[data-highlighted="true"] .action:hover:not(:disabled) { background: var(--ui-green); }
+
+.features {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.features li + li { padding-block-start: 8px; border-block-start: 1px solid var(--ui-border); }
+.error { margin: 0; color: #a12222; font-size: 14px; }
+
+@media (max-width: 620px) {
+  .card { gap: 14px; }
+  .header { min-block-size: 0; }
+  .badgeSlot:empty { display: none; }
+}
