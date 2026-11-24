@@ -16,7 +16,7 @@
 // بالمتاح للبيع لكل خيار (حجم/لون) يعتمد على ProductVariant.quantity.
 
 import { prisma } from "./prisma";
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 export class InsufficientStockError extends Error {
   constructor(public productId: string, public productName: string) {
@@ -31,6 +31,11 @@ interface ReserveItem {
   quantity: number;
 }
 
+export async function lockInventoryProducts(tx: Prisma.TransactionClient, productIds: string[]) {
+  if (!productIds.length) return;
+  await tx.$queryRaw`SELECT id FROM products WHERE id IN (${Prisma.join(productIds)}) ORDER BY id FOR UPDATE`;
+}
+
 /**
  * يحجز المخزون لكل منتجات الطلب ضمن transaction واحدة.
  * يجب استدعاؤها داخل prisma.$transaction(tx => ...) ونمرّر لها tx بدل prisma.
@@ -40,6 +45,7 @@ export async function reserveStock(
   items: ReserveItem[],
   productNames: Map<string, string>
 ): Promise<void> {
+  await lockInventoryProducts(tx, items.map(item => item.productId));
   for (const item of items) {
     if (item.variantId) {
       const variantResult = await tx.productVariant.updateMany({
@@ -76,6 +82,7 @@ export async function releaseStock(
   tx: Prisma.TransactionClient,
   items: ReserveItem[]
 ): Promise<void> {
+  await lockInventoryProducts(tx, items.map(item => item.productId));
   for (const item of items) {
     if (item.variantId) {
       await tx.productVariant.update({

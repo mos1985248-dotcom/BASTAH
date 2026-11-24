@@ -3,7 +3,7 @@
 // منتج بدون صفوف يبقى كما هو تماماً — الكمية الكلية تُحسب من المتغيرات على السيرفر.
 // المنطق (التحقق والحفظ عبر /api/products/:id/variants) كما كان حرفياً؛ التغيير في الشكل فقط.
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus, Trash2, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
 import { uiVars } from "@/components/ui/vars";
@@ -11,6 +11,7 @@ import s from "../forms.module.css";
 
 export interface EditVariant {
   id: string;
+  nameAr?: string;
   options: { name: string; value: string }[];
   price: number | null;
   quantity: number;
@@ -34,6 +35,18 @@ export default function VariantsCard({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+
+  const baseline = useRef(variants);
+  useEffect(() => {
+    const previous = baseline.current;
+    baseline.current = variants;
+    setRows(current => current.map(row => {
+      const old = previous.find(variant => variant.id === row.id);
+      const updated = variants.find(variant => variant.id === row.id);
+      return old && updated && row.quantity === String(old.quantity)
+        ? { ...row, quantity: String(updated.quantity) } : row;
+    }));
+  }, [variants]);
 
   const update = (key: string, field: keyof Row, value: string) => {
     setSaved(false);

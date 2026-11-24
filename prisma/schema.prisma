@@ -696,6 +696,7 @@ model Product {
 
   // Relations
   variants        ProductVariant[]
+  stockReceipts   ProductStockReceipt[]
   orderItems      OrderItem[]
   reviews         Review[]
   wishlistItems   WishlistItem[]
@@ -2228,4 +2229,20 @@ model CartReminderAttempt {
 
   @@index([cartId, cartUpdatedAt, createdAt])
   @@map("cart_reminder_attempts")
+}
+
+model ProductStockReceipt {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  requestId     String
+  variantId     String?
+  variantName   String?
+  quantity      Int
+  unitCostMinor Int
+  createdAt     DateTime @default(now())
+
+  @@unique([productId, requestId])
+  @@index([productId, createdAt, id])
+  @@map("product_stock_receipts")
 }

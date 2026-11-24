@@ -22,35 +22,33 @@ export async function POST(req: NextRequest, { params }: Params) {
     if (!parsed.success) return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     const { optionName, variants } = parsed.data;
 
-    const product = await prisma.product.findUnique({
-      where: { id: params.id },
-      select: {
-        id: true, storeId: true, status: true,
-        variants: { select: { id: true, nameAr: true, _count: { select: { orderItems: true } } } },
-      },
-    });
-    if (!product || product.storeId !== storeId) {
-      return NextResponse.json({ error: "المنتج غير موجود" }, { status: 404 });
-    }
+    const saved = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM products WHERE id = ${params.id} AND "storeId" = ${storeId} FOR UPDATE`;
+      const product = await tx.product.findUnique({
+        where: { id: params.id },
+        select: {
+          id: true, storeId: true, status: true,
+          variants: { select: { id: true, nameAr: true, _count: { select: { orderItems: true } } } },
+        },
+      });
+      if (!product || product.storeId !== storeId) {
+        throw new AuthError("المنتج غير موجود", 404);
+      }
 
-    const existingIds = new Set(product.variants.map((v) => v.id));
-    if (variants.some((v) => v.id && !existingIds.has(v.id))) {
-      return NextResponse.json({ error: "متغيّر غير تابع لهذا المنتج" }, { status: 400 });
-    }
+      const existingIds = new Set(product.variants.map((v) => v.id));
+      if (variants.some((v) => v.id && !existingIds.has(v.id))) {
+        throw new AuthError("متغيّر غير تابع لهذا المنتج", 400);
+      }
 
-    const keptIds = new Set(variants.filter((v) => v.id).map((v) => v.id as string));
-    const removed = product.variants.filter((v) => !keptIds.has(v.id));
-    // لا schema جديدة = لا حقل "معطّل": المتغيّر المرتبط بطلبات لا يُحذف، يُصفَّر مخزونه بدلاً من ذلك
-    const blocked = removed.find((v) => v._count.orderItems > 0);
-    if (blocked) {
-      return NextResponse.json(
-        { error: `لا يمكن حذف «${blocked.nameAr}» لأنه مرتبط بطلبات سابقة — اجعلي كميته 0 بدلاً من حذفه` },
-        { status: 409 }
-      );
-    }
+      const keptIds = new Set(variants.filter((v) => v.id).map((v) => v.id as string));
+      const removed = product.variants.filter((v) => !keptIds.has(v.id));
+      // لا schema جديدة = لا حقل "معطّل": المتغيّر المرتبط بطلبات لا يُحذف، يُصفَّر مخزونه بدلاً من ذلك
+      const blocked = removed.find((v) => v._count.orderItems > 0);
+      if (blocked) {
+        throw new AuthError(`لا يمكن حذف «${blocked.nameAr}» لأنه مرتبط بطلبات سابقة — اجعلي كميته 0 بدلاً من حذفه`, 409);
+      }
 
-    const baseTime = Date.now();
-    const saved = await prisma.$transaction(async (tx) => {
+      const baseTime = Date.now();
       if (removed.length > 0) {
         await tx.productVariant.deleteMany({ where: { id: { in: removed.map((v) => v.id) }, productId: product.id } });
       }
