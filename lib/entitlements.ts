@@ -20,7 +20,12 @@ export async function effectivePlan(db: Prisma.TransactionClient, storeId: strin
   let plan = subscription?.plan ?? "FREE";
   const hasPromotion = !!promotion && promotion.startsAt <= now && promotion.endsAt > now;
   if (active && hasPromotion && planOrder.indexOf(plan) < planOrder.indexOf("GROWTH")) plan = "GROWTH";
-  return { plan, active, expired, customMaxProducts: subscription?.customMaxProducts, promotion: hasPromotion ? promotion : null };
+  const paidThrough = subscription?.status === "TRIAL" ? subscription.trialEndsAt : subscription?.endDate;
+  const endedNaturally = expired || (subscription?.status === "SUSPENDED" &&
+    !!subscription.gracePeriodEndsAt && subscription.gracePeriodEndsAt <= now);
+  const retainedMuniraThrough = subscription?.store.status === "ACTIVE" && paidThrough && paidThrough <= now &&
+    (endedNaturally || subscription.status === "GRACE_PERIOD") ? paidThrough : null;
+  return { plan, active, expired, retainedMuniraThrough, customMaxProducts: subscription?.customMaxProducts, promotion: hasPromotion ? promotion : null };
 }
 
 export async function resolveFeature(db: Prisma.TransactionClient, storeId: string, featureKey: string, now = new Date()) {
@@ -54,6 +59,8 @@ export async function resolveFeature(db: Prisma.TransactionClient, storeId: stri
   }) ?? null;
   return {
     allowed: subscription.active && feature?.enabled !== false && enabled,
+    retainedMuniraThrough: featureKey === "munira" && feature?.enabled !== false && enabled
+      ? subscription.retainedMuniraThrough : null,
     limit: activeOverride?.limit ?? (rule ? rule.limit : defaultLimit),
     plan, reason, requiredPlan, active: subscription.active, expired: subscription.expired,
     trialMessages: config?.muniraTrialMessages ?? 0,

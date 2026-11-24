@@ -10,6 +10,7 @@ type Quota = {
   active: boolean;
   expired: boolean;
   allowed: boolean;
+  retained: boolean;
   limit: number;
   used: number;
   remaining: number;
@@ -54,7 +55,8 @@ export default function MuniraQuota({ streaming }: { streaming: boolean }) {
           <div><dt>المستهلك</dt><dd>{quota.used}</dd></div>
           <div><dt>{quota.allowed ? "المتبقي" : "غير مستخدم"}</dt><dd>{quota.remaining}</dd></div>
         </dl>
-        {!quota.active && <p>
+        {quota.retained && <p>يمكنك استخدام الرصيد المتبقي من آخر حصة. تبدأ حصة جديدة بعد تجديد الاشتراك.</p>}
+        {!quota.active && !quota.allowed && <p>
           إرسال رسائل جديدة يتطلب اشتراكًا نشطًا. <Link href="/dashboard/subscription">عرض الاشتراك</Link>
         </p>}
         {quota.active && !quota.allowed && quota.limit > 0 && <p>إرسال رسائل جديدة غير متاح حاليًا.</p>}

@@ -26,7 +26,7 @@ export async function GET() {
       planName: quota.planName, period: quota.key === "trial" ? "trial" : "monthly",
       limit: quota.planLimit, used, remaining: Math.max(0, quota.planLimit - used),
       active: quota.active, expired: quota.expired, available: quota.allowed ? Math.max(0, quota.limit - used) : 0,
-      allowed: quota.allowed,
+      allowed: quota.allowed, retained: quota.retained,
       plans,
     }, { headers });
   } catch (error) {
