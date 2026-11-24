@@ -13,6 +13,8 @@ const diagnosticText: Record<string, string> = {
   VERIFIED_FREE: "تم التحقق من خطة Workers المجانية.",
   KEYS_MISSING: "إعدادات Cloudflare غير مكتملة في هذه البيئة.",
   ACCOUNT_INVALID: "صيغة معرف حساب Cloudflare غير صحيحة.",
+  BILLING_AUTH_REJECTED: "مفتاح Cloudflare نشط، لكن مسار الاشتراكات رفضه. راجع نوع المفتاح ونطاق Billing Read للحساب.",
+  TOKEN_UNVERIFIED: "رفض مسار الاشتراكات المصادقة، وتعذّر تأكيد حالة المفتاح من مساري التحقق.",
   AUTH_INVALID: "رفض Cloudflare المصادقة. قد يكون المفتاح غير صالح أو منتهيًا.",
   PERMISSION_DENIED: "رفض Cloudflare الوصول. تحقّق من صلاحية Billing Read ونطاق الحساب في المفتاح.",
   ACCOUNT_NOT_FOUND: "لم يجد Cloudflare الحساب أو لم يسمح بعرضه لهذا المفتاح.",

@@ -52,6 +52,37 @@ test("Cloudflare verification classifies HTTP errors without exposing secret mat
   assert.ok(!logged.includes(secret) && !logged.includes(account));
 });
 
+test("Cloudflare 9106 distinguishes an active token rejected by billing without running inference", async t => {
+  t.mock.method(console, "warn", () => {});
+  const oldAccount = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const oldToken = process.env.CLOUDFLARE_API_TOKEN;
+  process.env.CLOUDFLARE_ACCOUNT_ID = "b".repeat(32);
+  process.env.CLOUDFLARE_API_TOKEN = "test-only-token";
+  t.after(() => {
+    if (oldAccount === undefined) delete process.env.CLOUDFLARE_ACCOUNT_ID;
+    else process.env.CLOUDFLARE_ACCOUNT_ID = oldAccount;
+    if (oldToken === undefined) delete process.env.CLOUDFLARE_API_TOKEN;
+    else process.env.CLOUDFLARE_API_TOKEN = oldToken;
+  });
+  const paths: string[] = [];
+  let active = true;
+  t.mock.method(globalThis, "fetch", async (url: string, init: RequestInit) => {
+    assert.equal(init.method ?? "GET", "GET");
+    const path = new URL(url).pathname;
+    paths.push(path);
+    if (active && path === "/client/v4/user/tokens/verify") {
+      return Response.json({ success: true, result: { status: "active" } });
+    }
+    return Response.json({ errors: [{ code: 9106 }] }, { status: 400 });
+  });
+  await assert.rejects(imageProviders.cloudflare.verify(), { message: "BILLING_AUTH_REJECTED" });
+  assert.equal(paths.length, 3);
+  assert.match(paths[0], /\/subscriptions$/);
+  assert.ok(paths.slice(1).every(path => path.endsWith("/tokens/verify")));
+  active = false;
+  await assert.rejects(imageProviders.cloudflare.verify(), { message: "TOKEN_UNVERIFIED" });
+});
+
 test("isolated studio processes 50 merchants with a shared ceiling and separate quota", {
   skip: process.env.RUN_MUNIRA_IMAGE_INTEGRATION !== "1",
 }, async () => {

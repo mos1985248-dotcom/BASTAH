@@ -19,7 +19,7 @@ const errorEnvelope = z.object({ errors: z.array(z.object({ code: z.number().int
 
 export const cloudflareCodes = [
   "VERIFIED_FREE", "KEYS_MISSING", "ACCOUNT_INVALID", "AUTH_INVALID", "PERMISSION_DENIED",
-  "ACCOUNT_NOT_FOUND", "NETWORK_FAILURE", "UNEXPECTED_RESPONSE", "BILLING_UNVERIFIED",
+  "ACCOUNT_NOT_FOUND", "BILLING_AUTH_REJECTED", "TOKEN_UNVERIFIED", "NETWORK_FAILURE", "UNEXPECTED_RESPONSE", "BILLING_UNVERIFIED",
   "BILLING_PAID_OR_AMBIGUOUS", "HTTP_429", "GENERATION_FAILED", "STORAGE_FAILURE",
   "INVALID_IMAGE", "LARGE_RESPONSE", "LARGE_IMAGE", "STUDIO_DISABLED",
 ] as const;
@@ -66,13 +66,13 @@ export function isVerifiedFreeImageAccount(payload: unknown) {
   return inspectCloudflareBilling(payload).code === "VERIFIED_FREE";
 }
 
-async function accountRequest(path: string, init?: RequestInit) {
+async function accountRequest(path: string, init?: RequestInit, userScoped = false) {
   const account = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
   const key = process.env.CLOUDFLARE_API_TOKEN?.trim();
   if (!account || !key) throw new CloudflareDiagnosticError({ code: "KEYS_MISSING" });
   if (!/^[a-f0-9]{32}$/i.test(account)) throw new CloudflareDiagnosticError({ code: "ACCOUNT_INVALID" });
   try {
-    return await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/${path}`, {
+    return await fetch(`https://api.cloudflare.com/client/v4/${userScoped ? "user" : `accounts/${account}`}/${path}`, {
       ...init, cache: "no-store", redirect: "error",
       headers: { Authorization: `Bearer ${key}`, Accept: "application/json", "Content-Type": "application/json" },
       signal: AbortSignal.timeout(init?.method === "POST" ? 42000 : 7000),
@@ -91,6 +91,22 @@ async function responseDiagnostic(response: Response, fallback: CloudflareCode):
     : response.status === 404 ? "ACCOUNT_NOT_FOUND"
     : response.status === 429 ? "HTTP_429" : fallback;
   return { code, httpStatus: response.status, providerCodes };
+}
+
+async function diagnoseBillingAuthentication(result: CloudflareDiagnostic): Promise<CloudflareDiagnostic> {
+  // A 9106 from subscriptions does not distinguish a rejected token from an endpoint scope mismatch.
+  const verification = z.object({ success: z.literal(true), result: z.object({ status: z.literal("active") }) });
+  let responded = false;
+  for (const userScoped of [false, true]) {
+    try {
+      const response = await accountRequest("tokens/verify", undefined, userScoped);
+      responded = true;
+      if (response.ok && verification.safeParse(JSON.parse((await readBounded(response.body, 32_000)).toString())).success) {
+        return { ...result, code: "BILLING_AUTH_REJECTED" };
+      }
+    } catch { /* The other token type can still be checked without inference or billing changes. */ }
+  }
+  return { ...result, code: responded ? "TOKEN_UNVERIFIED" : "NETWORK_FAILURE" };
 }
 
 export function safeCloudflareDiagnostic(error: unknown, fallback: CloudflareCode): CloudflareDiagnostic {
@@ -129,6 +145,7 @@ export const imageProviders = {
           ? { ...inspectCloudflareBilling(JSON.parse((await readBounded(response.body, 256_000)).toString())), httpStatus: response.status }
           : await responseDiagnostic(response, "UNEXPECTED_RESPONSE");
       } catch (error) { result = safeCloudflareDiagnostic(error, "UNEXPECTED_RESPONSE"); }
+      if (result.httpStatus === 400 && result.providerCodes?.includes(9106)) result = await diagnoseBillingAuthentication(result);
       logCloudflare("billing", result);
       if (result.code !== "VERIFIED_FREE") throw new CloudflareDiagnosticError(result);
       return result;
