@@ -10,7 +10,7 @@ import s from "@/components/dashboard/forms.module.css";
 
 interface ProductRow {
   id: string; nameAr: string; mainImage: string | null; price: number;
-  quantity: number; status: string; totalSold: number;
+  quantity: number; trackInventory: boolean; status: string; totalSold: number;
   variants: { id: string; nameAr: string; quantity: number }[];
 }
 
@@ -34,6 +34,15 @@ function Variants({ p }: { p: ProductRow }) {
       </div>
     </div>
   );
+}
+
+function ProductStatus({ product }: { product: ProductRow }) {
+  return <div className={s.productStatusActions}>
+    <ProductStatusBadge status={product.status} />
+    {product.trackInventory && (product.status === "OUT_OF_STOCK" || (product.status === "ACTIVE" && product.quantity === 0)) && (
+      <a href={`/dashboard/products/${product.id}/edit#add-stock`} className={s.stockShortcut}>إضافة للمستودع</a>
+    )}
+  </div>;
 }
 
 export default function SellerProductsPage() {
@@ -113,29 +122,29 @@ export default function SellerProductsPage() {
               <span role="columnheader">الحالة</span>
             </div>
             {filtered.map((p) => (
-              <a key={p.id} href={`/dashboard/products/${p.id}/edit`} className={`${s.cols} ${s.row}`} role="row">
-                <span className={s.prod}>
+              <div key={p.id} className={`${s.cols} ${s.row}`} role="row">
+                <div role="cell"><a href={`/dashboard/products/${p.id}/edit`} className={s.prod}>
                   <span className={s.thumb} style={p.mainImage ? { backgroundImage: `url(${p.mainImage})` } : undefined} aria-hidden="true" />
                   <span className={s.pname}>{p.nameAr}</span>
-                </span>
-                <span className={s.money}>{p.price} ر.س</span>
-                <Variants p={p} />
-                <span className={s.qty}>{p.totalSold}</span>
-                <span><ProductStatusBadge status={p.status} /></span>
-              </a>
+                </a></div>
+                <span className={s.money} role="cell">{p.price} ر.س</span>
+                <div role="cell"><Variants p={p} /></div>
+                <span className={s.qty} role="cell">{p.totalSold}</span>
+                <div role="cell"><ProductStatus product={p} /></div>
+              </div>
             ))}
           </div>
           <ul className={s.cards}>
             {filtered.map((p) => (
-              <li key={p.id}>
-                <a href={`/dashboard/products/${p.id}/edit`} className={s.card}>
+              <li key={p.id} className={s.card}>
+                <a href={`/dashboard/products/${p.id}/edit`} className={`${s.prod} ${s.cardBody}`}>
                   <span className={s.thumb} style={p.mainImage ? { backgroundImage: `url(${p.mainImage})` } : undefined} aria-hidden="true" />
                   <span className={s.cardBody}>
                     <span className={s.pname} style={{ display: "block" }}>{p.nameAr}</span>
                     <span className={s.cardMeta} style={{ display: "block" }}>{p.price} ر.س · {p.variants.length > 0 ? `الكمية الكلية: ${p.quantity}` : `الكمية: ${p.quantity}`}</span>
                   </span>
-                  <ProductStatusBadge status={p.status} />
                 </a>
+                <ProductStatus product={p} />
               </li>
             ))}
           </ul>

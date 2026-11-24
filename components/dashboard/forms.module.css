@@ -163,3 +163,12 @@
 /* ───── صفحة منيرة: المحادثة تملأ ما تبقى من الشاشة ───── */
 .chatPage { display: flex; flex-direction: column; height: calc(100dvh - 60px); }
 @media (max-width: 900px) { .chatPage { height: calc(100dvh - 60px - 76px); } }
+
+.productStatusActions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.prod { color: inherit; text-decoration: none; }
+a.prod:hover .pname, .stockShortcut:hover { text-decoration: underline; }
+.stockShortcut { display: inline-flex; align-items: center; min-height: 32px; color: var(--ui-green-deep); font-size: 13px; font-weight: 700; text-underline-offset: 3px; }
+.stockSection { scroll-margin-top: 96px; }
+@media (max-width: 600px) {
+  .productStatusActions { flex-direction: column; align-items: flex-end; flex-shrink: 0; }
+}

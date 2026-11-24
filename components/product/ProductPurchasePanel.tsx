@@ -10,6 +10,7 @@ import s from "./buy.module.css";
 
 interface Props {
   product: ProductDetail;
+  canRestock: boolean;
   selectedVariant: ProductVariantItem | null;
   onSelectVariant: (id: string) => void;
   qty: number;
@@ -48,7 +49,12 @@ export default function ProductPurchasePanel(p: Props) {
         {hasCompare && <span className={s.compare}>{product.comparePrice} ر.س</span>}
         {discount > 0 && <span className={s.sale}>خصم {discount}٪</span>}
       </div>
-      <span className={`${s.stock} ${stockClass}`}>{stockText}</span>
+      <div className={s.stockActions}>
+        <span className={`${s.stock} ${stockClass}`}>{stockText}</span>
+        {outOfStock && p.canRestock && (
+          <a className={s.cartLink} href={`/dashboard/products/${product.id}/edit#add-stock`}>إضافة للمستودع</a>
+        )}
+      </div>
 
       {product.variants.length > 0 && (
         <div className={s.block}>

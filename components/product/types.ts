@@ -87,6 +87,8 @@ export interface ProductDetail {
   price: number;
   comparePrice: number | null;
   quantity: number;
+  trackInventory: boolean;
+  status: string;
 
   mainImage: string | null;
   videoUrl: string | null;

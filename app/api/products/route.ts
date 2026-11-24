@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         where: { storeId: user.store.id },
         select: {
           id: true, nameAr: true, slug: true, mainImage: true, price: true,
-          quantity: true, status: true, totalSold: true, createdAt: true,
+          quantity: true, trackInventory: true, status: true, totalSold: true, createdAt: true,
           variants: { select: { id: true, nameAr: true, quantity: true }, orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
         },
         orderBy: { createdAt: "desc" },

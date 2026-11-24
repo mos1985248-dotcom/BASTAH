@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
 import s from "@/components/dashboard/forms.module.css";
 
@@ -16,6 +16,7 @@ const date = new Intl.DateTimeFormat("ar-SA-u-ca-gregory", {
 export default function StockReceiptsCard({ productId, variants, quantity, canReceive, onSaved }: {
   productId: string; variants: Variant[]; quantity: number; canReceive: boolean; onSaved: () => void;
 }) {
+  const sectionRef = useRef<HTMLElement>(null);
   const [history, setHistory] = useState<History | null>(null);
   const [quantityInput, setQuantityInput] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
@@ -43,6 +44,12 @@ export default function StockReceiptsCard({ productId, variants, quantity, canRe
   }
   useEffect(() => { void loadHistory(); }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (window.location.hash !== "#add-stock") return;
+    sectionRef.current?.scrollIntoView({ block: "start" });
+    sectionRef.current?.focus({ preventScroll: true });
+  }, []);
+
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setNotice("");
@@ -69,7 +76,7 @@ export default function StockReceiptsCard({ productId, variants, quantity, canRe
   }
 
   return (
-    <section className={s.panel} aria-label="إضافة كمية للمخزون" dir="rtl">
+    <section id="add-stock" ref={sectionRef} tabIndex={-1} className={`${s.panel} ${s.stockSection}`} aria-label="إضافة كمية للمخزون" dir="rtl">
       <div className={s.panelHead}><h2 className={s.panelTitle}>إضافة كمية للمخزون</h2></div>
       <div className={s.panelBody}>
       {variants.length === 0 && <p>الرصيد الحالي <strong>{quantity}</strong></p>}
