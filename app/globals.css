@@ -10,6 +10,10 @@
 */
 
 :root {
+  --font-plex-arabic: "IBM Plex Sans Arabic";
+  --font-kufi-arabic: "Noto Kufi Arabic Variable";
+  --font-aref-ruqaa: "Aref Ruqaa";
+  --font-amiri: "Amiri";
   --color-bg: #FBF8F2;
   --color-text: #1A1A1A;
   --color-primary-600: #2A6B57;
