@@ -3,8 +3,10 @@
 // كل المنطق في hooks/useMuniraChat.ts والتواصل في services/munira-client.ts
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useMuniraChat } from "@/hooks/useMuniraChat";
+import MuniraImageStudio from "@/components/dashboard/MuniraImageStudio";
+import studio from "@/components/dashboard/munira-studio.module.css";
 import MuniraQuota from "@/components/dashboard/MuniraQuota";
 import { ChatWindow } from "@/components/munira/ChatWindow";
 import { useCurrentUser } from "@/app/providers";
@@ -13,6 +15,7 @@ import f from "@/components/dashboard/forms.module.css";
 import m from "@/components/dashboard/munira-page.module.css";
 
 export default function MuniraPage() {
+  const [showStudio, setShowStudio] = useState(false);
   const { user } = useCurrentUser();
 
   const role =
@@ -32,6 +35,14 @@ export default function MuniraPage() {
     if (recording) stopRecording();
   }, [streaming, cancel, recording, stopRecording]);
 
+  const tabs = role === "seller" && user?.store && <nav className={studio.tabs} aria-label="أقسام منيرة" style={uiVars}>
+    <button type="button" className={f.btnSm} aria-pressed={!showStudio} onClick={() => setShowStudio(false)}>المحادثات</button>
+    <button type="button" className={f.btnSm} aria-pressed={showStudio} onClick={() => setShowStudio(true)}>استوديو منيرة</button>
+  </nav>;
+  if (showStudio && role === "seller" && user?.store) {
+    return <div className={f.page}>{tabs}<MuniraImageStudio storeSlug={user.store.slug} /></div>;
+  }
+
   return (
     <div className={`${f.chatPage} ${m.scope}`} style={uiVars}>
       <ChatWindow
@@ -46,7 +57,7 @@ export default function MuniraPage() {
         onStopRecording={stopRecording}
         onCancel={handleCancel}
         userName={user?.name}
-        accessory={role === "seller" && user?.store && <MuniraQuota key={user.store.id} streaming={streaming} />}
+        accessory={role === "seller" && user?.store && <>{tabs}<MuniraQuota key={user.store.id} streaming={streaming} /></>}
       />
     </div>
   );

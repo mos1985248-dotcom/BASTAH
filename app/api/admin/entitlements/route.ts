@@ -40,6 +40,7 @@ export async function GET(req: Request) {
             const limit = (config?.muniraTrialMessages || config?.muniraMonthlyMessages) ?? 0;
             return { plan, enabled: limit > 0, limit };
           }
+          if (key === "munira_images") return { plan, enabled: (config?.muniraMonthlyImages ?? 0) > 0, limit: config?.muniraMonthlyImages ?? 0 };
           if (key === "daftari") return { plan, enabled: config?.hasDaftari ?? enabled, limit: null };
           if (key === "coupons") return { plan, enabled: config?.hasDiscountCodes ?? enabled, limit: null };
           return { plan, enabled, limit: key === "cart_reminders" ? 1 : null };

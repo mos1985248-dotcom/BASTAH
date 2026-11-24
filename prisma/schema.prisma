@@ -419,6 +419,7 @@ model SubscriptionPlanConfig {
 
   muniraMonthlyMessages Int @default(0)
   muniraTrialMessages   Int @default(0)
+  muniraMonthlyImages Int @default(0)
 
   // قائمة المميزات للعرض
   featuresAr         String[]         @default([])
@@ -2245,4 +2246,30 @@ model ProductStockReceipt {
   @@unique([productId, requestId])
   @@index([productId, createdAt, id])
   @@map("product_stock_receipts")
+}
+
+model MuniraImage {
+  id           String   @id @default(cuid())
+  scope        String
+  requestId    String
+  inputHash    String
+  window      String
+  day         String
+  plan        SubscriptionPlan?
+  provider    String
+  model       String
+  state       String
+  neurons    Int
+  measuredNeurons Int?
+  estimatedNeurons Int?
+  error       String?
+  objectPath  String?
+  saved       Boolean  @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  @@unique([scope, requestId])
+  @@index([scope, window, state])
+  @@index([day, provider])
+  @@map("munira_images")
 }

@@ -49,6 +49,10 @@ export async function resolveFeature(db: Prisma.TransactionClient, storeId: stri
     defaultLimit = (config?.muniraTrialMessages || config?.muniraMonthlyMessages) ?? 0;
     defaultEnabled = defaultLimit > 0;
   }
+  if (featureKey === "munira_images") {
+    defaultLimit = config?.muniraMonthlyImages ?? 0;
+    defaultEnabled = defaultLimit > 0;
+  }
   if (featureKey === "cart_reminders") defaultLimit = 1;
 
   const enabled = activeOverride?.enabled ?? rule?.enabled ?? defaultEnabled;
