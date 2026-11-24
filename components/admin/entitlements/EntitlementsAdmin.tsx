@@ -89,7 +89,7 @@ export default function EntitlementsAdmin() {
           <button type="button" disabled={!storeId || busy} onClick={() => load(storeId)}>استعراض الصلاحيات</button>
           {data.decisions && <ul>{data.decisions.map(decision => <li key={decision.key}>
             {data.matrix.find(row => row.key === decision.key)?.label} {decision.allowed ? "متاحة" : "مقفلة"}
-            {" · "}{({ inactive_subscription: "اشتراك غير نشط", disabled_on_platform: "إيقاف عام", store_exception: "استثناء متجر", plan: "إعداد الباقة" } as Record<string, string>)[decision.reason]}
+            {" · "}{({ inactive_subscription: "اشتراك غير نشط", inactive_store: "متجر غير نشط", disabled_on_platform: "إيقاف عام", store_exception: "استثناء متجر", plan: "إعداد الباقة" } as Record<string, string>)[decision.reason]}
           </li>)}</ul>}
           <form onSubmit={submitOverride}>
             <h2 className={s.h2}>استثناء متجر</h2>
