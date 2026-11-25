@@ -263,7 +263,7 @@ export const checkoutBaseSchema = z.object({
   // فقط (راجع تعليق Store.pickupEnabled بالـschema)
   fulfillmentMethod: z.enum(["SHIPPING", "PICKUP"]).default("SHIPPING"),
   buyerNotes: z.string().trim().max(500).optional(),
-  couponCode: z.string().trim().max(30).optional(),
+  couponCode: z.string().trim().toUpperCase().regex(/^[A-Z0-9_-]{3,32}$/).optional(),
 });
 
 /**

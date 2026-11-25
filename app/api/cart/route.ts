@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser, AuthError } from "@/lib/auth";
 import { readAttributionCookie, recordEvent } from "@/lib/analytics";
+import { getFeature } from "@/lib/entitlements";
 import { z } from "zod";
 
 const addSchema = z.object({
@@ -36,7 +37,9 @@ export async function GET() {
       select: CART_ITEM_SELECT,
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json({ items });
+    const storeIds = [...new Set(items.map(item => item.product.store.id))];
+    const access = await Promise.all(storeIds.map(storeId => getFeature(storeId, "coupons")));
+    return NextResponse.json({ items, couponStores: storeIds.filter((_, index) => access[index].allowed) });
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
     console.error("[GET /api/cart]", err);

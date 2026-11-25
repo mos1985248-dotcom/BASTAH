@@ -25,7 +25,7 @@ import { requireUser, AuthError } from "@/lib/auth";
 import { checkoutSchema, formatZodError } from "@/lib/validation";
 import { reserveStock, releaseStock, InsufficientStockError } from "@/lib/inventory";
 import { createMoyasarInvoice, toHalalas, MoyasarError } from "@/lib/moyasar";
-import { computeVat } from "@/lib/tax";
+import { checkoutCoupon, checkoutTotals, CouponError } from "@/lib/checkout-coupon";
 import { getCodFee } from "@/lib/platform-settings";
 import { decryptSecret } from "@/lib/crypto";
 import { resolveCheckoutItems, computeShippingCost, CheckoutItemError, ShippingCalcError } from "@/lib/checkout-pricing";
@@ -122,25 +122,16 @@ export async function POST(req: NextRequest) {
 
     const subtotal = resolved.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
-    // كوبونات الخصم: التحقق الفعلي (الحد الأدنى، تاريخ الانتهاء، حد الاستخدام)
-    // مؤجَّل لمرحلة قادمة — حالياً نقبل الحقل ونُسجّله بدون تطبيق خصم فعلي
-    const discountAmount = 0;
-
-    // ── VAT: 15% على المجموع الفرعي فقط، ومشروطة برقم ضريبي حقيقي للتاجر ──
-    const taxAmount = computeVat(subtotal, subscription.hasTaxNumber);
-
-    // ⚠️ رسوم COD منفصلة تماماً عن shippingCost — قابلة للضبط من PlatformSetting،
-    // وصفر دائماً لأي طريقة دفع غير الدفع عند الاستلام
     const codFee = await getCodFee(paymentMethod);
-
-    // subtotal + shipping + codFee - discount + VAT = total
-    const total = subtotal + shippingCost + codFee - discountAmount + taxAmount;
 
     const orderNumber = generateOrderNumber();
     reservedItems = resolved.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity }));
 
     // ── المعاملة المحلية: حجز المخزون + إنشاء الطلب (atomic) ──
     const order = await prisma.$transaction(async (tx) => {
+      const discount = await checkoutCoupon(tx, storeId, couponCode, subtotal, true);
+      const discountAmount = discount.discountAmount;
+      const { taxAmount, total } = checkoutTotals(subtotal, discountAmount, shippingCost, codFee, subscription.hasTaxNumber, paymentMethod);
       await reserveStock(tx, reservedItems!, productNames);
 
       const newOrder = await tx.order.create({
@@ -152,7 +143,7 @@ export async function POST(req: NextRequest) {
           fulfillmentMethod,
           subtotal,
           discountAmount,
-          couponCode: couponCode ?? null,
+          couponCode: discount.couponCode,
           shippingCost,
           codFee,
           taxAmount,
@@ -308,7 +299,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: message }, { status: 502 });
     }
   } catch (err) {
-    if (err instanceof AuthError) {
+    if (err instanceof AuthError || err instanceof CouponError) {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
     if (err instanceof InsufficientStockError) {

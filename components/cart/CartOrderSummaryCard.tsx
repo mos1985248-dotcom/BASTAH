@@ -1,6 +1,6 @@
 // components/cart/CartOrderSummaryCard.tsx
 // عرض فقط: الحساب كله من /api/checkout/preview (CartStoreGroup) — لا حساب مستقل هنا.
-import { useState } from "react";
+import type { ReactNode } from "react";
 import { ShieldCheck } from "lucide-react";
 import { t } from "@/theme";
 import { CheckoutPreview } from "@/components/checkout/OrderPricingSummary";
@@ -16,6 +16,8 @@ export default function CartOrderSummaryCard({
   previewLoading,
   hasAddress,
   disabled,
+  couponField,
+  discountAmount,
 }: {
   storeId: string;
   subtotal: number;
@@ -23,8 +25,9 @@ export default function CartOrderSummaryCard({
   previewLoading: boolean;
   hasAddress: boolean;
   disabled: boolean;
+  couponField?: ReactNode;
+  discountAmount: number;
 }) {
-  const [coupon, setCoupon] = useState("");
   const showPreview = hasAddress && preview;
 
   return (
@@ -32,21 +35,11 @@ export default function CartOrderSummaryCard({
       <h2 className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>ملخص الطلب</h2>
       <p className={s.sub}>راجع تفاصيل طلبك قبل إتمام الشراء</p>
 
-      <label htmlFor={`cart-coupon-${storeId}`} className={s.couponLabel}>كود الخصم</label>
-      <div className={s.coupon}>
-        <input
-          id={`cart-coupon-${storeId}`}
-          value={coupon}
-          onChange={(e) => setCoupon(e.target.value)}
-          placeholder="اكتب كود الخصم هنا"
-          className={s.couponInput}
-        />
-        <button type="button" className={s.couponBtn} disabled title="أكواد الخصم تُطبَّق قريباً">تطبيق</button>
-      </div>
-      <p className={s.couponNote}>أكواد الخصم تُطبَّق قريبًا</p>
+      {couponField}
 
       <div className={s.rows}>
         <CartSummaryRow label="المجموع الفرعي" value={subtotal} />
+        {discountAmount > 0 && <CartSummaryRow label="الخصم" value={-discountAmount} />}
         {!hasAddress && (
           <p className={s.hint}>سيُحتسَب الشحن والضريبة عند اختيار عنوان الشحن بصفحة الدفع</p>
         )}
@@ -55,7 +48,6 @@ export default function CartOrderSummaryCard({
           <>
             <CartSummaryRow label="رسوم التوصيل" value={preview.shippingCost} freeLabel="مجاني" />
             {preview.codFee > 0 && <CartSummaryRow label="رسوم الدفع عند الاستلام" value={preview.codFee} />}
-            {preview.discountAmount > 0 && <CartSummaryRow label="الخصم" value={-preview.discountAmount} />}
             {preview.taxAmount > 0 && <CartSummaryRow label="ضريبة القيمة المضافة (15٪)" value={preview.taxAmount} />}
           </>
         )}
@@ -64,7 +56,7 @@ export default function CartOrderSummaryCard({
       <div className={s.total}>
         <span className={s.totalLabel}>الإجمالي الكلي</span>
         <span className={s.totalValue}>
-          {showPreview ? preview.total : subtotal}
+          {showPreview ? preview.total : Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100)}
           <small>ر.س</small>
         </span>
       </div>
