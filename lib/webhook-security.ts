@@ -76,6 +76,23 @@ export async function registerWebhookEvent(params: {
   } catch (err: any) {
     // P2002 = unique constraint violation على [source, externalId] → تكرار حقيقي
     if (err?.code === "P2002") {
+      if (source === "MOYASAR") {
+        const record = await prisma.webhookEvent.findUnique({
+          where: { source_externalId: { source, externalId } },
+          select: { id: true, status: true, storeId: true },
+        });
+        if (!record || record.storeId !== (storeId ?? null)) {
+          return { ok: false, reason: "error", message: "تعذّرت مطابقة إشعار دفع الاشتراك" };
+        }
+        if (record.status !== "processed") {
+          const retry = await prisma.webhookEvent.updateMany({
+            where: { id: record.id, status: "failed" },
+            data: { status: "received", errorMessage: null, payloadHash },
+          });
+          if (retry.count === 1) return { ok: true, eventRecordId: record.id };
+          return { ok: false, reason: "error", message: "معالجة إشعار دفع الاشتراك قيد التنفيذ" };
+        }
+      }
       return { ok: false, reason: "duplicate", message: "هذا الحدث عُولج مسبقاً (idempotent skip)" };
     }
     console.error("[webhook-registration-error]", err);
