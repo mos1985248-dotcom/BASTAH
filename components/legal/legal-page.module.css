@@ -1,0 +1,9 @@
+.content a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.content ol {
+  list-style: decimal;
+  padding-inline-start: 1.5rem;
+}
