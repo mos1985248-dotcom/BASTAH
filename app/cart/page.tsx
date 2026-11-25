@@ -2,7 +2,7 @@
 // المنطق (الجلب والكمية والحذف والمفضلة والتجميع حسب المتجر) كما كان حرفياً؛ التغيير في العرض فقط.
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Info, ShoppingCart } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { useCurrentUser } from "../providers";
@@ -22,6 +22,11 @@ export default function CartPage() {
   const { user, loading: userLoading } = useCurrentUser();
   const { selectedAddressId } = useAddressBook(!!user); // نستخدمها بصمت لمعاينة الشحن/الضريبة فقط — لا نموذج عنوان هنا
 
+  const [couponStores, setCouponStores] = useState<string[]>([]);
+  const [discounts, setDiscounts] = useState<Record<string, number>>({});
+  const updateDiscount = useCallback((storeId: string, amount: number) => {
+    setDiscounts(current => (current[storeId] ?? 0) === amount ? current : { ...current, [storeId]: amount });
+  }, []);
   const [items, setItems] = useState<CartItemData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -30,7 +35,7 @@ export default function CartPage() {
 
   useEffect(() => {
     if (!user) return;
-    api.get<{ items: CartItemData[] }>("/api/cart").then((d) => setItems(d.items)).catch(() => setError(true)).finally(() => setLoading(false));
+    api.get<{ items: CartItemData[]; couponStores: string[] }>("/api/cart").then((d) => { setItems(d.items); setCouponStores(d.couponStores); }).catch(() => setError(true)).finally(() => setLoading(false));
   }, [user]);
 
   useEffect(() => {
@@ -116,7 +121,9 @@ export default function CartPage() {
       i.product.status !== "ACTIVE" ||
       (i.variant ? i.variant.quantity === 0 : i.product.quantity === 0),
   );
-  const grandTotal = items.reduce((s, i) => s + (i.variant?.price ?? i.product.price) * i.quantity, 0);
+  const subtotal = items.reduce((s, i) => s + (i.variant?.price ?? i.product.price) * i.quantity, 0);
+  const totalDiscount = storeIds.reduce((sum, id) => sum + (discounts[id] ?? 0), 0);
+  const grandTotal = Math.max(0, Math.round((subtotal - totalDiscount) * 100) / 100);
 
   return (
     <SiteShell>
@@ -140,13 +147,15 @@ export default function CartPage() {
                 <p className={c.notice}>
                   <Info size={17} strokeWidth={1.8} aria-hidden="true" />
                   <span>
-                    سلتك تحتوي منتجات من {storeIds.length} متاجر — لكل متجر عملية دفع منفصلة. إجمالي السلة كاملة: <strong>{grandTotal} ر.س</strong>
+                    سلتك تحتوي منتجات من {storeIds.length} متاجر — لكل متجر عملية دفع منفصلة. قيمة المنتجات قبل الشحن والضريبة: <strong>{grandTotal} ر.س</strong>
                   </span>
                 </p>
               )}
               {Object.entries(groups).map(([storeId, g]) => (
                 <Fragment key={storeId}>
                   <CartStoreGroup
+                    couponsAvailable={couponStores.includes(storeId)}
+                    onDiscountChange={updateDiscount}
                     storeId={storeId}
                     storeName={g.storeName}
                     storeSlug={g.storeSlug}
@@ -172,7 +181,7 @@ export default function CartPage() {
       {!loading && storeIds.length === 1 && (
         <div className={c.sticky} style={uiVars}>
           <div>
-            <p className={c.stickyLabel}>الإجمالي</p>
+            <p className={c.stickyLabel}>قيمة المنتجات</p>
             <p className={c.stickyTotal}>{grandTotal} ر.س</p>
           </div>
           <a

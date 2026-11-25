@@ -8,7 +8,7 @@
 .coupon { display: flex; gap: 8px; }
 .couponInput { flex: 1; min-width: 0; min-height: 44px; padding: 0 14px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink); font: inherit; font-size: 14px; }
 .couponInput:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 1px; }
-.couponBtn { flex: none; min-height: 44px; padding: 0 18px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-sand); color: var(--ui-ink-muted); font: inherit; font-size: 14px; font-weight: 600; cursor: not-allowed; }
+.couponBtn { flex: none; min-height: 44px; padding: 0 18px; border-radius: var(--ui-pill); border: 1px solid var(--ui-border); background: var(--ui-sand); color: var(--ui-ink-muted); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 .couponNote { margin: 6px 0 0; font-size: 12px; color: var(--ui-ink-muted); }
 
 .rows { display: flex; flex-direction: column; gap: 2px; margin: 18px 0 0; padding: 14px 0 0; border-top: 1px solid var(--ui-border); }
@@ -40,3 +40,5 @@
 @media (max-width: 900px) { .card { position: static; padding: 20px; } }
 @media (prefers-reduced-motion: reduce) { .checkout { transition: none; } }
 /* basita-font-scale: applied */
+.couponBtn:disabled { opacity: 0.65; cursor: not-allowed; }
+.couponForm { margin: 0 0 12px; }

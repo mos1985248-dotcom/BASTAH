@@ -1,11 +1,11 @@
 // app/checkout/page.tsx
-// المنطق (الجلب والمعاينة السعرية وإنشاء الطلب وتفريغ السلة والتحويل لـMoyasar) كما كان حرفياً؛
-// التغيير في العرض والصياغة فقط.
 "use client";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { api, ApiError } from "@/lib/api-client";
 import { useCurrentUser } from "../providers";
+import { useCheckoutCoupon } from "@/hooks/useCheckoutCoupon";
+import CheckoutCouponField from "@/components/checkout/CheckoutCouponField";
 import { useAddressBook } from "@/hooks/useAddressBook";
 import { t } from "@/theme";
 import { uiVars } from "@/components/ui/vars";
@@ -34,6 +34,7 @@ function CheckoutContent() {
   const { user, loading: userLoading } = useCurrentUser();
   const addressBook = useAddressBook(!!user);
 
+  const [couponsAvailable, setCouponsAvailable] = useState(false);
   const [items, setItems] = useState<CartItemData[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -46,6 +47,16 @@ function CheckoutContent() {
   const [preview, setPreview] = useState<CheckoutPreview | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
 
+  const orderItems = useMemo(() => items.map(({ product, quantity, variantId }) => ({
+    productId: product.id,
+    quantity,
+    variantId: variantId ?? undefined,
+  })), [items]);
+
+  const coupon = useCheckoutCoupon(storeId, orderItems, couponsAvailable);
+  const couponCode = coupon.quote?.couponCode;
+  const [previewError, setPreviewError] = useState("");
+
   const bankTransferAvailable = items[0]?.product.store.subscription?.bankTransferEnabled ?? false;
   const pickupAvailable = items[0]?.product.store.pickupEnabled ?? false;
   const isPickup = fulfillmentMethod === "PICKUP";
@@ -53,8 +64,8 @@ function CheckoutContent() {
   useEffect(() => {
     if (!user) return;
     api
-      .get<{ items: CartItemData[] }>("/api/cart")
-      .then((d) => setItems(d.items.filter((i) => i.product.store.id === storeId)))
+      .get<{ items: CartItemData[]; couponStores: string[] }>("/api/cart")
+      .then((d) => { setItems(d.items.filter((i) => i.product.store.id === storeId)); setCouponsAvailable(!!storeId && d.couponStores.includes(storeId)); })
       .catch(() => setLoadError(true))
       .finally(() => setLoading(false));
   }, [user, storeId]);
@@ -62,23 +73,23 @@ function CheckoutContent() {
   // ⚠️ معاينة سعرية حقيقية من الـbackend (نفس دوال /api/checkout بالضبط) —
   // تتحدّث تلقائياً عند تغيير العنوان أو طريقة الدفع، بدون أي رقم تقريبي
   useEffect(() => {
-    if (!storeId || items.length === 0 || (!isPickup && !addressBook.selectedAddressId)) {
-      setPreview(null);
+    setPreview(null);
+    setPreviewError("");
+    if (!storeId || !orderItems.length || (!isPickup && !addressBook.selectedAddressId)) {
+      setPreviewLoading(false);
       return;
     }
+    let current = true;
     setPreviewLoading(true);
-    api
-      .post<CheckoutPreview>("/api/checkout/preview", {
-        storeId,
-        items: items.map((i) => ({ productId: i.product.id, quantity: i.quantity })),
-        addressId: isPickup ? undefined : addressBook.selectedAddressId,
-        paymentMethod,
-        fulfillmentMethod,
-      })
-      .then(setPreview)
-      .catch(() => setPreview(null))
-      .finally(() => setPreviewLoading(false));
-  }, [storeId, items, addressBook.selectedAddressId, paymentMethod, fulfillmentMethod, isPickup]);
+    api.post<CheckoutPreview>("/api/checkout/preview", {
+      storeId, items: orderItems, couponCode,
+      addressId: isPickup ? undefined : addressBook.selectedAddressId,
+      paymentMethod, fulfillmentMethod,
+    }).then(value => { if (current) setPreview(value); })
+      .catch(error => { if (current && couponCode) setPreviewError(error instanceof Error ? error.message : "تعذّرت معاينة سعر الكوبون."); })
+      .finally(() => { if (current) setPreviewLoading(false); });
+    return () => { current = false; };
+  }, [storeId, orderItems, couponCode, addressBook.selectedAddressId, paymentMethod, fulfillmentMethod, isPickup]);
 
   const handleConfirm = async () => {
     if (!storeId || items.length === 0) return;
@@ -90,18 +101,28 @@ function CheckoutContent() {
       setPlaceError("يجب الموافقة على الشروط والأحكام وسياسة الخصوصية أولاً");
       return;
     }
+    if (coupon.busy || (coupon.savedCode && (!couponCode || previewLoading ||
+      preview?.discountAmount !== coupon.quote?.discountAmount))) {
+      setPlaceError("انتظري معاينة سعر الكوبون أو أزيليه قبل إتمام الطلب.");
+      return;
+    }
     setPlacing(true);
     setPlaceError("");
     try {
       const result = await api.post<{ orderId: string; paymentUrl: string | null }>("/api/checkout", {
         storeId,
-        items: items.map((i) => ({ productId: i.product.id, quantity: i.quantity })),
+        items: orderItems,
+        couponCode,
         addressId: isPickup ? undefined : addressBook.selectedAddressId,
         paymentMethod,
         fulfillmentMethod,
       });
       // الطلب أُنشئ فعلياً في هذه اللحظة — نُفرّغ هذه العناصر من السلة
-      await Promise.all(items.map((i) => api.delete(`/api/cart/${i.product.id}`).catch(() => {})));
+      await Promise.all(items.map(({ product, variantId }) => {
+        const query = variantId ? `?variantId=${encodeURIComponent(variantId)}` : "";
+        return api.delete(`/api/cart/${product.id}${query}`).catch(() => {});
+      }));
+      coupon.clear();
       window.location.href = result.paymentUrl ?? `/orders/${result.orderId}`;
     } catch (err) {
       setPlaceError(err instanceof ApiError ? err.message : "تعذّر إتمام الطلب");
@@ -117,8 +138,9 @@ function CheckoutContent() {
   );
 
   if (!storeId) return shell(<NoStore />);
-  if (userLoading || loading) return shell(<CheckoutLoading />);
+  if (userLoading) return shell(<CheckoutLoading />);
   if (!user) return shell(<CheckoutLogin storeId={storeId} />);
+  if (loading) return shell(<CheckoutLoading />);
   if (loadError || items.length === 0) return shell(<CheckoutEmpty loadError={loadError} />);
 
   return (
@@ -157,6 +179,8 @@ function CheckoutContent() {
                 fulfillmentMethod={fulfillmentMethod}
                 onFulfillmentChange={setFulfillmentMethod}
               />
+              {(couponsAvailable || coupon.savedCode) && <CheckoutCouponField coupon={coupon} disabled={placing} />}
+              {previewError && <p role="alert">{previewError}</p>}
               <CheckoutConfirmPanel
                 agreedToTerms={agreedToTerms}
                 onAgreeChange={setAgreedToTerms}

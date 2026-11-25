@@ -1,6 +1,8 @@
 // components/cart/CartStoreGroup.tsx
 // المنطق (حساب المجموع وكشف المشكلات ومعاينة الشحن/الضريبة) كما كان حرفياً؛ التغيير في العرض فقط.
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useCheckoutCoupon } from "@/hooks/useCheckoutCoupon";
+import CheckoutCouponField from "@/components/checkout/CheckoutCouponField";
 import { api } from "@/lib/api-client";
 import { t } from "@/theme";
 import { uiVars } from "@/components/ui/vars";
@@ -12,6 +14,8 @@ import c from "./cart.module.css";
 
 export default function CartStoreGroup({
   storeId,
+  couponsAvailable,
+  onDiscountChange,
   storeName,
   storeSlug,
   items,
@@ -23,6 +27,8 @@ export default function CartStoreGroup({
   onToggleFavorite,
 }: {
   storeId: string;
+  couponsAvailable: boolean;
+  onDiscountChange: (storeId: string, amount: number) => void;
   storeName: string;
   storeSlug: string;
   items: CartItemData[];
@@ -54,48 +60,29 @@ export default function CartStoreGroup({
   const [previewLoading, setPreviewLoading] =
     useState(false);
 
-  // ⚠️ نفس نقطة النهاية المستخدمة فعلياً بصفحة الدفع — لا حساب مستقل هنا
+  const orderItems = useMemo(() => items.map(({ product, variantId, quantity }) => ({
+    productId: product.id, variantId: variantId ?? undefined, quantity,
+  })), [items]);
+  const coupon = useCheckoutCoupon(storeId, orderItems, couponsAvailable);
+  const couponCode = coupon.quote?.couponCode;
+  const discountAmount = coupon.quote?.discountAmount ?? 0;
+  useEffect(() => { onDiscountChange(storeId, discountAmount); }, [storeId, discountAmount, onDiscountChange]);
+
   useEffect(() => {
+    setPreview(null);
     if (!addressId || hasIssue) {
-      setPreview(null);
+      setPreviewLoading(false);
       return;
     }
-
+    let current = true;
     setPreviewLoading(true);
-
-    api
-      .post<CheckoutPreview>(
-        "/api/checkout/preview",
-        {
-          storeId,
-          items: items.map((i) => ({
-            productId: i.product.id,
-            variantId:
-              i.variantId ?? undefined,
-            quantity: i.quantity,
-          })),
-          addressId,
-          paymentMethod: "CREDIT_CARD",
-        }
-      )
-      .then(setPreview)
-      .catch(() => setPreview(null))
-      .finally(() =>
-        setPreviewLoading(false)
-      );
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    storeId,
-    addressId,
-    hasIssue,
-    items
-      .map(
-        (i) =>
-          `${i.product.id}:${i.variantId}:${i.quantity}`
-      )
-      .join(","),
-  ]);
+    api.post<CheckoutPreview>("/api/checkout/preview", {
+      storeId, items: orderItems, couponCode, addressId, paymentMethod: "CREDIT_CARD",
+    }).then(data => { if (current) setPreview(data); })
+      .catch(() => { if (current) setPreview(null); })
+      .finally(() => { if (current) setPreviewLoading(false); });
+    return () => { current = false; };
+  }, [storeId, addressId, hasIssue, orderItems, couponCode]);
 
   return (
     <section dir="rtl" className={c.group} style={uiVars} aria-labelledby={`cart-store-${storeId}`}>
@@ -138,6 +125,8 @@ export default function CartStoreGroup({
           preview={preview}
           previewLoading={previewLoading}
           hasAddress={!!addressId}
+          discountAmount={discountAmount}
+          couponField={couponsAvailable || coupon.savedCode ? <CheckoutCouponField coupon={coupon} disabled={hasIssue} /> : undefined}
           disabled={hasIssue}
         />
       </div>
