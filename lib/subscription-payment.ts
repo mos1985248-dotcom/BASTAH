@@ -29,7 +29,8 @@ const CYCLE_DAYS: Record<string, number> = { monthly: 30, yearly: 365 };
 /** يُطبَّق على أي حالة دفع Moyasar (data.status من الـwebhook أو من Fetch مباشر) */
 export async function applyMoyasarSubscriptionPaymentStatus(
   invoiceId: string,
-  moyasarStatus: string
+  moyasarStatus: string,
+  providerInvoiceId: string
 ): Promise<SubscriptionPaymentResult> {
   const invoice = await prisma.subscriptionInvoice.findUnique({
     where: { id: invoiceId },
@@ -37,52 +38,66 @@ export async function applyMoyasarSubscriptionPaymentStatus(
       subscription: { include: { store: { select: { id: true, userId: true, nameAr: true } } } },
     },
   });
-  if (!invoice) return { applied: false, changed: false, invoiceStatus: "", subscriptionStatus: "" };
+  if (!invoice || invoice.moyasarTxnId !== providerInvoiceId) return { applied: false, changed: false, invoiceStatus: "", subscriptionStatus: "" };
 
   const sub = invoice.subscription;
   const wasFirstActivation = sub.status === "TRIAL" || (sub.plan === "FREE" && invoice.plan !== "FREE");
-  const wasSuspended = sub.status === "SUSPENDED" || sub.status === "GRACE_PERIOD" || sub.status === "EXPIRED";
 
   if (moyasarStatus === "paid" || moyasarStatus === "captured") {
     if (invoice.status === "PAID") {
       return { applied: true, changed: false, invoiceStatus: invoice.status, subscriptionStatus: sub.status };
     }
 
-    const invoiceUpdate = await prisma.subscriptionInvoice.updateMany({
-      where: { id: invoice.id, status: { not: "PAID" } },
-      data: { status: "PAID", paidAt: new Date() },
+    const activation = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM store_subscriptions WHERE id = ${sub.id} FOR UPDATE`;
+      const invoiceUpdate = await tx.subscriptionInvoice.updateMany({
+        where: { id: invoice.id, moyasarTxnId: providerInvoiceId, status: { not: "PAID" } },
+        data: { status: "PAID", paidAt: new Date() },
+      });
+      if (invoiceUpdate.count === 0) return null;
+
+      const current = await tx.storeSubscription.findUniqueOrThrow({ where: { id: sub.id } });
+      const first = current.status === "TRIAL" || (current.plan === "FREE" && invoice.plan !== "FREE");
+      const suspended = current.status === "SUSPENDED" || current.status === "GRACE_PERIOD" || current.status === "EXPIRED";
+      const now = new Date();
+      const base = current.endDate && current.endDate > now ? current.endDate : now;
+      const days = CYCLE_DAYS[invoice.billingCycle] ?? 30;
+      await tx.storeSubscription.update({
+        where: { id: sub.id },
+        data: {
+          plan: invoice.plan,
+          billingCycle: invoice.billingCycle,
+          status: "ACTIVE",
+          endDate: new Date(base.getTime() + days * 24 * 60 * 60 * 1000),
+          pricePerMonth: invoice.billingCycle === "yearly" ? invoice.amount / 12 : invoice.amount,
+          lastPaymentFailedAt: null,
+          gracePeriodEndsAt: null,
+          suspendedAt: null,
+          reactivatedAt: suspended ? now : current.reactivatedAt,
+          cancelledAt: null,
+          cancelReason: null,
+        },
+      });
+      return { kind: first ? "activated" : suspended ? "reactivated" : "renewed" } as const;
     });
-    if (invoiceUpdate.count === 0) {
-      // خسرنا سباق التزامن لصالح استدعاء آخر (webhook + verify-payment معاً)
-      return { applied: true, changed: false, invoiceStatus: "PAID", subscriptionStatus: sub.status };
+    if (!activation) {
+      const fresh = await prisma.subscriptionInvoice.findUnique({
+        where: { id: invoice.id },
+        select: { status: true, moyasarTxnId: true, subscription: { select: { status: true } } },
+      });
+      return {
+        applied: fresh?.moyasarTxnId === providerInvoiceId,
+        changed: false,
+        invoiceStatus: fresh?.status ?? "",
+        subscriptionStatus: fresh?.subscription.status ?? "",
+      };
     }
-
-    const cycleDays = CYCLE_DAYS[invoice.billingCycle] ?? 30;
-    const base = sub.endDate && sub.endDate > new Date() ? sub.endDate : new Date();
-    const newEndDate = new Date(base.getTime() + cycleDays * 24 * 60 * 60 * 1000);
-
-    await prisma.storeSubscription.update({
-      where: { id: sub.id },
-      data: {
-        plan: invoice.plan,
-        billingCycle: invoice.billingCycle,
-        status: "ACTIVE",
-        endDate: newEndDate,
-        pricePerMonth: invoice.billingCycle === "yearly" ? invoice.amount / 12 : invoice.amount,
-        lastPaymentFailedAt: null,
-        gracePeriodEndsAt: null,
-        suspendedAt: null,
-        reactivatedAt: wasSuspended ? new Date() : sub.reactivatedAt,
-        cancelledAt: null,
-        cancelReason: null,
-      },
-    });
 
     await notifyPaymentOutcome({
       userId: sub.store.userId,
       storeNameAr: sub.store.nameAr,
       plan: invoice.plan,
-      kind: wasFirstActivation ? "activated" : wasSuspended ? "reactivated" : "renewed",
+      kind: activation.kind,
     });
 
     return { applied: true, changed: true, invoiceStatus: "PAID", subscriptionStatus: "ACTIVE" };
@@ -93,7 +108,7 @@ export async function applyMoyasarSubscriptionPaymentStatus(
       return { applied: true, changed: false, invoiceStatus: invoice.status, subscriptionStatus: sub.status };
     }
     const result = await prisma.subscriptionInvoice.updateMany({
-      where: { id: invoice.id, status: { not: "PAID" } }, // فاتورة مدفوعة مسبقاً لا تُنقَل لفاشلة أبداً
+      where: { id: invoice.id, moyasarTxnId: providerInvoiceId, status: { notIn: ["PAID", "FAILED"] } },
       data: { status: "FAILED" },
     });
     if (result.count === 0) {

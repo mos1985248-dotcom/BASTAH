@@ -13,7 +13,8 @@ import { formatPlatformCopy } from "@/lib/brand";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireActiveStore, AuthError } from "@/lib/auth";
-import { createMoyasarInvoice, MoyasarError, toHalalas } from "@/lib/moyasar";
+import { MoyasarError } from "@/lib/moyasar";
+import { startSubscriptionCheckout, SubscriptionCheckoutError } from "@/lib/subscription-checkout";
 import { z } from "zod";
 import type { SubscriptionPlan } from "@prisma/client";
 
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     const parsed = checkoutSchema.safeParse(await req.json());
     if (!parsed.success) {
-      return NextResponse.json({ error: parsed.error.errors[0]?.message ?? "بيانات غير صالحة" }, { status: 400 });
+      return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "بيانات غير صالحة" }, { status: 400 });
     }
     const { plan: targetPlan, billingCycle } = parsed.data;
 
@@ -72,78 +73,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ requiresPayment: false, subscription: { plan: updated.plan, status: updated.status } });
     }
 
-    // ── ترقية/تجديد: يتطلب دفعاً فعلياً ─────────────────────
-    if (!process.env.PLATFORM_MOYASAR_SECRET_KEY) {
+    const secretKey = process.env.PLATFORM_MOYASAR_SECRET_KEY;
+    if (!secretKey) {
       return NextResponse.json({ error: "بوابة دفع المنصة غير مُهيَّأة حالياً — تواصلي مع الدعم" }, { status: 503 });
     }
 
     const amount = billingCycle === "yearly" ? planConfig.priceYearly : planConfig.priceMonthly;
-    const now = new Date();
-    const periodYear = now.getFullYear();
-    const periodMonth = now.getMonth() + 1;
-
-    // فاتورة معلَّقة سابقة لنفس الفترة (نفس الشهر التقويمي)؟ أعيدي استخدامها
-    // بدل فاتورة جديدة — يمنع تكرار الفواتير عند إعادة محاولة الدفع
-    const existingPending = await prisma.subscriptionInvoice.findUnique({
-      where: { subscriptionId_periodYear_periodMonth: { subscriptionId: subscription.id, periodYear, periodMonth } },
+    const checkout = await startSubscriptionCheckout({
+      subscriptionId: subscription.id,
+      storeId,
+      userId: user.id,
+      targetPlan,
+      billingCycle,
+      amount,
+      description: `اشتراك بسطة مارت — ${formatPlatformCopy(planConfig.nameAr)} (${billingCycle === "yearly" ? "سنوي" : "شهري"}) — متجر ${subscription.store.nameAr}`,
+      appUrl: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+      secretKey,
+      now: new Date(),
     });
-    if (existingPending?.status === "PAID") {
-      return NextResponse.json({ error: "تم دفع اشتراك هذا الشهر بالفعل — أي تغيير إضافي يصبح فعّالاً الشهر القادم" }, { status: 409 });
-    }
-
-    const dueDate = new Date(now.getTime() + 24 * 60 * 60 * 1000); // خلال 24 ساعة
-
-    const invoice = existingPending
-      ? await prisma.subscriptionInvoice.update({
-          where: { id: existingPending.id },
-          data: { plan: targetPlan, billingCycle, amount, dueDate },
-        })
-      : await prisma.subscriptionInvoice.create({
-          data: {
-            subscriptionId: subscription.id,
-            plan: targetPlan,
-            billingCycle,
-            amount,
-            periodYear,
-            periodMonth,
-            dueDate,
-            status: "PENDING",
-          },
-        });
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-    try {
-      const moyasarInvoice = await createMoyasarInvoice({
-        secretKey: process.env.PLATFORM_MOYASAR_SECRET_KEY,
-        amountHalalas: toHalalas(amount),
-        description: `اشتراك بسطة مارت — ${formatPlatformCopy(planConfig.nameAr)} (${billingCycle === "yearly" ? "سنوي" : "شهري"}) — متجر ${subscription.store.nameAr}`,
-        successUrl: `${appUrl}/dashboard/subscription/return?invoiceId=${invoice.id}`,
-        metadata: { subscriptionInvoiceId: invoice.id, storeId, userId: user.id },
-      });
-
-      await prisma.subscriptionInvoice.update({
-        where: { id: invoice.id },
-        data: { moyasarTxnId: moyasarInvoice.id },
-      });
-
-      return NextResponse.json({ requiresPayment: true, invoiceId: invoice.id, paymentUrl: moyasarInvoice.url });
-
-    } catch (err) {
-      if (err instanceof MoyasarError) {
-        console.error("[Moyasar checkout failure]", {
-          errorName: err.name,
-          message: err.message,
-        });
-
-        return NextResponse.json(
-          { error: "تعذّر إنشاء عملية الدفع الآن — حاولي مجدداً" },
-          { status: 502 }
-        );
-      }
-      throw err;
-    }
+    return NextResponse.json(checkout);
   } catch (err) {
+    if (err instanceof SubscriptionCheckoutError) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
+    if (err instanceof MoyasarError) {
+      return NextResponse.json({ error: "تعذّر الوصول إلى بوابة الدفع الآن." }, { status: 502 });
+    }
     if (err instanceof AuthError) {
       return NextResponse.json(
         { error: err.message },

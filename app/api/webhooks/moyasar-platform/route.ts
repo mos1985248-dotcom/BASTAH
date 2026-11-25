@@ -5,6 +5,8 @@
 // لكن السرّ من env واحد بدل سرّ لكل تاجر.
 
 import { NextRequest, NextResponse } from "next/server";
+import { toHalalas } from "@/lib/moyasar";
+import { isMoyasarInvoiceReference } from "@/lib/subscription-invoice-reference";
 import { prisma } from "@/lib/prisma";
 import { verifyMoyasarSecretToken, registerWebhookEvent, markWebhookProcessed, markWebhookFailed } from "@/lib/webhook-security";
 import { applyMoyasarSubscriptionPaymentStatus } from "@/lib/subscription-payment";
@@ -33,7 +35,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "JSON غير صالح" }, { status: 400 });
   }
 
-  if (!payload.data?.id) {
+  if (!payload?.data?.id) {
     return NextResponse.json({ error: "بيانات الدفع غير مكتملة" }, { status: 400 });
   }
 
@@ -49,18 +51,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "secret_token غير صحيح" }, { status: 401 });
   }
 
-  // نعتمد invoice_id (موثَّق ومضمون على كائن الدفع) مع metadata كخط دفاع احتياطي
-  const invoiceMoyasarId = payload.data.invoice_id ?? null;
-  const metadataInvoiceId = payload.data.metadata?.subscriptionInvoiceId ?? null;
+  const invoiceMoyasarId = payload.data.invoice_id;
+  if (typeof invoiceMoyasarId !== "string" || !isMoyasarInvoiceReference(invoiceMoyasarId)) {
+    return NextResponse.json({ error: "معرّف فاتورة Moyasar غير موجود" }, { status: 400 });
+  }
 
   const invoice = await prisma.subscriptionInvoice.findFirst({
-    where: invoiceMoyasarId ? { moyasarTxnId: invoiceMoyasarId } : metadataInvoiceId ? { id: metadataInvoiceId } : undefined,
-    select: { id: true, subscription: { select: { storeId: true } } },
+    where: { moyasarTxnId: invoiceMoyasarId },
+    select: { id: true, amount: true, subscription: { select: { storeId: true } } },
   });
 
   if (!invoice) {
-    console.warn("[moyasar-platform-webhook-unmatched]", { invoiceMoyasarId, metadataInvoiceId, type: payload.type });
     return NextResponse.json({ error: "لا توجد فاتورة اشتراك مطابقة لهذا الحدث" }, { status: 404 });
+  }
+  if (["paid", "captured"].includes(payload.data.status) && payload.data.amount !== toHalalas(invoice.amount)) {
+    return NextResponse.json({ error: "مبلغ الدفع لا يطابق فاتورة الاشتراك" }, { status: 409 });
   }
 
   const registration = await registerWebhookEvent({
@@ -78,7 +83,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const result = await applyMoyasarSubscriptionPaymentStatus(invoice.id, payload.data.status);
+    const result = await applyMoyasarSubscriptionPaymentStatus(invoice.id, payload.data.status, invoiceMoyasarId);
     if (!result.applied) {
       await markWebhookFailed(registration.eventRecordId, "الفاتورة اختفت أثناء المعالجة");
       return NextResponse.json({ error: "الفاتورة غير موجودة" }, { status: 404 });

@@ -3,6 +3,7 @@
 // قراءة فقط — أي تغيير حالة/باقة يمر حصراً عبر checkout ثم webhook/verify-payment.
 
 import { NextResponse } from "next/server";
+import { isMoyasarInvoiceReference } from "@/lib/subscription-invoice-reference";
 import { prisma } from "@/lib/prisma";
 import { requireActiveStore, AuthError } from "@/lib/auth";
 
@@ -43,7 +44,10 @@ export async function GET() {
         pricePerMonth: subscription.pricePerMonth,
       },
       planConfig,
-      invoices: subscription.invoices,
+      invoices: subscription.invoices.map(invoice => ({
+        ...invoice,
+        moyasarTxnId: isMoyasarInvoiceReference(invoice.moyasarTxnId) ? invoice.moyasarTxnId : null,
+      })),
       store,
     });
   } catch (err) {

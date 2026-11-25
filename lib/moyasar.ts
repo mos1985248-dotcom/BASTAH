@@ -78,21 +78,24 @@ interface CreateInvoiceParams {
   amountHalalas: number; // Moyasar يتعامل بالهللة (1 ر.س = 100 هللة)
   description: string;
   successUrl: string;
+  expiresAt?: Date;
   metadata: Record<string, string>;
 }
 
 /** ينشئ فاتورة Moyasar (Invoice) — يرجع رابط صفحة الدفع المُستضافة للتوجيه إليه */
 export async function createMoyasarInvoice(params: CreateInvoiceParams): Promise<MoyasarInvoice> {
-  const { secretKey, amountHalalas, description, successUrl, metadata } = params;
+  const { secretKey, amountHalalas, description, successUrl, expiresAt, metadata } = params;
 
   const res = await fetch(`${MOYASAR_API}/invoices`, {
     method: "POST",
+    signal: expiresAt ? AbortSignal.timeout(10_000) : undefined,
     headers: { "Content-Type": "application/json", Authorization: authHeader(secretKey) },
     body: JSON.stringify({
       amount: amountHalalas,
       currency: "SAR",
       description,
       success_url: successUrl,
+      expired_at: expiresAt?.toISOString(),
       metadata,
     }),
   });
@@ -106,8 +109,9 @@ export async function createMoyasarInvoice(params: CreateInvoiceParams): Promise
 }
 
 /** يجلب فاتورة (وحالتها ودفعاتها) — يُستخدم للمصالحة عند تأخر الـwebhook */
-export async function fetchMoyasarInvoice(secretKey: string, invoiceId: string): Promise<MoyasarInvoice> {
-  const res = await fetch(`${MOYASAR_API}/invoices/${invoiceId}`, {
+export async function fetchMoyasarInvoice(secretKey: string, invoiceId: string, signal?: AbortSignal): Promise<MoyasarInvoice> {
+  const res = await fetch(`${MOYASAR_API}/invoices/${encodeURIComponent(invoiceId)}`, {
+    signal,
     headers: { Authorization: authHeader(secretKey) },
   });
   if (!res.ok) throw new MoyasarError("تعذّر جلب تفاصيل الفاتورة", res.status);

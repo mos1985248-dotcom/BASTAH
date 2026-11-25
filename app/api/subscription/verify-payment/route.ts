@@ -6,8 +6,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireActiveStore, AuthError } from "@/lib/auth";
-import { fetchMoyasarInvoice, MoyasarError } from "@/lib/moyasar";
+import { fetchMoyasarInvoice, MoyasarError, toHalalas } from "@/lib/moyasar";
 import { applyMoyasarSubscriptionPaymentStatus } from "@/lib/subscription-payment";
+import { isMoyasarInvoiceReference } from "@/lib/subscription-invoice-reference";
 import { z } from "zod";
 
 const bodySchema = z.object({ invoiceId: z.string().cuid() });
@@ -22,14 +23,14 @@ export async function POST(req: NextRequest) {
 
     const invoice = await prisma.subscriptionInvoice.findUnique({
       where: { id: parsed.data.invoiceId },
-      select: { id: true, status: true, moyasarTxnId: true, subscription: { select: { storeId: true, status: true, plan: true } } },
+      select: { id: true, status: true, amount: true, moyasarTxnId: true, subscription: { select: { storeId: true, status: true, plan: true } } },
     });
 
     if (!invoice || invoice.subscription.storeId !== storeId) {
       return NextResponse.json({ error: "الفاتورة غير موجودة" }, { status: 404 });
     }
 
-    if (invoice.status === "PAID" || !invoice.moyasarTxnId) {
+    if (invoice.status === "PAID" || !isMoyasarInvoiceReference(invoice.moyasarTxnId)) {
       return NextResponse.json({ invoiceStatus: invoice.status, subscriptionStatus: invoice.subscription.status, plan: invoice.subscription.plan });
     }
 
@@ -37,11 +38,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "بوابة دفع المنصة غير مُهيَّأة" }, { status: 503 });
     }
 
-    const moyasarInvoice = await fetchMoyasarInvoice(process.env.PLATFORM_MOYASAR_SECRET_KEY, invoice.moyasarTxnId);
+    const moyasarInvoice = await fetchMoyasarInvoice(process.env.PLATFORM_MOYASAR_SECRET_KEY, invoice.moyasarTxnId, AbortSignal.timeout(10_000));
+    if (moyasarInvoice.id !== invoice.moyasarTxnId || moyasarInvoice.currency !== "SAR" || moyasarInvoice.amount !== toHalalas(invoice.amount)) {
+      return NextResponse.json({ error: "بيانات فاتورة الدفع لا تطابق الاشتراك." }, { status: 409 });
+    }
     const latestPayment = moyasarInvoice.payments?.[moyasarInvoice.payments.length - 1];
-    const effectiveStatus = latestPayment?.status ?? moyasarInvoice.status;
+    const effectiveStatus = moyasarInvoice.status === "paid" ? "paid" : latestPayment?.status ?? moyasarInvoice.status;
+    if (moyasarInvoice.status !== "paid" && ["paid", "captured"].includes(effectiveStatus) &&
+      (latestPayment?.currency !== "SAR" || latestPayment.amount !== toHalalas(invoice.amount))) {
+      return NextResponse.json({ error: "مبلغ الدفع لا يطابق فاتورة الاشتراك." }, { status: 409 });
+    }
 
-    const result = await applyMoyasarSubscriptionPaymentStatus(invoice.id, effectiveStatus);
+    const result = await applyMoyasarSubscriptionPaymentStatus(invoice.id, effectiveStatus, invoice.moyasarTxnId);
 
     const fresh = await prisma.storeSubscription.findUnique({ where: { storeId }, select: { plan: true, status: true } });
     return NextResponse.json({
