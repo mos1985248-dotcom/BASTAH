@@ -8,6 +8,7 @@
 
 import { prisma } from "./prisma";
 import { ShippingService, resolveStoreShipping } from "./shipping/service";
+import { findBastahCity, normalizeCity } from "./shipping/bastah-cities";
 import { getBasitaShippingFee } from "./platform-settings";
 
 export interface ResolvedCheckoutItem {
@@ -128,8 +129,19 @@ export async function computeShippingCost(
   if (carrierLink) {
     try {
       const { carrier, credentials } = carrierLink;
-      const storeCity = (await prisma.store.findUnique({ where: { id: storeId }, select: { city: true } }))?.city ?? address.city;
-      const basitaFee = await getBasitaShippingFee();
+      const actualStoreCity = (await prisma.store.findUnique({ where: { id: storeId }, select: { city: true } }))?.city;
+      const storeCity = actualStoreCity ?? address.city;
+      const local = credentials.bastahLocal === "true";
+      if (local) {
+        if (!actualStoreCity || normalizeCity(actualStoreCity) !== normalizeCity(address.city)) throw new ShippingCalcError("بسطة للشحن متاحة للتوصيل داخل المدينة فقط", 422);
+        const city = await findBastahCity(address.city);
+        if (!city?.isActive) throw new ShippingCalcError("بسطة للشحن غير متاحة في هذه المدينة حالياً", 422);
+        const activeCouriers = await prisma.cityCourier.findMany({where:{isActive:true},select:{city:true}});
+        if (!activeCouriers.some(c=>normalizeCity(c.city)===normalizeCity(city.name))) throw new ShippingCalcError("لا يوجد مندوب نشط في هذه المدينة حالياً", 422);
+        credentials.flatFee = String(city.flatFee);
+        credentials.perKgFee = String(city.perKgFee);
+      }
+      const basitaFee = local ? 0 : await getBasitaShippingFee();
 
       const rate = await ShippingService.calculateRate(carrier as any, credentials, { originCity: storeCity, destCity: address.city, weightKg: totalWeightKg });
       const shippingCost = rate.carrierRate + basitaFee;
@@ -143,6 +155,7 @@ export async function computeShippingCost(
       });
       return { shippingCost, shippingRateLogId: logged.id };
     } catch (shippingErr) {
+      if (shippingErr instanceof ShippingCalcError) throw shippingErr;
       console.error("[checkout-carrier-rate-failed]", shippingErr);
       throw new ShippingCalcError("تعذّر حساب تكلفة الشحن من شركة الشحن — حاولي مجدداً لاحقاً", 502);
     }
