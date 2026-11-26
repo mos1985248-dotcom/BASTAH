@@ -15,7 +15,7 @@ export default function ProductToolsShowcase() {
       <div className={frame.card}>
         <header className={s.header}>
           <h2 id="product-tools-heading" className={daftari.title} style={{ fontFamily: t.typography.fontFamily.display }}>
-            أدوات التسعير والمخزون
+            التسعير والمخزون
           </h2>
           <a href="/dashboard/products" className={`${frame.cta} ${s.cta}`}>
             اذهب إلى منتجاتك
