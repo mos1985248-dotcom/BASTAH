@@ -150,7 +150,8 @@ export const imageProviders = {
     },
     async generate(model: string, prompt: string, size: ImageSize) {
       if (model !== pollinationsModel) throw new Error("UNSUPPORTED_MODEL");
-      const response = await fetch(pollinationsImageUrl(prompt), {
+      const seed = randomInt(1, 2_147_483_647);
+      const response = await fetch(pollinationsImageUrl(prompt, seed), {
         method: "GET", cache: "no-store", redirect: "error",
         headers: { Accept: "image/jpeg, image/png" }, signal: AbortSignal.timeout(30_000),
       });
@@ -174,7 +175,7 @@ export const imageProviders = {
       const buffer = await image.resize(width, height, { fit: "cover", position: "centre" })
         .webp({ quality: 89 }).toBuffer();
       if (buffer.length > 2_097_152) throw new Error("LARGE_IMAGE");
-      return { buffer, estimatedNeurons: 0 };
+      return { buffer, estimatedNeurons: 0, seed };
     },
   },
   cloudflare: {

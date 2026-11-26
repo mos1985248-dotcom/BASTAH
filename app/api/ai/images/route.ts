@@ -14,10 +14,10 @@ export async function GET() {
       imageQuota(storeId), studioSettings(),
       prisma.muniraImage.findMany({
         where: { scope: `store:${storeId}`, state: "COMPLETE", deletedAt: null },
-        select: { id: true, createdAt: true, saved: true }, orderBy: { createdAt: "desc" }, take: 100,
+        select: { id: true, createdAt: true, saved: true, generationInput: true, feedbackStatus: true, feedbackNote: true }, orderBy: { createdAt: "desc" }, take: 100,
       }),
     ]);
-    return Response.json({ quota, requiredPlan: await planDisplayName(quota.requiredPlan), enabled: config.enabled, images }, { headers });
+    return Response.json({ quota, requiredPlan: await planDisplayName(quota.requiredPlan), enabled: config.enabled, images: images.map(({ generationInput, ...image }) => ({ ...image, canRevise: generationInput !== null })) }, { headers });
   } catch (error) { return authErrorResponse(error); }
 }
 
