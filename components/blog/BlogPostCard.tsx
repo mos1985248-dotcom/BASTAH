@@ -19,8 +19,8 @@ export default function BlogPostCard({ post }: { post: BlogPostSummary }) {
       <div style={{ background: t.colors.white, borderRadius: t.radius.lg, overflow: "hidden", border: `1px solid ${t.colors.cream.border}` }}>
         <div
           style={{
-            height: 150,
-            background: post.coverImage ? `url(${post.coverImage}) center/cover` : `linear-gradient(135deg, ${t.colors.primary[700]}, ${t.colors.gold[600]})`,
+            aspectRatio: "16 / 9",
+            background: post.coverImage ? `url(${post.coverImage}) center/contain no-repeat` : `linear-gradient(135deg, ${t.colors.primary[700]}, ${t.colors.gold[600]})`,
           }}
         />
         <div style={{ padding: t.spacing["4"] }}>
