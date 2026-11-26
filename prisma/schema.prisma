@@ -2264,6 +2264,10 @@ model MuniraImage {
   estimatedNeurons Int?
   error       String?
   objectPath  String?
+  generationInput Json?
+  feedbackStatus String?
+  feedbackNote String?
+  feedbackAt DateTime?
   saved       Boolean  @default(false)
   deletedAt   DateTime?
   createdAt   DateTime @default(now())

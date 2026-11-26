@@ -32,6 +32,31 @@ export const imageInput = z.object({
   size: z.enum(["square", "portrait", "landscape"]),
 }).strict();
 type ImageInput = z.infer<typeof imageInput>;
+const recordedInput = imageInput.omit({ requestId: true });
+export const imageFeedback = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("MATCHED"), note: z.string().trim().max(240).optional() }),
+  z.object({ status: z.literal("NEEDS_EDIT"), note: z.string().trim().min(3).max(240) }),
+]);
+
+export async function saveImageFeedback(scope: string, id: string, input: z.infer<typeof imageFeedback>) {
+  const note = redactPrompt(input.note ?? "").trim();
+  if (note && !sanitizeUserInput(note).safe) throw new AuthError("راجع الملاحظة وحاول مجددًا.", 400);
+  const result = await prisma.muniraImage.updateMany({
+    where: { id, scope, state: "COMPLETE", deletedAt: null },
+    data: { feedbackStatus: input.status, feedbackNote: note || null, feedbackAt: new Date() },
+  });
+  if (!result.count) throw new AuthError("الصورة غير موجودة.", 404);
+  return note;
+}
+
+export async function reviseStudioImage(storeId: string, id: string, requestId: string, reason: string) {
+  const scope = `store:${storeId}`;
+  const source = await ownedStudioImage(scope, id);
+  const original = recordedInput.safeParse(source.generationInput);
+  if (!original.success) throw new AuthError("هذه الصورة أقدم من سجل الأوصاف. اكتب وصفًا جديدًا لإنشاء صورة أخرى.", 409);
+  const note = await saveImageFeedback(scope, id, { status: "NEEDS_EDIT", note: reason });
+  return generateStudioImage(scope, { ...original.data, requestId }, storeId, undefined, undefined, { id, note });
+}
 
 export async function studioSettings() {
   const setting = await prisma.platformSetting.findUnique({ where: { key: imageSettingsKey } });
@@ -68,14 +93,16 @@ export function acceptsManualFreeEvidence(diagnostic: ReturnType<typeof safeClou
 }
 
 export async function generateStudioImage(scope: string, input: ImageInput, storeId?: string, testModel?: string,
-  manualTest?: { adminId: string; accountId: string }) {
+  manualTest?: { adminId: string; accountId: string }, revision?: { id: string; note: string }) {
   const manualDeadline = Date.now() + 60_000;
   if (manualTest && (storeId || scope !== `admin:${manualTest.adminId}` || testModel !== fluxModel ||
       manualTest.accountId.toLowerCase() !== process.env.CLOUDFLARE_ACCOUNT_ID?.trim().toLowerCase())) {
     throw new AuthError("معرّف الحساب لا يطابق حساب Cloudflare في بيئة النشر.", 400);
   }
   const clean = redactPrompt(input.prompt);
-  const inputHash = createHash("sha256").update(JSON.stringify([input.prompt, input.kind, input.size, testModel ?? null])).digest("hex");
+  const hashParts = [input.prompt, input.kind, input.size, testModel ?? null];
+  if (revision) hashParts.push(revision.id, revision.note);
+  const inputHash = createHash("sha256").update(JSON.stringify(hashParts)).digest("hex");
   if (!sanitizeUserInput(clean).safe || clean.length > 800 ||
     /(?:child\s*(?:porn|sexual)|sexual\s*(?:image\s+of\s+a\s+)?(?:minor|child)|إباحي.{0,20}(?:طفل|قاصر)|(?:طفل|قاصر).{0,20}إباحي)/iu.test(clean)) throw new AuthError("راجع وصف الصورة وحاول مجددًا.", 400);
   const key = { scope, requestId: input.requestId };
@@ -177,7 +204,15 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
       }
     }
     let prompt = `${imageKinds[input.kind]}. ${clean}`;
+    if (revision) prompt += `\nTargeted correction for the next image: ${revision.note}. Preserve other requested elements.`;
     if (usesPollinations) {
+      const preferences = storeId && !revision ? await prisma.muniraImage.findMany({
+        where: { scope, state: "COMPLETE", deletedAt: null, feedbackStatus: "MATCHED", feedbackNote: { not: null } },
+        orderBy: { feedbackAt: "desc" }, take: 3, select: { feedbackNote: true, generationInput: true },
+      }) : [];
+      const relevant = preferences.filter(item => recordedInput.safeParse(item.generationInput).data?.kind === input.kind)
+        .map(item => item.feedbackNote).filter(Boolean);
+      if (relevant.length) prompt += `\nOptional store preferences, use only if relevant and compatible with the current request: ${relevant.join("; ")}`;
       const answer = await freeAnswer({
         system: [
           "Rewrite the request as one concise English prompt for a realistic commercial product photograph.",
@@ -203,6 +238,9 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
     uploaded = true;
     await prisma.muniraImage.update({ where: { id: reservation.id }, data: {
       state: "COMPLETE", objectPath, estimatedNeurons: image.estimatedNeurons,
+      generationInput: { prompt: clean, kind: input.kind, size: input.size, finalPrompt: prompt,
+        ...(revision && { sourceId: revision.id, correction: revision.note }),
+        ...("seed" in image && typeof image.seed === "number" && { seed: image.seed }) },
     } });
     return reservation.id;
   } catch (failure) {

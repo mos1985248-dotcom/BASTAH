@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
 import { imageKinds, imageSizes } from "@/lib/munira/image-options";
+import { productImageTemplates } from "@/lib/munira/image-templates";
 import { uiVars } from "@/components/ui/vars";
 import f from "./forms.module.css";
 import s from "./munira-studio.module.css";
 
 type Quota = { allowed: boolean; limit: number; used: number; remaining: number; resetAt: string };
 type Studio = {
-  quota: Quota; requiredPlan: string | null; enabled: boolean; images: { id: string; createdAt: string; saved: boolean }[];
+  quota: Quota; requiredPlan: string | null; enabled: boolean; images: { id: string; createdAt: string; saved: boolean; canRevise: boolean; feedbackStatus: string | null; feedbackNote: string | null }[];
 };
 const endpoint = "/api/ai/images";
 const date = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Riyadh", dateStyle: "medium" });
@@ -26,6 +27,10 @@ export default function MuniraImageStudio({ initialPrompt = "", onUse, storeSlug
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const [feedbackDraft, setFeedbackDraft] = useState("");
+  const [feedbackMode, setFeedbackMode] = useState<"MATCHED" | "NEEDS_EDIT" | null>(null);
+  const revisionTicket = useRef<{ key: string; requestId: string }>();
+  const selectedImage = state?.images.find(item => item.id === current);
   const ticket = useRef<{ hash: string; id: string }>();
   const load = async () => setState(await api.get<Studio>(endpoint));
   useEffect(() => { load().catch(() => setError("تعذّر تحميل استوديو منيرة.")); }, []);
@@ -47,12 +52,46 @@ export default function MuniraImageStudio({ initialPrompt = "", onUse, storeSlug
       ticket.current = { hash, id: requestId };
       try {
         const result = await api.post<{ id: string; quota: Quota }>(endpoint, { requestId, prompt, kind, size });
-        setCurrent(result.id);
+        selectImage(result.id);
         setState(previous => previous && { ...previous, quota: result.quota });
         ticket.current = undefined;
         await load();
       } catch (error) {
         if (error instanceof Error && "status" in error) ticket.current = undefined;
+        throw error;
+      }
+    });
+  }
+
+  function selectImage(id: string | null) {
+    setCurrent(id);
+    setFeedbackMode(null);
+    setFeedbackDraft("");
+  }
+
+  async function submitFeedback(regenerate: boolean) {
+    if (!current || !feedbackMode) return;
+    const feedbackUrl = `${endpoint}/${current}/feedback`;
+    await perform(async () => {
+      if (!regenerate) {
+        await api.patch(feedbackUrl, { status: feedbackMode, note: feedbackDraft });
+        await load();
+        setFeedbackMode(null);
+        setNotice("حُفظ تقييم الصورة.");
+        return;
+      }
+      const reason = feedbackDraft.trim();
+      const key = JSON.stringify([current, reason]);
+      const requestId = revisionTicket.current?.key === key ? revisionTicket.current.requestId : crypto.randomUUID();
+      revisionTicket.current = { key, requestId };
+      try {
+        const result = await api.post<{ id: string; quota: Quota }>(feedbackUrl, { requestId, reason });
+        revisionTicket.current = undefined;
+        selectImage(result.id);
+        setState(previous => previous && { ...previous, quota: result.quota });
+        await load();
+      } catch (error) {
+        if (error instanceof Error && "status" in error) revisionTicket.current = undefined;
         throw error;
       }
     });
@@ -95,6 +134,13 @@ export default function MuniraImageStudio({ initialPrompt = "", onUse, storeSlug
       : !state.enabled ? <p role="status">استوديو منيرة متوقف مؤقتًا.</p>
       : state.quota.remaining === 0 ? <p role="status">استُهلكت حصة الصور حتى موعد التجدد.</p>
       : <form onSubmit={generate} className={s.fields}>
+        <div>
+          <strong>قوالب تصوير المنتجات</strong>
+          <div className={s.actions} aria-label="قوالب تصوير المنتجات">
+            {productImageTemplates.map(template => <button key={template.id} type="button" className={f.btnSm}
+              disabled={busy} onClick={() => { setPrompt(template.prompt); setKind("product"); }}>{template.label}</button>)}
+          </div>
+        </div>
         <label className={f.fieldWrap}><span className={f.fieldLabel}>وصف الصورة</span>
           <textarea className={f.field} rows={4} value={prompt} minLength={3} maxLength={800} onChange={event => setPrompt(event.target.value)} required />
         </label>
@@ -125,11 +171,39 @@ export default function MuniraImageStudio({ initialPrompt = "", onUse, storeSlug
             {onUse ? "استخدام الصورة في المنتج" : "استخدام الصورة غلافًا للمتجر"}
           </button>}
         </div>
+        <div className={s.fields} aria-label="تقييم الصورة">
+          {selectedImage?.feedbackStatus && <small>
+            التقييم {selectedImage.feedbackStatus === "MATCHED" ? "مطابقة" : "تحتاج تعديل"}
+          </small>}
+          <div className={s.actions}>
+            <button type="button" className={f.btnSm} disabled={busy} onClick={() => {
+              setFeedbackMode("MATCHED");
+              setFeedbackDraft(selectedImage?.feedbackStatus === "MATCHED" ? selectedImage.feedbackNote ?? "" : "");
+            }}>مطابقة</button>
+            <button type="button" className={f.btnSm} disabled={busy} onClick={() => {
+              setFeedbackMode("NEEDS_EDIT");
+              setFeedbackDraft(selectedImage?.feedbackStatus === "NEEDS_EDIT" ? selectedImage.feedbackNote ?? "" : "");
+            }}>تحتاج تعديل</button>
+          </div>
+          {feedbackMode && <>
+            <label className={f.fieldWrap}><span className={f.fieldLabel}>
+              {feedbackMode === "MATCHED" ? "ما أعجبك في الصورة؟ اختياري، يُستخدم في طلبات متجرك" : "ما الذي تريد تعديله؟"}
+            </span><textarea className={f.field} rows={2} maxLength={240} value={feedbackDraft}
+              onChange={event => setFeedbackDraft(event.target.value)} disabled={busy} /></label>
+            <div className={s.actions}>
+              <button type="button" className={f.btnSm} disabled={busy || (feedbackMode === "NEEDS_EDIT" && feedbackDraft.trim().length < 3)}
+                onClick={() => void submitFeedback(false)}>حفظ التقييم</button>
+              {feedbackMode === "NEEDS_EDIT" && selectedImage?.canRevise && state.enabled && state.quota.allowed && state.quota.remaining > 0 &&
+                <button type="button" className={f.btnSm} disabled={busy || feedbackDraft.trim().length < 3}
+                  onClick={() => void submitFeedback(true)}>إعادة التوليد بالتعديل</button>}
+            </div>
+          </>}
+        </div>
       </section>}
       <section><h3>صوري</h3>
         {state.images.some(image => !image.saved) && <p>تظهر الصور التي لم تحفظها بعد بعلامة «مسودة».</p>}
         {state.images.length ? <ul className={s.gallery}>{state.images.map(image => <li key={image.id}>
-          <button type="button" onClick={() => setCurrent(image.id)}>
+          <button type="button" onClick={() => selectImage(image.id)}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`${endpoint}/${image.id}`} loading="lazy" alt="معاينة الصورة المحفوظة" />
           </button>
@@ -138,7 +212,7 @@ export default function MuniraImageStudio({ initialPrompt = "", onUse, storeSlug
           <button type="button" className={f.btnSm} disabled={busy} onClick={() => {
             if (window.confirm("حذف الصورة من مكتبتك؟")) void perform(async () => {
               await api.delete(`${endpoint}/${image.id}`);
-              if (current === image.id) setCurrent(null);
+              if (current === image.id) selectImage(null);
               await load();
             });
           }}>حذف</button>
