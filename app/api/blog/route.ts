@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { blogCoverImage } from "@/lib/blog-covers";
 import { z } from "zod";
 
 const queryParamsSchema = z.object({
@@ -49,7 +50,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     return NextResponse.json({
-      posts,
+      posts: posts.map((post) => ({ ...post, coverImage: blogCoverImage(post.slug, post.coverImage) })),
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   } catch (err) {

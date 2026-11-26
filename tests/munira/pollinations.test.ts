@@ -58,3 +58,25 @@ test("Pollinations trims the branded bottom strip while preserving clean images"
   assert.ok((await bottomPixel(true))[1] > 240);
   assert.ok((await bottomPixel(false))[1] < 20);
 });
+
+test("Pollinations requests and returns the exact preset dimensions", async t => {
+  const fixture = await sharp({ create: { width: 32, height: 32, channels: 3, background: "white" } }).png().toBuffer();
+  const original = globalThis.fetch;
+  t.after(() => { globalThis.fetch = original; });
+  const presets = [
+    ["product", 1200, 1200], ["store_logo", 1024, 1024], ["store_cover", 1800, 600],
+    ["square_ad", 1080, 1080], ["story_ad", 1080, 1920],
+  ] as const;
+  for (const [kind, width, height] of presets) {
+    globalThis.fetch = async (input) => {
+      const url = new URL(String(input));
+      assert.equal(url.searchParams.get("width"), String(width));
+      assert.equal(url.searchParams.get("height"), String(height));
+      return new Response(new Uint8Array(fixture), { headers: { "Content-Type": "image/png" } });
+    };
+    const generated = await imageProviders.pollinations.generate("flux", "Example", kind);
+    const output = await sharp(generated.buffer).metadata();
+    assert.equal(output.width, width);
+    assert.equal(output.height, height);
+  }
+});

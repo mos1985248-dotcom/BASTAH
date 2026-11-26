@@ -7,6 +7,7 @@
 import type { Metadata } from "next";
 import { formatPlatformCopy } from "@/lib/brand";
 import { prisma } from "@/lib/prisma";
+import { blogCoverImage } from "@/lib/blog-covers";
 import BlogPostClient from "@/components/blog/BlogPostClient";
 
 interface Props {
@@ -25,6 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const description = formatPlatformCopy(post.excerptAr ?? "مقال من مدونة بسطة مارت — منصة الأسر المنتجة السعودية");
 
+  const coverImage = blogCoverImage(params.slug, post.coverImage);
+
   return {
     title: `${formatPlatformCopy(post.titleAr)} | مدونة بسطة مارت`,
     description,
@@ -32,7 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: "بسطة مارت",
       title: formatPlatformCopy(post.titleAr),
       description,
-      images: post.coverImage ? [post.coverImage] : undefined,
+      images: coverImage ? [coverImage] : undefined,
       type: "article",
     },
   };

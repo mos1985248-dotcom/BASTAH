@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
-import { imageKinds, imageSizes } from "@/lib/munira/image-options";
+import { imageKinds, imagePresets, imageSizes, isImagePreset, type ImagePreset } from "@/lib/munira/image-options";
 import { productImageTemplates } from "@/lib/munira/image-templates";
 import { uiVars } from "@/components/ui/vars";
 import f from "./forms.module.css";
@@ -21,8 +21,9 @@ export default function MuniraImageStudio({ initialPrompt = "", onUse, storeSlug
 }) {
   const [state, setState] = useState<Studio | null>(null);
   const [prompt, setPrompt] = useState(initialPrompt.slice(0, 800));
-  const [kind, setKind] = useState<keyof typeof imageKinds>("product");
+  const [kind, setKind] = useState<keyof typeof imageKinds | ImagePreset>("product");
   const [size, setSize] = useState<keyof typeof imageSizes>("square");
+  const preset = isImagePreset(kind) ? imagePresets[kind] : null;
   const [current, setCurrent] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -147,13 +148,16 @@ export default function MuniraImageStudio({ initialPrompt = "", onUse, storeSlug
         <div className={s.options}>
           <label className={f.fieldWrap}><span className={f.fieldLabel}>نوع الصورة</span>
             <select className={f.field} value={kind} onChange={event => setKind(event.target.value as typeof kind)}>
-              {Object.entries(imageKinds).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              {Object.entries(imagePresets).map(([key, option]) => <option key={key} value={key}>{option.label}</option>)}
+              {Object.entries(imageKinds).filter(([key]) => key !== "product" && key !== "cover").map(([key, label]) => (
+                <option key={key} value={key}>{label}</option>
+              ))}
             </select>
           </label>
           <label className={f.fieldWrap}><span className={f.fieldLabel}>المقاس</span>
-            <select className={f.field} value={size} onChange={event => setSize(event.target.value as typeof size)}>
+            {preset ? <output className={s.fixedSize} dir="ltr">{preset.width} × {preset.height}</output> : <select className={f.field} value={size} onChange={event => setSize(event.target.value as typeof size)}>
               {Object.entries(imageSizes).map(([key, option]) => <option key={key} value={key}>{option.label}</option>)}
-            </select>
+            </select>}
           </label>
         </div>
         <p>استخدم الصور التي تعكس المنتج الحقيقي، وتجنّب المعلومات الشخصية أو المضللة.</p>
