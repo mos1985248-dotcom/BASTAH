@@ -13,6 +13,7 @@ import ErrorState from "@/components/admin/ui/ErrorState";
 import PlatformCarrierCard, { PlatformCarrier } from "@/components/admin/shipping/PlatformCarrierCard";
 import CustomProviderCard, { CustomProvider } from "@/components/admin/shipping/CustomProviderCard";
 import AddCustomProviderForm from "@/components/admin/shipping/AddCustomProviderForm";
+import BastahCitiesManager from "@/components/admin/shipping/BastahCitiesManager";
 import CouriersManager from "@/components/admin/shipping/CouriersManager";
 import CourierShipmentsList from "@/components/admin/shipping/CourierShipmentsList";
 import ShippingWithDues from "@/components/admin/finance/ShippingWithDues";
@@ -71,6 +72,7 @@ function ShippingProvidersContent() {
           ))}
         </div>
         <AddCustomProviderForm onAdded={load} />
+        {customProviders.some(p=>p.carrierKey==="BASTHA") && <div style={{marginTop:16}}><BastahCitiesManager /></div>}
       </section>
 
       <section>
