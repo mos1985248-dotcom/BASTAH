@@ -142,7 +142,63 @@ export function pollinationsImageUrl(prompt: string, seed = randomInt(1, 2_147_4
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?model=flux&width=1024&height=1024&nologo=true&seed=${seed}`;
 }
 
+export const openRouterImageModel = "recraft/recraft-v4.1-flash-v2:free";
+export const openRouterImageSunset = Date.parse("2026-11-28T00:00:00Z");
+
+async function openRouterJson(path: string, key: string, init?: RequestInit) {
+  const response = await fetch("https://openrouter.ai/api/v1/" + path, {
+    ...init, cache: "no-store", redirect: "error",
+    headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+    signal: AbortSignal.timeout(init?.method === "POST" ? 30000 : 5000),
+  });
+  if (!response.ok) throw new Error("HTTP_" + response.status);
+  return JSON.parse((await readBounded(response.body, init?.method === "POST" ? 12_000_000 : 4_000_000)).toString());
+}
+
+const freeImageEndpoint = z.object({
+  provider_slug: z.string().regex(/^[a-z0-9-]+$/),
+  provider_tag: z.string().regex(/^[a-z0-9-]+$/),
+  pricing: z.array(z.object({ billable: z.string(), cost_usd: z.literal(0) })).min(1),
+});
+async function verifyOpenRouterImage(model: string) {
+  if (model !== openRouterImageModel || Date.now() >= openRouterImageSunset) throw new Error("MODEL_NOT_FREE");
+  const key = process.env.MUNIRA_OPENROUTER_API_KEY?.trim();
+  if (!key) throw new Error("OPENROUTER_KEY_MISSING");
+  const account = await openRouterJson("key", key);
+  if (account.data?.is_free_tier !== true || account.data?.is_management_key === true) throw new Error("BILLING_UNVERIFIED");
+  const catalog = await openRouterJson("images/models", key);
+  if (!Array.isArray(catalog.data) || !catalog.data.some((entry: { id?: string; architecture?: { output_modalities?: string[] } }) =>
+    entry.id === model && entry.architecture?.output_modalities?.includes("image"))) throw new Error("MODEL_NOT_FREE");
+  const endpoint = await openRouterJson("images/models/" + model + "/endpoints", key);
+  const parsed = z.object({ id: z.literal(model), endpoints: z.array(freeImageEndpoint).min(1) }).safeParse(endpoint);
+  if (!parsed.success || !parsed.data.endpoints.every(e => e.pricing.some(p => p.billable === "output_image"))) throw new Error("MODEL_NOT_FREE");
+  return { key, provider: parsed.data.endpoints[0].provider_tag };
+}
+
 export const imageProviders = {
+  openrouter: {
+    models: [openRouterImageModel] as readonly string[],
+    async verify() { /* Verification occurs immediately before dispatch in generate. */ },
+    async generate(model: string, prompt: string, size: ImageSize) {
+      const { key, provider } = await verifyOpenRouterImage(model);
+      const result = await openRouterJson("images", key, {
+        method: "POST", body: JSON.stringify({
+          model, prompt, n: 1, aspect_ratio: size === "square" ? "1:1" : size === "portrait" ? "4:5" : "16:9",
+          provider: { only: [provider], allow_fallbacks: false },
+        }),
+      });
+      if (result.usage?.cost !== 0) throw new Error("COST_UNVERIFIED");
+      const data = result.data?.[0]?.b64_json;
+      if (typeof data !== "string" || data.length > 10_000_000 || !/^[A-Za-z0-9+/]+={0,2}$/.test(data)) throw new Error("INVALID_IMAGE");
+      const image = sharp(Buffer.from(data, "base64"), { limitInputPixels: 4_194_304, failOn: "error" });
+      const info = await image.metadata();
+      if (!info.width || !info.height || !["jpeg", "png", "webp"].includes(info.format ?? "") || (info.pages ?? 1) > 1) throw new Error("INVALID_IMAGE");
+      const { width, height } = imageSizes[size];
+      const buffer = await image.resize(width, height, { fit: "cover" }).webp({ quality: 90 }).toBuffer();
+      if (buffer.length > 2_097_152) throw new Error("LARGE_IMAGE");
+      return { buffer, estimatedNeurons: 0 };
+    },
+  },
   pollinations: {
     models: [pollinationsModel] as readonly string[],
     async verify() {
