@@ -3,6 +3,7 @@ import { t } from "@/theme";
 import { uiVars } from "@/components/ui/vars";
 import frame from "./munira.module.css";
 import s from "./product-tools.module.css";
+import daftari from "./daftari.module.css";
 
 export default function ProductToolsShowcase() {
   return (
@@ -13,8 +14,8 @@ export default function ProductToolsShowcase() {
     >
       <div className={frame.card}>
         <header className={s.header}>
-          <h2 id="product-tools-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
-            تسعير المنتجات وتسجيل المخزون
+          <h2 id="product-tools-heading" className={daftari.title} style={{ fontFamily: t.typography.fontFamily.display }}>
+            أدوات التسعير والمخزون
           </h2>
           <a href="/dashboard/products" className={`${frame.cta} ${s.cta}`}>
             اذهب إلى منتجاتك
