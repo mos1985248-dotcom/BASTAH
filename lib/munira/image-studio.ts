@@ -9,14 +9,14 @@ import { quotaWindow } from "./quota";
 import { redactPrompt } from "./context";
 import { sanitizeUserInput } from "./security";
 import { fluxModel, imageKinds, imageSizes } from "./image-options";
-import { busyImageMessage, imageBudget, imageProviders, logCloudflare, pollinationsCooldownMs, pollinationsModel, reservedNeurons, safeCloudflareDiagnostic } from "./image-provider";
+import { busyImageMessage, imageBudget, imageProviders, openRouterImageModel, logCloudflare, pollinationsCooldownMs, pollinationsModel, reservedNeurons, safeCloudflareDiagnostic } from "./image-provider";
 
 export const imageSettingsKey = "munira.image-studio";
 export const studioBucket = "munira-private";
 export const imageConfigSchema = z.object({
   enabled: z.boolean(),
   models: z.array(z.object({
-    provider: z.enum(["cloudflare", "pollinations"]), model: z.string().max(160),
+    provider: z.enum(["cloudflare", "pollinations", "openrouter"]), model: z.string().max(160),
     enabled: z.boolean(), priority: z.number().int().min(1).max(1000),
   })).max(10),
 }).superRefine(({ models }, context) => {
@@ -60,11 +60,14 @@ export async function reviseStudioImage(storeId: string, id: string, requestId: 
 
 export async function studioSettings() {
   const setting = await prisma.platformSetting.findUnique({ where: { key: imageSettingsKey } });
-  if (!setting) return { enabled: false, models: [{ provider: "cloudflare" as const, model: fluxModel, enabled: false, priority: 1 }, { provider: "pollinations" as const, model: pollinationsModel, enabled: false, priority: 2 }] };
+  if (!setting) return { enabled: false, models: [{ provider: "cloudflare" as const, model: fluxModel, enabled: false, priority: 1 }, { provider: "pollinations" as const, model: pollinationsModel, enabled: false, priority: 2 }, { provider: "openrouter" as const, model: openRouterImageModel, enabled: false, priority: 3 }] };
   try {
     const config = imageConfigSchema.parse(JSON.parse(setting.value));
     if (!config.models.some(row => row.provider === "pollinations") && config.models.length < 10) {
       config.models.push({ provider: "pollinations", model: pollinationsModel, enabled: false, priority: 2 });
+    }
+    if (!config.models.some(row => row.provider === "openrouter") && config.models.length < 10) {
+      config.models.push({ provider: "openrouter", model: openRouterImageModel, enabled: false, priority: 3 });
     }
     return config;
   }
@@ -125,6 +128,7 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
   if (!model) throw new AuthError(busyImageMessage, 503);
   const provider = imageProviders[model.provider];
   const usesPollinations = model.provider === "pollinations";
+  const usesCloudflare = model.provider === "cloudflare";
 
   const reservation = await prisma.$transaction(async tx => {
     await tx.$queryRaw`SELECT 1 FROM pg_advisory_xact_lock(441298117)`;
@@ -153,7 +157,7 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
     })) {
       throw new AuthError("بلغ مولّد الصور المجاني حد الطلبات. حاول بعد قليل، لم تُخصم صورة.", 429);
     }
-    if (!usesPollinations) {
+    if (usesCloudflare) {
       const budget = await tx.muniraImage.aggregate({
         where: { provider: model.provider, createdAt: { gte: new Date(now.getTime() - 86_400_000) } }, _sum: { neurons: true },
       });
@@ -173,7 +177,7 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
     }
     const row = await tx.muniraImage.create({ data: {
       ...key, inputHash, window, day, plan: access?.plan, provider: model.provider, model: model.model,
-      state: "PENDING", neurons: usesPollinations ? 0 : reservedNeurons,
+      state: "PENDING", neurons: usesCloudflare ? reservedNeurons : 0,
     } });
     return { id: row.id, replayed: false };
   }, { maxWait: 3_000, timeout: 10_000 }).catch((error: unknown) => {
@@ -250,8 +254,8 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
       : dispatched ? "GENERATION_FAILED" : "UNEXPECTED_RESPONSE";
     const diagnostic = safeCloudflareDiagnostic(failure, localFailure);
     if (usesPollinations) console.warn("[MUNIRA-POLLINATIONS]", { code: diagnostic.code });
-    else if (dispatched) logCloudflare(diagnostic.code === "STORAGE_FAILURE" ? "storage" : "generation", diagnostic);
-    await prisma.muniraImage.update({ where: { id: reservation.id }, data: { state: "FAILED", error: diagnostic.code, ...(!dispatched && { neurons: 0 }) } });
+    else if (usesCloudflare && dispatched) logCloudflare(diagnostic.code === "STORAGE_FAILURE" ? "storage" : "generation", diagnostic);
+    await prisma.muniraImage.update({ where: { id: reservation.id }, data: { state: "FAILED", error: model.provider === "openrouter" && failure instanceof Error && /^(MODEL_NOT_FREE|BILLING_UNVERIFIED|OPENROUTER_KEY_MISSING|COST_UNVERIFIED|HTTP_\d{3})$/.test(failure.message) ? failure.message : diagnostic.code, ...(!dispatched && { neurons: 0 }) } });
     if (usesPollinations && diagnostic.code === "HTTP_429") {
       throw new AuthError("مولّد الصور المجاني بلغ حد الطلبات. حاول بعد قليل، لم تُخصم صورة.", 429);
     }
