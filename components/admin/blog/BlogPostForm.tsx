@@ -146,7 +146,6 @@ export default function BlogPostForm({
             borderColor: t.colors.cream.border,
             direction: "ltr",
             textAlign: "left",
-            fontFamily: "monospace",
           }}
           value={form.slug}
           onChange={(e) => onChange({ slug: e.target.value })}

@@ -1,249 +1,79 @@
-// components/admin/AnalyticsTab.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { Banknote, CalendarDays, CircleDollarSign, Clock3, CreditCard, Cpu, Package, Store, TrendingDown, WalletCards } from "lucide-react";
 import { api } from "@/lib/api-client";
-import { t } from "@/theme";
-import StatCard from "./StatCard";
+import KpiCard from "./ui/KpiCard";
+import LoadingState from "./ui/LoadingState";
+import ErrorState from "./ui/ErrorState";
+import EmptyState from "./ui/EmptyState";
+import styles from "./admin.module.css";
+
+type Analytics = {
+  gmv: { thisMonth: number; allTime: number };
+  mrr: number;
+  arr: number;
+  failedPayments: { count: number; amount: number };
+  activeSellers: number;
+  churnedThisMonth: number;
+  orders: { thisMonth: number; pending: number };
+  aiCostUsd30d: number;
+  planDistribution: { plan: string; count: number }[];
+};
+
+const planLabels: Record<string, string> = {
+  FREE: "بسطة بداية",
+  STARTER: "بسطة نمو",
+  GROWTH: "بسطة انطلاق",
+  PRO: "بسطة ازدهار",
+};
+const number = new Intl.NumberFormat("ar-SA");
+const money = (value: number) => `${number.format(value ?? 0)} ر.س`;
 
 export default function AnalyticsTab() {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<Analytics | null>(null);
   const [error, setError] = useState(false);
 
-  useEffect(() => {
-    api
-      .get<any>("/api/admin/analytics")
-      .then(setData)
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return (
-      <div
-        style={{
-          minHeight: 180,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: t.colors.text.mid,
-          fontSize: t.typography.fontSize.sm,
-        }}
-      >
-        جاري التحميل...
-      </div>
-    );
+  function load() {
+    setError(false);
+    api.get<Analytics>("/api/admin/analytics").then(setData).catch(() => setError(true));
   }
 
-  if (error) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          minHeight: 120,
-          padding: "20px",
-          borderRadius: t.radius.md,
-          background: t.colors.cream.bg,
-          border: `1px solid ${t.colors.cream.border}`,
-          color: t.colors.semantic.danger,
-          fontSize: t.typography.fontSize.sm,
-        }}
-      >
-        <AlertTriangle size={16} strokeWidth={1.8} />
-        <span>تعذّر تحميل الإحصاءات، حاول تحديث الصفحة</span>
-      </div>
-    );
-  }
+  useEffect(load, []);
 
-  if (!data) return null;
-
-  const PLAN_COLORS: Record<string, string> = {
-    FREE: t.colors.text.light,
-    STARTER: t.colors.gold[600],
-    GROWTH: t.colors.primary[600],
-    PRO: t.colors.primary[800],
-  };
-
-  const gridStyle = {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-    gap: t.spacing["3"],
-  };
-
-  const sectionStyle = {
-    display: "flex",
-    flexDirection: "column" as const,
-    gap: t.spacing["3"],
-  };
-
-  const sectionTitle = {
-    margin: 0,
-    fontSize: t.typography.fontSize.sm,
-    fontWeight: t.typography.fontWeight.bold,
-    color: t.colors.text.mid,
-    lineHeight: 1.5,
-  };
+  if (error) return <ErrorState message="تعذّر تحميل الإحصاءات." onRetry={load} />;
+  if (!data) return <LoadingState label="جارٍ تحميل الإحصاءات…" />;
 
   return (
-    <div
-      dir="rtl"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: t.spacing["5"],
-        width: "100%",
-      }}
-    >
-      {/* الإيرادات */}
-      <section style={sectionStyle}>
-        <h3 style={sectionTitle}>الإيرادات</h3>
-
-        <div style={gridStyle}>
-          <StatCard
-            label="GMV هذا الشهر"
-            value={`${(data.gmv.thisMonth ?? 0).toLocaleString("ar")} ر.س`}
-          />
-
-          <StatCard
-            label="GMV الكلي"
-            value={`${(data.gmv.allTime ?? 0).toLocaleString("ar")} ر.س`}
-          />
-
-          <StatCard
-            label="MRR"
-            value={`${(data.mrr ?? 0).toLocaleString("ar")} ر.س`}
-            color={t.colors.semantic.success}
-          />
-
-          <StatCard
-            label="ARR"
-            value={`${(data.arr ?? 0).toLocaleString("ar")} ر.س`}
-          />
-
-          <StatCard
-            label="مدفوعات فاشلة"
-            value={data.failedPayments.count}
-            sub={`${(data.failedPayments.amount ?? 0).toFixed(0)} ر.س`}
-            color={t.colors.semantic.danger}
-          />
+    <div className={styles.overview}>
+      <section className={styles.overviewSection} aria-labelledby="admin-revenue">
+        <h2 id="admin-revenue" className={styles.sectionTitle}>الإيرادات</h2>
+        <div className={styles.overviewGrid}>
+          <KpiCard icon={Banknote} label="قيمة المبيعات هذا الشهر" value={money(data.gmv.thisMonth)} />
+          <KpiCard icon={WalletCards} label="إجمالي قيمة المبيعات" value={money(data.gmv.allTime)} />
+          <KpiCard icon={CalendarDays} label="إيراد الاشتراكات الشهري" value={money(data.mrr)} tone="success" />
+          <KpiCard icon={CircleDollarSign} label="إيراد الاشتراكات السنوي المقدّر" value={money(data.arr)} />
+          <KpiCard icon={CreditCard} label="مدفوعات فاشلة" value={number.format(data.failedPayments.count)}
+            sub={money(data.failedPayments.amount)} tone="danger" />
         </div>
       </section>
-
-      {/* العمليات */}
-      <section style={sectionStyle}>
-        <h3 style={sectionTitle}>العمليات</h3>
-
-        <div style={gridStyle}>
-          <StatCard
-            label="بائعون نشطون"
-            value={data.activeSellers}
-          />
-
-          <StatCard
-            label="انسحبوا (30 يوم)"
-            value={data.churnedThisMonth}
-            color={t.colors.semantic.warning}
-          />
-
-          <StatCard
-            label="طلبات هذا الشهر"
-            value={data.orders.thisMonth}
-          />
-
-          <StatCard
-            label="طلبات معلقة"
-            value={data.orders.pending}
-            color={t.colors.gold[600]}
-          />
-
-          <StatCard
-            label="تكلفة AI (30 يوم)"
-            value={`$${(data.aiCostUsd30d ?? 0).toFixed(2)}`}
-            color={t.colors.text.mid}
-          />
+      <section className={styles.overviewSection} aria-labelledby="admin-operations">
+        <h2 id="admin-operations" className={styles.sectionTitle}>العمليات</h2>
+        <div className={styles.overviewGrid}>
+          <KpiCard icon={Store} label="بائعون نشطون" value={number.format(data.activeSellers)} />
+          <KpiCard icon={TrendingDown} label="اشتراكات انتهت أو أُلغيت" value={number.format(data.churnedThisMonth)} sub="آخر 30 يومًا" tone="warning" />
+          <KpiCard icon={Package} label="طلبات هذا الشهر" value={number.format(data.orders.thisMonth)} />
+          <KpiCard icon={Clock3} label="طلبات قيد المتابعة" value={number.format(data.orders.pending)} tone="warning" />
+          <KpiCard icon={Cpu} label="تكلفة الذكاء الاصطناعي المقدّرة" value={`$${(data.aiCostUsd30d ?? 0).toFixed(2)}`} sub="آخر 30 يومًا" />
         </div>
       </section>
-
-      {/* توزيع الباقات */}
-      <section style={sectionStyle}>
-        <h3 style={sectionTitle}>توزيع الباقات</h3>
-
-        <div
-          className="basita-plan-dist-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-            gap: t.spacing["3"],
-          }}
-        >
-          {(data.planDistribution ?? []).map((p: any) => (
-            <div
-              key={p.plan}
-              style={{
-                background: t.colors.white,
-                border: `1px solid ${t.colors.cream.border}`,
-                borderRadius: t.radius.md,
-                padding: "14px 12px",
-                textAlign: "center",
-                minHeight: 82,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                transition: "transform 150ms ease, box-shadow 150ms ease",
-              }}
-            >
-              <p
-                style={{
-                  margin: "0 0 5px",
-                  fontSize: t.typography.fontSize.xl,
-                  fontWeight: t.typography.fontWeight.bold,
-                  color:
-                    PLAN_COLORS[p.plan] ??
-                    t.colors.primary[800],
-                  lineHeight: 1.2,
-                }}
-              >
-                {p.count}
-              </p>
-
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: t.typography.fontSize.xs,
-                  color: t.colors.text.mid,
-                }}
-              >
-                {p.plan}
-              </p>
-            </div>
-          ))}
-        </div>
+      <section className={styles.overviewSection} aria-labelledby="admin-plans">
+        <h2 id="admin-plans" className={styles.sectionTitle}>توزيع الباقات</h2>
+        {data.planDistribution.length ? <div className={styles.overviewGrid}>
+          {data.planDistribution.map(plan => <KpiCard key={plan.plan} icon={Store}
+            label={planLabels[plan.plan] ?? plan.plan} value={number.format(plan.count)} />)}
+        </div> : <EmptyState message="لا توجد اشتراكات نشطة لعرضها." />}
       </section>
-
-      <style>{`
-        .basita-plan-dist-grid > div:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-        }
-
-        @media (max-width: 700px) {
-          .basita-plan-dist-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .basita-plan-dist-grid {
-            gap: 8px !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
-
