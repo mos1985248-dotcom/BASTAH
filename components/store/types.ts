@@ -28,6 +28,7 @@ export interface StorePublicInfo {
 
 export interface StoreDetail {
   id: string;
+  sections: { id: string; name: string }[];
 
   nameAr: string;
   nameEn: string | null;

@@ -133,6 +133,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     // ⚠️ منتج له متغيرات: كميته = مجموع كميات متغيراته ويُديرها /variants فقط — نتجاهل quantity هنا
     const data = { ...parsed.data };
+    if (data.storeSectionId && !(await prisma.storeSection.findUnique({
+      where: { storeId_id: { storeId: product.storeId, id: data.storeSectionId } }, select: { id: true },
+    }))) {
+      return NextResponse.json({ error: "قسم المتجر غير متاح" }, { status: 400 });
+    }
     if (data.quantity !== undefined && (await prisma.productVariant.count({ where: { productId: params.id } })) > 0) {
       delete data.quantity;
     }

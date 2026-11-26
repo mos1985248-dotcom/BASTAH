@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUser, getCurrentUser, AuthError } from "@/lib/auth";
+import { isSubscriptionInGoodStanding } from "@/lib/subscription-limits";
 import { updateStoreSchema, formatZodError } from "@/lib/validation";
 
 interface Params {
@@ -39,6 +40,11 @@ export async function GET(_req: NextRequest, { params }: Params) {
         totalFollowers: true,
         createdAt: true,
         publicInfo: true,
+        sections: {
+          where: { products: { some: { status: "ACTIVE" } } },
+          orderBy: [{ position: "asc" }, { id: "asc" }],
+          select: { id: true, name: true },
+        },
         pickupEnabled: true,
         latitude: true,
         longitude: true,
@@ -67,10 +73,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
     // المالك يحتاجها لتعبئة نموذج التعديل بلوحته (يستخدم هذا المسار نفسه).
     const isOwnerOrAdmin =
       currentUser?.id === store.userId || currentUser?.role === "ADMIN" || currentUser?.role === "SUPER_ADMIN";
-    const { userId: _ownerId, latitude, longitude, ...storePublic } = store;
+    const { userId: _ownerId, latitude, longitude, sections, ...storePublic } = store;
 
     return NextResponse.json({
-      store: { ...storePublic, isFollowing, ...(isOwnerOrAdmin ? { latitude, longitude } : {}) },
+      store: { ...storePublic, sections: store.subscription && isSubscriptionInGoodStanding(store.subscription.status) ? sections : [], isFollowing, ...(isOwnerOrAdmin ? { latitude, longitude } : {}) },
     });
   } catch (err) {
     console.error("[GET /api/stores/:slug]", err);

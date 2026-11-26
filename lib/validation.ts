@@ -101,6 +101,7 @@ const productBaseSchema = z.object({
   nameAr: z.string().trim().min(2, "اسم المنتج مطلوب").max(150),
   nameEn: z.string().trim().max(150).optional(),
   categoryId: z.string().cuid().optional(),
+  storeSectionId: z.string().cuid().nullable().optional(),
   shortDescAr: z.string().trim().max(160).optional(),
   descAr: z.string().trim().max(3000).optional(),
 
@@ -139,6 +140,7 @@ export const listProductsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
   storeId: z.string().cuid().optional(),
+  storeSectionId: z.string().cuid().optional(),
   category: z.string().trim().optional(),
   city: z.string().trim().optional(),
   search: z.string().trim().max(100).optional(),
