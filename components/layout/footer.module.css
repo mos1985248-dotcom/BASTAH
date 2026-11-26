@@ -29,7 +29,7 @@
   composes: logoMark from "./nav.module.css";
 }
 .brandName { composes: brandName from "./nav.module.css"; margin: 0; }
-.footer .logoMark { border-color: var(--ui-gold); }
+.footer .logoMark { width: 36px; height: 36px; padding: 0; border: 0; border-radius: 0; background: #fff; box-sizing: border-box; }
 .footer .brandName { color: var(--ui-white); }
 .brandTag { margin: 2px 0 0; font-size: 13px; color: var(--ui-card); opacity: 0.85; }
 .brandText { margin: 18px 0 0; max-width: 440px; font-size: 14.5px; line-height: 2; color: var(--ui-card); opacity: 0.88; }
