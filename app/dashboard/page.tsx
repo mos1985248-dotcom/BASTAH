@@ -125,14 +125,14 @@ export default function SellerDashboard() {
         <div id="settings">
           <StoreSettingsQuickEdit
               store={{
-                slug: store.slug, nameAr: store.nameAr, logo: store.logo, coverImage: store.coverImage, whatsapp: store.whatsapp, city: store.city,
+                slug: store.slug, nameAr: store.nameAr, shortDesc: store.shortDesc, logo: store.logo, coverImage: store.coverImage, whatsapp: store.whatsapp, city: store.city,
                 storyAr: store.publicInfo?.storyAr ?? null, videoUrl: store.publicInfo?.videoUrl ?? null,
                 storyTags: store.publicInfo?.storyTags ?? [], workingHours: store.publicInfo?.workingHours ?? null,
                 licenseNumber: store.publicInfo?.licenseNumber ?? null, deliveryPartner: store.publicInfo?.deliveryPartner ?? null,
                 paymentMethods: store.publicInfo?.paymentMethods ?? [], returnPolicyDays: store.publicInfo?.returnPolicyDays ?? null,
                 latitude: store.latitude, longitude: store.longitude, pickupEnabled: store.pickupEnabled,
               }}
-              onSaved={({ nameAr }) => setStore((prev) => (prev ? { ...prev, nameAr } : prev))}
+              onSaved={(saved) => setStore((prev) => (prev ? { ...prev, ...saved } : prev))}
           />
         </div>
       )}

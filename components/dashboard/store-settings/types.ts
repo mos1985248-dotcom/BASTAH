@@ -3,6 +3,7 @@
 export interface EditableStoreData {
   slug: string;
   nameAr: string;
+  shortDesc: string | null;
   logo: string | null;
   coverImage: string | null;
   whatsapp: string | null;
@@ -22,6 +23,7 @@ export interface EditableStoreData {
 
 export interface SettingsForm {
   nameAr: string;
+  shortDesc: string;
   logo: string;
   coverImage: string;
   whatsapp: string;

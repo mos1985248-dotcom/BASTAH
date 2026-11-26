@@ -21,7 +21,7 @@ export default function StoreSettingsQuickEdit({
   onSaved,
 }: {
   store: EditableStoreData;
-  onSaved?: (saved: { nameAr: string }) => void;
+  onSaved?: (saved: { nameAr: string; shortDesc: string }) => void;
 }) {
   const ctx = useStoreSettings(store, onSaved);
   const { saving, error, savedMsg, handleSave } = ctx;

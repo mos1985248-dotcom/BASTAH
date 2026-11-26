@@ -9,10 +9,11 @@ import type { EditableStoreData, SettingsForm } from "./types";
 
 export function useStoreSettings(
   store: EditableStoreData,
-  onSaved?: (saved: { nameAr: string }) => void,
+  onSaved?: (saved: { nameAr: string; shortDesc: string }) => void,
 ) {
   const [form, setForm] = useState<SettingsForm>({
     nameAr: store.nameAr ?? "",
+    shortDesc: store.shortDesc ?? "",
     logo: store.logo ?? "",
     coverImage: store.coverImage ?? "",
     whatsapp: store.whatsapp ?? "",
@@ -119,10 +120,12 @@ export function useStoreSettings(
       return;
     }
 
+    const shortDesc = form.shortDesc.trim();
     try {
       await Promise.all([
         api.patch(`/api/stores/${store.slug}`, {
           nameAr: form.nameAr.trim(),
+          shortDesc,
           whatsapp: form.whatsapp || undefined,
           city: form.city || undefined,
           latitude: hasCoords ? Number(form.latitude) : undefined,
@@ -142,7 +145,7 @@ export function useStoreSettings(
         }),
       ]);
       setSavedMsg("تم حفظ التغييرات بنجاح، وستظهر على صفحة متجرك مباشرة.");
-      onSaved?.({ nameAr: form.nameAr.trim() });
+      onSaved?.({ nameAr: form.nameAr.trim(), shortDesc });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "تعذّر حفظ التغييرات.");
     } finally {

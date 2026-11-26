@@ -28,6 +28,21 @@ export function ContactSection({ ctx }: { ctx: StoreSettingsCtx }) {
           <span className={s.note}>رابط متجرك لا يتغير عند تعديل الاسم، فتبقى الروابط المشاركة تعمل.</span>
         </div>
 
+        <label className={`${f.fieldWrap} ${s.full}`}>
+          <span className={s.lblBlock}>
+            <IconLabel icon={BookOpen} text="نبذة المتجر (البايو)" />
+          </span>
+          <textarea
+            value={form.shortDesc}
+            onChange={(event) => set("shortDesc", event.target.value)}
+            dir="rtl"
+            rows={3}
+            maxLength={160}
+            placeholder="اكتب نبذة قصيرة عن متجرك ومنتجاتك"
+            className={`${f.field} ${f.area}`}
+          />
+        </label>
+
         <Field
           label={<IconLabel icon={MessageCircle} text="واتساب المتجر" />}
           value={form.whatsapp}
