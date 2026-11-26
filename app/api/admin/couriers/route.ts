@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, AuthError } from "@/lib/auth";
 import { createCityCourierSchema, formatZodError } from "@/lib/validation";
+import { findBastahCity } from "@/lib/shipping/bastah-cities";
 import { logAudit, getClientIp } from "@/lib/audit-log";
 
 export async function GET() {
@@ -28,8 +29,10 @@ export async function POST(req: NextRequest) {
     const parsed = createCityCourierSchema.safeParse(await req.json());
     if (!parsed.success) return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
 
+    const city = await findBastahCity(parsed.data.city);
+    if (!city) return NextResponse.json({ error: "اختر مدينة من القائمة المعتمدة" }, { status: 400 });
     const courier = await prisma.cityCourier.create({
-      data: parsed.data,
+      data: { ...parsed.data, city: city.name },
       select: { id: true, city: true, name: true, phone: true, isActive: true, commissionPerShipment: true, createdAt: true },
     });
     await logAudit({
