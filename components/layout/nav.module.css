@@ -207,3 +207,31 @@
 @media (min-width: 768px) { .mobileSearch { display: none; } }
 @media (prefers-reduced-motion: reduce) { .link, .menuBtn, .toggleBtn { transition: none; } }
 /* basita-font-scale: applied */
+
+/* Desktop header: three compact tiers, preserving current navigation and mobile. */
+@media (min-width: 1024px) {
+  .header { box-shadow: 0 3px 12px color-mix(in srgb, var(--ui-green-deep) 7%, transparent); }
+  .topbarInner { min-height: 30px; font-size: 12px; gap: 28px; }
+  .main { grid-template-columns: auto minmax(180px, 1fr) auto; grid-template-areas: "logo search actions" "nav nav nav"; gap: 0 24px; padding: 0 24px; min-height: 0; border-bottom: 0; }
+  .logo { grid-area: logo; padding-block: 14px; gap: 9px; }
+  .logoMark { width: 48px; height: 48px; border: 0; background: transparent; }
+  .brandName { font-size: 32px; }
+  .tagline { font-size: 11px; }
+  .search { grid-area: search; max-width: 620px; justify-self: center; }
+  .actions { grid-area: actions; gap: 10px; }
+  .actions :global(.basita-nav-register) { display: inline-flex; background: var(--ui-gold); color: var(--ui-green-deep); border-radius: 10px; padding-inline: 17px; }
+  .actions :global(.basita-nav-register):hover { background: var(--ui-sand); }
+  .actions :global(.basita-nav-icon) { border: 0; background: transparent; }
+  .actions :global(.basita-nav-login) { padding-inline: 8px; }
+  .nav { grid-area: nav; display: block; border-top: 1px solid var(--ui-border); padding-block: 4px; }
+  .links { justify-content: center; gap: clamp(12px, 3vw, 48px); }
+  .link { min-height: 40px; font-size: 20px; padding-inline: 14px; border-radius: 8px; }
+  .active::after { bottom: 2px; background: var(--ui-green-deep); }
+  .menuBtn, .toggleBtn, .drawer, .mobileSearch { display: none; }
+}
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .main { gap: 0 12px; padding-inline: 16px; }
+  .brandName { font-size: 28px; }
+  .actions { gap: 4px; }
+  .links { gap: 12px; }
+}
