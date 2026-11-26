@@ -18,6 +18,8 @@ const inputStyle: React.CSSProperties = {
 };
 
 export default function CouriersManager() {
+  const [cities, setCities] = useState<{key:string;name:string}[]>([]);
+  const [cityFilter, setCityFilter] = useState("");
   const [couriers, setCouriers] = useState<Courier[] | null>(null);
   const [error, setError] = useState("");
   const [formError, setFormError] = useState("");
@@ -32,6 +34,7 @@ export default function CouriersManager() {
       .catch((err) => setError(err instanceof ApiError ? err.message : "تعذّر تحميل المناديب"));
   };
   useEffect(load, []);
+  useEffect(() => { api.get<{cities:{key:string;name:string}[]}>("/api/admin/shipping/cities").then(r=>setCities(r.cities)).catch(()=>setFormError("تعذّر تحميل قائمة المدن")); }, []);
 
   const add = async () => {
     setSaving(true);
@@ -85,8 +88,9 @@ export default function CouriersManager() {
       {couriers.length === 0 && (
         <p style={{ margin: 0, fontSize: 12, color: t.colors.text.mid }}>لا يوجد مناديب بعد — أضيفي أول مندوب بالنموذج أدناه.</p>
       )}
+      <select aria-label="تصفية المناديب حسب المدينة" value={cityFilter} onChange={e=>setCityFilter(e.target.value)} style={inputStyle}><option value="">كل المدن</option>{Array.from(new Set(couriers.map(c=>c.city))).map(city=><option key={city}>{city}</option>)}</select>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: t.spacing["3"] }}>
-        {couriers.map((c) => (
+        {couriers.filter(c=>!cityFilter||c.city===cityFilter).map((c) => (
           <div key={c.id} style={{ background: t.colors.white, borderRadius: t.radius.lg, border: `1px solid ${t.colors.cream.border}`, padding: t.spacing["3"], opacity: c.isActive ? 1 : 0.6 }}>
             <p style={{ margin: 0, fontWeight: t.typography.fontWeight.bold, fontSize: 14, color: t.colors.text.dark }}>{c.name}</p>
             <p style={{ margin: "2px 0", fontSize: 12, color: t.colors.text.mid }}>{c.city} · <span dir="ltr">{c.phone}</span></p>
@@ -121,7 +125,7 @@ export default function CouriersManager() {
 
       <div style={{ background: t.colors.white, borderRadius: t.radius.lg, border: `1px solid ${t.colors.cream.border}`, padding: t.spacing["3"], display: "flex", flexDirection: "column", gap: t.spacing["2"] }}>
         <div style={{ display: "flex", gap: t.spacing["2"], flexWrap: "wrap" }}>
-          <input placeholder="المدينة" value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} style={inputStyle} />
+          <select aria-label="مدينة المندوب" value={form.city} onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))} style={inputStyle}><option value="">اختر المدينة</option>{cities.map(c=><option key={c.key} value={c.name}>{c.name}</option>)}</select>
           <input placeholder="اسم المندوب" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} style={inputStyle} />
           <input placeholder="واتساب (05xxxxxxxx)" dir="ltr" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} style={inputStyle} />
           <input placeholder="العمولة لكل شحنة (ر.س) — اختياري" type="number" min={0} value={form.commission} onChange={(e) => setForm((p) => ({ ...p, commission: e.target.value }))} style={inputStyle} />
