@@ -115,11 +115,11 @@ export default function MuniraImageProviders() {
         const failures = entries.filter(item => item.state === "FAILED").reduce((sum, item) => sum + item._count, 0);
         const estimated = entries.reduce((sum, item) => sum + (item._sum.estimatedNeurons ?? 0), 0);
         return <section className={s.quota} key={row.model}>
-          <strong>Cloudflare Workers AI</strong><bdi>{row.model}</bdi>
+          <strong>{row.provider === "pollinations" ? "Pollinations.ai · وصول مجاني محدود" : "Cloudflare Workers AI"}</strong><bdi>{row.model}</bdi>
           <label><input type="checkbox" checked={row.enabled} disabled={busy} onChange={event => updateModel(row.model, { enabled: event.target.checked })} /> مفعّل</label>
           <label>الأولوية <input type="number" min={1} max={1000} value={row.priority} onChange={event => updateModel(row.model, { priority: Number(event.target.value) })} /></label>
           <p>{attempts} محاولة · {success} صورة · {failures} فشل · نسبة النجاح {attempts ? Math.round(success * 100 / attempts) : 0}%</p>
-          <p>Neurons المقدّرة للصور الناجحة {estimated}. لا تتوفر قراءة فعلية موثوقة.</p>
+          {row.provider === "cloudflare" && <p>Neurons المقدّرة للصور الناجحة {estimated}. لا تتوفر قراءة فعلية موثوقة.</p>}
           {state.lastFailure?.model === row.model && <p>آخر خطأ <bdi>{diagnosticText[state.lastFailure.error ?? ""] ?? state.lastFailure.error}</bdi></p>}
           <button className={f.btnSm} type="button" disabled={busy || !state.settings.enabled || testPrompt.trim().length < 3} onClick={() => action({
             action: "test", model: row.model, image: { requestId: crypto.randomUUID(), prompt: testPrompt, kind: "product", size: "square" },

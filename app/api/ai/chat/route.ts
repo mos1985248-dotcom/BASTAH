@@ -1,13 +1,14 @@
 import { createHash, randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentUser } from "@/lib/auth";
+import { AuthError, getCurrentUser } from "@/lib/auth";
 import { checkAiRateLimit } from "@/lib/rate-limit";
 import { detectLanguageFromText, PRIORITY_LANGUAGES, type SupportedLanguage } from "@/lib/munira/language";
 import { sanitizeUserInput, INJECTION_ERROR_MESSAGES } from "@/lib/munira/security";
 import { freeAnswer, freeUnavailable } from "@/lib/munira/free-router";
 import { localPricingAnswer, muniraPrompt, redactPrompt } from "@/lib/munira/context";
 import { completeMessage, MuniraRequestError, releaseMessage, reserveMessage } from "@/lib/munira/quota";
+import { generateStudioImage } from "@/lib/munira/image-studio";
 import { prisma } from "@/lib/prisma";
 
 export const maxDuration = 60;
@@ -80,8 +81,14 @@ export async function POST(req: NextRequest) {
         content: redactPrompt(message.content).slice(0, 450),
       }));
       const older = history.slice(4).filter(message => message.role === "USER").map(message => message.content);
+      const imageRequest = storeId && content.length <= 800 &&
+        /^(?:(?:منيرة|يا منيرة)[،,: ]+)?(?:(?:أريد|اريد|أبغى|ابغى|ابي|أبي|أحتاج|احتاج)\s+)?(?:ولّ?د(?:ي)?|أنشئ(?:ي)?|انشئ(?:ي)?|صمّ?م(?:ي)?|سوّ?ي|اعمل(?:ي)?|اعملي|أريد|اريد)\s+(?:لي\s+)?صورة(?:\s|$)/u.test(content.trim());
+      const id = imageRequest && storeId ? await generateStudioImage(ticket.scope, {
+        requestId: ticket.requestId, prompt: content, kind: "product", size: "square",
+      }, storeId) : null;
       const local = localPricingAnswer(content);
-      const answer = local ? { text: local } : await freeAnswer({
+      const answer = id ? { text: `تم توليد الصورة وحفظها في مكتبة منيرة.\n/api/ai/images/${id}` }
+        : local ? { text: local } : await freeAnswer({
         system: muniraPrompt(language, role, older),
         messages: [...recent, { role: "user", content }], maxTokens: 450,
       }, { feature: "chat", route: "/api/ai/chat", userId: user?.id, storeId, sessionId: session?.id });
@@ -102,6 +109,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       await releaseMessage(ticket, lease);
       if (error instanceof MuniraRequestError) throw error;
+      if (error instanceof AuthError) return NextResponse.json({ error: error.message }, { status: error.status });
       return NextResponse.json({ error: freeUnavailable }, { status: 503 });
     }
   } catch (error) {
