@@ -8,6 +8,7 @@ import TrustBadgeBar from "@/components/home/TrustBadgeBar";
 import MuniraShowcase from "@/components/home/MuniraShowcase";
 import PlansSection from "@/components/home/PlansSection";
 import DaftariShowcase from "@/components/home/DaftariShowcase";
+import ProductToolsShowcase from "@/components/home/ProductToolsShowcase";
 import StoryBlogCTARow from "@/components/home/StoryBlogCTARow";
 import CategoryNav from "@/components/home/CategoryNav";
 import FeaturedStores from "@/components/home/FeaturedStores";
@@ -53,6 +54,7 @@ export default function HomeClient() {
       {/* أدوات التاجر */}
       <SectionBand tone="white">
         <MuniraShowcase />
+        <ProductToolsShowcase />
         <DaftariShowcase />
       </SectionBand>
 
