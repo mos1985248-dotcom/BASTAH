@@ -10,6 +10,9 @@ type Settings = { enabled: boolean; models: Model[] };
 type Check = { checkedAt: string; code: string; httpStatus?: number; providerCodes?: number[];
   evidence?: { subscriptions: number; workersRows: number; freeActive: number; contradictory: number } };
 const diagnosticText: Record<string, string> = {
+  MODEL_NOT_FREE: "النموذج المجاني انتهى أو تعذّر إثبات سعر صفر.",
+  OPENROUTER_KEY_MISSING: "مفتاح OpenRouter الخاص بمنيرة غير موجود في بيئة الخادم.",
+  COST_UNVERIFIED: "لم يؤكد OpenRouter تكلفة صفرية.",
   VERIFIED_FREE: "تم التحقق من خطة Workers المجانية.",
   KEYS_MISSING: "إعدادات Cloudflare غير مكتملة في هذه البيئة.",
   ACCOUNT_INVALID: "صيغة معرف حساب Cloudflare غير صحيحة.",
@@ -115,7 +118,8 @@ export default function MuniraImageProviders() {
         const failures = entries.filter(item => item.state === "FAILED").reduce((sum, item) => sum + item._count, 0);
         const estimated = entries.reduce((sum, item) => sum + (item._sum.estimatedNeurons ?? 0), 0);
         return <section className={s.quota} key={row.model}>
-          <strong>{row.provider === "pollinations" ? "Pollinations.ai · وصول مجاني محدود" : "Cloudflare Workers AI"}</strong><bdi>{row.model}</bdi>
+          <strong>{row.provider === "openrouter" ? "OpenRouter · مجاني فقط (تجريبي)" : row.provider === "pollinations" ? "Pollinations.ai · وصول مجاني محدود" : "Cloudflare Workers AI"}</strong><bdi>{row.model}</bdi>
+          {row.provider === "openrouter" && <p>يتحقق النظام من مجانية الحساب وسعر الصورة قبل الطلب. ينتهي عرض Recraft المجاني في 28 نوفمبر 2026.</p>}
           <label><input type="checkbox" checked={row.enabled} disabled={busy} onChange={event => updateModel(row.model, { enabled: event.target.checked })} /> مفعّل</label>
           <label>الأولوية <input type="number" min={1} max={1000} value={row.priority} onChange={event => updateModel(row.model, { priority: Number(event.target.value) })} /></label>
           <p>{attempts} محاولة · {success} صورة · {failures} فشل · نسبة النجاح {attempts ? Math.round(success * 100 / attempts) : 0}%</p>
