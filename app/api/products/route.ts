@@ -2,6 +2,7 @@ import { assertStoreFeature } from "@/lib/feature-access";
 // app/api/products/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { pricingRecord, productPricingSchema } from "@/lib/pricing/storage";
 import { requireActiveStore, requireUser, AuthError } from "@/lib/auth";
@@ -16,6 +17,34 @@ const SORT_MAP: Record<string, Prisma.ProductOrderByWithRelationInput> = {
   price_desc: { price: "desc" },
   rating: { avgRating: "desc" },
 };
+
+async function listPublicProducts(where: Prisma.ProductWhereInput, sort: string, page: number, limit: number) {
+  const products = await prisma.product.findMany({
+      where,
+      select: {
+        id: true,
+        nameAr: true,
+        nameEn: true,
+        slug: true,
+        mainImage: true,
+        price: true,
+        comparePrice: true,
+        avgRating: true,
+        totalReviews: true,
+        totalSold: true,
+        isHandmade: true,
+        quantity: true,
+        store: { select: { id: true, nameAr: true, slug: true, city: true } },
+      },
+      orderBy: SORT_MAP[sort],
+      skip: (page - 1) * limit,
+      take: limit,
+  });
+  const total = page === 1 && products.length < limit ? products.length : await prisma.product.count({ where });
+  return { products, total };
+}
+
+const readPublicCatalog = unstable_cache(listPublicProducts, ["public-catalog-first-page-v1"], { revalidate: 15 });
 
 // ── GET /api/products — قائمة عامة، أو "view=seller" لمتجر التاجر نفسه ──
 // view=seller يتجاوز فلتر status=ACTIVE العام لأن التاجر يحتاج رؤية
@@ -84,43 +113,24 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [products, total] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        select: {
-          id: true,
-          nameAr: true,
-          nameEn: true,
-          slug: true,
-          mainImage: true,
-          price: true,
-          comparePrice: true,
-          avgRating: true,
-          totalReviews: true,
-          totalSold: true,
-          isHandmade: true,
-          quantity: true,
-          store: { select: { id: true, nameAr: true, slug: true, city: true } },
-        },
-        orderBy: SORT_MAP[sort],
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      prisma.product.count({ where }),
-    ]);
+    const started = performance.now();
+    const firstPublicPage = page === 1 && !storeId && !category && !city && !search &&
+      minPrice === undefined && maxPrice === undefined && !view;
+    const { products, total } = await (firstPublicPage
+      ? readPublicCatalog(where, sort, page, limit)
+      : listPublicProducts(where, sort, page, limit));
+    const timing = `catalog;dur=${(performance.now() - started).toFixed(1)}`;
 
     // Only cache the anonymous first page of the unfiltered public catalog.
     // Keep browser caching disabled so it can see updates once the edge entry expires.
-    const cacheable = page === 1 && !storeId && !category && !city && !search &&
-      minPrice === undefined && maxPrice === undefined && !view &&
-      !req.headers.has("cookie") && !req.headers.has("authorization");
+    const cacheable = firstPublicPage && !req.headers.has("cookie") && !req.headers.has("authorization");
     return NextResponse.json({
       products,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     }, {
       headers: cacheable
-        ? { "Cache-Control": "public, max-age=0, must-revalidate", "Vercel-CDN-Cache-Control": "public, s-maxage=15" }
-        : { "Cache-Control": "private, no-store" },
+        ? { "Cache-Control": "public, max-age=0, must-revalidate", "Vercel-CDN-Cache-Control": "public, s-maxage=15", "Server-Timing": timing }
+        : { "Cache-Control": "private, no-store", "Server-Timing": timing },
     });
   } catch (err) {
     console.error("[GET /api/products]", err);
