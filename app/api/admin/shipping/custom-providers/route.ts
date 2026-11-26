@@ -5,6 +5,7 @@
 // للعقد المتوقَّع من endpoint الشركة (POST {baseUrl}{ratePath} → {rate}).
 
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireRole, AuthError } from "@/lib/auth";
 import { createShippingProviderConfigSchema, formatZodError } from "@/lib/validation";
@@ -124,7 +125,31 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   try {
     const admin = await requireRole("ADMIN", "SUPER_ADMIN");
-    const { id, isActive } = await req.json();
+    const body = await req.json();
+    if (body?.settings !== undefined) {
+      const parsed = z.object({
+        id: z.string().min(1),
+        settings: z.object({
+          displayNameAr: z.string().trim().min(2).max(120),
+          flatFee: z.number().finite().min(0).max(100000),
+          perKgFee: z.number().finite().min(0).max(100000),
+          serviceCity: z.string().trim().max(120),
+        }).strict(),
+      }).strict().safeParse(body);
+      if (!parsed.success) return NextResponse.json({ error: "تحقق من الاسم والأسعار والمدينة" }, { status: 400 });
+      const { id, settings } = parsed.data;
+      const current = await prisma.shippingProviderConfig.findUnique({ where: { id }, select: { id: true, providerType: true, carrierKey: true, displayNameAr: true, flatFee: true, perKgFee: true, serviceCity: true } });
+      if (!current) return NextResponse.json({ error: "الشركة غير موجودة" }, { status: 404 });
+      if (current.providerType !== "MANUAL") return NextResponse.json({ error: "هذه الإعدادات للشركات المحلية فقط" }, { status: 422 });
+      const record = await prisma.shippingProviderConfig.update({
+        where: { id },
+        data: settings,
+        select: { id: true, carrierKey: true, displayNameAr: true, flatFee: true, perKgFee: true, serviceCity: true, isActive: true },
+      });
+      await logAudit({ actorId: admin.id, action: "SHIPPING_PROVIDER_ADDED", targetType: "ShippingProviderConfig", targetId: id, metadata: { event: "custom_provider_settings_updated", carrierKey: current.carrierKey, before: { displayNameAr: current.displayNameAr, flatFee: current.flatFee, perKgFee: current.perKgFee, serviceCity: current.serviceCity }, after: settings }, ipAddress: getClientIp(req.headers) });
+      return NextResponse.json({ record });
+    }
+    const { id, isActive } = body;
     if (typeof isActive !== "boolean" || !id) {
       return NextResponse.json({ error: "id وisActive مطلوبان" }, { status: 400 });
     }
