@@ -45,3 +45,9 @@
   .closingCta { width: 100%; justify-content: center; }
 }
 /* basita-font-scale: applied */
+
+.sectionFilters { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 16px; }
+.sectionFilter { max-inline-size: 100%; min-block-size: 44px; padding: 7px 16px; border: 1px solid var(--ui-border); border-radius: var(--ui-pill); background: var(--ui-card); color: var(--ui-green-deep); font: inherit; font-weight: 700; overflow-wrap: anywhere; cursor: pointer; }
+.sectionFilter[aria-pressed="true"] { background: var(--ui-green); border-color: var(--ui-green); color: var(--ui-white); }
+.sectionFilter:focus-visible { outline: 2px solid var(--ui-green); outline-offset: 2px; }
+.sectionFilter:disabled { opacity: 0.55; cursor: not-allowed; }

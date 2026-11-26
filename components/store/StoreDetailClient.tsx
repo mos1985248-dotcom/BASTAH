@@ -82,7 +82,7 @@ export default function StoreDetailClient() {
     <SiteShell>
       <main style={{ width: "100%", direction: "rtl", background: t.colors.heritage.sand }}>
         <StoreHero store={store} />
-        <StoreProductsSection storeId={store.id} />
+        <StoreProductsSection key={store.id} storeId={store.id} sections={store.sections} />
         <StoreStoryAndBadges store={store} />
         <StoreAchievements store={store} />
         <StoreInfoGrid store={store} />

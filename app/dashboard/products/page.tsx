@@ -71,6 +71,8 @@ export default function SellerProductsPage() {
         </a>
       </div>
 
+      <a href="/dashboard/products/sections" className={s.back}>إدارة أقسام المتجر</a>
+
       {products.length > 0 && (
         <>
           <label className={s.search} style={{ marginBottom: 12 }}>

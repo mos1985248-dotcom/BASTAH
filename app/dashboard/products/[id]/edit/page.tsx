@@ -13,11 +13,12 @@ import StockReceiptsCard from "@/components/dashboard/product-edit/StockReceipts
 import VariantsCard, { EditVariant } from "@/components/dashboard/product-edit/VariantsCard";
 import { useProductTranslate } from "@/hooks/useProductTranslate";
 import { EditProductImage } from "@/components/dashboard/product-edit/ProductImageTile";
+import StoreSectionSelect from "@/components/dashboard/StoreSectionSelect";
 import s from "@/components/dashboard/forms.module.css";
 
 interface ProductDetail {
   id: string; nameAr: string; price: number; quantity: number; trackInventory: boolean; shortDescAr: string | null;
-  categoryId: string | null; status: string; productImages: EditProductImage[]; variants?: EditVariant[];
+  storeSectionId: string | null; categoryId: string | null; status: string; productImages: EditProductImage[]; variants?: EditVariant[];
 }
 
 const emptyVariants: EditVariant[] = [];
@@ -40,7 +41,7 @@ function ProductEditor({ id }: { id: string }) {
   const [vatRate, setVatRate] = useState<string | null>(null);
   const [pricingError, setPricingError] = useState("");
   const [product, setProduct] = useState<ProductDetail | null>(null);
-  const [form, setForm] = useState({ nameAr: "", nameEn: "", price: "", quantity: "", shortDescAr: "", shortDescEn: "" });
+  const [form, setForm] = useState({ nameAr: "", nameEn: "", price: "", quantity: "", shortDescAr: "", shortDescEn: "", storeSectionId: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [savingDetails, setSavingDetails] = useState(false);
@@ -65,6 +66,7 @@ function ProductEditor({ id }: { id: string }) {
           ? { ...current, quantity: currentQuantity } : current);
         if (updateForm) setForm({
           nameAr: product.nameAr,
+          storeSectionId: product.storeSectionId ?? "",
           nameEn: (product as any).nameEn ?? "",
           price: String(product.price),
           quantity: String(product.quantity),
@@ -105,6 +107,7 @@ function ProductEditor({ id }: { id: string }) {
       await api.patch(`/api/products/${id}`, {
         pricing: pricing ?? undefined,
         nameAr: form.nameAr,
+        storeSectionId: form.storeSectionId === (product?.storeSectionId ?? "") ? undefined : form.storeSectionId || null,
         nameEn: form.nameEn || undefined,
         price: Number(form.price),
         quantity: hasVariants || form.quantity === lastLoadedQuantity.current ? undefined : Number(form.quantity),
@@ -222,6 +225,7 @@ function ProductEditor({ id }: { id: string }) {
             saving={savingDetails}
             quantityLocked={hasVariants}
           >
+            <StoreSectionSelect value={form.storeSectionId} onChange={(value) => setForm((previous) => ({ ...previous, storeSectionId: value }))} disabled={savingDetails} />
             <ProductPricingCalculator
               productName={form.nameAr}
               categoryId={product.categoryId}

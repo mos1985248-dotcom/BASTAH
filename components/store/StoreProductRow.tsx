@@ -11,7 +11,7 @@ export default function StoreProductRow({
   onToggleFavorite,
 }: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   products: MarketplaceProduct[];
   rankBadgeFirst?: string;
   favoriteIds: Set<string>;
@@ -23,7 +23,7 @@ export default function StoreProductRow({
       <div className={s.rowHead}>
         <div>
           <h3 className={s.rowTitle}>{title}</h3>
-          <p className={s.rowSub}>{subtitle}</p>
+          {subtitle && <p className={s.rowSub}>{subtitle}</p>}
         </div>
         <span className={s.count}>{products.length} منتجات</span>
       </div>

@@ -17,11 +17,12 @@ import NewImagesPicker from "@/components/dashboard/product-new/NewImagesPicker"
 import {
   MAX_PRODUCT_IMAGES, validateImageFile, uploadImagesSequentially, type PendingImage,
 } from "@/lib/upload-product-images";
+import StoreSectionSelect from "@/components/dashboard/StoreSectionSelect";
 import s from "@/components/dashboard/forms.module.css";
 
 export default function AddProductPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ nameAr: "", price: "", quantity: "", shortDescAr: "" });
+  const [form, setForm] = useState({ nameAr: "", price: "", quantity: "", shortDescAr: "", storeSectionId: "" });
   const [vatRate, setVatRate] = useState<string | null>(null);
   const [vatError, setVatError] = useState("");
   const [pricing, setPricing] = useState<PricingInput | null>(null);
@@ -90,6 +91,7 @@ export default function AddProductPage() {
       let productId = createdId;
       if (!productId) {
         const { product } = await api.post<{ product: { id: string } }>("/api/products", {
+          storeSectionId: form.storeSectionId || undefined,
           pricing: pricing ?? undefined,
           nameAr: form.nameAr,
           price: Number(form.price),
@@ -146,6 +148,7 @@ export default function AddProductPage() {
                 <DashboardField label="السعر (ر.س)" type="number" value={form.price} onChange={(v) => set("price", v)} />
                 <DashboardField label="الكمية" type="number" value={form.quantity} onChange={(v) => set("quantity", v)} />
               </div>
+              <StoreSectionSelect value={form.storeSectionId} onChange={(value) => set("storeSectionId", value)} disabled={loading} />
               <DashboardTextarea label="وصف مختصر" value={form.shortDescAr} onChange={(v) => set("shortDescAr", v)} />
             </fieldset>
           </section>

@@ -1,0 +1,6 @@
+.list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; border-bottom: 1px solid var(--ui-border); padding-block-end: 12px; }
+.row:last-child { border: 0; padding-block-end: 0; }
+.name { display: flex; align-items: center; gap: 8px; min-width: 0; overflow-wrap: anywhere; color: var(--ui-green-deep); font-weight: 700; }
+.name svg { flex-shrink: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }

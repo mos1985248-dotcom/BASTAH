@@ -37,7 +37,7 @@ async function listPublicProducts(where: Prisma.ProductWhereInput, sort: string,
         quantity: true,
         store: { select: { id: true, nameAr: true, slug: true, city: true } },
       },
-      orderBy: SORT_MAP[sort],
+      orderBy: where.storeId ? [SORT_MAP[sort], { id: "desc" }] : SORT_MAP[sort],
       skip: (page - 1) * limit,
       take: limit,
     }),
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
   }
-  const { page, limit, storeId, category, city, search, minPrice, maxPrice, sort } = parsed.data;
+  const { page, limit, storeId, storeSectionId, category, city, search, minPrice, maxPrice, sort } = parsed.data;
 
   // ⚠️ فلتر متجر منفصل بنوع صريح — تعديله تدريجياً (city لاحقاً) بدل
   // تضمينه مباشرة داخل where وتعديله بالسبريد (...where.store) كان يُربك
@@ -99,7 +99,11 @@ export async function GET(req: NextRequest) {
     status: "ACTIVE",
     store: storeFilter,
   };
+  if (storeSectionId && !storeId) {
+    return NextResponse.json({ error: "حدد المتجر لعرض منتجات القسم" }, { status: 400 });
+  }
   if (storeId) where.storeId = storeId;
+  if (storeSectionId) where.storeSectionId = storeSectionId;
   if (category) where.category = { slug: category };
   if (search) {
     where.OR = [
@@ -155,6 +159,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     }
     const data = parsed.data;
+    if (data.storeSectionId && !(await prisma.storeSection.findUnique({
+      where: { storeId_id: { storeId, id: data.storeSectionId } }, select: { id: true },
+    }))) {
+      return NextResponse.json({ error: "قسم المتجر غير متاح" }, { status: 400 });
+    }
     if (pricing.data) await assertStoreFeature(storeId, "pricing");
     const record = pricing.data ? pricingRecord(pricing.data) : undefined;
 
