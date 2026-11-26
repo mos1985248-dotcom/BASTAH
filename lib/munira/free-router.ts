@@ -30,13 +30,14 @@ export async function routeThroughFreeModels<T extends Config>(
 export async function freeAnswer(
   prompt: Prompt,
   context: { feature: string; route: string; userId?: string; storeId?: string; sessionId?: string },
+  timeoutMs = 45_000,
 ) {
   const models = await prisma.muniraModel.findMany({
     where: { enabled: true, ...(prompt.audio ? { provider: "gemini" } : {}) },
     orderBy: [{ priority: "asc" }, { id: "asc" }],
   });
   const sub = context.storeId ? await prisma.storeSubscription.findUnique({ where: { storeId: context.storeId }, select: { plan: true } }) : null;
-  const deadline = Date.now() + 45_000;
+  const deadline = Date.now() + timeoutMs;
   return routeThroughFreeModels(models, model => generateFree(model, prompt, Math.min(deadline, Date.now() + 18_000)), async (model, result, error) => {
     const uncertainCost = model.provider === "groq" || error === "NONZERO_COST" || error === "COST_UNVERIFIED";
     await prisma.$transaction([

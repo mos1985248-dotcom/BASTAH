@@ -105,7 +105,7 @@ export async function POST(req: Request) {
     } else {
       const settings = imageConfigSchema.safeParse(data.settings);
       if (!settings.success) throw new AuthError("إعدادات النموذج غير صالحة.", 400);
-      if (settings.data.enabled) {
+      if (settings.data.enabled && settings.data.models.some(row => row.enabled && row.provider === "cloudflare")) {
         const check = await checkCloudflare();
         if (check.code !== "VERIFIED_FREE") return Response.json({ ok: false, check }, { headers });
       }

@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import sharp from "sharp";
 import { z } from "zod";
 import { fluxModel, imageSizes } from "./image-options";
@@ -134,7 +135,41 @@ export async function readBounded(body: ReadableStream<Uint8Array> | null, maxBy
 }
 
 export type ImageSize = keyof typeof imageSizes;
+export const pollinationsModel = "flux";
+export const pollinationsCooldownMs = 45_000;
+
+export function pollinationsImageUrl(prompt: string, seed = randomInt(1, 2_147_483_647)) {
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?model=flux&width=1024&height=1024&nologo=true&seed=${seed}`;
+}
+
 export const imageProviders = {
+  pollinations: {
+    models: [pollinationsModel] as readonly string[],
+    async verify() {
+      // The legacy endpoint can serve a free request. Never provide billing credentials.
+    },
+    async generate(model: string, prompt: string, size: ImageSize) {
+      if (model !== pollinationsModel) throw new Error("UNSUPPORTED_MODEL");
+      const response = await fetch(pollinationsImageUrl(prompt), {
+        method: "GET", cache: "no-store", redirect: "error",
+        headers: { Accept: "image/jpeg, image/png" }, signal: AbortSignal.timeout(30_000),
+      });
+      if (response.status === 402 || response.status === 429) throw new Error("HTTP_429");
+      if (!response.ok) throw new Error("GENERATION_FAILED");
+      const contentType = response.headers.get("content-type")?.split(";")[0].trim().toLowerCase();
+      if (contentType !== "image/jpeg" && contentType !== "image/png") throw new Error("INVALID_IMAGE");
+      const input = await readBounded(response.body, 8_388_608);
+      const image = sharp(input, { limitInputPixels: 4_194_304, failOn: "error" });
+      const metadata = await image.metadata();
+      if ((metadata.format !== "jpeg" && metadata.format !== "png") || (metadata.pages ?? 1) > 1) {
+        throw new Error("INVALID_IMAGE");
+      }
+      const { width, height } = size === "square" ? { width: 1024, height: 1024 } : imageSizes[size];
+      const buffer = await image.resize(width, height, { fit: "cover" }).webp({ quality: 83 }).toBuffer();
+      if (buffer.length > 2_097_152) throw new Error("LARGE_IMAGE");
+      return { buffer, estimatedNeurons: 0 };
+    },
+  },
   cloudflare: {
     models: [fluxModel] as readonly string[],
     async verify() {

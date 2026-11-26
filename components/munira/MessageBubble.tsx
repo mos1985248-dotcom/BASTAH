@@ -22,6 +22,9 @@ function detectDir(text: string): "rtl" | "ltr" {
 export function MessageBubble({ message }: Props) {
   const isUser = message.role === "user";
   const isEmpty = message.content === "" && message.pending;
+  const imageResult = !isUser && !message.pending
+    ? /^تم توليد الصورة وحفظها في مكتبة منيرة\.\n(\/api\/ai\/images\/[a-z0-9]+)$/i.exec(message.content)?.[1]
+    : undefined;
   const dir = detectDir(message.content || "أ");
 
   return (
@@ -68,7 +71,11 @@ export function MessageBubble({ message }: Props) {
           boxShadow: t.shadows.sm,
         }}
       >
-        {isEmpty ? <TypingIndicator /> : message.content}
+        {isEmpty ? <TypingIndicator /> : imageResult ? <>
+          <p>تم توليد الصورة وحفظها في مكتبة منيرة.</p>
+          <Image src={imageResult} alt="الصورة المولّدة للمنتج" width={1024} height={1024} unoptimized style={{ width: "100%", height: "auto" }} />
+          <a href={imageResult + "?download=1"}>تنزيل الصورة</a>
+        </> : message.content}
       </div>
     </div>
   );
