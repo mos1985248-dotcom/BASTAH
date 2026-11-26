@@ -109,9 +109,18 @@ export async function GET(req: NextRequest) {
       prisma.product.count({ where }),
     ]);
 
+    // Only cache the anonymous first page of the unfiltered public catalog.
+    // Keep browser caching disabled so it can see updates once the edge entry expires.
+    const cacheable = page === 1 && !storeId && !category && !city && !search &&
+      minPrice === undefined && maxPrice === undefined && !view &&
+      !req.headers.has("cookie") && !req.headers.has("authorization");
     return NextResponse.json({
       products,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    }, {
+      headers: cacheable
+        ? { "Cache-Control": "public, max-age=0, must-revalidate", "Vercel-CDN-Cache-Control": "public, s-maxage=15" }
+        : { "Cache-Control": "private, no-store" },
     });
   } catch (err) {
     console.error("[GET /api/products]", err);
