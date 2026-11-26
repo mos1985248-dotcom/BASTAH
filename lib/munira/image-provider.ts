@@ -161,11 +161,18 @@ export const imageProviders = {
       const input = await readBounded(response.body, 8_388_608);
       const image = sharp(input, { limitInputPixels: 4_194_304, failOn: "error" });
       const metadata = await image.metadata();
-      if ((metadata.format !== "jpeg" && metadata.format !== "png") || (metadata.pages ?? 1) > 1) {
+      if (!metadata.width || !metadata.height ||
+          (metadata.format !== "jpeg" && metadata.format !== "png") || (metadata.pages ?? 1) > 1) {
         throw new Error("INVALID_IMAGE");
       }
+      if (response.headers.get("x-pollinations-logo")) {
+        // Classic branded images place the logo in the bottom edge.
+        const height = Math.max(1, Math.floor(metadata.height * 0.945));
+        image.extract({ left: 0, top: 0, width: metadata.width, height });
+      }
       const { width, height } = size === "square" ? { width: 1024, height: 1024 } : imageSizes[size];
-      const buffer = await image.resize(width, height, { fit: "cover" }).webp({ quality: 83 }).toBuffer();
+      const buffer = await image.resize(width, height, { fit: "cover", position: "centre" })
+        .webp({ quality: 89 }).toBuffer();
       if (buffer.length > 2_097_152) throw new Error("LARGE_IMAGE");
       return { buffer, estimatedNeurons: 0 };
     },

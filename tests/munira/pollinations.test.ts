@@ -38,3 +38,23 @@ test("Pollinations accepts valid binary images and stops at a payment or rate li
   await assert.rejects(imageProviders.pollinations.generate("flux", "Dates", "square"), /INVALID_IMAGE/);
   assert.equal(calls, 3);
 });
+
+test("Pollinations trims the branded bottom strip while preserving clean images", async t => {
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  const pixels = Buffer.alloc(100 * 100 * 3, 255);
+  for (let offset = 95 * 100 * 3; offset < pixels.length; offset += 3) {
+    pixels[offset + 1] = 0;
+    pixels[offset + 2] = 0;
+  }
+  const fixture = await sharp(pixels, { raw: { width: 100, height: 100, channels: 3 } }).png().toBuffer();
+  async function bottomPixel(branded: boolean) {
+    globalThis.fetch = async () => new Response(new Uint8Array(fixture), {
+      headers: branded ? { "Content-Type": "image/png", "x-pollinations-logo": "present" } : { "Content-Type": "image/png" },
+    });
+    const image = await imageProviders.pollinations.generate("flux", "Dates", "square");
+    return sharp(image.buffer).extract({ left: 512, top: 1010, width: 1, height: 1 }).raw().toBuffer();
+  }
+  assert.ok((await bottomPixel(true))[1] > 240);
+  assert.ok((await bottomPixel(false))[1] < 20);
+});
