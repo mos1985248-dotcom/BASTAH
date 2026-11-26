@@ -19,7 +19,8 @@ const SORT_MAP: Record<string, Prisma.ProductOrderByWithRelationInput> = {
 };
 
 async function listPublicProducts(where: Prisma.ProductWhereInput, sort: string, page: number, limit: number) {
-  const products = await prisma.product.findMany({
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
       where,
       select: {
         id: true,
@@ -39,8 +40,9 @@ async function listPublicProducts(where: Prisma.ProductWhereInput, sort: string,
       orderBy: SORT_MAP[sort],
       skip: (page - 1) * limit,
       take: limit,
-  });
-  const total = page === 1 && products.length < limit ? products.length : await prisma.product.count({ where });
+    }),
+    prisma.product.count({ where }),
+  ]);
   return { products, total };
 }
 
