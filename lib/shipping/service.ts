@@ -48,6 +48,7 @@ export async function resolveStoreShipping(
       return {
         carrier: link.carrier,
         credentials: {
+          ...(config.carrierKey === "BASTHA" ? { bastahLocal: "true" } : {}),
           flatFee: String(config.flatFee ?? 0),
           perKgFee: String(config.perKgFee ?? 0),
         },
