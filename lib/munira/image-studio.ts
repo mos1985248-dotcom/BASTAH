@@ -126,12 +126,14 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
     })) {
       throw new AuthError("بلغ مولّد الصور المجاني حد الطلبات. حاول بعد قليل، لم تُخصم صورة.", 429);
     }
-    const budget = await tx.muniraImage.aggregate({
-      where: { provider: model.provider, createdAt: { gte: new Date(now.getTime() - 86_400_000) } }, _sum: { neurons: true },
-    });
-    if (!usesPollinations && (budget._sum.neurons ?? 0) + reservedNeurons > imageBudget) {
-      logCloudflare("budget", { code: "HTTP_429" });
-      throw new AuthError(busyImageMessage, 429);
+    if (!usesPollinations) {
+      const budget = await tx.muniraImage.aggregate({
+        where: { provider: model.provider, createdAt: { gte: new Date(now.getTime() - 86_400_000) } }, _sum: { neurons: true },
+      });
+      if ((budget._sum.neurons ?? 0) + reservedNeurons > imageBudget) {
+        logCloudflare("budget", { code: "HTTP_429" });
+        throw new AuthError(busyImageMessage, 429);
+      }
     }
     if (manualTest) {
       const used = await tx.platformSetting.findUnique({ where: { key: oneTimeImageTestKey }, select: { key: true } });
@@ -147,6 +149,13 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
       state: "PENDING", neurons: usesPollinations ? 0 : reservedNeurons,
     } });
     return { id: row.id, replayed: false };
+  }, { maxWait: 3_000, timeout: 10_000 }).catch((error: unknown) => {
+    const code = (error as { code?: string } | null)?.code;
+    if (code === "P2028" || code === "P2024") {
+      console.warn("[MUNIRA-IMAGE-RESERVATION]", { provider: model.provider, code });
+      throw new AuthError(busyImageMessage, 503);
+    }
+    throw error;
   });
 
   if (reservation.replayed) return reservation.id;
