@@ -29,7 +29,9 @@
   composes: logoMark from "./nav.module.css";
 }
 .brandName { composes: brandName from "./nav.module.css"; margin: 0; }
-.footer .logoMark { width: 36px; height: 36px; padding: 0; border: 0; border-radius: 0; background: #fff; box-sizing: border-box; }
+.footer .logoMark { width: 46px; height: 46px; padding: 5px; border: 0; border-radius: 50%; background: #fff; box-sizing: border-box; flex: 0 0 46px; }
+.footer .logoMark img { width: 100% !important; height: 100% !important; object-fit: contain; }
+@media (max-width: 767px) { .footer .logoMark { width: 40px; height: 40px; flex-basis: 40px; padding: 4px; } }
 .footer .brandName { color: var(--ui-white); }
 .brandTag { margin: 2px 0 0; font-size: 13px; color: var(--ui-card); opacity: 0.85; }
 .brandText { margin: 18px 0 0; max-width: 440px; font-size: 14.5px; line-height: 2; color: var(--ui-card); opacity: 0.88; }
