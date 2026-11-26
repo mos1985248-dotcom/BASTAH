@@ -1,7 +1,7 @@
 import { randomInt } from "node:crypto";
 import sharp from "sharp";
 import { z } from "zod";
-import { fluxModel, imageSizes } from "./image-options";
+import { fluxModel, imagePresets, imageSizes, isImagePreset, type ImageSize } from "./image-options";
 
 export const imageBudget = 8000;
 export const reservedNeurons = 1000;
@@ -134,12 +134,13 @@ export async function readBounded(body: ReadableStream<Uint8Array> | null, maxBy
   return Buffer.concat(chunks, length);
 }
 
-export type ImageSize = keyof typeof imageSizes;
+export type { ImageSize } from "./image-options";
 export const pollinationsModel = "flux";
 export const pollinationsCooldownMs = 45_000;
 
-export function pollinationsImageUrl(prompt: string, seed = randomInt(1, 2_147_483_647)) {
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?model=flux&width=1024&height=1024&nologo=true&seed=${seed}`;
+export function pollinationsImageUrl(prompt: string, seed = randomInt(1, 2_147_483_647), size?: ImageSize) {
+  const { width, height } = size && isImagePreset(size) ? imagePresets[size] : { width: 1024, height: 1024 };
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?model=flux&width=${width}&height=${height}&nologo=true&seed=${seed}`;
 }
 
 export const openRouterImageModel = "recraft/recraft-v4.1-flash-v2:free";
@@ -183,7 +184,7 @@ export const imageProviders = {
       const { key, provider } = await verifyOpenRouterImage(model);
       const result = await openRouterJson("images", key, {
         method: "POST", body: JSON.stringify({
-          model, prompt, n: 1, aspect_ratio: size === "square" ? "1:1" : size === "portrait" ? "4:5" : "16:9",
+          model, prompt, n: 1, aspect_ratio: isImagePreset(size) ? imagePresets[size].aspectRatio : size === "square" ? "1:1" : size === "portrait" ? "4:5" : "16:9",
           provider: { only: [provider], allow_fallbacks: false },
         }),
       });
@@ -193,7 +194,7 @@ export const imageProviders = {
       const image = sharp(Buffer.from(data, "base64"), { limitInputPixels: 4_194_304, failOn: "error" });
       const info = await image.metadata();
       if (!info.width || !info.height || !["jpeg", "png", "webp"].includes(info.format ?? "") || (info.pages ?? 1) > 1) throw new Error("INVALID_IMAGE");
-      const { width, height } = imageSizes[size];
+      const { width, height } = isImagePreset(size) ? imagePresets[size] : imageSizes[size];
       const buffer = await image.resize(width, height, { fit: "cover" }).webp({ quality: 90 }).toBuffer();
       if (buffer.length > 2_097_152) throw new Error("LARGE_IMAGE");
       return { buffer, estimatedNeurons: 0 };
@@ -207,7 +208,7 @@ export const imageProviders = {
     async generate(model: string, prompt: string, size: ImageSize) {
       if (model !== pollinationsModel) throw new Error("UNSUPPORTED_MODEL");
       const seed = randomInt(1, 2_147_483_647);
-      const response = await fetch(pollinationsImageUrl(prompt, seed), {
+      const response = await fetch(pollinationsImageUrl(prompt, seed, size), {
         method: "GET", cache: "no-store", redirect: "error",
         headers: { Accept: "image/jpeg, image/png" }, signal: AbortSignal.timeout(30_000),
       });
@@ -227,7 +228,7 @@ export const imageProviders = {
         const height = Math.max(1, Math.floor(metadata.height * 0.945));
         image.extract({ left: 0, top: 0, width: metadata.width, height });
       }
-      const { width, height } = size === "square" ? { width: 1024, height: 1024 } : imageSizes[size];
+      const { width, height } = isImagePreset(size) ? imagePresets[size] : size === "square" ? { width: 1024, height: 1024 } : imageSizes[size];
       const buffer = await image.resize(width, height, { fit: "cover", position: "centre" })
         .webp({ quality: 89 }).toBuffer();
       if (buffer.length > 2_097_152) throw new Error("LARGE_IMAGE");
@@ -263,7 +264,7 @@ export const imageProviders = {
         throw new Error("INVALID_IMAGE");
       }
       const estimatedNeurons = Math.ceil(Math.ceil(info.width / 512) * Math.ceil(info.height / 512) * 4.8 + steps * 9.6);
-      const { width, height } = imageSizes[size];
+      const { width, height } = isImagePreset(size) ? imagePresets[size] : imageSizes[size];
       const buffer = await image.resize(width, height, { fit: "cover" }).webp({ quality: 83 }).toBuffer();
       if (buffer.length > 2_097_152) throw new Error("LARGE_IMAGE");
       return { buffer, estimatedNeurons };

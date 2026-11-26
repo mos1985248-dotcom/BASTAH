@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { blogCoverImage } from "@/lib/blog-covers";
 
 interface Params {
   params: { slug: string };
@@ -24,7 +25,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
       return NextResponse.json({ error: "المقال غير موجود" }, { status: 404 });
     }
 
-    return NextResponse.json({ post });
+    return NextResponse.json({ post: { ...post, coverImage: blogCoverImage(post.slug, post.coverImage) } });
   } catch (err) {
     console.error("[GET /api/blog/:slug]", err);
     return NextResponse.json({ error: "حدث خطأ في جلب المقال" }, { status: 500 });

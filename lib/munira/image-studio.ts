@@ -8,7 +8,7 @@ import { freeAnswer } from "./free-router";
 import { quotaWindow } from "./quota";
 import { redactPrompt } from "./context";
 import { sanitizeUserInput } from "./security";
-import { fluxModel, imageKinds, imageSizes } from "./image-options";
+import { fluxModel, imageKinds, imagePresets, isImagePreset, outputSize } from "./image-options";
 import { busyImageMessage, imageBudget, imageProviders, openRouterImageModel, logCloudflare, pollinationsCooldownMs, pollinationsModel, reservedNeurons, safeCloudflareDiagnostic } from "./image-provider";
 
 export const imageSettingsKey = "munira.image-studio";
@@ -28,8 +28,8 @@ export const imageConfigSchema = z.object({
 export const imageInput = z.object({
   requestId: z.string().uuid(),
   prompt: z.string().trim().min(3).max(800),
-  kind: z.enum(["product", "background", "social", "cover", "advertisement", "custom"]),
-  size: z.enum(["square", "portrait", "landscape"]),
+  kind: z.enum(["product", "background", "social", "cover", "advertisement", "custom", "store_logo", "store_cover", "square_ad", "story_ad"]),
+  size: z.enum(["square", "portrait", "landscape"]).default("square"),
 }).strict();
 type ImageInput = z.infer<typeof imageInput>;
 const recordedInput = imageInput.omit({ requestId: true });
@@ -207,7 +207,9 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
         throw new Error("STUDIO_DISABLED");
       }
     }
-    let prompt = `${imageKinds[input.kind]}. ${clean}`;
+    const preset = isImagePreset(input.kind) ? imagePresets[input.kind] : null;
+    const label = isImagePreset(input.kind) ? imagePresets[input.kind].label : imageKinds[input.kind];
+    let prompt = `${label}. ${clean}`;
     if (revision) prompt += `\nTargeted correction for the next image: ${revision.note}. Preserve other requested elements.`;
     if (usesPollinations) {
       const preferences = storeId && !revision ? await prisma.muniraImage.findMany({
@@ -219,7 +221,7 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
       if (relevant.length) prompt += `\nOptional store preferences, use only if relevant and compatible with the current request: ${relevant.join("; ")}`;
       const answer = await freeAnswer({
         system: [
-          "Rewrite the request as one concise English prompt for a realistic commercial product photograph.",
+          "Rewrite the request as one concise English image prompt suited to the requested format (logo, banner, advertisement or product photograph).",
           "Preserve the product identity, requested quantity, colors, packaging, props, background and composition. Do not invent packaging, ingredients, claims or brand elements.",
           "Describe the product first, then the angle, composition, lighting and background. Use natural texture, subtle variation, accurate color, controlled highlights and soft shadows unless requested otherwise.",
           "For food, preserve its real shape and texture. Avoid plastic-like sheen and excessive smoothing. Keep the subject fully visible with generous breathing room around the frame.",
@@ -229,10 +231,14 @@ export async function generateStudioImage(scope: string, input: ImageInput, stor
       }, { feature: "image_prompt", route: "/api/ai/images", storeId }, 15_000);
       const description = redactPrompt(answer.text).trim().replace(/\s+/g, " ").slice(0, 900);
       if (!description || /[\u0600-\u06ff]/.test(description)) throw new Error("GENERATION_FAILED");
-      prompt = `${description}. Realistic commercial product photography, natural surface detail, clear subject focus, balanced studio lighting, generous edge margins, no added text or watermark.`;
+      prompt = input.kind === "store_logo"
+        ? `${description}. Clean logo design with crisp shapes and no watermark.`
+        : `${description}. Commercial visual, clear subject focus, balanced lighting, generous edge margins, no added text or watermark.`;
     }
+    if (preset) prompt += `
+Composition: ${preset.composition}`;
     dispatched = true;
-    const image = await provider.generate(model.model, prompt, input.size);
+    const image = await provider.generate(model.model, prompt, outputSize(input.kind, input.size));
     try {
       const { error } = await studioStorage().upload(objectPath, image.buffer, { contentType: "image/webp", upsert: false });
       if (error) throw error;
