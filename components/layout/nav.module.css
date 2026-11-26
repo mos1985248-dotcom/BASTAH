@@ -219,8 +219,8 @@
   .tagline { font-size: 11px; }
   .search { grid-area: search; max-width: 620px; justify-self: center; }
   .actions { grid-area: actions; gap: 10px; }
-  .actions :global(.basita-nav-register) { display: inline-flex; background: var(--ui-gold); color: var(--ui-green-deep); border-radius: 10px; padding-inline: 17px; }
-  .actions :global(.basita-nav-register):hover { background: var(--ui-sand); }
+  .actions :global(.basita-nav-register) { display: inline-flex; background: var(--ui-green); color: var(--ui-white); border-radius: 10px; padding-inline: 17px; }
+  .actions :global(.basita-nav-register):hover { background: var(--ui-green-hover); color: var(--ui-white); }
   .actions :global(.basita-nav-icon) { border: 0; background: transparent; }
   .actions :global(.basita-nav-login) { padding-inline: 8px; }
   .nav { grid-area: nav; display: block; border-top: 1px solid var(--ui-border); padding-block: 4px; }
