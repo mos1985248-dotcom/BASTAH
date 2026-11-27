@@ -9,7 +9,9 @@ export default function SiteShell({ children, homeMobileNav = false }: {
   homeMobileNav?: boolean;
 }) {
   return (
-    <div 
+    <div
+      id="site-top"
+      tabIndex={-1}
       className={homeMobileNav ? s.homeShell : undefined}
       style={{ 
         minHeight: "100vh", 

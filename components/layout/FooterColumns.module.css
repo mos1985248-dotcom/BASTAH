@@ -11,5 +11,17 @@
 .link:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 3px; border-radius: 4px; }
 
 @media (max-width: 899px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 767px) {
+  .grid { gap: 20px 16px; }
+  .grid > div { min-width: 0; }
+  .heading { margin: 0 0 4px; padding-bottom: 6px; }
+  .title { font-size: 20px; overflow-wrap: anywhere; }
+  .link { width: 100%; min-height: 44px; padding-block: 5px; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+}
+@supports (grid-template-rows: subgrid) {
+  @media (max-width: 767px) {
+    .grid > div { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+  }
+}
 @media (prefers-reduced-motion: reduce) { .link { transition: none; } }
 /* basita-font-scale: applied */
