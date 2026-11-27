@@ -15,7 +15,6 @@
   --type-body: 16px;
   --type-leading: 1.7;
   --font-aref-ruqaa: "Aref Ruqaa";
-  --font-amiri: "Amiri";
   --color-bg: #FBF8F2;
   --color-text: #1A1A1A;
   --color-primary-600: #2A6B57;
@@ -63,7 +62,7 @@ body {
 
 /*
   العناوين:
-  IBM Plex Sans Arabic
+  Amiri
 
   النصوص:
   IBM Plex Sans Arabic
@@ -71,20 +70,16 @@ body {
 
 h1,
 h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family:
-    var(--font-plex-arabic),
-    "IBM Plex Sans Arabic",
-    system-ui,
-    sans-serif;
+h3 {
+  font-family: var(--font-amiri), "Amiri", serif;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-h1 { font-size: 36px; font-weight: 700; line-height: 1.25; }
-h2 { font-size: var(--type-section); font-weight: 700; line-height: 1.4; }
+h4, h5, h6 { font-family: var(--font-plex-arabic), sans-serif; overflow-wrap: anywhere; }
+
+h1 { font-size: 36px; font-weight: 700; line-height: 1.45; }
+h2 { font-size: var(--type-section); font-weight: 700; line-height: 1.5; }
 button { font-weight: 600; }
 
 @media (max-width: 767px) {
