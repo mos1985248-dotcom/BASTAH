@@ -25,7 +25,7 @@ export default function StoreReviewsSection({ store }: { store: StoreDetail }) {
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
       <div className={sec.head}>
-        <p className={sec.kicker}>{total} مراجعة</p>
+        {total > 0 && <p className={sec.kicker}>{total} مراجعة</p>}
         <h2 className={sec.title} style={{ fontFamily: t.typography.fontFamily.display }}>تقييمات العملاء</h2>
         <p className={sec.sub}>آراء عملاء حقيقيين بعد تجربة المتجر</p>
       </div>

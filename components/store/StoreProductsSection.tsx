@@ -25,7 +25,6 @@ export default function StoreProductsSection({ storeId, sections = [] }: { store
     <section id="products" aria-label="منتجات المتجر" className={s.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}>
       <div className={s.head}>
-        <p className={s.kicker}>من بسطة هذا المتجر</p>
         <h2 className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>منتجات المتجر</h2>
       </div>
       {sections.length > 0 ? (

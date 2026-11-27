@@ -1,5 +1,5 @@
 // components/store/StoreInfoGrid.tsx
-import { Calendar, CreditCard, FileText, MapPin, Package, RotateCcw, Truck, type LucideIcon } from "lucide-react";
+import { Calendar, CreditCard, FileText, Package, RotateCcw, Truck, type LucideIcon } from "lucide-react";
 import { yearsActiveFrom } from "@/lib/store-helpers";
 import type { StoreDetail } from "./types";
 import s from "./about.module.css";
@@ -14,7 +14,6 @@ export default function StoreInfoGrid({ store }: { store: StoreDetail }) {
     { Icon: FileText, label: "رقم الترخيص", value: info?.licenseNumber || "غير مُدرَج" },
     { Icon: Truck, label: "شركة الشحن", value: info?.deliveryPartner || "غير محددة" },
     { Icon: CreditCard, label: "طرق الدفع", value: info?.paymentMethods?.length ? info.paymentMethods.join(" · ") : "غير محددة" },
-    { Icon: MapPin, label: "المدينة", value: store.city || "غير محددة" },
     {
       Icon: RotateCcw,
       label: "سياسة الإرجاع",

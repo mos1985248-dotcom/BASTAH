@@ -1,6 +1,6 @@
 // components/store/StoreStoryAndBadges.tsx
 // الشارات الثابتة تعكس قدرات المنصة الفعلية وليست ميزة خاصة بمتجر معيّن.
-import { BadgeCheck, Clock, Leaf, RotateCcw, ShieldCheck, Tag, Truck, type LucideIcon } from "lucide-react";
+import { BadgeCheck, Clock, Leaf, ShieldCheck, Tag, Truck, type LucideIcon } from "lucide-react";
 import { t } from "@/theme";
 import { uiVars } from "@/components/ui/vars";
 import sec from "./sections.module.css";
@@ -16,12 +16,10 @@ const PLATFORM_BADGES: { label: string; Icon: LucideIcon }[] = [
 
 export default function StoreStoryAndBadges({ store }: { store: StoreDetail }) {
   const image = store.bannerImages?.[0] ?? null;
-  const days = store.publicInfo?.returnPolicyDays;
   const badges: { label: string; Icon: LucideIcon }[] = [
     ...(store.isVerified ? [{ label: "متجر موثّق", Icon: BadgeCheck }] : []),
     ...(store.publicInfo?.storyTags ?? []).map((label) => ({ label, Icon: Tag })),
     ...PLATFORM_BADGES,
-    ...(days !== undefined ? [{ label: `إرجاع خلال ${days} ${days === 1 ? "يوم" : "أيام"}`, Icon: RotateCcw }] : []),
   ];
 
   return (
@@ -34,7 +32,6 @@ export default function StoreStoryAndBadges({ store }: { store: StoreDetail }) {
         <div className={s.storyCard}>
           {image && <div className={s.storyImage} role="img" aria-label={`صورة من ${store.nameAr}`} style={{ backgroundImage: `url(${image})` }} />}
           <div className={s.storyBody}>
-            <p className={sec.kicker}>عن المتجر</p>
             <h2 className={s.storyTitle} style={{ fontFamily: t.typography.fontFamily.display }}>قصة الأسرة</h2>
             <p className={s.storyText}>
               {store.publicInfo?.storyAr || "لم تضف هذه الأسرة قصتها بعد — تابعونا قريبًا."}
