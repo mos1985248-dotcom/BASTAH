@@ -3,7 +3,7 @@
 .header { max-width: 640px; margin-bottom: 32px; }
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
 .kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
-.title { margin: 0 0 10px; font-size: var(--type-section); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.title { margin: 0 0 10px; font-size: var(--type-section); font-weight: 500; line-height: 1.5; color: var(--ui-green-deep); }
 .sub { margin: 0; font-size: 16px; line-height: 1.9; color: var(--ui-ink-muted); }
 
 .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 20px; align-items: stretch; overflow: visible; }
@@ -17,7 +17,7 @@
   position: absolute; top: -14px; inset-inline-start: 24px; padding: 5px 14px; border-radius: var(--ui-pill);
   background: var(--ui-gold); color: var(--ui-ink); font-size: 12px; font-weight: 700;
 }
-.name { margin: 0; font-size: 32px; font-weight: 700; line-height: 1.5; }
+.name { margin: 0; font-size: 32px; font-weight: 500; line-height: 1.5; }
 .tagline { margin: 2px 0 0; font-size: 14px; line-height: 1.8; color: var(--ui-ink-muted); }
 .featured .tagline { color: var(--ui-card); opacity: 0.85; }
 

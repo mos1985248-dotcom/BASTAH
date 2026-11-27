@@ -23,7 +23,7 @@
   border-radius: 12px; background: var(--ui-card); border: 1px solid var(--ui-border);
 }
 .brand { display: flex; flex-direction: column; min-width: 0; }
-.brandName { font-family: var(--font-readex), "Readex Pro", sans-serif; font-size: 31px; font-weight: 600; line-height: 1.4; color: var(--ui-green-deep); white-space: nowrap; }
+.brandName { font-family: var(--font-readex), "Readex Pro", sans-serif; font-size: 31px; font-weight: 500; line-height: 1.4; color: var(--ui-green-deep); white-space: nowrap; }
 
 .tagline {
   margin-top: 3px;

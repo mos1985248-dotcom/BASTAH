@@ -5,7 +5,7 @@
 .header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
 .kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
-.title { margin: 0; font-size: var(--type-section); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.title { margin: 0; font-size: var(--type-section); font-weight: 500; line-height: 1.5; color: var(--ui-green-deep); }
 .sub { margin: 4px 0 0; font-size: 15px; line-height: 1.8; color: var(--ui-ink-muted); }
 .all {
   flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px;
@@ -116,7 +116,7 @@
 .name {
   display: inline-flex; align-items: center; justify-content: center; gap: 5px;
   font-family: var(--font-readex), sans-serif;
-  text-align: center; font-size: 21px; line-height: 1.5; font-weight: 700; color: #3c2618;
+  text-align: center; font-size: 21px; line-height: 1.5; font-weight: 500; color: #3c2618;
 }
 .verified { flex: none; color: #08744a; }
 .counter {
@@ -154,7 +154,7 @@
   flex: none; width: 280px; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; gap: 12px;
   margin-top: 22px; padding: 28px 24px; border-radius: 24px; background: var(--ui-green-deep); color: var(--ui-white); border: 1px solid var(--ui-gold);
 }
-.endTitle { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.6; }
+.endTitle { margin: 0; font-size: 20px; font-weight: 500; line-height: 1.6; }
 .endText { margin: 0; font-size: 14px; line-height: 1.8; color: var(--ui-card); opacity: 0.85; }
 .endCta {
   align-self: flex-start; display: inline-flex; align-items: center; min-height: 48px; margin-top: 8px; padding: 0 24px;
@@ -169,7 +169,7 @@
   border-radius: 24px; border: 1px solid var(--ui-border); background: var(--ui-card); color: var(--ui-ink-muted);
 }
 .notice p { margin: 0; font-size: 15px; line-height: 1.8; }
-.noticeTitle { font-size: 17px !important; font-weight: 700; color: var(--ui-ink); }
+.noticeTitle { font-size: 17px !important; font-weight: 500; color: var(--ui-ink); }
 
 @media (max-width: 767px) {
   .section { padding: 36px 12px; }
