@@ -9,7 +9,7 @@
 .copy { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "intro action" "chips chips"; align-items: center; column-gap: 24px; row-gap: 20px; min-width: 0; }
 .intro { grid-area: intro; min-width: 0; }
 .kicker { margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
-.title { margin: 0 0 8px; font-size: clamp(46px, 5.75vw, 69px); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.title { margin: 0 0 8px; font-size: var(--type-section); font-weight: 700; line-height: 1.4; color: var(--ui-green-deep); }
 .lead { margin: 0; font-size: 17px; line-height: 1.8; color: var(--ui-ink-muted); }
 
 .chips { grid-area: chips; display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
