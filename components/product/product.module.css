@@ -36,3 +36,6 @@
   .lower { gap: 40px; margin-top: 40px; }
 }
 /* basita-font-scale: applied */
+
+.compactSectionTitle { font-size: 28px; font-weight: 500; line-height: 1.5; }
+@media (max-width: 767px) { .compactSectionTitle { font-size: 22px; } }
