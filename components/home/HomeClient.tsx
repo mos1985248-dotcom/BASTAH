@@ -26,6 +26,9 @@ export default function HomeClient() {
   // التاجر عنده متجر أصلاً
   const showStartStore =
     !loading && (!user || (user.role !== "SELLER" && !user.store));
+  const freeStartHref = !showStartStore
+    ? undefined
+    : !user ? "/register" : user.role === "BUYER" ? "/dashboard/create-store" : undefined;
 
   return (
     <SiteShell homeMobileNav>
@@ -65,7 +68,7 @@ export default function HomeClient() {
 
       {/* الإقفال النهائي */}
       <SectionBand tone="tint">
-        <StoryBlogCTARow showStartStore={showStartStore} />
+        <StoryBlogCTARow startStoreHref={freeStartHref} />
       </SectionBand>
       </div>
     </SiteShell>

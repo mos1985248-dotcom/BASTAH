@@ -5,16 +5,26 @@ import { t } from "@/theme";
 import { formatPlatformCopy } from "@/lib/brand";
 import s from "./plans.module.css";
 
+const productPluralRules = new Intl.PluralRules("ar");
+
+function formatProductLimit(limit: number | null) {
+  if (limit === null) return "منتجات غير محدودة";
+  if (limit === 0) return "لا يمكن إضافة منتجات";
+  if (limit === 2) return "منتجان كحد أقصى";
+  const unit = productPluralRules.select(limit) === "few" ? "منتجات" : "منتج";
+  return `${limit} ${unit} كحد أقصى`;
+}
+
 export default function PlanCard({ plan }: { plan: PlanConfig }) {
   const featured = Boolean(plan.badgeAr);
   const rows = [
     {
       ok: true,
-      text: plan.maxProducts === null ? "منتجات غير محدودة" : `${plan.maxProducts} منتج كحد أقصى`,
+      text: formatProductLimit(plan.maxProducts),
     },
     {
       ok: plan.hasAIFeatures,
-      text: plan.hasAIFeatures ? "مساعد الذكاء الاصطناعي (منيرة)" : "بدون منيرة",
+      text: `مساعد الذكاء الاصطناعي (منيرة) — ${plan.hasAIFeatures ? "متاح" : "غير متاح"}`,
     },
     {
       ok: plan.hasDaftari,
