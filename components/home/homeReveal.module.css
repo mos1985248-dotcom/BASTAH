@@ -11,3 +11,22 @@
 @media (prefers-reduced-motion: reduce) {
   .scope [data-home-reveal-state="running"] { animation: none; }
 }
+
+/* Mobile entrances stay fully visible; movement alone provides the lift. */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  .scope [data-home-reveal-state="running"] {
+    animation: mobile-lift 210ms cubic-bezier(0.22, 1, 0.36, 1) 0ms both;
+  }
+
+  /* Independent scale preserves entrance translation and existing transforms. */
+  .scope :is(a[href], button:not(:disabled), [role="button"]:not([aria-disabled="true"])):not([aria-disabled="true"]):active {
+    scale: 0.985;
+    transition: scale 70ms ease-out;
+  }
+}
+
+@keyframes mobile-lift {
+  0% { translate: 0 5px; }
+  68% { translate: 0 -1px; }
+  100% { translate: 0 0; }
+}
