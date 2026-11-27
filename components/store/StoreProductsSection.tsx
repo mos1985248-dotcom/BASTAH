@@ -22,14 +22,14 @@ export default function StoreProductsSection({ storeId, sections = [] }: { store
   const { favoriteIds, toggleFavorite } = useFavorites();
 
   return (
-    <section id="products" aria-label="منتجات المتجر" className={s.section}
+    <section id="products" aria-label="من بسطتنا" className={s.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}>
       <div className={s.head}>
-        <h2 className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>منتجات المتجر</h2>
+        <h2 className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>من بسطتنا</h2>
       </div>
       {sections.length > 0 ? (
         <>
-          <div className={s.sectionFilters} role="group" aria-label="أقسام المتجر">
+          <div className={s.sectionFilters} role="group" aria-label="أقسام البسطة">
             {[{ id: "", name: "الكل" }, ...sections].map((section) => (
               <button key={section.id} type="button" className={s.sectionFilter}
                 aria-pressed={selection === section.id} onClick={() => setSelection(section.id)}>
@@ -38,7 +38,7 @@ export default function StoreProductsSection({ storeId, sections = [] }: { store
             ))}
           </div>
           <SectionProducts key={selection} storeId={storeId} sectionId={selection}
-            title={sections.find((section) => section.id === selection)?.name ?? "كل المنتجات"}
+            title={sections.find((section) => section.id === selection)?.name ?? "كل ما في البسطة"}
             favoriteIds={favoriteIds} onToggleFavorite={toggleFavorite} />
         </>
       ) : <FeaturedProducts storeId={storeId} favoriteIds={favoriteIds} onToggleFavorite={toggleFavorite} />}
@@ -87,21 +87,21 @@ function FeaturedProducts({ storeId, favoriteIds, onToggleFavorite }: ProductLis
     <div aria-busy={loading}>
       {loading && <ProductsSkeleton />}
 
-      {empty && <EmptyState title="لا توجد منتجات بعد في هذا المتجر" description="تابع المتجر ليصلك جديده." />}
+      {empty && <EmptyState title="لا توجد منتجات معروضة في البسطة بعد" description="تابع البسطة ليصلك جديدها." />}
 
       {!loading && !empty && (
         <div className={s.rows}>
           <StoreProductRow
-            title="الأكثر مبيعًا"
-            subtitle="المنتجات التي يفضّلها عملاء المتجر"
+            title="الأكثر طلبًا من بسطتنا"
+            subtitle="اختيارات زوّار البسطة"
             products={bestSellers}
             rankBadgeFirst="الأكثر مبيعًا"
             favoriteIds={favoriteIds}
             onToggleFavorite={onToggleFavorite}
           />
           <StoreProductRow
-            title="أحدث المنتجات"
-            subtitle="أضيفت مؤخرًا إلى المتجر"
+            title="جديد البسطة"
+            subtitle="ما أضفناه حديثًا إلى بسطتنا"
             products={newest}
             favoriteIds={favoriteIds}
             onToggleFavorite={onToggleFavorite}
@@ -160,13 +160,13 @@ function SectionProducts({ storeId, sectionId, title, favoriteIds, onToggleFavor
     <div aria-busy={loading}>
       {loading && <ProductsSkeleton />}
       {failed && <div>
-        <p role="alert">تعذّر تحميل منتجات المتجر.</p>
+        <p role="alert">تعذّر عرض ما في البسطة.</p>
         <button type="button" className={s.sectionFilter} onClick={() => goToPage(page)}>إعادة المحاولة</button>
       </div>}
       {result && (
         <>
           {result.products.length ? <StoreProductRow title={title} products={result.products}
-            favoriteIds={favoriteIds} onToggleFavorite={onToggleFavorite} /> : <EmptyState title="لا توجد منتجات هنا حاليًا" />}
+            favoriteIds={favoriteIds} onToggleFavorite={onToggleFavorite} /> : <EmptyState title="لا توجد منتجات في هذا القسم حاليًا" />}
           {(page > 1 || result.pagination.pages > page) && (
             <div className={s.sectionFilters} role="group" aria-label="صفحات المنتجات">
               <button type="button" className={s.sectionFilter} disabled={page === 1} onClick={() => goToPage(page - 1)}>السابق</button>

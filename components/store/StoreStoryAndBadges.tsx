@@ -17,14 +17,14 @@ const PLATFORM_BADGES: { label: string; Icon: LucideIcon }[] = [
 export default function StoreStoryAndBadges({ store }: { store: StoreDetail }) {
   const image = store.bannerImages?.[0] ?? null;
   const badges: { label: string; Icon: LucideIcon }[] = [
-    ...(store.isVerified ? [{ label: "متجر موثّق", Icon: BadgeCheck }] : []),
+    ...(store.isVerified ? [{ label: "بسطة موثّقة", Icon: BadgeCheck }] : []),
     ...(store.publicInfo?.storyTags ?? []).map((label) => ({ label, Icon: Tag })),
     ...PLATFORM_BADGES,
   ];
 
   return (
     <section
-      aria-label="قصة المتجر ومزاياه"
+      aria-label="حكاية أهل البسطة ومزاياها"
       className={sec.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
@@ -32,16 +32,15 @@ export default function StoreStoryAndBadges({ store }: { store: StoreDetail }) {
         <div className={s.storyCard}>
           {image && <div className={s.storyImage} role="img" aria-label={`صورة من ${store.nameAr}`} style={{ backgroundImage: `url(${image})` }} />}
           <div className={s.storyBody}>
-            <h2 className={s.storyTitle} style={{ fontFamily: t.typography.fontFamily.display }}>قصة الأسرة</h2>
+            <h2 className={s.storyTitle} style={{ fontFamily: t.typography.fontFamily.display }}>حكاية أهل البسطة</h2>
             <p className={s.storyText}>
-              {store.publicInfo?.storyAr || "لم تضف هذه الأسرة قصتها بعد — تابعونا قريبًا."}
+              {store.publicInfo?.storyAr || "أهل البسطة لم يرووا حكايتهم بعد."}
             </p>
           </div>
         </div>
 
         <div className={s.trust}>
-          <h2 className={s.trustTitle} style={{ fontFamily: t.typography.fontFamily.display }}>لماذا يثق العملاء بنا؟</h2>
-          <p className={s.trustSub}>مزايا تساعدك على التسوّق بثقة</p>
+          <h2 className={s.trustTitle} style={{ fontFamily: t.typography.fontFamily.display }}>تسوّق من بسطتنا بثقة</h2>
           <ul className={s.badges}>
             {badges.map(({ label, Icon }) => (
               <li key={label} className={s.badge}>

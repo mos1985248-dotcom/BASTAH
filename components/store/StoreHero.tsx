@@ -46,7 +46,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
           <div className={s.identity}>
             <h1 className={s.name} style={{ fontFamily: t.typography.fontFamily.display }}>
               {store.nameAr}
-              {store.isVerified && <BadgeCheck size={24} strokeWidth={1.9} className={s.verified} aria-label="متجر موثّق" />}
+              {store.isVerified && <BadgeCheck size={24} strokeWidth={1.9} className={s.verified} aria-label="بسطة موثّقة" />}
             </h1>
             <p className={s.meta}>
               <span className={s.metaItem}>
@@ -62,7 +62,7 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
               {info?.videoUrl && (
                 <a href={info.videoUrl} target="_blank" rel="noopener noreferrer" className={s.metaItem}>
                   <Play size={14} strokeWidth={1.9} aria-hidden="true" />
-                  فيديو المتجر
+                  جولة بالفيديو
                 </a>
               )}
             </p>

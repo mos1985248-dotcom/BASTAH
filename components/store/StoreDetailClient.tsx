@@ -46,7 +46,7 @@ export default function StoreDetailClient() {
         setError(
           err instanceof ApiError
             ? err.message
-            : "تعذّر تحميل المتجر"
+            : "تعذّر فتح البسطة"
         );
       } finally {
         if (active) {

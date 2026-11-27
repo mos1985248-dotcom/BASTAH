@@ -14,12 +14,12 @@ export default function StoreClosingBanner({ store: _store }: { store: StoreDeta
       <div className={s.closing}>
         <div>
           <h2 className={s.closingTitle} style={{ fontFamily: t.typography.fontFamily.display }}>
-            شكرًا لدعمك للأسر المنتجة السعودية
+            شكرًا لمرورك على بسطتنا
           </h2>
-          <p className={s.closingText}>كل عملية شراء منك تدعم أسرة سعودية وتصنع فرقًا حقيقيًا في حياتهم.</p>
+          <p className={s.closingText}>كل طلب من بسطات الأسر السعودية يدعم عمل أهلها.</p>
         </div>
         <a href="#products" className={s.closingCta}>
-          تصفّح جميع المنتجات
+          العودة إلى منتجات البسطة
         </a>
       </div>
     </section>
