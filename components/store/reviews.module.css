@@ -50,3 +50,8 @@
   .emptyState h3 { font-size: 17px; font-weight: 500; line-height: 1.7; }
   .emptyState p { font-size: 13px; line-height: 1.8; }
 }
+
+/* Align mobile storefront typography to the platform wordmark. */
+@media (max-width: 767px) {
+  .emptyState h3 { font-size: 17px; font-weight: 500; } .comment { font-size: 14px; font-weight: 400; }
+}

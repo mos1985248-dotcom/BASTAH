@@ -80,3 +80,8 @@
 }
 @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
 /* basita-font-scale: applied */
+
+/* Align mobile storefront typography to the platform wordmark. */
+@media (max-width: 767px) {
+  .name { font-size: 21px; font-weight: 500; } .btn { font-size: 13px; font-weight: 500; }
+}
