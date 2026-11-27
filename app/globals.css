@@ -10,8 +10,10 @@
 */
 
 :root {
-  --font-plex-arabic: "IBM Plex Sans Arabic";
-  --font-kufi-arabic: "Noto Kufi Arabic Variable";
+  --font-kufi-arabic: var(--font-plex-arabic);
+  --type-section: 30px;
+  --type-body: 16px;
+  --type-leading: 1.7;
   --font-aref-ruqaa: "Aref Ruqaa";
   --font-amiri: "Amiri";
   --color-bg: #FBF8F2;
@@ -50,6 +52,9 @@ body {
 
 body {
   min-height: 100vh;
+  font-size: var(--type-body);
+  line-height: var(--type-leading);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ─────────────────────────────────────────
@@ -58,7 +63,7 @@ body {
 
 /*
   العناوين:
-  Noto Kufi Arabic
+  IBM Plex Sans Arabic
 
   النصوص:
   IBM Plex Sans Arabic
@@ -71,10 +76,21 @@ h4,
 h5,
 h6 {
   font-family:
-    var(--font-kufi-arabic),
-    "Noto Kufi Arabic",
+    var(--font-plex-arabic),
+    "IBM Plex Sans Arabic",
     system-ui,
     sans-serif;
+  overflow-wrap: anywhere;
+}
+
+h1 { font-size: 36px; font-weight: 700; line-height: 1.25; }
+h2 { font-size: var(--type-section); font-weight: 700; line-height: 1.4; }
+button { font-weight: 600; }
+
+@media (max-width: 767px) {
+  :root { --type-section: 24px; --type-body: 15px; }
+  h1 { font-size: 30px; }
+  p { overflow-wrap: anywhere; }
 }
 
 button,
