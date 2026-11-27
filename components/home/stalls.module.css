@@ -115,7 +115,7 @@
 .woodSign::after { left: 18px; }
 .name {
   display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-  font-family: var(--font-plex-arabic), sans-serif;
+  font-family: var(--font-readex), sans-serif;
   text-align: center; font-size: 21px; line-height: 1.5; font-weight: 700; color: #3c2618;
 }
 .verified { flex: none; color: #08744a; }
