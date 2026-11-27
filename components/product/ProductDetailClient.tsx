@@ -18,6 +18,7 @@ import ProductPolicyCards from "./ProductPolicyCards";
 import ProductReviewsSection from "./ProductReviewsSection";
 import RelatedProducts from "./RelatedProducts";
 import StickyBuyBar from "./StickyBuyBar";
+import GuestCheckoutForm from "./GuestCheckoutForm";
 import { ProductError, ProductLoading } from "./ProductStates";
 import type { ProductDetail } from "./types";
 import s from "./product.module.css";
@@ -44,6 +45,13 @@ export default function ProductDetailClient() {
   }, [id]);
 
   const purchase = useProductPurchase(product, id);
+  const [guestOpen, setGuestOpen] = useState(false);
+  const guestEnabled = process.env.NEXT_PUBLIC_GUEST_CHECKOUT_ENABLED === "true";
+  const buyNow = () => {
+    if (purchase.userLoading || purchase.maxQty < 1) return;
+    if (guestEnabled && !purchase.user) { setGuestOpen(true); return; }
+    void purchase.handleBuyNow();
+  };
 
   if (loading) return <SiteShell><ProductLoading /></SiteShell>;
   if (error || !product) return <SiteShell><ProductError message={error} /></SiteShell>;
@@ -97,7 +105,7 @@ export default function ProductDetailClient() {
                 maxQty={purchase.maxQty}
                 effectivePrice={purchase.effectivePrice}
                 onAddToCart={purchase.handleAddToCart}
-                onBuyNow={purchase.handleBuyNow}
+                onBuyNow={buyNow}
                 addingToCart={purchase.addingToCart}
                 addedToCart={purchase.addedToCart}
                 checkingOut={purchase.checkingOut}
@@ -110,7 +118,7 @@ export default function ProductDetailClient() {
           <div className={s.lower}>
             <ProductDescription product={product} />
             <ProductPolicyCards product={product} />
-            <div>
+            {(!guestEnabled || purchase.user || purchase.userLoading) && <div>
               <AddressSelector
                 hasUser={!!purchase.user}
                 userLoading={purchase.userLoading}
@@ -123,19 +131,25 @@ export default function ProductDetailClient() {
                 onFormChange={(k, v) => purchase.setAddrForm((p) => ({ ...p, [k]: v }))}
                 onSave={purchase.handleAddAddress}
               />
-            </div>
+            </div>}
             <ProductReviewsSection product={product} />
             <RelatedProducts product={product} />
           </div>
         </main>
       </div>
 
+      {guestEnabled && guestOpen && !purchase.user && <div className={s.guestOverlay} role="dialog" aria-modal="true" aria-label="الشراء كزائر">
+        <div className={s.guestDialog} style={uiVars}>
+          <button type="button" className={s.guestClose} onClick={() => setGuestOpen(false)} aria-label="إغلاق">×</button>
+          <GuestCheckoutForm key={`${id}-${purchase.selectedVariantId}-${purchase.qty}`} storeId={product.store.id} productId={id} variantId={purchase.selectedVariant?.id} quantity={purchase.qty} />
+        </div>
+      </div>}
       <StickyBuyBar
         qty={purchase.qty}
         price={purchase.effectivePrice}
         disabled={purchase.checkingOut || purchase.maxQty === 0}
         checkingOut={purchase.checkingOut}
-        onBuyNow={purchase.handleBuyNow}
+        onBuyNow={buyNow}
         onAddToCart={purchase.handleAddToCart}
         addingToCart={purchase.addingToCart}
         addedToCart={purchase.addedToCart}
