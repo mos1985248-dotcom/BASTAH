@@ -28,7 +28,6 @@ export default function MuniraShowcase() {
       <div className={s.card}>
         <div className={s.copy}>
           <div className={s.intro}>
-            <p className={s.kicker}>مساعدتك الذكية</p>
             <h2 id="munira-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
               منيرة
             </h2>
