@@ -68,7 +68,7 @@
 .brandText { margin: 18px 0 0; max-width: 440px; font-size: 14.5px; line-height: 2; color: var(--ui-card); opacity: 0.88; }
 
 /* ───── النشرة البريدية ───── */
-.newsTitle { margin: 0 0 6px; font-family: var(--font-amiri), "Amiri", serif; font-size: 26px; font-weight: 700; line-height: 1.5; color: var(--ui-white); }
+.newsTitle { margin: 0 0 6px; font-family: var(--font-readex), "Readex Pro", sans-serif; font-size: 26px; font-weight: 700; line-height: 1.5; color: var(--ui-white); }
 .newsText { margin: 0 0 16px; font-size: 14px; line-height: 1.9; color: var(--ui-card); opacity: 0.88; }
 .form { display: flex; align-items: center; width: 100%; max-width: 440px; min-height: 52px; padding: 4px; box-sizing: border-box; border-radius: 999px; background: var(--ui-card); }
 .mailIcon { flex: none; margin-inline-start: 14px; color: var(--ui-ink-muted); }
