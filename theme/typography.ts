@@ -7,7 +7,7 @@
 // للنصوص، الأزرار، النماذج، القوائم والمحتوى العام.
 //
 // خط العناوين:
-// Noto Kufi Arabic
+// IBM Plex Sans Arabic
 // للعناوين الرئيسية والعناصر التي تحتاج حضورًا بصريًا أقوى.
 //
 // الهدف:
@@ -15,9 +15,9 @@
 
 export const fontFamily = {
   base: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
-  heading: "var(--font-kufi-arabic), 'Noto Kufi Arabic', system-ui, sans-serif",
-  // خط العناوين التراثي (تجربة): display هو المعتمد مؤقتاً، وdisplayAlt للمقارنة.
-  display: "var(--font-amiri), 'Amiri', serif", // Amiri هو الخط الرئيسي المعتمد للعناوين
+  heading: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
+  // Keep heritage serif available separately for brand marks.
+  display: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
   displayAlt: "var(--font-amiri), 'Amiri', serif",
 } as const;
 
@@ -36,8 +36,8 @@ export const fontSize = {
   md: "17px",
   lg: "19px",
   xl: "22px",
-  "2xl": "26px",
-  "3xl": "32px",
+  "2xl": "24px",
+  "3xl": "30px",
   "4xl": "40px",
   "5xl": "48px",
 } as const;
