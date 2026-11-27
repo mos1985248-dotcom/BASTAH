@@ -4,6 +4,6 @@
   .desktopCopy { display: none; }
   .mobileCopy { display: inline; }
 
-  /* The floating button uses 64px from the inline end. Leave 8px clear. */
-  section.section { padding-inline: clamp(20px, 6vw, 40px) 72px; }
+  /* Equal mobile gutters keep all merchant sections centered. */
+  section.section { padding-inline: clamp(12px, 3vw, 20px); }
 }
