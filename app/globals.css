@@ -662,3 +662,10 @@ textarea:focus-visible {
     padding: 0 4px;
   }
 }
+/* Tactile feedback for shared interactive controls on small screens. */
+@media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+  :is(.basita-card-interactive, .basita-btn-interactive, .basita-nav-icon):not(:disabled):not([aria-disabled="true"]):active {
+    scale: 0.985;
+    transition: scale 70ms ease-out;
+  }
+}
