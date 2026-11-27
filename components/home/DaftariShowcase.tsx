@@ -21,7 +21,6 @@ export default function DaftariShowcase() {
       <div className={s.grid}>
         <div className={s.copy}>
           <div className={s.heading}>
-            <p className={s.kicker}>أدوات تساعدك في إدارة متجرك</p>
             <h2 id="daftari-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
               دفاتري
             </h2>

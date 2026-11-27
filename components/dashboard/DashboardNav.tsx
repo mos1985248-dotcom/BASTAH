@@ -2,7 +2,7 @@
 // بيانات التنقل ومنطق «العنصر النشط» مشتركان بين القائمة الجانبية وشريط الجوال.
 // كل الروابط السابقة محفوظة؛ التغيير في التجميع فقط (مبيعات / تنمية المتجر / إعدادات المتجر).
 import {
-  Home, List, Plus, Receipt, Wallet, Settings, CreditCard, FileText, Truck, Sparkles,
+  Home, List, Plus, Receipt, Wallet, Settings, CreditCard, FileText, Truck, MessageCircle,
   Headset, User, ShoppingBag, Landmark, Megaphone, Plug, type LucideIcon,
 } from "lucide-react";
 
@@ -26,7 +26,7 @@ export const GROUPS: NavGroup[] = [
     items: [
       { href: "/dashboard/marketing", label: "التسويق", Icon: Megaphone },
       { href: "/dashboard/integrations", label: "التكاملات", Icon: Plug },
-      { href: "/dashboard/munira", label: "منيرة", Icon: Sparkles },
+      { href: "/dashboard/munira", label: "منيرة", Icon: MessageCircle },
     ],
   },
   {
