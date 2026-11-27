@@ -27,16 +27,16 @@ export default function MuniraShowcase() {
     >
       <div className={s.card}>
         <div className={s.copy}>
-          <div className={s.intro}>
+          <div className={s.intro} data-home-reveal>
             <h2 id="munira-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
               منيرة
             </h2>
             <p className={s.lead}>مساعدتك الذكية لإدارة متجرك وزيادة مبيعاتك</p>
           </div>
 
-          <ul className={s.chips}>
+          <ul className={s.chips} data-home-reveal-group>
             {CAPABILITIES.map(({ Icon, label }) => (
-              <li key={label} className={s.chip}>
+              <li key={label} className={s.chip} data-home-reveal>
                 <Icon size={16} strokeWidth={1.8} aria-hidden="true" />
                 {label}
               </li>

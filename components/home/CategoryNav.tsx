@@ -37,7 +37,7 @@ export default function CategoryNav() {
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
       <p className={s.kicker}>من سوق بسطة مارت</p>
-      <h2 id="categories-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
+      <h2 data-home-reveal id="categories-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
         تسوّق حسب الفئة
       </h2>
 
