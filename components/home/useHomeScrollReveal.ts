@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 
 const CARD = "[data-home-reveal]";
 const MOTION = "(prefers-reduced-motion: reduce)";
+const MOBILE = "(max-width: 767px)";
 
 /** Progressive enhancement: cards keep their normal appearance until an entrance starts. */
 export default function useHomeScrollReveal() {
@@ -15,6 +16,7 @@ export default function useHomeScrollReveal() {
         !window.CSS?.supports("animation-name", "home-reveal")) return;
 
     const motion = window.matchMedia(MOTION);
+    const mobile = window.matchMedia(MOBILE);
     const finish = (card: HTMLElement) => {
       card.dataset.homeRevealState = "done";
       card.style.removeProperty("--home-reveal-delay");
@@ -26,6 +28,7 @@ export default function useHomeScrollReveal() {
         (entry.target as HTMLElement).dataset.homeRevealState === "waiting");
       const cards = entering.map(({ target }) => {
         const card = target as HTMLElement;
+        if (mobile.matches) return { card, delay: 0 };
         const group = card.closest("[data-home-reveal-group]");
         const row = group ? Array.from(group.children).filter((child): child is HTMLElement =>
           child instanceof HTMLElement && child.matches(CARD) && child.offsetTop === card.offsetTop
