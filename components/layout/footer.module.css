@@ -42,6 +42,18 @@
 .backToTop:hover { background: var(--ui-green); }
 .backToTop:focus-visible { outline: 2px solid var(--ui-card); outline-offset: -5px; }
 
+@media (max-width: 767px) {
+  .backToTopDock {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    background: var(--ui-green-deep);
+  }
+  .backToTopDock .backToTop { position: static; }
+}
+
 /* ───── الهوية ───── */
 .brandHead { display: flex; align-items: center; gap: 10px; }
 .logoMark {
