@@ -20,7 +20,10 @@ import s from "./nav.module.css";
 // الترويسة أعرض قليلاً من محتوى الصفحات لتتسع للروابط والبحث والأيقونات
 const headerVars = { ...uiVars, "--nav-max": "1440px" } as CSSProperties;
 
-export default function Navbar({ homeMobileNav = false }: { homeMobileNav?: boolean }) {
+export default function Navbar({ homeMobileNav = false, marketplaceHeader = false }: {
+  homeMobileNav?: boolean;
+  marketplaceHeader?: boolean;
+}) {
   const { user, loading } = useCurrentUser();
   const counts = useNavCounts(user?.id);
   const router = useRouter();
@@ -45,7 +48,7 @@ export default function Navbar({ homeMobileNav = false }: { homeMobileNav?: bool
   }, [menuOpen]);
 
   return (
-    <header className={homeMobileNav ? `${s.header} ${s.homeHeader}` : s.header} style={headerVars}>
+    <header className={`${s.header}${homeMobileNav ? ` ${s.homeHeader}` : ""}${marketplaceHeader ? ` ${s.marketplaceHeader}` : ""}`} style={headerVars}>
       <NavTopBar />
 
       <div className={s.main}>

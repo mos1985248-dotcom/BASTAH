@@ -286,3 +286,33 @@
   .homeHeader .drawer { max-height: calc(100dvh - 64px - var(--home-bottom-nav-space)); box-sizing: border-box; }
   .homeHeader .mobileSearch + .drawer { max-height: calc(100dvh - 128px - var(--home-bottom-nav-space)); }
 }
+
+@media (max-width: 767px) {
+  .menuBtn[aria-expanded="true"] { margin-inline: 2px; border-color: var(--ui-gold); background: var(--ui-sand); }
+  .drawerInner { gap: 5px; padding: 10px; }
+  .drawerLink { gap: 10px; padding-inline: 12px; }
+  .drawerLink .drawerArrow { width: 17px; height: 17px; margin-inline-start: 4px; opacity: 1; }
+  .drawerShortcuts { gap: 8px; padding: 0 2px 2px; }
+  .drawerShortcuts .drawerLink { padding: 8px; font-size: 18px; }
+
+  .marketplaceHeader .main { gap: 6px; padding-inline: 10px; }
+  .marketplaceHeader .logo { gap: 6px; }
+  .marketplaceHeader .actions { gap: 5px; }
+  .marketplaceHeader .menuBtn,
+  .marketplaceHeader .toggleBtn,
+  .marketplaceHeader .actions :global(.basita-nav-icon),
+  .marketplaceHeader .actions :global(.basita-nav-login),
+  .marketplaceHeader .actions :global(.basita-nav-auth) > button,
+  .marketplaceHeader .actions :global(.basita-auth-loading) { width: 42px; height: 42px; min-height: 42px; }
+}
+@media (max-width: 380px) {
+  .marketplaceHeader .main { gap: 4px; padding-inline: 8px; }
+  .marketplaceHeader .brandName { font-size: 21px; }
+  .marketplaceHeader .logoMark { width: 34px; height: 34px; }
+  .marketplaceHeader .menuBtn,
+  .marketplaceHeader .toggleBtn,
+  .marketplaceHeader .actions :global(.basita-nav-icon),
+  .marketplaceHeader .actions :global(.basita-nav-login),
+  .marketplaceHeader .actions :global(.basita-nav-auth) > button,
+  .marketplaceHeader .actions :global(.basita-auth-loading) { width: 40px; height: 40px; min-height: 40px; }
+}

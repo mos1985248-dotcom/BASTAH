@@ -35,11 +35,19 @@
   .row { grid-template-columns: 48px 1fr; }
 }
 @media (max-width: 767px) {
-  .copy { text-align: center; }
-  .kicker { justify-content: center; }
-  .lead { margin-inline: auto; }
-  /* Equal side columns keep the text centered while retaining the numbers. */
-  .row { grid-template-columns: 36px minmax(0, 1fr) 36px; text-align: center; }
-  .num { justify-self: center; }
+  .section { padding: 28px 12px; padding-inline-end: 72px; }
+  .grid { gap: 14px; padding: 12px; }
+  .visual { aspect-ratio: 2 / 1; max-height: 180px; border-radius: 16px; }
+  .title { margin-bottom: 4px; font-size: clamp(26px, 5.8vw, 36px); line-height: 1.35; }
+  .lead { margin-bottom: 12px; font-size: 14px; line-height: 1.65; }
+  .list { display: grid; gap: 8px; }
+  .row {
+    grid-template-columns: 34px minmax(0, 1fr); align-items: center; gap: 8px;
+    min-height: 52px; padding: 6px 8px; border: 1px solid var(--ui-border);
+    border-inline-start-color: var(--ui-gold); border-radius: 12px; background: var(--ui-card);
+  }
+  .num { justify-self: center; font-size: 23px; }
+  .rowTitle { font-size: 15px; line-height: 1.4; }
+  .rowDesc { margin-top: 1px; font-size: 13px; line-height: 1.55; }
 }
 /* basita-font-scale: applied */
