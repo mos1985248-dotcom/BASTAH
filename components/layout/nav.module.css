@@ -261,17 +261,20 @@
   padding: 4px 2px;
   border-radius: 10px;
   color: var(--ui-green-deep);
-  font-size: 12px;
+  font-size: clamp(11px, 3.2vw, 13px);
   font-weight: 600;
   line-height: 1.4;
   text-align: center;
+  min-width: 0;
+  white-space: nowrap;
+  font-family: var(--font-plex-arabic), sans-serif;
   text-decoration: none;
 }
 
 .bottomLink[aria-current="page"] { text-decoration: underline var(--ui-gold) 2px; text-underline-offset: 4px; }
 .bottomLink:focus-visible { outline: 2px solid var(--ui-green-deep); outline-offset: 2px; }
 .bottomIcon { position: relative; }
-.bottomMerchant { background: var(--ui-green-deep); color: var(--ui-white); font-weight: 700; }
+.bottomMerchant { background: var(--ui-green-deep); color: var(--ui-white); font-weight: 600; }
 .bottomMerchant svg { color: var(--ui-gold); }
 
 @media (max-width: 767px) {
