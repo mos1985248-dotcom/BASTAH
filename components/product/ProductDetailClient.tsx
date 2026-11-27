@@ -132,12 +132,13 @@ export default function ProductDetailClient() {
 
       <StickyBuyBar
         qty={purchase.qty}
-        maxQty={purchase.maxQty}
-        onQtyChange={purchase.setQty}
         price={purchase.effectivePrice}
         disabled={purchase.checkingOut || purchase.maxQty === 0}
         checkingOut={purchase.checkingOut}
         onBuyNow={purchase.handleBuyNow}
+        onAddToCart={purchase.handleAddToCart}
+        addingToCart={purchase.addingToCart}
+        addedToCart={purchase.addedToCart}
         error={purchase.checkoutError}
       />
     </SiteShell>

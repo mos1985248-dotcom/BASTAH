@@ -3,6 +3,7 @@ import { AlertTriangle } from "lucide-react";
 import { uiVars } from "@/components/ui/vars";
 import EmptyState from "@/components/ui/EmptyState";
 import Skeleton from "@/components/ui/Skeleton";
+import { useFavorites } from "@/hooks/useFavorites";
 import ProductCard, { MarketplaceProduct } from "./ProductCard";
 import card from "./card.module.css";
 import s from "./market.module.css";
@@ -18,6 +19,7 @@ export default function ProductGrid({
   error: string;
   onRetry?: () => void;
 }) {
+  const { favoriteIds, toggleFavorite } = useFavorites();
   if (loading) {
     return (
       <div className={s.grid} style={uiVars} aria-busy="true">
@@ -55,7 +57,7 @@ export default function ProductGrid({
   return (
     <div className={s.grid} style={uiVars}>
       {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
+        <ProductCard key={p.id} product={p} isFavorite={favoriteIds.has(p.id)} onToggleFavorite={toggleFavorite} />
       ))}
     </div>
   );

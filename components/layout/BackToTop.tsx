@@ -12,9 +12,14 @@ export default function BackToTop() {
   useEffect(() => {
     const footer = dock.current?.closest("footer");
     const mobile = window.matchMedia("(max-width: 767px)");
+    let lastY = window.scrollY;
     const update = () => {
-      const scrolled = window.scrollY >= window.innerHeight;
-      setVisible(scrolled);
+      const y = window.scrollY;
+      const scrolled = y >= window.innerHeight;
+      const delta = y - lastY;
+      if (!scrolled || delta > 4) setVisible(false);
+      else if (delta < -4) setVisible(true);
+      lastY = y;
       setAtFooter(scrolled && mobile.matches && Boolean(footer && footer.getBoundingClientRect().top < window.innerHeight));
     };
     update();
