@@ -10,7 +10,6 @@ import SiteShell from "@/components/layout/SiteShell";
 import StoreHero from "@/components/store/StoreHero";
 import StoreStoryAndBadges from "@/components/store/StoreStoryAndBadges";
 import StoreAchievements from "@/components/store/StoreAchievements";
-import StoreInfoGrid from "@/components/store/StoreInfoGrid";
 import StoreReviewsSection from "@/components/store/StoreReviewsSection";
 import StoreProductsSection from "@/components/store/StoreProductsSection";
 import StoreClosingBanner from "@/components/store/StoreClosingBanner";
@@ -77,7 +76,7 @@ export default function StoreDetailClient() {
     );
   }
 
-  // الترتيب يخدم رحلة الشراء: الرأس ← المنتجات ← القصة والثقة ← المؤشرات والمعلومات ← التقييمات ← الختام
+  // الترتيب يخدم رحلة الشراء: الرأس ← المنتجات ← القصة والثقة ← المؤشرات ← التقييمات ← الختام
   return (
     <SiteShell>
       <main style={{ width: "100%", direction: "rtl", background: t.colors.heritage.sand }}>
@@ -85,7 +84,6 @@ export default function StoreDetailClient() {
         <StoreProductsSection key={store.id} storeId={store.id} sections={store.sections} />
         <StoreStoryAndBadges store={store} />
         <StoreAchievements store={store} />
-        <StoreInfoGrid store={store} />
         <StoreReviewsSection store={store} />
         <StoreClosingBanner store={store} />
       </main>
