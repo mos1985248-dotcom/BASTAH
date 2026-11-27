@@ -14,6 +14,8 @@
 .title { margin: 0 0 12px; font-weight: 700; font-size: clamp(34px, 3.3vw, 46px); line-height: 1.4; color: var(--ui-white); }
 .titleAccent { display: block; color: var(--ui-gold); }
 .lead { margin: 0 0 21px; max-width: 520px; font-size: 18px; font-weight: 700; line-height: 1.8; color: var(--ui-card); }
+.founderNote { margin: 14px 0 0; font-size: 15px; line-height: 1.75; color: var(--ui-card); }
+.founderNote strong { color: var(--ui-gold); }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
 .cta {
   display: inline-flex; align-items: center; justify-content: center;
@@ -34,12 +36,13 @@
 @media (max-width: 767px) {
   .section { padding: 9px 12px 0; }
   .card { display: flex; flex-direction: column; min-height: 0; border-radius: 24px; }
-  .visual { order: -1; width: 100%; aspect-ratio: 16 / 9; }
-  .copy { padding: 21px 17px 24px; }
+  .visual { order: -1; width: 100%; flex: none; aspect-ratio: 16 / 9; }
+  .copy { padding: 21px clamp(14px, 4.4vw, 24px) 24px; }
+  .title, .lead, .founderNote { max-width: 100%; overflow-wrap: anywhere; }
   .title { font-size: clamp(30px, 8vw, 34px); line-height: 1.35; margin-bottom: 10px; }
   .lead { font-size: 16px; line-height: 1.75; margin-bottom: 17px; }
   .actions { width: 100%; gap: 10px; }
-  .cta { flex: 1 1 0; min-width: 0; min-height: 50px; padding: 8px 10px; font-size: 16px; text-align: center; }
+  .cta { flex: 1 1 9rem; min-width: 0; min-height: 50px; padding: 8px 10px; font-size: 16px; text-align: center; overflow-wrap: anywhere; }
 }
 @media (prefers-reduced-motion: reduce) {
   .video { display: none; }
