@@ -16,3 +16,7 @@
 @media (max-width: 899px) {
   .inner { padding: 18px 16px; }
 }
+@media (max-width: 767px) {
+  .inner { grid-template-columns: minmax(0, 1fr); }
+  .copyright { overflow-wrap: anywhere; }
+}
