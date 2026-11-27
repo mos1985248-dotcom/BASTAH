@@ -5,6 +5,7 @@ import { t } from "@/theme";
 import { uiVars } from "@/components/ui/vars";
 import { useStoreFollow } from "@/hooks/useStoreFollow";
 import { yearsActiveFrom } from "@/lib/store-helpers";
+import StoreInfoGrid from "./StoreInfoGrid";
 import StoreHeroActions from "./StoreHeroActions";
 import type { StoreDetail } from "./types";
 import s from "./hero.module.css";
@@ -70,6 +71,8 @@ export default function StoreHero({ store }: { store: StoreDetail }) {
 
           <StoreHeroActions store={store} following={following} busy={busy} onToggleFollow={toggle} />
         </div>
+
+        <StoreInfoGrid store={store} />
 
         <ul className={s.stats}>
           {stats.map((st) => (

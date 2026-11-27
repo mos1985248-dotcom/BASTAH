@@ -1,9 +1,6 @@
 // components/store/StoreInfoGrid.tsx
 import { Calendar, CreditCard, FileText, MapPin, Package, RotateCcw, Truck, type LucideIcon } from "lucide-react";
-import { t } from "@/theme";
-import { uiVars } from "@/components/ui/vars";
 import { yearsActiveFrom } from "@/lib/store-helpers";
-import sec from "./sections.module.css";
 import type { StoreDetail } from "./types";
 import s from "./about.module.css";
 
@@ -27,11 +24,7 @@ export default function StoreInfoGrid({ store }: { store: StoreDetail }) {
   ];
 
   return (
-    <section
-      aria-label="بيانات المتجر"
-      className={sec.section}
-      style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
-    >
+    <section aria-label="بيانات المتجر" className={s.infoSection}>
       <dl className={s.info}>
         {items.map(({ Icon, label, value }) => (
           <div key={label} className={s.infoItem}>
