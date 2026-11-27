@@ -88,19 +88,20 @@
 }
 
 @media (max-width: 767px) {
-  .card { gap: 18px; padding: 14px; }
-  .copy { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "chips" "action"; gap: 16px; }
-  .chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .chip { min-width: 0; min-height: 48px; padding: 6px 8px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+  .card { gap: 16px; padding: 14px; }
+  .copy { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "chips" "action"; gap: 12px; }
+  .chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 8px; }
+  .chip { min-width: 0; min-height: 46px; padding: 4px 7px; gap: 5px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
   .chip svg { flex: none; }
   .chip:last-child:nth-child(odd) { grid-column: 1 / -1; }
-  .lead { font-size: 15px; }
+  .lead { font-size: 15px; line-height: 1.65; }
   .chat { border-radius: 20px; }
   .chatHead { padding: 12px; gap: 8px; }
   .chatBody { padding: 14px 10px; }
   .bubble { min-width: 0; padding: 8px 10px; font-size: 13px; overflow-wrap: anywhere; }
   .bubbleUser { max-width: 90%; }
   .replyRow { max-width: 100%; min-width: 0; gap: 6px; }
+  .followUp { width: 100%; }
   .chatInput { margin: 0 10px 12px; gap: 6px; padding-inline-start: 10px; font-size: 12px; }
   .send { flex: none; width: 34px; height: 34px; }
 }

@@ -4,6 +4,6 @@
   .desktopCopy { display: none; }
   .mobileCopy { display: inline; }
 
-  /* Leave room for the floating 48px button and its 16px inline inset. */
-  section.section { padding-inline: 12px 72px; }
+  /* The floating button uses 64px from the inline end. Leave 8px clear. */
+  section.section { padding-inline: clamp(20px, 6vw, 40px) 72px; }
 }
