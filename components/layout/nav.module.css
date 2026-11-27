@@ -235,3 +235,54 @@
   .actions { gap: 4px; }
   .links { gap: 12px; }
 }
+
+.bottomNav {
+  @apply grid md:hidden;
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 39;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
+  align-items: center;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  background: var(--ui-sand);
+  border-top: 1px solid var(--ui-gold);
+  box-shadow: 0 -4px 16px color-mix(in srgb, var(--ui-green-deep) 12%, transparent);
+}
+
+.bottomLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 48px;
+  padding: 4px 2px;
+  border-radius: 10px;
+  color: var(--ui-green-deep);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+}
+
+.bottomLink[aria-current="page"] { text-decoration: underline var(--ui-gold) 2px; text-underline-offset: 4px; }
+.bottomLink:focus-visible { outline: 2px solid var(--ui-green-deep); outline-offset: 2px; }
+.bottomIcon { position: relative; }
+.bottomMerchant { background: var(--ui-green-deep); color: var(--ui-white); font-weight: 700; }
+.bottomMerchant svg { color: var(--ui-gold); }
+
+@media (max-width: 767px) {
+  .homeShell {
+    --home-bottom-nav-space: calc(72px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--home-bottom-nav-space);
+  }
+  .bottomNav { min-height: var(--home-bottom-nav-space); }
+  .homeHeader .topbar,
+  .homeHeader .actions :global(.basita-nav-icon),
+  .homeHeader .guestActions { display: none; }
+  .homeHeader .drawer { max-height: calc(100dvh - 64px - var(--home-bottom-nav-space)); box-sizing: border-box; }
+  .homeHeader .mobileSearch + .drawer { max-height: calc(100dvh - 128px - var(--home-bottom-nav-space)); }
+}
