@@ -7,7 +7,7 @@
 
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
 .kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
-.title { margin: 0 0 12px; font-size: var(--type-section); font-weight: 700; line-height: 1.4; color: var(--ui-green-deep); }
+.title { margin: 0 0 12px; font-size: var(--type-section); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
 .lead { margin: 0 0 28px; max-width: 520px; font-size: 16px; line-height: 1.9; color: var(--ui-ink-muted); }
 
 .list { margin: 0; padding: 0; list-style: none; }
@@ -38,7 +38,7 @@
   .section { padding-block: 26px; padding-inline: clamp(12px, 3vw, 20px); }
   .grid { gap: 12px; padding: 12px; }
   .visual { aspect-ratio: 2 / 1; max-height: 180px; border-radius: 16px; }
-  .title { margin-bottom: 4px; font-size: var(--type-section); line-height: 1.4; }
+  .title { margin-bottom: 4px; font-size: var(--type-section); line-height: 1.5; }
   .lead { margin-bottom: 12px; font-size: 14px; line-height: 1.65; }
   .list { display: grid; gap: 8px; }
   .row {
