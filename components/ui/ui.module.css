@@ -14,7 +14,9 @@
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.4;
+  min-width: 0;
+  max-width: 100%;
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -138,4 +140,10 @@
 @media (prefers-reduced-motion: reduce) {
   .btn, .input, .toast { transition: none; animation: none; }
   .spinner { animation-duration: 1.6s; }
+}
+
+@media (max-width: 767px) {
+  .btn { font-size: 14px; padding-inline: 14px; }
+  .btn.sm { font-size: 13px; padding-inline: 10px; }
+  .btn.lg { font-size: 15px; padding-inline: 16px; }
 }
