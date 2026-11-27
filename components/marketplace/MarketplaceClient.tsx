@@ -44,7 +44,7 @@ function MarketplaceContent() {
   const active = view === "products" ? products : stores;
 
   return (
-    <SiteShell>
+    <SiteShell marketplaceHeader>
       <div style={{ background: t.colors.heritage.sand }}>
         <MarketplaceHero search={search} onSearchChange={setSearch} onSubmit={() => setTerm(search)} />
 

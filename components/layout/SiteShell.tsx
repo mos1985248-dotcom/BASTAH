@@ -4,9 +4,10 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import s from "./nav.module.css";
 
-export default function SiteShell({ children, homeMobileNav = false }: {
+export default function SiteShell({ children, homeMobileNav = false, marketplaceHeader = false }: {
   children: React.ReactNode;
   homeMobileNav?: boolean;
+  marketplaceHeader?: boolean;
 }) {
   return (
     <div
@@ -21,7 +22,7 @@ export default function SiteShell({ children, homeMobileNav = false }: {
         fontFamily: t.typography.fontFamily.base,
       }}
     >
-      <Navbar homeMobileNav={homeMobileNav} />
+      <Navbar homeMobileNav={homeMobileNav} marketplaceHeader={marketplaceHeader} />
       <div style={{ flex: 1 }}>{children}</div>
       <Footer />
     </div>
