@@ -280,7 +280,7 @@
 @media (max-width: 767px) {
   .homeShell {
     --home-bottom-nav-space: calc(72px + env(safe-area-inset-bottom, 0px));
-    padding-bottom: var(--home-bottom-nav-space);
+    /* Bottom inset is supplied by the root public layout. */
   }
   .bottomNav { min-height: var(--home-bottom-nav-space); }
   .homeHeader .topbar,
@@ -335,4 +335,19 @@
   .marketplaceHeader .actions { gap: 3px; }
   .marketplaceHeader .brandName { font-size: 16px; }
   .marketplaceHeader .logoMark { width: 30px; height: 30px; }
+}
+
+@media (max-width: 767px) {
+  .publicMobileShell { --home-bottom-nav-space: calc(72px + env(safe-area-inset-bottom, 0px)); padding-bottom: var(--home-bottom-nav-space); }
+  .publicMobileShell .main { grid-template-columns: auto minmax(0, 1fr) auto auto; }
+  .publicMobileShell .actions :global(.basita-nav-icon),
+  .publicMobileShell .actions :global(.basita-nav-login),
+  .publicMobileShell .guestActions { display: none; }
+  .publicMobileShell .actions:empty { display: none; }
+  .publicMobileShell .marketplaceHeader .main { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .publicMobileShell .marketplaceHeader .toggleBtn,
+  .publicMobileShell .marketplaceHeader .mobileSearch { display: none; }
+  .publicMobileShell .marketplaceHeader .brandName { font-size: 21px; }
+  .publicMobileShell .drawer { max-height: calc(100dvh - 114px - var(--home-bottom-nav-space)); }
+  .bottomNav { min-height: calc(72px + env(safe-area-inset-bottom, 0px)); }
 }

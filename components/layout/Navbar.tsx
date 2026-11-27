@@ -12,7 +12,6 @@ import NavLinks from "./NavLinks";
 import MobileNav from "./MobileNav";
 import NavAuthArea from "./NavAuthArea";
 import NavIconLinks, { useNavCounts } from "./NavIconLinks";
-import MobileBottomNav from "./MobileBottomNav";
 import SearchBar from "./SearchBar";
 import { NotificationBell } from "@/components/NotificationBell";
 import s from "./nav.module.css";
@@ -120,7 +119,6 @@ export default function Navbar({ homeMobileNav = false, marketplaceHeader = fals
         </div>
       )}
       {menuOpen && <MobileNav onNavigate={() => setMenuOpen(false)} />}
-      {homeMobileNav && <MobileBottomNav user={user} loading={loading} cartCount={counts.cartCount} />}
     </header>
   );
 }

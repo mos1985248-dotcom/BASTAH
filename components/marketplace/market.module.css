@@ -107,7 +107,7 @@
 /* Compact mobile typography — preserve desktop and touch targets. */
 @media (max-width: 767px) {
   .hero { padding: 20px 14px; }
-  .heroKicker { font-size: 12px; font-weight: 500; margin-bottom: 6px; }
+  .heroKicker { font-size: 12px; font-weight: 500; margin-bottom: 8px; }
   .heroTitle { font-size: 26px; font-weight: 500; line-height: 1.45; }
   .heroSub { font-size: 14px; font-weight: 400; line-height: 1.7; margin-bottom: 16px; }
   .storesTitle { font-size: 22px; font-weight: 500; margin-bottom: 8px; }

@@ -10,16 +10,18 @@ export default function SearchBar({
   onSubmit,
   placeholder = "ابحث عن منتج، متجر أو تصنيف...",
   variant = "light",
+  showLeadingIcon = true,
 }: {
   value: string;
   onChange: (v: string) => void;
   onSubmit: () => void;
   placeholder?: string;
   variant?: "light" | "onDark";
+  showLeadingIcon?: boolean;
 }) {
   return (
     <div className={`${s.searchBox} ${variant === "onDark" ? s.searchDark : ""}`} style={uiVars}>
-      <Search size={18} strokeWidth={1.9} className={s.searchIcon} aria-hidden="true" />
+      {showLeadingIcon && <Search size={18} strokeWidth={1.9} className={s.searchIcon} aria-hidden="true" />}
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}

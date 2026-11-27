@@ -5,6 +5,7 @@ import { Amiri, Readex_Pro } from "next/font/google";
 import "@fontsource/aref-ruqaa/400.css";
 import "@fontsource/aref-ruqaa/700.css";
 import { UserProvider } from "./providers";
+import PublicMobileNavigation from "@/components/layout/PublicMobileNavigation";
 
 const readex = Readex_Pro({
   subsets: ["arabic", "latin"],
@@ -41,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${readex.variable} ${amiri.variable}`}>
       <body>
-        <UserProvider>{children}</UserProvider>
+        <UserProvider><PublicMobileNavigation>{children}</PublicMobileNavigation></UserProvider>
       </body>
     </html>
   );

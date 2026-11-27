@@ -50,7 +50,7 @@
   .trustItem:nth-child(n + 3) { border-top: 1px solid var(--ui-border); }
   .trustItem:nth-child(3) { border-inline-start: none; }
   .sticky {
-    position: fixed; inset-inline: 0; bottom: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    position: fixed; inset-inline: 0; bottom: var(--home-bottom-nav-space, 0px); z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: 14px;
     padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--ui-card); border-top: 1px solid var(--ui-border); box-shadow: var(--ui-shadow);
   }
 }

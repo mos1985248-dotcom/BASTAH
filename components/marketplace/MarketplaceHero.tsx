@@ -28,6 +28,7 @@ export default function MarketplaceHero({
             onSubmit={onSubmit}
             placeholder="ابحث عن منتج أو متجر..."
             variant="onDark"
+            showLeadingIcon={false}
           />
         </div>
       </div>
