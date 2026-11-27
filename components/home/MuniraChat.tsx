@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import { SendHorizontal } from "lucide-react";
+import MerchantToolCopy from "./MerchantToolCopy";
 import s from "./munira.module.css";
 
 function Avatar({ size }: { size: number }) {
@@ -46,12 +47,12 @@ export default function MuniraChat() {
           <Avatar size={44} />
           <div>
             <p className={s.chatName}>منيرة</p>
-            <p className={s.chatRole}>مساعدة ذكية لمتجرك</p>
+            <p className={s.chatRole}><MerchantToolCopy desktop="مساعدة ذكية لمتجرك" mobile="أساعدك في شغل بسطتك" /></p>
           </div>
         </div>
 
         <div ref={body} className={s.chatBody} data-conversation-play={play ? "true" : undefined} aria-hidden="true">
-          <p className={`${s.bubble} ${s.bubbleUser}`}>أريد وصفاً جذاباً لتمر سكري ١ كيلو</p>
+          <p className={`${s.bubble} ${s.bubbleUser}`}><MerchantToolCopy desktop="أريد وصفاً جذاباً لتمر سكري ١ كيلو" mobile="يا منيرة، أبي وصف يشوّق لتمر سكري كيلو." /></p>
 
           <div className={s.replyRow}>
             <Avatar size={28} />
@@ -66,7 +67,7 @@ export default function MuniraChat() {
 
           <div className={`${s.replyRow} ${s.followUp}`}>
             <Avatar size={28} />
-            <p className={`${s.bubble} ${s.bubbleBot}`}>هل تريد اسماً مقترحاً للمنتج؟</p>
+            <p className={`${s.bubble} ${s.bubbleBot}`}><MerchantToolCopy desktop="هل تريد اسماً مقترحاً للمنتج؟" mobile="تبغين أقترح لك اسم بعد؟" /></p>
           </div>
         </div>
 

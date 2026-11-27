@@ -2,20 +2,22 @@
 import { ArrowLeft, ClipboardList, Receipt, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
 import { t } from "@/theme";
 import { uiVars } from "@/components/ui/vars";
+import MerchantToolCopy from "./MerchantToolCopy";
+import tools from "./merchant-tools.module.css";
 import s from "./daftari.module.css";
 
-const ENTRIES: { Icon: LucideIcon; label: string }[] = [
-  { Icon: Wallet, label: "تسجيل المدفوعات" },
-  { Icon: Receipt, label: "تسجيل المصروفات" },
-  { Icon: TrendingUp, label: "حساب الأرباح" },
-  { Icon: ClipboardList, label: "تقارير سهلة وواضحة" },
+const ENTRIES: { Icon: LucideIcon; label: string; mobile: string }[] = [
+  { Icon: Wallet, label: "تسجيل المدفوعات", mobile: "وش دخل من المبيعات؟" },
+  { Icon: Receipt, label: "تسجيل المصروفات", mobile: "وش راح على الخامات والتغليف؟" },
+  { Icon: TrendingUp, label: "حساب الأرباح", mobile: "كم بقي لك ربح صافي؟" },
+  { Icon: ClipboardList, label: "تقارير سهلة وواضحة", mobile: "ملخّص بسطتك بنظرة" },
 ];
 
 export default function DaftariShowcase() {
   return (
     <section
       aria-labelledby="daftari-heading"
-      className={s.section}
+      className={`${s.section} ${tools.section}`}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
       <div className={s.grid}>
@@ -24,11 +26,13 @@ export default function DaftariShowcase() {
             <h2 id="daftari-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
               دفاتري
             </h2>
-            <p className={s.sub}>محاسبة بسيطة لمتجرك</p>
+            <p className={s.sub}><MerchantToolCopy desktop="محاسبة بسيطة لمتجرك" mobile="دفتر بسطتك، على راحتك" /></p>
           </div>
           <p className={s.lead}>
-            متابعة مبيعاتك ومصروفاتك وأرباحك بلا تعقيد محاسبي، لتبقى أرقام
-            متجرك واضحة أمامك في كل وقت.
+            <MerchantToolCopy
+              desktop="متابعة مبيعاتك ومصروفاتك وأرباحك بلا تعقيد محاسبي، لتبقى أرقام متجرك واضحة أمامك في كل وقت."
+              mobile="خلّ اللي دخل من البيع لحاله، واللي راح على الخامات والتغليف لحاله. كذا تعرف صافي ربحك وتشوف الملخّص براحة بال."
+            />
           </p>
         </div>
 
@@ -39,10 +43,10 @@ export default function DaftariShowcase() {
             دفتر المتجر
           </p>
           <div className={s.entries} role="list" aria-label="ما يتيحه دفاتري">
-            {ENTRIES.map(({ Icon, label }) => (
+            {ENTRIES.map(({ Icon, label, mobile }) => (
               <div key={label} role="listitem" className={s.entry}>
                 <Icon size={20} strokeWidth={1.7} aria-hidden="true" />
-                <span className={s.entryLabel}>{label}</span>
+                <span className={s.entryLabel}><MerchantToolCopy desktop={label} mobile={mobile} /></span>
                 <span className={s.leader} aria-hidden="true" />
             </div>
           ))}
