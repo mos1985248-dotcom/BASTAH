@@ -3,21 +3,21 @@
 // نظام الخطوط المركزي لمنصة بسطة.
 //
 // الخط الأساسي:
-// IBM Plex Sans Arabic
+// Readex Pro
 // للنصوص، الأزرار، النماذج، القوائم والمحتوى العام.
 //
 // خط العناوين:
-// Amiri
+// Readex Pro
 // للعناوين الرئيسية والعناصر التي تحتاج حضورًا بصريًا أقوى.
 //
 // الهدف:
 // واجهة عربية حديثة، واضحة، مريحة، ومتوازنة بصريًا.
 
 export const fontFamily = {
-  base: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
-  heading: "var(--font-amiri), 'Amiri', serif",
-  // Heritage display face for headings and brand marks.
-  display: "var(--font-amiri), 'Amiri', serif",
+  base: "var(--font-readex), 'Readex Pro', system-ui, sans-serif",
+  heading: "var(--font-readex), 'Readex Pro', system-ui, sans-serif",
+  // Unified display face; heritage face remains available separately.
+  display: "var(--font-readex), 'Readex Pro', system-ui, sans-serif",
   displayAlt: "var(--font-amiri), 'Amiri', serif",
 } as const;
 
