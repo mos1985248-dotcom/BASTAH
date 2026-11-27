@@ -7,7 +7,7 @@
 // للنصوص، الأزرار، النماذج، القوائم والمحتوى العام.
 //
 // خط العناوين:
-// IBM Plex Sans Arabic
+// Amiri
 // للعناوين الرئيسية والعناصر التي تحتاج حضورًا بصريًا أقوى.
 //
 // الهدف:
@@ -15,9 +15,9 @@
 
 export const fontFamily = {
   base: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
-  heading: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
-  // Keep heritage serif available separately for brand marks.
-  display: "var(--font-plex-arabic), 'IBM Plex Sans Arabic', system-ui, sans-serif",
+  heading: "var(--font-amiri), 'Amiri', serif",
+  // Heritage display face for headings and brand marks.
+  display: "var(--font-amiri), 'Amiri', serif",
   displayAlt: "var(--font-amiri), 'Amiri', serif",
 } as const;
 
