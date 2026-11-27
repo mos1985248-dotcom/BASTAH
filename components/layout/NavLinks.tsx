@@ -5,9 +5,12 @@ import { usePathname } from "next/navigation";
 import s from "./nav.module.css";
 
 // ملاحظة: رابط «منيرة (AI)» أُزيل من التنقل العام لأنه خاص بالتاجر وموجود في لوحة التاجر.
+export const HOME_HREF = "/";
+export const STORES_HREF = "/marketplace?view=stores#stores";
+
 export const NAV_LINKS = [
-  { href: "/", label: "الرئيسية" },
-  { href: "/marketplace?view=stores#stores", label: "ممشى البسطات" },
+  { href: HOME_HREF, label: "الرئيسية" },
+  { href: STORES_HREF, label: "ممشى البسطات" },
   { href: "/marketplace#categories", label: "الأقسام" },
   { href: "/offers", label: "العروض" },
   { href: "/blog", label: "المدونة" },

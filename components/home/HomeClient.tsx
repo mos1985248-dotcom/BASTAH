@@ -28,7 +28,7 @@ export default function HomeClient() {
     !loading && (!user || (user.role !== "SELLER" && !user.store));
 
   return (
-    <SiteShell>
+    <SiteShell homeMobileNav>
       <div ref={revealRef} className={reveal.scope} style={{ background: t.colors.heritage.sand }}>
       {/* رحلة المتسوّق أولاً */}
       <HeroSection showStartStore={showStartStore} />

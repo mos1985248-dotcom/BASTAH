@@ -2,10 +2,15 @@
 import { t } from "@/theme";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import s from "./nav.module.css";
 
-export default function SiteShell({ children }: { children: React.ReactNode }) {
+export default function SiteShell({ children, homeMobileNav = false }: {
+  children: React.ReactNode;
+  homeMobileNav?: boolean;
+}) {
   return (
     <div 
+      className={homeMobileNav ? s.homeShell : undefined}
       style={{ 
         minHeight: "100vh", 
         background: t.colors.cream.bg, 
@@ -14,7 +19,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         fontFamily: t.typography.fontFamily.base,
       }}
     >
-      <Navbar />
+      <Navbar homeMobileNav={homeMobileNav} />
       <div style={{ flex: 1 }}>{children}</div>
       <Footer />
     </div>

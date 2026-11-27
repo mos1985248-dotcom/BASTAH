@@ -11,7 +11,8 @@ import NavTopBar from "./NavTopBar";
 import NavLinks from "./NavLinks";
 import MobileNav from "./MobileNav";
 import NavAuthArea from "./NavAuthArea";
-import NavIconLinks from "./NavIconLinks";
+import NavIconLinks, { useNavCounts } from "./NavIconLinks";
+import MobileBottomNav from "./MobileBottomNav";
 import SearchBar from "./SearchBar";
 import { NotificationBell } from "@/components/NotificationBell";
 import s from "./nav.module.css";
@@ -19,8 +20,9 @@ import s from "./nav.module.css";
 // الترويسة أعرض قليلاً من محتوى الصفحات لتتسع للروابط والبحث والأيقونات
 const headerVars = { ...uiVars, "--nav-max": "1440px" } as CSSProperties;
 
-export default function Navbar() {
+export default function Navbar({ homeMobileNav = false }: { homeMobileNav?: boolean }) {
   const { user, loading } = useCurrentUser();
+  const counts = useNavCounts(user?.id);
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -43,7 +45,7 @@ export default function Navbar() {
   }, [menuOpen]);
 
   return (
-    <header className={s.header} style={headerVars}>
+    <header className={homeMobileNav ? `${s.header} ${s.homeHeader}` : s.header} style={headerVars}>
       <NavTopBar />
 
       <div className={s.main}>
@@ -98,8 +100,8 @@ export default function Navbar() {
         </button>
 
         {/* السلة والمفضلة والإشعارات والحساب */}
-        <div className={s.actions}>
-          <NavIconLinks userId={user?.id} />
+        <div className={user ? s.actions : `${s.actions} ${s.guestActions}`}>
+          <NavIconLinks {...counts} />
           {user && (
             <span className={s.bellWrap}>
               <NotificationBell userId={user.id} />
@@ -115,6 +117,7 @@ export default function Navbar() {
         </div>
       )}
       {menuOpen && <MobileNav onNavigate={() => setMenuOpen(false)} />}
+      {homeMobileNav && <MobileBottomNav user={user} loading={loading} cartCount={counts.cartCount} />}
     </header>
   );
 }

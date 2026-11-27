@@ -5,7 +5,7 @@ import { ShoppingCart, Heart } from "lucide-react";
 import { api } from "@/lib/api-client";
 import s from "./navctl.module.css";
 
-export default function NavIconLinks({ userId }: { userId: string | undefined }) {
+export function useNavCounts(userId: string | undefined) {
   const [cartCount, setCartCount] = useState(0);
   const [favCount, setFavCount] = useState(0);
 
@@ -25,6 +25,10 @@ export default function NavIconLinks({ userId }: { userId: string | undefined })
       .catch(() => {});
   }, [userId]);
 
+  return { cartCount, favCount };
+}
+
+export default function NavIconLinks({ cartCount, favCount }: ReturnType<typeof useNavCounts>) {
   return (
     <div className={s.iconRow}>
       <a
@@ -47,6 +51,6 @@ export default function NavIconLinks({ userId }: { userId: string | undefined })
   );
 }
 
-function CountBadge({ count }: { count: number }) {
+export function CountBadge({ count }: { count: number }) {
   return <span className={s.count}>{count > 9 ? "9+" : count}</span>;
 }
