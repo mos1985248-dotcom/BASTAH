@@ -1,15 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 // components/home/StallCard.tsx
 // بطاقة بسطة تراثية: اسم المتجر يظهر مرة واحدة فقط على اللافتة.
 import { ArrowLeft, BadgeCheck, Heart, MapPin, Star, Store } from "lucide-react";
 import type { HomeStore } from "./StoreCard";
 import s from "./stalls.module.css";
 
-const background = (url: string) => ({ backgroundImage: `url(${url})` });
+// Merchant images can come from external URLs. Keep the fallback available on load errors.
+function hideFailedImage(event: SyntheticEvent<HTMLImageElement>) {
+  event.currentTarget.hidden = true;
+}
 
 export default function StallCard({ store, fluid, reveal = false, compact = false }: { store: HomeStore; fluid?: boolean; reveal?: boolean; compact?: boolean }) {
-  const initial = store.nameAr.trim().charAt(0);
   const [favorite, setFavorite] = useState(false);
   useEffect(() => {
     try {
@@ -58,15 +60,20 @@ export default function StallCard({ store, fluid, reveal = false, compact = fals
       </span>
       <span className={s.stallFrame}>
         <span className={s.stallScene}>
-          <span className={s.cover} style={store.coverImage ? background(store.coverImage) : undefined} aria-hidden="true">
-            {!store.coverImage && <span className={s.initialBig}>{initial}</span>}
+          <span className={s.cover} aria-hidden="true">
+            <span className={s.coverMark}><Store size={30} strokeWidth={1.5} /></span>
+            {store.coverImage && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={store.coverImage} className={s.coverImage} src={store.coverImage} alt="" onError={hideFailedImage} />
+            )}
           </span>
           <span className={s.sceneGlow} aria-hidden="true" />
           {!compact && nameSign}
           {hasProducts && (
             <span className={s.sceneProducts} aria-hidden="true">
               {productImages.map((url, i) => (
-                <span key={`${url}-${i}`} className={s.sceneProduct} style={background(url)} />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={`${url}-${i}`} className={s.sceneProduct} src={url} alt="" onError={hideFailedImage} />
               ))}
             </span>
           )}
@@ -75,8 +82,12 @@ export default function StallCard({ store, fluid, reveal = false, compact = fals
         {compact && nameSign}
         <span className={s.info}>
           <span className={s.infoTop}>
-            <span className={s.logo} style={store.logo ? background(store.logo) : undefined} aria-hidden="true">
-              {!store.logo && <Store size={22} strokeWidth={1.7} />}
+            <span className={s.logo} aria-hidden="true">
+              <Store size={22} strokeWidth={1.7} />
+              {store.logo && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={store.logo} className={s.logoImage} src={store.logo} alt="" onError={hideFailedImage} />
+              )}
             </span>
             {(!compact || store.city) && <span className={s.meta}>
               <MapPin size={14} strokeWidth={1.9} aria-hidden="true" />
