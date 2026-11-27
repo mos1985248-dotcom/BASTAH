@@ -2,7 +2,7 @@
 .section { margin: 0 auto; padding: 36px 16px 8px; direction: rtl; }
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
 .kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
-.title { margin: 0 0 28px; font-size: var(--type-section); font-weight: 700; line-height: 1.4; color: var(--ui-green-deep); }
+.title { margin: 0 0 28px; font-size: var(--type-section); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
 
 .grid { --home-reveal-duration: 300ms; --home-reveal-distance: 10px; --home-reveal-ease: cubic-bezier(0.22, 1, 0.36, 1); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .tile {
