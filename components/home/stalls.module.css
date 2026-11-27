@@ -72,11 +72,20 @@
 .stallScene::after { left: 0; }
 .cover {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, #d8b990, #85603c) center / cover no-repeat;
+  color: var(--ui-gold);
+  background:
+    repeating-linear-gradient(135deg, transparent 0 11px, rgb(255 255 255 / 5%) 11px 12px),
+    var(--ui-green-deep);
   transition: transform .35s var(--ui-ease);
 }
 .stall:hover .cover { transform: scale(1.035); }
-.initialBig { font-size: 80px; font-weight: 700; color: #fff6e5; text-shadow: 0 3px 14px #45280d80; }
+.coverMark {
+  display: grid; place-items: center; width: 56px; height: 56px;
+  border: 1px solid var(--ui-gold); border-radius: 16px; background: var(--ui-green-deep);
+}
+.coverImage, .logoImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.coverImage { background: var(--ui-green-deep); }
+.coverImage[hidden], .logoImage[hidden], .sceneProduct[hidden] { display: none; }
 .sceneGlow {
   position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(180deg, #39220c50 0%, transparent 34%, #3820091f 65%, #2e1709a8 100%);
@@ -119,9 +128,10 @@
 .infoTop { display: flex; align-items: center; gap: 9px; min-height: 44px; }
 .logo {
   display: inline-flex; flex: none; align-items: center; justify-content: center;
-  width: 44px; height: 44px; border-radius: 50%; border: 2px solid #c9a36b;
+  position: relative; overflow: hidden; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #c9a36b;
   background: #f7e9cf center / cover no-repeat; color: #075437;
 }
+.logoImage { background: var(--ui-sand); }
 .meta { display: inline-flex; align-items: center; gap: 4px; min-width: 0; font-size: 13px; color: #63564a; }
 .meta svg { flex: none; }
 .rating { display: inline-flex; align-items: center; gap: 3px; margin-inline-start: auto; font-size: 13px; font-weight: 700; color: #8e651c; }
@@ -184,7 +194,6 @@
   .woodSign::before { right: 9px; } .woodSign::after { left: 9px; }
   .name { font-size: clamp(12px, 3.6vw, 17px); line-height: 1.4; overflow-wrap: anywhere; }
   .verified { width: 13px; height: 13px; }
-  .initialBig { font-size: 52px; }
   .info { padding: 9px 7px 10px; gap: 7px; }
   .infoTop { gap: 4px; min-height: 30px; flex-wrap: wrap; }
   .logo { width: 29px; height: 29px; }
@@ -204,7 +213,6 @@
 .stallFrame { border-color: #d7b88f; box-shadow: 0 10px 24px #51351621; }
 .stallScene { background: linear-gradient(160deg, #ad8055, #e4c49a 60%, #94643e); }
 .stallScene::before, .stallScene::after { width: 7px; }
-.cover { background-position: center; }
 .woodSign { box-shadow: 0 3px 0 #76471f, 0 7px 18px #27150855; }
 .sceneProducts {
   position: absolute; z-index: 2; bottom: 18px; inset-inline: 12px;
@@ -213,7 +221,7 @@
 }
 .sceneProduct {
   display: block; width: 31%; max-width: 86px; aspect-ratio: 1;
-  background-color: #fff4e5; background-position: center; background-size: cover;
+  background-color: #fff4e5; object-fit: cover;
   border: 3px solid #f7e4c8; border-radius: 11px 11px 5px 5px;
   box-shadow: 0 5px 12px #29170a7a;
 }
@@ -384,3 +392,39 @@
   .compact .favorite svg { width: 16px; height: 16px; }
 }
 /* basita-font-scale: applied */
+
+.lane {
+  --home-reveal-duration: 320ms;
+  --home-reveal-distance: 10px;
+  --home-reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lane > .stall { transition: transform 320ms var(--home-reveal-ease); }
+.lane > .stall:hover, .lane > .stall:hover .cover,
+.lane > .stall:hover .enter svg:last-child { transform: none; }
+.lane .cover, .lane .enter svg:last-child { transition: transform 320ms var(--home-reveal-ease); }
+.lane .enter { transition: background-color 320ms var(--home-reveal-ease); }
+
+@media (max-width: 767px) {
+  .lane .stallFrame { border-radius: 0 0 16px 16px; }
+  .lane .info { gap: 6px; }
+  .lane .enter { border-radius: 10px; }
+  .lane .coverMark { width: 44px; height: 44px; border-radius: 12px; }
+  .lane .coverMark svg { width: 24px; height: 24px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lane .stallLink:active .cover { transform: scale(1.02); }
+  .lane .stallLink:is(:active, :focus-visible) .enter svg:last-child { transform: translateX(-3px); }
+  .lane .stallLink:active .enter { background: var(--ui-green-hover); }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .lane > .stall:hover { transform: translateY(-2px); }
+  .lane > .stall:hover .cover { transform: scale(1.03); }
+  .lane > .stall:hover .enter svg:last-child { transform: translateX(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lane > .stall, .lane .cover, .lane .enter, .lane .enter svg:last-child { transition: none; }
+}
