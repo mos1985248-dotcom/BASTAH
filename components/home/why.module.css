@@ -35,7 +35,7 @@
   .row { grid-template-columns: 48px 1fr; }
 }
 @media (max-width: 767px) {
-  .section { padding-block: 26px; padding-inline: clamp(20px, 6vw, 40px) 72px; }
+  .section { padding-block: 26px; padding-inline: clamp(12px, 3vw, 20px); }
   .grid { gap: 12px; padding: 12px; }
   .visual { aspect-ratio: 2 / 1; max-height: 180px; border-radius: 16px; }
   .title { margin-bottom: 4px; font-size: clamp(26px, 5.8vw, 36px); line-height: 1.35; }
