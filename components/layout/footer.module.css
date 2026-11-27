@@ -22,6 +22,25 @@
 }
 .links { grid-column: 1 / -1; }
 .inner > * { min-width: 0; }
+.backToTop {
+  position: fixed;
+  inset-inline-end: 16px;
+  bottom: calc(16px + var(--home-bottom-nav-space, env(safe-area-inset-bottom, 0px)));
+  z-index: 38;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--ui-gold);
+  border-radius: 50%;
+  background: var(--ui-green-deep);
+  color: var(--ui-gold);
+  box-shadow: var(--ui-shadow);
+  cursor: pointer;
+}
+.backToTop:hover { background: var(--ui-green); }
+.backToTop:focus-visible { outline: 2px solid var(--ui-card); outline-offset: -5px; }
 
 /* ───── الهوية ───── */
 .brandHead { display: flex; align-items: center; gap: 10px; }

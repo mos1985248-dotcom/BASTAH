@@ -4,6 +4,7 @@ import FooterBrand from "./FooterBrand";
 import FooterNewsletter from "./FooterNewsletter";
 import FooterColumns from "./FooterColumns";
 import FooterBottom from "./FooterBottom";
+import BackToTop from "./BackToTop";
 import s from "./footer.module.css";
 
 export default function Footer() {
@@ -21,6 +22,7 @@ export default function Footer() {
       </div>
 
       <FooterBottom />
+      <BackToTop />
     </footer>
   );
 }
