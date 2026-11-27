@@ -1,16 +1,16 @@
 // app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
-import { Amiri, IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Amiri, Readex_Pro } from "next/font/google";
 import "@fontsource/aref-ruqaa/400.css";
 import "@fontsource/aref-ruqaa/700.css";
 import { UserProvider } from "./providers";
 
-const plex = IBM_Plex_Sans_Arabic({
+const readex = Readex_Pro({
   subsets: ["arabic", "latin"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-plex-arabic",
+  variable: "--font-readex",
 });
 
 const amiri = Amiri({
@@ -39,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className={`${plex.variable} ${amiri.variable}`}>
+    <html lang="ar" dir="rtl" className={`${readex.variable} ${amiri.variable}`}>
       <body>
         <UserProvider>{children}</UserProvider>
       </body>
