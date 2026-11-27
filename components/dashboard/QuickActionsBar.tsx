@@ -1,5 +1,5 @@
 // components/dashboard/QuickActionsBar.tsx
-import { Headset, Plus, Receipt, Sparkles, Wallet, type LucideIcon } from "lucide-react";
+import { Headset, Plus, Receipt, MessageCircle, Wallet, type LucideIcon } from "lucide-react";
 import { uiVars } from "@/components/ui/vars";
 import s from "./home.module.css";
 
@@ -7,7 +7,7 @@ const ACTIONS: { href: string; Icon: LucideIcon; label: string }[] = [
   { href: "/dashboard/products/new", Icon: Plus, label: "إضافة منتج" },
   { href: "/dashboard/orders", Icon: Receipt, label: "الطلبات" },
   { href: "/dashboard/daftari", Icon: Wallet, label: "دفاتري" },
-  { href: "/dashboard/munira", Icon: Sparkles, label: "منيرة" },
+  { href: "/dashboard/munira", Icon: MessageCircle, label: "منيرة" },
   { href: "/dashboard/support", Icon: Headset, label: "الدعم" },
 ];
 

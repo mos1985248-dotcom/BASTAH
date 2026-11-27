@@ -35,7 +35,6 @@ export default function FeaturedStores() {
     >
       <div className={s.header}>
         <div>
-          <p className={s.kicker}>من سوق بسطة مارت</p>
           <h2 id="stores-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
             تجوّل في سوق بسطة مارت
           </h2>
