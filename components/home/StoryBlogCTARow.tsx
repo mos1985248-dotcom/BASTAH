@@ -28,7 +28,7 @@ const LINKS: {
   },
 ];
 
-export default function StoryBlogCTARow({ showStartStore }: { showStartStore: boolean }) {
+export default function StoryBlogCTARow({ startStoreHref }: { startStoreHref?: "/register" | "/dashboard/create-store" }) {
   const display = t.typography.fontFamily.display;
   return (
     <section
@@ -36,7 +36,7 @@ export default function StoryBlogCTARow({ showStartStore }: { showStartStore: bo
       className={s.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
-      <div className={`${s.grid} ${showStartStore ? s.three : ""}`}>
+      <div className={`${s.grid} ${startStoreHref ? s.three : ""}`}>
         {LINKS.map(({ href, Icon, title, text, cta }) => (
           <a key={href} href={href} className={s.card}>
             <Icon size={28} strokeWidth={1.5} className={s.icon} aria-hidden="true" />
@@ -49,17 +49,20 @@ export default function StoryBlogCTARow({ showStartStore }: { showStartStore: bo
           </a>
         ))}
 
-        {showStartStore && (
-          <a href="/register" className={`${s.card} ${s.start}`}>
-            <p className={s.kicker}>فرصتك تبدأ هنا</p>
+        {startStoreHref && (
+          <a href={startStoreHref} className={`${s.card} ${s.start}`}>
+            <p className={s.kicker}>الباقة المجانية</p>
             <h3 className={`${s.title} ${s.startTitle}`} style={{ fontFamily: display }}>
               ابدأ متجرك مجانًا
             </h3>
             <p className={s.text}>
-              انضم إلى الأسر المنتجة على بسطة مارت وابدأ رحلتك في بيع منتجاتك
-              والوصول إلى عملاء جدد.
+              {startStoreHref === "/register"
+                ? "سجّل حساب تاجر مجانًا، ثم أنشئ متجرك على بسطة مارت."
+                : "أنشئ متجرك المجاني باستخدام حسابك الحالي على بسطة مارت."}
             </p>
-            <span className={s.startCta}>ابدأ مجانًا</span>
+            <span className={s.startCta}>
+              {startStoreHref === "/register" ? "سجّل كتاجر مجانًا" : "أنشئ متجرك مجانًا"}
+            </span>
           </a>
         )}
       </div>
