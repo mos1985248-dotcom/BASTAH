@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api } from "@/lib/api-client";
 import { imageKinds, imagePresets, imageSizes, isImagePreset, type ImagePreset } from "@/lib/munira/image-options";
@@ -13,6 +14,7 @@ type Quota = { allowed: boolean; limit: number; used: number; remaining: number;
 type Studio = {
   quota: Quota; requiredPlan: string | null; enabled: boolean; images: { id: string; createdAt: string; saved: boolean; canRevise: boolean; feedbackStatus: string | null; feedbackNote: string | null }[];
 };
+const BastahModal = dynamic(() => import("@/components/ui/BastahModal"), { ssr: false });
 const endpoint = "/api/ai/images";
 const date = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Riyadh", dateStyle: "medium" });
 
@@ -229,13 +231,17 @@ export default function MuniraImageStudio({ initialPrompt = "", onUse, storeSlug
 export function MuniraImageButton({ prompt, onUse, disabled }: {
   prompt: string; onUse: (file: File) => void | Promise<void>; disabled?: boolean;
 }) {
-  const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
+  const [openedOnce, setOpenedOnce] = useState(false);
+  const close = () => setOpen(false);
+
   return <>
-    <button type="button" className={f.btnSm} disabled={disabled} onClick={() => { setOpen(true); dialog.current?.showModal(); }}>أنشئ صورة مع منيرة</button>
-    <dialog className={s.dialog} ref={dialog} onClose={() => setOpen(false)} aria-label="استوديو منيرة" style={uiVars}>
-      <button type="button" className={f.btnSm} onClick={() => dialog.current?.close()}>إغلاق</button>
-      {open && <MuniraImageStudio initialPrompt={prompt} onUse={onUse} close={() => dialog.current?.close()} />}
-    </dialog>
+    <button type="button" className={f.btnSm} disabled={disabled} aria-haspopup="dialog" onClick={() => {
+      setOpenedOnce(true);
+      setOpen(true);
+    }}>أنشئ صورة مع منيرة</button>
+    {openedOnce && <BastahModal open={open} label="استوديو منيرة" onClose={close}>
+      <MuniraImageStudio initialPrompt={prompt} onUse={onUse} close={close} />
+    </BastahModal>}
   </>;
 }

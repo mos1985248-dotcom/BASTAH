@@ -21,16 +21,16 @@ export default function WhyBasita() {
     >
       <div className={s.grid}>
         <div className={s.copy}>
-          <h2 id="why-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
+          <h2 data-home-reveal id="why-heading" className={s.title} style={{ fontFamily: t.typography.fontFamily.display }}>
             لماذا بسطة مارت؟
           </h2>
           <p className={s.lead}>
             كل ما تحتاجه الأسرة المنتجة لتبيع، تنمو، وتوصل منتجاتها لعملاء أكثر.
           </p>
 
-          <ol className={s.list}>
+          <ol className={s.list} data-home-reveal-group>
             {FEATURES.map((f) => (
-              <li key={f.n} className={s.row}>
+              <li key={f.n} className={s.row} data-home-reveal>
                 <span className={s.num} style={{ fontFamily: t.typography.fontFamily.display }} aria-hidden="true">
                   {f.n}
                 </span>
