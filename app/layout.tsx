@@ -1,17 +1,19 @@
 // app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
-import "@fontsource/ibm-plex-sans-arabic/300.css";
-import "@fontsource/ibm-plex-sans-arabic/400.css";
-import "@fontsource/ibm-plex-sans-arabic/500.css";
-import "@fontsource/ibm-plex-sans-arabic/600.css";
-import "@fontsource/ibm-plex-sans-arabic/700.css";
-import "@fontsource-variable/noto-kufi-arabic";
+import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import "@fontsource/aref-ruqaa/400.css";
 import "@fontsource/aref-ruqaa/700.css";
 import "@fontsource/amiri/400.css";
 import "@fontsource/amiri/700.css";
 import { UserProvider } from "./providers";
+
+const plex = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-plex-arabic",
+});
 
 export const metadata: Metadata = {
   title: "بسطة مارت | سوق الأسر المنتجة السعودية",
@@ -32,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" className={plex.variable}>
       <body>
         <UserProvider>{children}</UserProvider>
       </body>
