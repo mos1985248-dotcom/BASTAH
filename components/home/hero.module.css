@@ -53,3 +53,13 @@
   .ctaGold { transition: translate 0.2s var(--ui-ease), box-shadow 0.2s var(--ui-ease); }
   .ctaGold:hover { translate: 0 -2px; box-shadow: 0 8px 20px rgb(120 79 33 / 23%); }
 }
+
+/* Compact mobile typography — preserve desktop and touch targets. */
+@media (max-width: 767px) {
+  .copy { padding: 16px 16px 18px; }
+  .title { font-size: 26px; font-weight: 500; line-height: 1.45; margin-bottom: 8px; }
+  .lead { font-size: 14px; font-weight: 400; line-height: 1.75; margin-bottom: 14px; }
+  .cta { font-size: 14px; font-weight: 500; min-height: 44px; padding: 8px 6px; flex-basis: 8rem; white-space: normal; }
+  .founderNote { margin-top: 10px; font-size: 13px; line-height: 1.7; }
+  .founderNote strong { font-weight: 500; }
+}

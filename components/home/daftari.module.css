@@ -65,3 +65,8 @@
   .ledgerTitle { padding: 12px; font-size: 24px; }
   .band { padding: 16px; gap: 16px; }
 }
+
+/* Compact mobile typography — preserve desktop and touch targets. */
+@media (max-width: 767px) {
+  .ledgerTitle, .bandTitle { font-size: 22px; font-weight: 500; }
+}

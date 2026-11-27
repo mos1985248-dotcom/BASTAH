@@ -68,3 +68,8 @@
 }
 @media (prefers-reduced-motion: reduce) { .cta { transition: none; } }
 /* basita-font-scale: applied */
+
+/* Compact mobile typography — preserve desktop and touch targets. */
+@media (max-width: 767px) {
+  .name { font-size: 23px; font-weight: 500; }
+}

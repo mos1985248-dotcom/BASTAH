@@ -319,3 +319,20 @@
   .marketplaceHeader .actions :global(.basita-nav-auth) > button,
   .marketplaceHeader .actions :global(.basita-auth-loading) { width: 40px; height: 40px; min-height: 40px; }
 }
+
+/* Compact mobile typography — preserve desktop and touch targets. */
+@media (max-width: 767px) {
+  .brandName { font-size: 21px; font-weight: 500; }
+  .logo { gap: 6px; }
+  .bottomLink, .bottomMerchant { font-size: 11px; font-weight: 500; }
+  .drawerLink { font-size: 14px; font-weight: 500; }
+  .drawerShortcuts .drawerLink { font-size: 14px; }
+  .marketplaceHeader .brandName { font-size: clamp(16px, 5.3vw, 21px); }
+  .marketplaceHeader .logo { gap: 4px; }
+}
+@media (max-width: 360px) {
+  .marketplaceHeader .main { gap: 3px; padding-inline: 6px; }
+  .marketplaceHeader .actions { gap: 3px; }
+  .marketplaceHeader .brandName { font-size: 16px; }
+  .marketplaceHeader .logoMark { width: 30px; height: 30px; }
+}

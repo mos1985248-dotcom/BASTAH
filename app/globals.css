@@ -682,3 +682,9 @@ textarea:focus-visible {
     transition: scale 70ms ease-out;
   }
 }
+
+/* Compact mobile typography — preserve desktop and touch targets. */
+@media (max-width: 767px) {
+  :root { --type-section: 22px; --type-body: 14px; }
+  h1 { font-size: 26px; }
+}

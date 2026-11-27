@@ -40,3 +40,10 @@
   .start { order: -1; }
 }
 @media (prefers-reduced-motion: reduce) { .card, .link svg { transition: none; } .card:hover .link svg { transform: none; } }
+
+/* Compact mobile typography — preserve desktop and touch targets. */
+@media (max-width: 767px) {
+  .title { font-size: 22px; font-weight: 500; }
+  .card { padding: 20px 16px; }
+  .text { font-size: 14px; }
+}

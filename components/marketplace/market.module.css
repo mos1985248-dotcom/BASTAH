@@ -103,3 +103,17 @@
 }
 @media (prefers-reduced-motion: reduce) { .tab, .chip { transition: none; } }
 /* basita-font-scale: applied */
+
+/* Compact mobile typography — preserve desktop and touch targets. */
+@media (max-width: 767px) {
+  .hero { padding: 20px 14px; }
+  .heroKicker { font-size: 12px; font-weight: 500; margin-bottom: 6px; }
+  .heroTitle { font-size: 26px; font-weight: 500; line-height: 1.45; }
+  .heroSub { font-size: 14px; font-weight: 400; line-height: 1.7; margin-bottom: 16px; }
+  .storesTitle { font-size: 22px; font-weight: 500; margin-bottom: 8px; }
+  .controls { gap: 10px; padding-top: 14px; }
+  .tab { font-size: 14px; font-weight: 500; }
+  .chip { font-size: 13px; font-weight: 500; padding-inline: 12px; }
+  .count { font-size: 13px; }
+  .toolbar { margin-bottom: 10px; }
+}

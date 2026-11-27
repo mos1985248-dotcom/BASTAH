@@ -43,3 +43,12 @@
 .skeleton { overflow: hidden; border-radius: 20px; border: 1px solid var(--ui-border); background: var(--ui-card); }
 .skeletonBody { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 18px; }
 @media (prefers-reduced-motion: reduce) { .card, .fav { transition: none; } }
+
+/* Compact mobile typography — preserve desktop and touch targets. */
+@media (max-width: 767px) {
+  .body { padding: 10px; gap: 4px; }
+  .name { font-size: 14px; font-weight: 500; }
+  .price { font-size: 16px; font-weight: 600; }
+  .store, .rating, .price small, .compare { font-size: 12px; }
+  .foot { flex-wrap: wrap; gap: 4px; }
+}
