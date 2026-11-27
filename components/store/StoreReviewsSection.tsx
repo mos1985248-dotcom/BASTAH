@@ -20,13 +20,13 @@ export default function StoreReviewsSection({ store }: { store: StoreDetail }) {
 
   return (
     <section
-      aria-label="من تجارب زوّار البسطة"
+      aria-label="مراجعة عملاء بسطتنا"
       className={sec.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
       <div className={sec.head}>
         {total > 0 && <p className={sec.kicker}>{total} مراجعة</p>}
-        <h2 className={sec.title} style={{ fontFamily: t.typography.fontFamily.display }}>من تجارب زوّار البسطة</h2>
+        <h2 className={sec.title} style={{ fontFamily: t.typography.fontFamily.display }}>مراجعة عملاء بسطتنا</h2>
         <p className={sec.sub}>تقييمات المشترين بعد استلام طلباتهم</p>
       </div>
 
