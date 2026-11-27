@@ -10,7 +10,8 @@
 */
 
 :root {
-  --font-kufi-arabic: var(--font-plex-arabic);
+  --font-plex-arabic: var(--font-readex);
+  --font-kufi-arabic: var(--font-readex);
   --type-section: 30px;
   --type-body: 16px;
   --type-leading: 1.7;
@@ -44,7 +45,7 @@ body {
 
   font-family:
     var(--font-plex-arabic),
-    "IBM Plex Sans Arabic",
+    "Readex Pro",
     system-ui,
     sans-serif;
 }
@@ -62,21 +63,21 @@ body {
 
 /*
   العناوين:
-  Amiri
+  Readex Pro
 
   النصوص:
-  IBM Plex Sans Arabic
+  Readex Pro
 */
 
 h1,
 h2,
 h3 {
-  font-family: var(--font-amiri), "Amiri", serif;
+  font-family: var(--font-readex), "Readex Pro", sans-serif;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-h4, h5, h6 { font-family: var(--font-plex-arabic), sans-serif; overflow-wrap: anywhere; }
+h4, h5, h6 { font-family: var(--font-readex), sans-serif; overflow-wrap: anywhere; }
 
 h1 { font-size: 36px; font-weight: 700; line-height: 1.45; }
 h2 { font-size: var(--type-section); font-weight: 700; line-height: 1.5; }
