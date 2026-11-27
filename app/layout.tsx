@@ -1,11 +1,9 @@
 // app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic } from "next/font/google";
+import { Amiri, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "@fontsource/aref-ruqaa/400.css";
 import "@fontsource/aref-ruqaa/700.css";
-import "@fontsource/amiri/400.css";
-import "@fontsource/amiri/700.css";
 import { UserProvider } from "./providers";
 
 const plex = IBM_Plex_Sans_Arabic({
@@ -13,6 +11,13 @@ const plex = IBM_Plex_Sans_Arabic({
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
   variable: "--font-plex-arabic",
+});
+
+const amiri = Amiri({
+  subsets: ["arabic", "latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-amiri",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className={plex.variable}>
+    <html lang="ar" dir="rtl" className={`${plex.variable} ${amiri.variable}`}>
       <body>
         <UserProvider>{children}</UserProvider>
       </body>
