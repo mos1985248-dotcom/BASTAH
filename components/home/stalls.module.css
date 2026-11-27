@@ -5,7 +5,7 @@
 .header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
 .kicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }
 .kicker::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--ui-gold); }
-.title { margin: 0; font-size: clamp(34.5px, 4.6vw, 50.5px); font-weight: 700; line-height: 1.6; color: var(--ui-green-deep); }
+.title { margin: 0; font-size: var(--type-section); font-weight: 700; line-height: 1.4; color: var(--ui-green-deep); }
 .sub { margin: 4px 0 0; font-size: 15px; line-height: 1.8; color: var(--ui-ink-muted); }
 .all {
   flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px;
@@ -115,7 +115,7 @@
 .woodSign::after { left: 18px; }
 .name {
   display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-  font-family: "Amiri", "Traditional Arabic", serif !important;
+  font-family: var(--font-plex-arabic), sans-serif;
   text-align: center; font-size: 21px; line-height: 1.5; font-weight: 700; color: #3c2618;
 }
 .verified { flex: none; color: #08744a; }
