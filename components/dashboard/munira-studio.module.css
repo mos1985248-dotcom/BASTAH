@@ -12,8 +12,6 @@
 .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 12px; }
 .gallery li { display: grid; gap: 6px; align-content: start; border: 1px solid var(--ui-border); border-radius: 12px; padding: 8px; }
 .gallery img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 7px; }
-.dialog { width: min(92vw, 740px); max-height: 90dvh; overflow: auto; border: 1px solid var(--ui-border); border-radius: 16px; padding: 14px; margin: auto; color: var(--ui-ink); background: var(--ui-white); }
-.dialog::backdrop { background: rgb(20 36 30 / 60%); }
 .tabs { display: flex; gap: 8px; align-items: center; padding: 8px 12px; }
 
 .fixedSize {

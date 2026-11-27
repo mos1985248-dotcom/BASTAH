@@ -1,0 +1,58 @@
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: var(--ui-ink);
+}
+
+.dialog::backdrop { background: transparent; }
+:global(html):has(.dialog[open]) { overflow: hidden; }
+
+.surface {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: 16px;
+  background: rgb(20 36 30 / 55%);
+  backdrop-filter: blur(5px);
+}
+
+.panel {
+  box-sizing: border-box;
+  width: min(100%, 740px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: clamp(12px, 3vw, 24px);
+  border: 1px solid var(--ui-border);
+  border-radius: clamp(16px, 3vw, 24px);
+  background: var(--ui-card);
+  box-shadow: var(--ui-shadow);
+}
+
+.controls { display: flex; justify-content: flex-end; }
+.close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--ui-border);
+  border-radius: 50%;
+  background: var(--ui-sand);
+  color: var(--ui-green-deep);
+  cursor: pointer;
+}
+.close:focus-visible { outline: 2px solid var(--ui-green); outline-offset: 2px; }
+@media (hover: hover) {
+  .close:hover { border-color: var(--ui-green); }
+}
