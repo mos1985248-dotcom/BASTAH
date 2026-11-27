@@ -16,7 +16,7 @@ export default function StoreAchievements({ store }: { store: StoreDetail }) {
   ];
   return (
     <section
-      aria-label="إحصائيات المتجر"
+      aria-label="البسطة بالأرقام"
       className={sec.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >

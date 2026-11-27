@@ -27,9 +27,9 @@ export function StoreError({ message }: { message: string }) {
     <main className={s.section} style={{ ...uiVars, maxWidth: 560, minHeight: "55vh", display: "flex", alignItems: "center" }}>
       <div role="alert" style={{ width: "100%", textAlign: "center", padding: 32, borderRadius: 28, border: "1px solid var(--ui-border)", background: "var(--ui-card)" }}>
         <AlertTriangle size={28} strokeWidth={1.8} color="var(--ui-danger)" aria-hidden="true" />
-        <h1 style={{ margin: "12px 0 6px", fontSize: 22, color: "var(--ui-ink)" }}>{message ? "تعذّر تحميل المتجر" : "المتجر غير موجود"}</h1>
+        <h1 style={{ margin: "12px 0 6px", fontSize: 22, color: "var(--ui-ink)" }}>{message ? "تعذّر فتح البسطة" : "البسطة غير موجودة"}</h1>
         <p style={{ margin: 0, color: "var(--ui-ink-muted)", lineHeight: 1.8 }}>
-          {message || "قد يكون الرابط غير صحيح أو أن المتجر لم يعد متاحًا."}
+          {message || "تأكّد من الرابط، فقد تكون البسطة غير متاحة الآن."}
         </p>
       </div>
     </main>

@@ -30,7 +30,7 @@ export default function StoreHeroActions({
   return (
     <div className={s.actions}>
       <a href="#products" className={`${s.btn} ${s.btnGold}`}>
-        تصفّح المنتجات
+        تجوّل في البسطة
       </a>
       <button
         type="button"
@@ -40,11 +40,11 @@ export default function StoreHeroActions({
         aria-pressed={following}
       >
         <Heart size={16} strokeWidth={1.9} fill={following ? "currentColor" : "none"} aria-hidden="true" />
-        {following ? "بالمفضلة" : "متابعة"}
+        {following ? "تتابع البسطة" : "تابع البسطة"}
       </button>
       <button type="button" className={s.btn} onClick={handleShare}>
         {shared ? <Check size={16} strokeWidth={2} aria-hidden="true" /> : <Share2 size={16} strokeWidth={1.9} aria-hidden="true" />}
-        {shared ? "تم النسخ" : "مشاركة"}
+        {shared ? "تم نسخ الرابط" : "شارك البسطة"}
       </button>
       {store.whatsapp && (
         <a

@@ -24,7 +24,7 @@ export default function ReviewCard({ review }: { review: StoreReview }) {
       {review.product && <p className={s.about}>عن المنتج: {review.product.nameAr}</p>}
       {review.sellerReply && (
         <div className={s.reply}>
-          <span className={s.replyLabel}>رد المتجر:</span>
+          <span className={s.replyLabel}>رد أهل البسطة</span>
           <p className={s.replyText}>{review.sellerReply}</p>
         </div>
       )}

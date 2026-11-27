@@ -20,14 +20,14 @@ export default function StoreReviewsSection({ store }: { store: StoreDetail }) {
 
   return (
     <section
-      aria-label="تقييمات العملاء"
+      aria-label="من تجارب زوّار البسطة"
       className={sec.section}
       style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}
     >
       <div className={sec.head}>
         {total > 0 && <p className={sec.kicker}>{total} مراجعة</p>}
-        <h2 className={sec.title} style={{ fontFamily: t.typography.fontFamily.display }}>تقييمات العملاء</h2>
-        <p className={sec.sub}>آراء عملاء حقيقيين بعد تجربة المتجر</p>
+        <h2 className={sec.title} style={{ fontFamily: t.typography.fontFamily.display }}>من تجارب زوّار البسطة</h2>
+        <p className={sec.sub}>تقييمات المشترين بعد استلام طلباتهم</p>
       </div>
 
       {firstLoad ? (
@@ -36,7 +36,7 @@ export default function StoreReviewsSection({ store }: { store: StoreDetail }) {
         <div className={s.emptyState}>
           <EmptyState
             title="لا توجد مراجعات معتمدة بعد"
-            description="يمكنك أن تكون أول من يقيّم المتجر بعد استلام طلبك."
+            description="بعد استلام طلبك، شارك تجربتك مع أهل البسطة."
           />
         </div>
       ) : (

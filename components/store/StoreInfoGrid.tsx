@@ -10,7 +10,7 @@ export default function StoreInfoGrid({ store }: { store: StoreDetail }) {
   const days = info?.returnPolicyDays;
 
   const items: { Icon: LucideIcon; label: string; value: string }[] = [
-    { Icon: Calendar, label: "سنوات النشاط", value: years > 0 ? `${years} ${years === 1 ? "سنة" : "سنوات"}` : "متجر جديد" },
+    { Icon: Calendar, label: "سنوات النشاط", value: years > 0 ? `${years} ${years === 1 ? "سنة" : "سنوات"}` : "بسطة جديدة" },
     { Icon: FileText, label: "رقم الترخيص", value: info?.licenseNumber || "غير مُدرَج" },
     { Icon: Truck, label: "شركة الشحن", value: info?.deliveryPartner || "غير محددة" },
     { Icon: CreditCard, label: "طرق الدفع", value: info?.paymentMethods?.length ? info.paymentMethods.join(" · ") : "غير محددة" },
@@ -19,11 +19,11 @@ export default function StoreInfoGrid({ store }: { store: StoreDetail }) {
       label: "سياسة الإرجاع",
       value: days !== undefined ? `${days} ${days === 1 ? "يوم" : "أيام"} من الاستلام` : "غير محددة",
     },
-    { Icon: Package, label: "الاستلام الشخصي", value: store.pickupEnabled ? "متاح من موقع التاجر" : "غير متاح" },
+    { Icon: Package, label: "الاستلام الشخصي", value: store.pickupEnabled ? "متاح من موقع البسطة" : "غير متاح" },
   ];
 
   return (
-    <section aria-label="بيانات المتجر" className={s.infoSection}>
+    <section aria-label="معلومات البسطة" className={s.infoSection}>
       <dl className={s.info}>
         {items.map(({ Icon, label, value }) => (
           <div key={label} className={s.infoItem}>
