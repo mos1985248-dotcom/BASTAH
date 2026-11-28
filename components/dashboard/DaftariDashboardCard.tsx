@@ -30,7 +30,7 @@ export default function DaftariDashboardCard({ plan }: { plan: string }) {
       <div className={s.cardHead}>
         <div>
           <h2 id="daftari-card-title" className={s.cardTitle}>دفاتري — محاسبة بسيطة</h2>
-          <p className={s.cardSub}>ملخص هذا الشهر</p>
+          <p className={s.cardSub}>ملخص القيود اليدوية هذا الشهر</p>
         </div>
         <a href={hasAccess ? "/dashboard/daftari" : "/pricing"} className={s.more}>
           {hasAccess ? "افتح دفاتري" : "رقّ للتفعيل"}
@@ -45,7 +45,7 @@ export default function DaftariDashboardCard({ plan }: { plan: string }) {
         {hasAccess && loading && <p className={s.muted} style={{ margin: 0 }} role="status">جاري التحميل...</p>}
         {hasAccess && !loading && summary && (
           <div className={s.mini}>
-            <MiniStat label="مبيعات الشهر" value={`${summary.income} ر.س`} color="var(--ui-green)" />
+            <MiniStat label="مبيعات مسجلة يدويًا" value={`${summary.income} ر.س`} color="var(--ui-green)" />
             <MiniStat label="مصروفات الشهر" value={`${summary.expenses} ر.س`} color="var(--ui-danger)" />
             <MiniStat label="صافي الحركات المسجلة" value={`${summary.netProfit} ر.س`} color="var(--ui-green-deep)" />
           </div>

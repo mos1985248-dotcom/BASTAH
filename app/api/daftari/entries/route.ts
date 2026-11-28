@@ -1,3 +1,7 @@
+import { getFeature } from "@/lib/entitlements";
+import { readPlatformSales } from "@/lib/daftari/platform-sales";
+import { monthRangeUtc, riyadhMonthOf } from "@/lib/finance/riyadh";
+import { toMinor, fromMinor } from "@/lib/finance/money";
 import { assertStoreFeature } from "@/lib/feature-access";
 // app/api/daftari/entries/route.ts
 // ⚠️ Endpoint جديد بالكامل — يفعّل موديل DaftariEntry الموجود أصلاً بدون
@@ -38,21 +42,23 @@ export async function GET(req: NextRequest) {
       prisma.daftariEntry.count({ where: { storeId: user.store.id } }),
     ]);
 
-    const now = new Date();
-    const riyadh = new Date(now.getTime() + 3 * 3600000);
-    const monthStart = new Date(Date.UTC(riyadh.getUTCFullYear(), riyadh.getUTCMonth(), 1) - 3 * 3600000);
-    const monthEnd = new Date(Date.UTC(riyadh.getUTCFullYear(), riyadh.getUTCMonth() + 1, 1) - 3 * 3600000);
-    const monthEntries = await prisma.daftariEntry.findMany({ where: { storeId: user.store.id, entryDate: { gte: monthStart, lt: monthEnd } } });
-
-    const income = monthEntries.filter((e) => e.type === "SALE").reduce((s, e) => s + e.amount, 0);
-    const expenses = monthEntries.filter((e) => e.type === "EXPENSE").reduce((s, e) => s + e.amount, 0);
-    const refunds = monthEntries.filter((e) => e.type === "REFUND").reduce((s, e) => s + e.amount, 0);
-
+    const period = riyadhMonthOf(new Date());
+    const { start: monthStart, end: monthEnd } = monthRangeUtc(period);
+    const [monthEntries, platform, reports, advanced] = await Promise.all([
+      prisma.daftariEntry.findMany({ where: { storeId: user.store.id, entryDate: { gte: monthStart, lt: monthEnd }, orderId: null, isManual: true } }),
+      readPlatformSales(prisma, user.store.id, monthStart, monthEnd),
+      getFeature(user.store.id, "daftari_reports"),
+      getFeature(user.store.id, "daftari_advanced"),
+    ]);
+    const sumType = (type: string) => fromMinor(monthEntries.filter(e=>e.type===type).reduce((s,e)=>s+(toMinor(e.amount)??0),0));
+    const income = sumType("SALE"), expenses = sumType("EXPENSE"), refunds = sumType("REFUND");
     return NextResponse.json({
+      platform,
+      capabilities: { reports: reports.allowed, advanced: advanced.allowed && reports.allowed },
       entries,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-      monthSummary: { income, expenses, refunds, netProfit: income - expenses - refunds },
-    });
+      monthSummary: { income, expenses, refunds, netProfit: fromMinor((toMinor(income)??0)-(toMinor(expenses)??0)-(toMinor(refunds)??0)) },
+    }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
     console.error("[GET /api/daftari/entries]", err);
