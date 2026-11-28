@@ -13,7 +13,6 @@
 .grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr); gap: 32px; align-items: start; }
 .galleryCol { position: sticky; top: 96px; min-width: 0; }
 .infoCol { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.guestUnavailable { margin: 0; font-size: 13px; line-height: 1.6; color: var(--ui-ink-muted); }
 .lower { display: flex; flex-direction: column; gap: 56px; margin-top: 56px; }
 
 .sectionKicker { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; font-weight: 600; color: var(--ui-kicker); }

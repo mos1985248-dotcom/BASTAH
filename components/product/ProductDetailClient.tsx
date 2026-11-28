@@ -111,10 +111,8 @@ export default function ProductDetailClient() {
                 addedToCart={purchase.addedToCart}
                 checkingOut={purchase.checkingOut}
                 error={purchase.checkoutError}
+                showDisabledGuestCheckout={!guestEnabled && !purchase.userLoading && !purchase.user}
               />
-              {!guestEnabled && !purchase.userLoading && !purchase.user && (
-                <p className={s.guestUnavailable}>الشراء كزائر <span>· غير متاح حاليًا</span></p>
-              )}
               <ProductStoreCard store={product.store} redirectPath={`/products/${id}`} />
             </div>
           </div>

@@ -71,6 +71,7 @@
 .btnBuy:hover:not(:disabled) { background: var(--ui-green-hover); box-shadow: var(--ui-shadow); }
 .btnCart { background: transparent; color: var(--ui-green); }
 .btnCart:hover:not(:disabled) { background: var(--ui-sand); }
+.guestUnavailable { margin: -4px 0 0; font-size: 13px; line-height: 1.6; color: var(--ui-ink-muted); text-align: center; }
 .cartLink { align-self: center; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--ui-green); }
 
 /* ───── الثقة ───── */
