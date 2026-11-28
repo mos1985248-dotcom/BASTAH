@@ -1,5 +1,5 @@
 // components/marketplace/MarketControls.tsx
-// تبويب «المنتجات | المتاجر» + فلتر الأقسام (الوجهة الفعلية لرابط /marketplace#categories).
+// تبويب «المنتجات | البسطات» + فلتر الأقسام (الوجهة الفعلية لرابط /marketplace#categories).
 import { CATEGORY_LABELS } from "@/components/home/categories-data";
 import s from "./market.module.css";
 
@@ -18,7 +18,7 @@ export default function MarketControls({
 }) {
   const tabs: { id: MarketView; label: string }[] = [
     { id: "products", label: "المنتجات" },
-    { id: "stores", label: "المتاجر" },
+    { id: "stores", label: "البسطات" },
   ];
   return (
     <div className={s.controls} id="categories">
