@@ -22,6 +22,7 @@ interface Props {
   addedToCart: boolean;
   checkingOut: boolean;
   error: string;
+  showDisabledGuestCheckout?: boolean;
 }
 
 export default function ProductPurchasePanel(p: Props) {
@@ -82,6 +83,14 @@ export default function ProductPurchasePanel(p: Props) {
           {p.addedToCart ? <Check size={18} strokeWidth={2.2} aria-hidden="true" /> : <ShoppingBag size={18} strokeWidth={1.8} aria-hidden="true" />}
           {p.addingToCart ? "جاري الإضافة..." : p.addedToCart ? "أُضيف للسلة" : "أضف إلى السلة"}
         </button>
+        {p.showDisabledGuestCheckout && (
+          <>
+            <button type="button" className={`${s.btn} ${s.btnCart}`} disabled aria-describedby="guest-checkout-availability">
+              الشراء كزائر
+            </button>
+            <p id="guest-checkout-availability" className={s.guestUnavailable}>غير متاح حاليًا</p>
+          </>
+        )}
         {p.addedToCart && (
           <a href="/cart" className={s.cartLink}>
             الانتقال إلى السلة ←
