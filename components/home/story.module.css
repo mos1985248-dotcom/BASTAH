@@ -49,5 +49,5 @@
 }
 
 @media (min-width: 1024px) {
-  .title { font-size: var(--type-section); }
+  .title { font-size: 23px; font-weight: 500; }
 }
