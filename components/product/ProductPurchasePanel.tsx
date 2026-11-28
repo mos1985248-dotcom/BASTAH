@@ -86,7 +86,7 @@ export default function ProductPurchasePanel(p: Props) {
         {p.showDisabledGuestCheckout && (
           <>
             <button type="button" className={`${s.btn} ${s.btnCart}`} disabled aria-describedby="guest-checkout-availability">
-              الشراء كزائر
+              اشترِ كزائر
             </button>
             <p id="guest-checkout-availability" className={s.guestUnavailable}>غير متاح حاليًا</p>
           </>
