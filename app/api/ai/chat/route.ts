@@ -9,6 +9,9 @@ import { freeAnswer, freeUnavailable } from "@/lib/munira/free-router";
 import { localPricingAnswer, muniraPrompt, redactPrompt } from "@/lib/munira/context";
 import { completeMessage, MuniraRequestError, releaseMessage, reserveMessage } from "@/lib/munira/quota";
 import { generateStudioImage } from "@/lib/munira/image-studio";
+import { getFeature } from "@/lib/entitlements";
+import { readPlatformSales } from "@/lib/daftari/platform-sales";
+import { monthRangeUtc, riyadhMonthOf } from "@/lib/finance/riyadh";
 import { prisma } from "@/lib/prisma";
 
 export const maxDuration = 60;
@@ -65,6 +68,10 @@ export async function POST(req: NextRequest) {
     if (body.sessionId && !session) throw new MuniraRequestError("المحادثة غير موجودة.", 404);
 
     const content = redactPrompt(checked.sanitizedContent ?? last.content);
+    const financialAnalysis = content.trim() === "تحليل دفاتري لهذا الشهر";
+    if (financialAnalysis) {
+      if (!storeId || !(await getFeature(storeId,"daftari")).allowed || !(await getFeature(storeId,"daftari_reports")).allowed || !(await getFeature(storeId,"daftari_advanced")).allowed) throw new MuniraRequestError("التحليل المالي متاح لباقة ازدهار.",403);
+    }
     const ticket = { scope: storeId ? `store:${storeId}` : user ? `user:${user.id}` : `guest:${guestToken}`, requestId: body.requestId ?? randomUUID() };
     const inputHash = createHash("sha256").update(content).digest("hex");
     const reservation = await reserveMessage({ ...ticket, storeId, inputHash });
@@ -87,11 +94,17 @@ export async function POST(req: NextRequest) {
         requestId: ticket.requestId, prompt: content, kind: "product", size: "square",
       }, storeId) : null;
       const local = localPricingAnswer(content);
+      let financeContext = "";
+      if(financialAnalysis && storeId){
+        const {start,end}=monthRangeUtc(riyadhMonthOf(new Date()));
+        const data=await readPlatformSales(prisma,storeId,start,end);
+        financeContext = "\nبيانات مجمعة من الخادم لهذا المتجر فقط (ريال سعودي): "+JSON.stringify(data)+"\nحللي هذه الأرقام فقط؛ ليست تدفقات نقدية أو صافي ربح. لا تتخيلي تكاليف أو رسومًا أو بيانات أخرى. اذكري حدود البيانات وقدمي اقتراحات عملية.";
+      }
       const answer = id ? { text: `تم توليد الصورة وحفظها في مكتبة منيرة.\n/api/ai/images/${id}` }
         : local ? { text: local } : await freeAnswer({
-        system: muniraPrompt(language, role, older),
+        system: muniraPrompt(language, role, older)+financeContext,
         messages: [...recent, { role: "user", content }], maxTokens: 450,
-      }, { feature: "chat", route: "/api/ai/chat", userId: user?.id, storeId, sessionId: session?.id });
+      }, { feature: financialAnalysis?"daftari_analysis":"chat", route: "/api/ai/chat", userId: user?.id, storeId, sessionId: session?.id });
 
       const sessionId = await completeMessage(ticket, lease, answer.text, async tx => {
         const id = session?.id ?? (await tx.chatSession.create({

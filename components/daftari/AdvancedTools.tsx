@@ -3,6 +3,7 @@ import { useState } from "react";
 import { api } from "@/lib/api-client";
 import { planScenario } from "@/lib/daftari/planning";
 import type { PlatformSalesSummary } from "@/lib/daftari/platform-sales";
+import BudgetTools from "./BudgetTools";
 import s from "./daftari.module.css";
 type Month=PlatformSalesSummary&{period:string};
 export default function AdvancedTools(){
@@ -20,5 +21,6 @@ export default function AdvancedTools(){
   <p className={s.sub}>سيناريو تقديري لمنتج واحد أو متوسط مزيج ثابت، دون ضريبة. أدخل تكاليفك الفعلية المتوقعة؛ لا يُحفظ كقيد محاسبي.</p>
   <div className={s.planGrid}>{([["fixed","المصروفات الثابتة الشهرية"],["price","سعر بيع الوحدة"],["variable","التكلفة المتغيرة للوحدة"],["units","الوحدات المتوقع بيعها"]] as const).map(([key,label])=><label key={key} className={s.fieldWrap}><span className={s.fieldLabel}>{label}</span><input className={s.field} type="number" min="0" max="10000000" step={key==="units"?"1":"0.01"} value={values[key]} onChange={e=>setValues(v=>({...v,[key]:e.target.value}))}/></label>)}</div>
   {result&&<div><p>نقطة التعادل: {result.breakEvenUnits===null?"لا يمكن تحقيقها بهذا الهامش":result.breakEvenUnits+" وحدة"}</p><p>الإيرادات المتوقعة: {result.revenue.toFixed(2)} ر.س</p><p>نتيجة السيناريو: {result.profit.toFixed(2)} ر.س</p></div>}
+  <BudgetTools/>
  </div>;
 }

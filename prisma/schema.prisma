@@ -316,6 +316,7 @@ model Store {
   aiSessions      ChatSession[]     @relation("StoreSessions")
   publicInfo      StorePublicInfo?
   daftariEntries  DaftariEntry[]
+  daftariBudgets DaftariBudget[]
   // ⚠️ لوحة التسويق (القسم ٣) — بنية فقط، بدون أي Provider حقيقي بعد
   marketingContent MarketingContent[]
   adCampaigns      AdCampaign[]
@@ -2304,4 +2305,16 @@ model DaftariOrderItemCost {
   productCostMinor Int
   capturedAt DateTime @default(now())
   @@map("daftari_order_item_costs")
+}
+
+model DaftariBudget {
+  storeId String
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  year Int
+  month Int
+  revenueMinor BigInt
+  expensesMinor BigInt
+  updatedAt DateTime @updatedAt
+  @@id([storeId, year, month])
+  @@map("daftari_budgets")
 }
