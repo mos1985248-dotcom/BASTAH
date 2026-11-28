@@ -16,3 +16,7 @@ test("prices and product limits are read from the supplied active plans", () => 
   assert.deepEqual(result.context, { topic: "plans", plan: "STARTER" });
   assert.deepEqual(formatPlanAnswer(plans, { codes: ["PRO"], yearly: false }).context, { topic: "plans" });
 });
+
+test("billing complaints and account changes are not treated as price inquiries", () => {
+  for (const q of ["كيف أغير باقتي؟", "كيف ألغي الاشتراك؟", "دفعت الاشتراك ولم يتأكد", "هل هناك عمولة على الاشتراك؟", "كيف أجدد الاشتراك؟"]) assert.equal(planIntent(q, { topic: "plans", plan: "STARTER" }), null);
+});

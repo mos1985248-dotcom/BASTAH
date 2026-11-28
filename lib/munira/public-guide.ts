@@ -16,7 +16,7 @@ export function normalizeArabic(text: string) {
 export function storeSearch(text: string, marketCities: string[], previousProduct?: string) {
   const input = normalizeArabic(text);
   const sale = /(?:^| )(?:تبيع لي|تبيع|يبيع|تبيعون|عندها|عنده|توفر|يوفر|للبيع) (.+)$/u.exec(input);
-  const itemBeforeLocation = /(?:^| )(?:ابغ[اي]|اريد|ابي|عايز|عاوزه|ادور على|ابحث عن|فين الاقي|وين الاقي|وين القي|فين القي) (.+?) (?:في|من|بمدينة|مدينه) (.+)$/u.exec(input);
+  const itemBeforeLocation = /(?:^| )(?:ابغ[اي]|اريد|ابي|عايز|عاوزه|ادور على|ابحث عن|فين الاقي|وين الاقي|وين القي|فين القي) (.+?) (?:في|من|بمدينه|مدينه) (.+)$/u.exec(input);
   const followUp = previousProduct && /^(?:(?:طيب|وطيب|وماذا عن) )?(?:في|من|بمدينه) (.{2,50})$/u.exec(input);
   if (!sale && !itemBeforeLocation && !followUp) return null;
   const location = sale ? /(?:^| )(?:في|من|بمدينه|مدينه) (.+)$/u.exec(input.slice(0, sale.index))?.[1] : itemBeforeLocation?.[2];
@@ -80,7 +80,7 @@ export function helpArticle(input: string, items = publicKnowledge) {
     const question = words(item.question);
     return { item, score: new Set(tokens.filter(word => question.includes(word))).size };
   }).sort((a, b) => b.score - a.score);
-  return (scores[0]?.score ?? 0) >= 2 && scores[0].score > (scores[1]?.score ?? 0) ? scores[0].item : null;
+  return (scores[0]?.score ?? 0) >= 2 && scores[0].score >= new Set(tokens).size * 0.75 && scores[0].score > (scores[1]?.score ?? 0) ? scores[0].item : null;
 }
 
 export const merchantStart = /(?:افتح|فتح|انشاء|ابدا|اسوي|اعمل|ابد[اي]|اسجل).{0,28}(?:متجر|بسطه)|(?:متجر|بسطه).{0,16}(?:جديد|البيع)/u;

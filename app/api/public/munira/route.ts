@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
       if (gap) {
         try {
           await prisma.$transaction(async tx => {
-            await tx.$executeRaw`SELECT pg_advisory_xact_lock(73829105)`;
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(73829105)::text`;
             await tx.muniraKnowledgeGap.deleteMany({ where: { lastSeenAt: { lt: new Date(Date.now() - 30 * 86400000) } } });
             const existing = await tx.muniraKnowledgeGap.findUnique({ where: { questionKey: gap.questionKey } });
             if (!existing && await tx.muniraKnowledgeGap.count() >= 500) return;

@@ -15,7 +15,8 @@ const aliases: Record<PlanCode, string[]> = {
 const contains = (text: string, word: string) => (" " + text + " ").includes(" " + normalizeArabic(word) + " ");
 export function planIntent(message: string, previous?: PlanContext) {
   const text = normalizeArabic(message);
-  const explicit = /(?:^| )(?:باقه|باقات|الباقه|الباقات|اشتراك|الاشتراك|الاشتراكات)(?: |$)/u.test(text) && !/الغاء|الغي|استرداد|ترقيه|تغيير|اجدد|تجديد|مشكل|خصم المبلغ|دفعت/u.test(text);
+  if (/الغاء|الغي|استرداد|ترقيه|تغيير|اجدد|تجديد|مشكل|خصم المبلغ|دفعت|عموله/u.test(text) || /(?:اغير|تغير|ارقي|الاشتراك في طلب)/u.test(text)) return null;
+  const explicit = /(?:^| )(?:باقه|باقات|الباقه|الباقات|اشتراك|الاشتراك|الاشتراكات)(?: |$)/u.test(text) ;
   const follow = /^(?:(?:طيب|وطيب|و|طب) ?)?(?:كم (?:سعرها|سعره|سعرها سنويا|منتج|منتجات)|كم (?:السعر|العدد)|وش (?:مزاياها|فيها)|ايش مزاياها|مميزاتها|مزاياها|سعرها|والسنوي|والشهري|سنويا|شهريا|كم سنويا|كم شهريا|كم سعرها بالسنه|كم سعرها بالشهر)$/u.test(text);
   const named = planCodes.filter(code => aliases[code].some(name => contains(text, name)));
   const shortName = named.length === 1 && aliases[named[0]].some(name => [normalizeArabic(name), "طيب " + normalizeArabic(name), "و" + normalizeArabic(name)].includes(text));

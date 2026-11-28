@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     const data = { ...parsed.data, questionKey, aliases: [...new Set(parsed.data.aliases)] };
     // Serialize the library limit and upsert; never silently drop published articles.
     const result = await prisma.$transaction(async tx => {
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(73829104)`;
+      await tx.$queryRaw`SELECT pg_advisory_xact_lock(73829104)::text`;
       const existing = await tx.muniraKnowledgeArticle.findUnique({ where: { questionKey } });
       if (!existing && await tx.muniraKnowledgeArticle.count() >= 100) return null;
       const saved = await tx.muniraKnowledgeArticle.upsert({ where: { questionKey }, create: data, update: data });
