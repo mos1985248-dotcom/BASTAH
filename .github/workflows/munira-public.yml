@@ -1,0 +1,34 @@
+name: Public Munira validation
+on:
+  push:
+    branches: [feat/munira-public-knowledge]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/munira/**'
+      - 'app/api/public/munira/**'
+      - 'app/api/admin/munira/**'
+      - 'components/munira/**'
+      - 'components/admin/munira/**'
+      - 'prisma/**'
+      - 'tests/munira/**'
+      - '.github/workflows/munira-public.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/test
+      DIRECT_URL: postgresql://test:test@localhost:5432/test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx prisma validate
+      - run: npx tsx --test tests/munira/public-guide.test.ts tests/munira/public-plans.test.ts tests/munira/public-gap.test.ts tests/munira/public-regression.test.ts
+      - run: npx tsc --noEmit
