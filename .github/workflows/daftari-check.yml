@@ -43,3 +43,24 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
       - run: npx tsc --noEmit
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit all dependencies
+        run: |
+          npm audit --json > audit-all.json || true
+          node -e 'const a=require("./audit-all.json"); if(!a.metadata?.vulnerabilities) {console.error("Audit unavailable",a.error);process.exit(1)}; console.log(JSON.stringify(a.metadata.vulnerabilities)); for(const [name,v] of Object.entries(a.vulnerabilities||{})) console.log(JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,via:v.via,range:v.range,fixAvailable:v.fixAvailable}))'
+      - name: Audit production dependencies and enforce high severity gate
+        run: |
+          npm audit --omit=dev --json > audit-production.json || true
+          node -e 'const a=require("./audit-production.json"); if(!a.metadata?.vulnerabilities) {console.error("Audit unavailable",a.error);process.exit(1)}; console.log(JSON.stringify(a.metadata.vulnerabilities)); for(const [name,v] of Object.entries(a.vulnerabilities||{})) console.log(JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,via:v.via,range:v.range,fixAvailable:v.fixAvailable})); if(a.metadata.vulnerabilities.high || a.metadata.vulnerabilities.critical) process.exitCode=1'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-audit
+          path: audit-*.json
