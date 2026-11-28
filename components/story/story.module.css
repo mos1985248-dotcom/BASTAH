@@ -1,7 +1,7 @@
 /* components/story/story.module.css — صفحة «قصتنا». الألوان عبر --ui-* فقط؛ تتكيّف مع الكمبيوتر والجوال. */
 .page { direction: rtl; background: var(--ui-sand); color: var(--ui-ink); overflow-x: clip; }
 .wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding-inline: clamp(16px, 4vw, 32px); }
-.display { font-family: var(--font-amiri), "Amiri", serif; }
+.display { font-family: var(--font-readex), "Readex Pro", system-ui, sans-serif; }
 
 /* ───── الهيرو ───── */
 .hero { padding: clamp(28px, 6vw, 72px) 0 clamp(20px, 4vw, 40px); }
