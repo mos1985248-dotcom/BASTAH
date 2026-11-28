@@ -1,0 +1,35 @@
+name: Security dependency candidate
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Resolve compatible security patches
+        run: |
+          npm install --package-lock-only --ignore-scripts --save-exact sharp@0.35.5
+          npm install --package-lock-only --ignore-scripts --save-dev --save-exact tsx@4.23.15 'postcss@^8.5.23'
+          npm audit fix --package-lock-only --ignore-scripts || true
+      - name: Verify installation and candidate
+        run: |
+          npm ci
+          npm run test:daftari
+          npx tsc --noEmit
+      - name: Report remaining vulnerabilities
+        if: always()
+        run: npm audit --omit=dev
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-candidate-manifests
+          path: |
+            package.json
+            package-lock.json
