@@ -5,7 +5,7 @@ import Image from "next/image";
 import s from "./hero.module.css";
 
 const POSTER = "/images/bastah-heritage-premium-poster.webp";
-const VIDEO = "/videos/bastah-heritage-premium-15s.mp4";
+const VIDEO = "/videos/bastah-heritage-readex-logo.mp4";
 type Connection = EventTarget & { saveData?: boolean };
 
 export default function HeroVisual() {
