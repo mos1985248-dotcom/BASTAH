@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import s from "./hero.module.css";
 
-const POSTER = "/images/bastah-heritage-hero-poster.webp";
-const VIDEO = "/videos/bastah-heritage-hero.mp4";
+const POSTER = "/images/bastah-heritage-premium-poster.webp";
+const VIDEO = "/videos/bastah-heritage-premium-15s.mp4";
 type Connection = EventTarget & { saveData?: boolean };
 
 export default function HeroVisual() {
@@ -57,7 +57,7 @@ export default function HeroVisual() {
     <div className={s.visual}>
       <Image
         src={POSTER}
-        alt="مشاهد من سوق سعودي تراثي عند الغروب"
+        alt="ممر تراثي سعودي تضيئه الفوانيس"
         fill
         priority
         sizes="(max-width: 767px) 100vw, 50vw"
