@@ -9,7 +9,7 @@ import { redactPrompt } from "@/lib/munira/context";
 import { freeAnswer } from "@/lib/munira/free-router";
 
 export const maxDuration = 25;
-const input = z.object({ message: z.string().trim().min(2).max(800), mode: z.enum(["ask", "draft"]).default("ask") }).strict();
+const input = z.object({ message: z.string().trim().min(2).max(800), mode: z.enum(["ask", "draft"]).default("ask"), previousProduct: z.string().trim().min(2).max(80).optional() }).strict();
 const publicStore = { status: "ACTIVE" as const, subscription: { status: { in: GOOD_STANDING_STATUSES } } };
 const startLink = [{ label: "ابدأ متجرك", href: "/register" }];
 const fallback = { text: "ما لقيت إجابة مؤكدة. جرّب إعادة صياغة السؤال، أو اختر «تواصل مع الدعم».", links: [{ href: "/faq", label: "مركز المساعدة" }] };
@@ -37,27 +37,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ text: filterOutput(answer.text).slice(0, 1600), links: startLink });
     }
 
-    if (storeSearch(message, [])) {
+    const previousProduct = parsed.data.previousProduct;
+    if (storeSearch(message, [], previousProduct)) {
       const names = await prisma.store.findMany({
         where: { ...publicStore, city: { not: null } }, distinct: ["city"], select: { city: true }, take: 300,
       });
-      const terms = storeSearch(message, names.flatMap(({ city }) => city ? [city] : []))!;
+      const terms = storeSearch(message, names.flatMap(({ city }) => city ? [city] : []), previousProduct)!;
       const variants = [...new Set([terms.product, terms.product.replace(/ه$/u, "ة"),
         terms.product === "تمر" ? "تمور" : terms.product, terms.product.replace(/ا/g, "أ")])];
+      const matchingProducts = {
+        status: "ACTIVE" as const,
+        OR: variants.flatMap(name => [
+          { nameAr: { contains: name, mode: "insensitive" as const } },
+          { nameEn: { contains: name, mode: "insensitive" as const } },
+          { category: { nameAr: { contains: name, mode: "insensitive" as const } } },
+        ]),
+      };
       const stores = await prisma.store.findMany({
         where: {
           ...publicStore,
           ...(terms.city && { city: { in: terms.matchingCities, mode: "insensitive" as const } }),
-          products: { some: {
-            status: "ACTIVE",
-            OR: variants.flatMap(name => [
-              { nameAr: { contains: name, mode: "insensitive" as const } },
-              { nameEn: { contains: name, mode: "insensitive" as const } },
-              { category: { nameAr: { contains: name, mode: "insensitive" as const } } },
-            ]),
-          } },
+          products: { some: matchingProducts },
         },
-        select: { nameAr: true, slug: true, city: true },
+        select: {
+          nameAr: true, slug: true, city: true,
+          products: {
+            where: matchingProducts,
+            select: { id: true, nameAr: true, price: true, trackInventory: true, quantity: true },
+            orderBy: [{ totalSold: "desc" }, { id: "asc" }],
+            take: 2,
+          },
+        },
         orderBy: [{ isVerified: "desc" }, { avgRating: "desc" }, { id: "asc" }],
         take: 5,
       });
@@ -65,8 +75,14 @@ export async function POST(req: NextRequest) {
         text: stores.length
           ? `لقيت لك بسطات تعرض «${terms.product}»${terms.city ? ` في ${terms.city}` : ""}. افتح البسطة وشوف المنتجات المتوفرة.`
           : `ما لقيت بسطة مطابقة لطلبك الآن${terms.city ? ` في ${terms.city}` : ""}. جرّب اسم منتج أو مدينة أخرى.`,
-        links: stores.map(({ nameAr, city, slug }) => ({
-          label: city ? `${nameAr} · ${city}` : nameAr, href: `/store/${encodeURIComponent(slug)}`,
+        links: [],
+        searchProduct: terms.product,
+        stores: stores.map(({ nameAr, city, slug, products }) => ({
+          name: nameAr, city, href: `/store/${encodeURIComponent(slug)}`,
+          products: products.map(({ id, nameAr, price, trackInventory, quantity }) => ({
+            name: nameAr, price, href: `/products/${encodeURIComponent(id)}`,
+            available: trackInventory ? quantity > 0 : null,
+          })),
         })),
       });
     }

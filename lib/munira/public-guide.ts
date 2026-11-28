@@ -13,15 +13,16 @@ export function normalizeArabic(text: string) {
     .replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
 }
 
-export function storeSearch(text: string, marketCities: string[]) {
+export function storeSearch(text: string, marketCities: string[], previousProduct?: string) {
   const input = normalizeArabic(text);
   const sale = /(?:^| )(?:تبيع لي|تبيع|يبيع|تبيعون|عندها|عنده|توفر|يوفر|للبيع) (.+)$/u.exec(input);
   const itemBeforeLocation = /(?:^| )(?:ابغ[اي]|اريد|ابي|عايز|عاوزه|ادور على|ابحث عن|فين الاقي|وين الاقي|وين القي|فين القي) (.+?) (?:في|من|بمدينة|مدينه) (.+)$/u.exec(input);
-  if (!sale && !itemBeforeLocation) return null;
+  const followUp = previousProduct && /^(?:(?:طيب|وطيب|وماذا عن) )?(?:في|من|بمدينه) (.{2,50})$/u.exec(input);
+  if (!sale && !itemBeforeLocation && !followUp) return null;
   const location = sale ? /(?:^| )(?:في|من|بمدينه|مدينه) (.+)$/u.exec(input.slice(0, sale.index))?.[1] : itemBeforeLocation?.[2];
   const tailLocation = sale ? /^(.*?) (?:في|من|بمدينه|مدينه) (.+)$/u.exec(sale[1]) : null;
-  const place = (location ?? tailLocation?.[2])?.replace(/ (?:بسطه|متجر)$/u, "");
-  const product = (tailLocation?.[1] ?? sale?.[1] ?? itemBeforeLocation?.[1] ?? "")
+  const place = (location ?? tailLocation?.[2] ?? (followUp ? followUp[1] : undefined))?.replace(/ (?:بسطه|متجر)$/u, "");
+  const product = (tailLocation?.[1] ?? sale?.[1] ?? itemBeforeLocation?.[1] ?? (followUp ? previousProduct : "") ?? "")
     .replace(/^(?:منتج|منتجات) /u, "").slice(0, 80).trim();
   if (product.length < 2) return null;
   const city = place ? cityAliases.get(place) ?? marketCities.find(name => normalizeArabic(name) === place) ?? place : null;
