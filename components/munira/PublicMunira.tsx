@@ -15,6 +15,7 @@ type Answer = {
   text: string;
   links: { href: string; label: string }[];
   searchProduct?: string;
+  context?: { topic: "plans"; plan?: "FREE" | "STARTER" | "GROWTH" | "PRO" };
   stores?: { name: string; city: string | null; href: string; products: { name: string; price: number; href: string; available: boolean | null }[] }[];
 };
 const prices = new Intl.NumberFormat("ar-SA", { style: "currency", currency: "SAR" });
@@ -29,6 +30,7 @@ export default function PublicMunira() {
   const [opened, setOpened] = useState(false);
   const [mode, setMode] = useState<Mode>("ask");
   const [previousProduct, setPreviousProduct] = useState<string>();
+  const [context, setContext] = useState<Answer["context"]>();
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [lastQuestion, setLastQuestion] = useState("");
@@ -45,6 +47,7 @@ export default function PublicMunira() {
     if (next === "support" && !issue) setIssue(lastQuestion || question);
     if (next !== "support" && next !== mode) {
       setPreviousProduct(undefined);
+      setContext(undefined);
       setAnswer(null);
       setQuestion("");
     }
@@ -67,8 +70,10 @@ export default function PublicMunira() {
         setLastQuestion(question);
         const result = await api.post<Answer>("/api/public/munira", {
           message: question, mode, previousProduct: mode === "ask" ? previousProduct : undefined,
+          context: mode === "ask" ? context : undefined,
         });
         setPreviousProduct(result.searchProduct);
+        setContext(result.context);
         setAnswer(result);
         setQuestion("");
       }

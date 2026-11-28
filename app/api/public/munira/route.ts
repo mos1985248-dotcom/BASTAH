@@ -7,10 +7,11 @@ import { helpArticle, merchantStart, normalizeArabic, storeSearch, knowledgeChoi
 import { sanitizeUserInput, filterOutput } from "@/lib/munira/security";
 import { redactPrompt } from "@/lib/munira/context";
 import { loadPublicKnowledge, matchPublishedAlias } from "@/lib/munira/public-knowledge";
+import { planCodes, planIntent, formatPlanAnswer } from "@/lib/munira/public-plans";
 import { freeAnswer } from "@/lib/munira/free-router";
 
 export const maxDuration = 25;
-const input = z.object({ message: z.string().trim().min(2).max(800), mode: z.enum(["ask", "draft"]).default("ask"), previousProduct: z.string().trim().min(2).max(80).optional() }).strict();
+const input = z.object({ message: z.string().trim().min(2).max(800), mode: z.enum(["ask", "draft"]).default("ask"), previousProduct: z.string().trim().min(2).max(80).optional(), context: z.object({ topic: z.literal("plans"), plan: z.enum(planCodes).optional() }).strict().optional() }).strict();
 const publicStore = { status: "ACTIVE" as const, subscription: { status: { in: GOOD_STANDING_STATUSES } } };
 const startLink = [{ label: "ابدأ متجرك", href: "/register" }];
 const fallback = { text: "ما لقيت إجابة مؤكدة. جرّب إعادة صياغة السؤال، أو اختر «تواصل مع الدعم».", links: [{ href: "/faq", label: "مركز المساعدة" }] };
@@ -38,6 +39,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ text: filterOutput(answer.text).slice(0, 1600), links: startLink });
     }
 
+    const planRequest = planIntent(message, parsed.data.context);
+    if (planRequest) {
+      const plans = await prisma.subscriptionPlanConfig.findMany({ where: { isActive: true }, orderBy: { priceMonthly: "asc" }, select: { plan: true, nameAr: true, priceMonthly: true, priceYearly: true, currency: true, maxProducts: true, featuresAr: true } });
+      return NextResponse.json(formatPlanAnswer(plans, planRequest));
+    }
     const previousProduct = parsed.data.previousProduct;
     if (storeSearch(message, [], previousProduct)) {
       const names = await prisma.store.findMany({
