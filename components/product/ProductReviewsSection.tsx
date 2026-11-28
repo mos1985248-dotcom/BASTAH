@@ -30,8 +30,7 @@ export default function ProductReviewsSection({ product }: { product: ProductDet
 
   return (
     <section aria-labelledby="product-reviews-title" style={uiVars}>
-      <p className={p.sectionKicker}>{total} مراجعة</p>
-      <h2 id="product-reviews-title" className={p.sectionTitle} style={{ fontFamily: t.typography.fontFamily.display }}>
+      <h2 id="product-reviews-title" className={`${p.sectionTitle} ${p.compactSectionTitle}`} style={{ fontFamily: t.typography.fontFamily.display }}>
         تقييمات العملاء
       </h2>
       <p className={p.sectionSub}>آراء عملاء حقيقيين اشتروا هذا المنتج</p>

@@ -2,58 +2,108 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash, randomBytes } from "node:crypto";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { guestQuoteSchema } from "@/lib/guest-checkout";
-import { resolveCheckoutItems, computeShippingCost, CheckoutItemError, ShippingCalcError } from "@/lib/checkout-pricing";
-import { checkoutTotals } from "@/lib/checkout-coupon";
-import { getCodFee } from "@/lib/platform-settings";
+import { guestQuote, guestQuoteSchema } from "@/lib/guest-checkout";
+import { CheckoutItemError, ShippingCalcError } from "@/lib/checkout-pricing";
 import { reserveStock, InsufficientStockError } from "@/lib/inventory";
 import { snapshotCodShare } from "@/lib/finance/snapshots";
 import { authRateLimit, checkRateLimit } from "@/lib/rate-limit";
+import { guestBuyerId, guestOrderId, guestSession } from "@/lib/guest-order-session";
 
-// First isolated implementation: COD only. Never grants a normal user session.
-const schema=guestQuoteSchema.extend({paymentMethod:z.literal("CASH_ON_DELIVERY"),requestId:z.string().uuid(),expectedTotal:z.number().finite().nonnegative()});
-export async function POST(req:NextRequest){
- if(process.env.GUEST_CHECKOUT_ENABLED!=="true"||!authRateLimit)return NextResponse.json({error:"شراء الزائر غير متاح حالياً"},{status:503});
- if(req.headers.get("origin")!==req.nextUrl.origin)return NextResponse.json({error:"طلب غير صالح"},{status:403});
- try{
-  const parsed=schema.safeParse(await req.json());
-  if(!parsed.success)return NextResponse.json({error:"تحقق من بيانات الطلب"},{status:400});
-  const d=parsed.data;
-  if(!d.phone)return NextResponse.json({error:"رقم الجوال غير صالح"},{status:400});
-  const phone=d.phone;
-  const ip=req.headers.get("x-forwarded-for")?.split(",")[0].trim()??"unknown";
-  const limit=await checkRateLimit(authRateLimit,"guest-order:"+ip);
-  const phoneLimit=await checkRateLimit(authRateLimit,"guest-phone:"+createHash("sha256").update(phone).digest("hex"));
-  if(!limit.allowed||!phoneLimit.allowed)return NextResponse.json({error:"محاولات كثيرة، حاول لاحقاً"},{status:429});
-  // Separate opaque credential, never looked up by unverified phone.
-  const token=randomBytes(32).toString("hex");
-  const buyerId="guest_"+createHash("sha256").update(token).digest("hex");
-  const orderId="guest_"+createHash("sha256").update(d.requestId).digest("hex");
-  const sub=await prisma.storeSubscription.findUnique({where:{storeId:d.storeId},include:{store:{select:{status:true}}}});
-  if(!sub||sub.status==="SUSPENDED"||sub.store.status!=="ACTIVE")return NextResponse.json({error:"المتجر غير متاح"},{status:422});
-  const {resolved,productNames}=await resolveCheckoutItems(d.storeId,d.items);
-  const subtotal=resolved.reduce((sum,i)=>sum+i.unitPrice*i.quantity,0);
-  const {shippingCost,shippingRateLogId}=await computeShippingCost(d.storeId,resolved,d,subtotal);
-  const codFee=await getCodFee(d.paymentMethod);
-  const totals=checkoutTotals(subtotal,0,shippingCost,codFee,sub.hasTaxNumber,d.paymentMethod);
-  if(Math.round(totals.total*100)!==Math.round(d.expectedTotal*100))return NextResponse.json({error:"تغيّر الإجمالي، أعد حساب التكلفة"},{status:409});
-  const order=await prisma.$transaction(async tx=>{
-   await tx.user.create({data:{id:buyerId,name:d.name,role:"BUYER",isActive:false,isVerified:false}});
-   await reserveStock(tx,resolved,productNames);
-   const created=await tx.order.create({data:{id:orderId,orderNumber:"BS-G-"+randomBytes(8).toString("hex").toUpperCase(),buyerId,storeId:d.storeId,paymentMethod:"CASH_ON_DELIVERY",fulfillmentMethod:"SHIPPING",...totals,shippingName:d.name,shippingPhone:phone,shippingCity:d.city,shippingRegion:d.region,shippingAddress:d.address,items:{create:resolved.map(i=>({productId:i.productId,variantId:i.variantId,nameAr:i.nameAr,price:i.unitPrice,quantity:i.quantity,total:i.unitPrice*i.quantity}))},statusHistory:{create:{status:"PENDING",note:"طلب زائر — الدفع عند الاستلام"}}},select:{id:true,orderNumber:true,total:true}});
-   if(shippingRateLogId){
-    const rate=await tx.shippingRate.update({where:{id:shippingRateLogId},data:{orderId:created.id}});
-    if(codFee>0)await snapshotCodShare(tx,created.id,String(rate.carrier));
-   }
-   return created;
-  });
-  const response=NextResponse.json({orderId:order.id,orderNumber:order.orderNumber,total:order.total},{status:201,headers:{"Cache-Control":"no-store"}});
-  response.cookies.set("bastah_guest_"+order.id.slice(-24),token,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",path:"/api/guest-checkout",maxAge:60*60*24*30});
-  return response;
- }catch(e){
-  if(e instanceof CheckoutItemError||e instanceof ShippingCalcError)return NextResponse.json({error:e.message},{status:e.status});
-  if(e instanceof InsufficientStockError)return NextResponse.json({error:e.message},{status:409});
-  if(typeof e==="object"&&e!==null&&"code" in e&&e.code==="P2002")return NextResponse.json({error:"تم تسجيل طلب بهذه المحاولة، لا تكرر الإرسال"},{status:409});
-  return NextResponse.json({error:"تعذّر إنشاء الطلب"},{status:500});
- }
+const amount = z.number().finite().nonnegative();
+const schema = guestQuoteSchema.extend({
+  requestId: z.string().uuid(),
+  expected: z.object({ subtotal: amount, shippingCost: amount, codFee: amount, taxAmount: amount, total: amount }),
+});
+const orderSelect = { id: true, orderNumber: true, total: true } as const;
+const noStore = { "Cache-Control": "no-store" };
+
+export async function POST(req: NextRequest) {
+  if (process.env.GUEST_CHECKOUT_ENABLED !== "true" || !authRateLimit) {
+    return NextResponse.json({ error: "شراء الزائر غير متاح حالياً" }, { status: 503 });
+  }
+  if (req.headers.get("origin") !== req.nextUrl.origin) {
+    return NextResponse.json({ error: "طلب غير صالح" }, { status: 403 });
+  }
+  const token = guestSession(req);
+  if (!token) return NextResponse.json({ error: "أعد حساب التكلفة قبل تأكيد الطلب" }, { status: 409 });
+  try {
+    const parsed = schema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success || !parsed.data.phone) {
+      return NextResponse.json({ error: "تحقق من بيانات الطلب" }, { status: 400 });
+    }
+    const data = parsed.data;
+    const phone = parsed.data.phone;
+    const buyerId = guestBuyerId(token);
+    const id = guestOrderId(data.requestId, token);
+    const findOrder = () => prisma.order.findFirst({ where: { id, buyerId }, select: orderSelect });
+    const respond = (order: { id: string; orderNumber: string; total: number }, status: number) =>
+      NextResponse.json({ orderId: order.id, orderNumber: order.orderNumber, total: order.total }, { status, headers: noStore });
+
+    const existing = await findOrder();
+    if (existing) return respond(existing, 200);
+
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
+    const limits = await Promise.all([
+      checkRateLimit(authRateLimit, "guest-order:" + ip),
+      checkRateLimit(authRateLimit, "guest-phone:" + createHash("sha256").update(phone).digest("hex")),
+    ]);
+    if (limits.some((limit) => !limit.allowed)) {
+      return NextResponse.json({ error: "محاولات كثيرة، حاول لاحقاً" }, { status: 429 });
+    }
+
+    const priced = await guestQuote(data).catch(async (error: unknown) => {
+      const committed = await findOrder();
+      if (committed) return { committed };
+      throw error;
+    });
+    if ("committed" in priced) return respond(priced.committed, 200);
+    const { totals, resolved, productNames, shippingRateLogId } = priced;
+    const keys = ["subtotal", "shippingCost", "codFee", "taxAmount", "total"] as const;
+    if (keys.some((key) => Math.round(totals[key] * 100) !== Math.round(data.expected[key] * 100))) {
+      return NextResponse.json({ error: "تغيّرت تكلفة الطلب، أعد حساب الإجمالي" }, { status: 409 });
+    }
+
+    try {
+      const order = await prisma.$transaction(async (tx) => {
+        await tx.user.upsert({
+          where: { id: buyerId },
+          create: { id: buyerId, name: data.name, role: "BUYER", isActive: false, isVerified: false },
+          update: {},
+        });
+        // Create the unique order before reserving stock so concurrent retries
+        // cannot run a second reservation against an already committed order.
+        const created = await tx.order.create({
+          data: {
+            id, orderNumber: "BS-G-" + randomBytes(8).toString("hex").toUpperCase(),
+            buyerId, storeId: data.storeId, paymentMethod: data.paymentMethod, fulfillmentMethod: "SHIPPING",
+            ...totals, shippingName: data.name, shippingPhone: phone, shippingCity: data.city,
+            shippingRegion: data.region, shippingAddress: data.address,
+            items: { create: resolved.map((item) => ({
+              productId: item.productId, variantId: item.variantId, nameAr: item.nameAr,
+              price: item.unitPrice, quantity: item.quantity, total: item.unitPrice * item.quantity,
+            })) },
+            statusHistory: { create: { status: "PENDING", note: "طلب زائر — الدفع عند الاستلام" } },
+          },
+          select: orderSelect,
+        });
+        await reserveStock(tx, resolved, productNames);
+        if (shippingRateLogId) {
+          const rate = await tx.shippingRate.update({ where: { id: shippingRateLogId }, data: { orderId: created.id } });
+          if (totals.codFee > 0) await snapshotCodShare(tx, created.id, String(rate.carrier));
+        }
+        return created;
+      });
+      return respond(order, 201);
+    } catch (error) {
+      const committed = await findOrder();
+      if (committed) return respond(committed, 200);
+      throw error;
+    }
+  } catch (error) {
+    if (error instanceof CheckoutItemError || error instanceof ShippingCalcError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    if (error instanceof InsufficientStockError) return NextResponse.json({ error: error.message }, { status: 409 });
+    return NextResponse.json({ error: "تعذّر إنشاء الطلب، جرّب مرة أخرى" }, { status: 500 });
+  }
 }

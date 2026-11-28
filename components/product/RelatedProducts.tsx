@@ -32,8 +32,7 @@ export default function RelatedProducts({ product }: { product: ProductDetail })
 
   return (
     <section aria-labelledby="related-title" style={uiVars}>
-      <p className={p.sectionKicker}>قد يعجبك أيضًا</p>
-      <h2 id="related-title" className={p.sectionTitle} style={{ fontFamily: t.typography.fontFamily.display }}>
+      <h2 id="related-title" className={`${p.sectionTitle} ${p.compactSectionTitle}`} style={{ fontFamily: t.typography.fontFamily.display }}>
         منتجات مشابهة
       </h2>
       <p className={p.sectionSub}>اختيارات من نفس القسم</p>

@@ -22,7 +22,7 @@
   background: var(--ui-sand) center / cover no-repeat; font-size: 40px; font-weight: 700; color: var(--ui-green-deep);
 }
 .identity { min-width: 0; padding-top: 16px; }
-.name { display: flex; align-items: center; gap: 10px; margin: 0; font-size: clamp(30px, 3.91vw, 43.5px); font-weight: 700; line-height: 1.5; color: var(--ui-green-deep); }
+.name { display: flex; align-items: center; gap: 10px; margin: 0; font-size: clamp(30px, 3.91vw, 43.5px); font-weight: 500; line-height: 1.5; color: var(--ui-green-deep); }
 .verified { flex: none; color: var(--ui-green); }
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 4px 0 0; font-size: 14px; color: var(--ui-ink-muted); }
 .metaItem { display: inline-flex; align-items: center; gap: 5px; }
@@ -80,3 +80,8 @@
 }
 @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
 /* basita-font-scale: applied */
+
+/* Align mobile storefront typography to the platform wordmark. */
+@media (max-width: 767px) {
+  .name { font-size: 21px; font-weight: 500; } .btn { font-size: 13px; font-weight: 500; }
+}

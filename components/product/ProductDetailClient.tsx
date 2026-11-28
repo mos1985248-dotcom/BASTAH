@@ -19,6 +19,7 @@ import ProductReviewsSection from "./ProductReviewsSection";
 import RelatedProducts from "./RelatedProducts";
 import StickyBuyBar from "./StickyBuyBar";
 import GuestCheckoutForm from "./GuestCheckoutForm";
+import GuestCheckoutDialog from "./GuestCheckoutDialog";
 import { ProductError, ProductLoading } from "./ProductStates";
 import type { ProductDetail } from "./types";
 import s from "./product.module.css";
@@ -138,12 +139,13 @@ export default function ProductDetailClient() {
         </main>
       </div>
 
-      {guestEnabled && guestOpen && !purchase.user && <div className={s.guestOverlay} role="dialog" aria-modal="true" aria-label="الشراء كزائر">
-        <div className={s.guestDialog} style={uiVars}>
-          <button type="button" className={s.guestClose} onClick={() => setGuestOpen(false)} aria-label="إغلاق">×</button>
-          <GuestCheckoutForm key={`${id}-${purchase.selectedVariantId}-${purchase.qty}`} storeId={product.store.id} productId={id} variantId={purchase.selectedVariant?.id} quantity={purchase.qty} />
-        </div>
-      </div>}
+      {guestEnabled && guestOpen && !purchase.user && (
+        <GuestCheckoutDialog onClose={() => setGuestOpen(false)}>
+          <GuestCheckoutForm key={`${id}-${purchase.selectedVariantId}-${purchase.qty}`} storeId={product.store.id}
+            items={[{ productId: id, variantId: purchase.selectedVariant?.id, quantity: purchase.qty }]}
+            redirectPath={`/products/${id}`} />
+        </GuestCheckoutDialog>
+      )}
       <StickyBuyBar
         qty={purchase.qty}
         price={purchase.effectivePrice}

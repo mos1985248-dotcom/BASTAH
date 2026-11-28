@@ -3,11 +3,11 @@
 .storyCard { overflow: hidden; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-card); }
 .storyImage { height: 200px; background: var(--ui-sand) center / cover no-repeat; }
 .storyBody { padding: 24px 28px 28px; }
-.storyTitle { margin: 0 0 10px; font-size: 27.5px; font-weight: 700; color: var(--ui-green-deep); }
+.storyTitle { margin: 0 0 10px; font-size: 27.5px; font-weight: 500; color: var(--ui-green-deep); }
 .storyText { margin: 0; font-size: 16px; line-height: 2; color: var(--ui-ink); white-space: pre-line; }
 
 .trust { padding: 24px 28px; border-radius: 28px; border: 1px solid var(--ui-border); background: var(--ui-sand); }
-.trustTitle { margin: 0 0 14px; font-size: 25.5px; font-weight: 700; color: var(--ui-green-deep); }
+.trustTitle { margin: 0 0 14px; font-size: 25.5px; font-weight: 500; color: var(--ui-green-deep); }
 .badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .badge {
   display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: var(--ui-pill);
@@ -71,4 +71,9 @@
   .infoSection { margin: 0 16px 10px; }
   .info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .infoItem { padding: 6px 8px; }
+}
+
+/* Align mobile storefront typography to the platform wordmark. */
+@media (max-width: 767px) {
+  .storyTitle, .trustTitle { font-size: 20px; font-weight: 500; } .storyText { font-size: 14px; font-weight: 400; } .infoValue, .badge { font-weight: 500; }
 }
