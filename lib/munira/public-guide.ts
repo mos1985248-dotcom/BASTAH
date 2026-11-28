@@ -30,6 +30,38 @@ export function storeSearch(text: string, marketCities: string[], previousProduc
   return { product, city, matchingCities };
 }
 
+export const publicKnowledge = faqGroups.flatMap(group => group.items);
+
+// Explicit aliases resolve common dialect and spelling variants without an AI call.
+const aliases: [string, string[]][] = [
+  ["ما هي بسطة مارت؟", ["ماهي بسطة مارت", "وش بسطة مارت", "ايش بسطة مارت", "شنو بسطة مارت", "يعني ايه بسطة مارت", "عرفيني على بسطة مارت", "عرفني على بسطة مارت", "ما هو موقع بسطة مارت", "عن بسطة مارت", "بسطة مارت", "وش فكرة بسطة مارت"]],
+  ["كيف أفتح بسطتي؟", ["كيف افتح بسطة", "ابي افتح بسطة", "ابغى افتح متجر", "كيف اسجل كبائع", "كيف اصير تاجر"]],
+  ["هل أستطيع البدء مجانًا؟", ["هل التسجيل مجاني", "هل اقدر ابدا مجانا", "فيه باقة مجانية", "هل فتح البسطة مجاني"]],
+  ["كيف أعرف أسعار الباقات ومزاياها؟", ["كم الاشتراك", "كم سعر الاشتراك", "كم اسعار الباقات", "وش الباقات", "ماهي الباقات", "باقات بسطة مارت"]],
+  ["هل تأخذ بسطة مارت عمولة على المبيعات؟", ["هل تاخذون عمولة", "كم عمولتكم", "فيه عمولة على البيع", "كم نسبة بسطة مارت من المبيعات"]],
+  ["ما طرق الدفع المتاحة؟", ["كيف ادفع", "وش طرق الدفع", "كيف الدفع", "ايش وسائل الدفع"]],
+  ["كيف أتتبع الشحنة؟", ["وين شحنتي", "كيف اتتبع شحنتي", "كيف اتتبع الشحنة"]],
+  ["كيف أتابع طلبي؟", ["وين طلبي", "كيف اتابع الطلب", "كيف اعرف حالة طلبي"]],
+  ["كيف تُحسب تكلفة الشحن؟", ["كم الشحن", "كم سعر التوصيل", "كم تكلفة الشحن"]],
+  ["كيف أحصل على المساعدة؟", ["ابي الدعم", "ابغى اكلم الدعم", "كيف اتواصل مع الدعم", "كيف اكلم خدمة العملاء"]],
+  ["ما هي منيرة ودفاتري؟", ["وش دفاتري", "ماهي دفاتري", "وش منيرة", "ماهي منيرة", "ايش منيرة ودفاتري"]],
+  ["نسيت كلمة المرور، ماذا أفعل؟", ["نسيت كلمة السر", "نسيت كلمة المرور", "كيف استرجع كلمة المرور"]],
+  ["هل أستطيع إرجاع المنتج؟", ["كيف ارجع المنتج", "هل اقدر ارجع المنتج", "وش سياسة الاسترجاع"]],
+];
+const aliasIndex = new Map(aliases.flatMap(([question, phrases]) => phrases.map(phrase => [normalizeArabic(phrase), question] as const)));
+
+// AI may select a published answer, never invent a policy or external link.
+export function selectKnowledgeAnswer(output: string) {
+  const match = /^\s*(?:FAQ:)?(\d{1,3})\s*$/u.exec(output);
+  if (!match) return null;
+  const index = Number(match[1]);
+  return index > 0 ? publicKnowledge[index - 1] ?? null : null;
+}
+
+export function knowledgeChoices() {
+  return publicKnowledge.map((item, i) => `${i + 1}. ${item.question}`).join("\n");
+}
+
 const stop = new Set("من في على عن هل كيف ما هي هو انا ابغي ابغى اريد عايز ابي بسطة بسطه مارت الله لو سمحت ايش وش".split(" "));
 const words = (text: string) => normalizeArabic(text).split(" ").filter(x => x.length > 2 && !stop.has(x))
   .map(x => x.replace(/^ال(?=.{3})/u, ""));
@@ -37,8 +69,10 @@ const words = (text: string) => normalizeArabic(text).split(" ").filter(x => x.l
 export function helpArticle(input: string) {
   const normalized = normalizeArabic(input);
   const tokens = words(input);
-  const items = faqGroups.flatMap(group => group.items);
-  if (/^(?:(?:ايش|وش|ما|ما هي) )?(?:الباقات|باقات بسطة|اسعار الباقات)$/u.test(normalized)) {
+  const items = publicKnowledge;
+  const alias = aliasIndex.get(normalized);
+  if (alias) return items.find(item => item.question === alias) ?? null;
+  if (/^(?:(?:ايش|وش|ما|ما هي) )?(?:الباقات|باقات بسطه|اسعار الباقات)$/u.test(normalized)) {
     return items.find(item => item.linkLabel === "مقارنة الباقات") ?? null;
   }
   const exact = items.find(item => normalizeArabic(item.question) === normalized);
