@@ -223,7 +223,7 @@ export default function TicketListPane({
                   overflowWrap: "anywhere",
                 }}
               >
-                {tk.user?.name}
+                {tk.user?.name ?? "زائر"}
               </p>
 
               <span

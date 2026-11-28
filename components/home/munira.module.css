@@ -105,3 +105,5 @@
   .chatInput { margin: 0 10px 12px; gap: 6px; padding-inline-start: 10px; font-size: 12px; }
   .send { flex: none; width: 34px; height: 34px; }
 }
+
+button.cta { border: 0; font-family: inherit; cursor: pointer; }

@@ -92,7 +92,7 @@ export default function TicketDetailPane({
               overflowWrap: "anywhere",
             }}
           >
-            {ticket.user?.name} · {ticket.user?.email}
+            {ticket.user ? `${ticket.user.name} · ${ticket.user.email ?? ""}` : `زائر · ${ticket.guestEmail ?? ""}`}
           </p>
         </div>
 
@@ -210,7 +210,7 @@ export default function TicketDetailPane({
                   lineHeight: 1.5,
                 }}
               >
-                {m.user?.name}{" "}
+                {m.user?.name ?? "زائر"}{" "}
                 {m.isInternal && (
                   <span
                     style={{
@@ -283,7 +283,12 @@ export default function TicketDetailPane({
             gap: 7,
           }}
         >
-          <button
+          {ticket.guestEmail ? (
+            <a href={`mailto:${encodeURIComponent(ticket.guestEmail)}?subject=${encodeURIComponent(ticket.ticketNumber)}&body=${encodeURIComponent(reply.trim())}`}
+              style={{ alignSelf: "center", color: t.colors.primary[800], fontSize: t.typography.fontSize.xs }}>
+              فتح البريد للرد على الزائر
+            </a>
+          ) : <button
             type="button"
             onClick={() => onSendReply(false)}
             disabled={sending || !reply.trim()}
@@ -309,7 +314,7 @@ export default function TicketDetailPane({
           >
             <Send size={13} strokeWidth={2} />
             إرسال للمستخدم
-          </button>
+          </button>}
 
           <button
             type="button"

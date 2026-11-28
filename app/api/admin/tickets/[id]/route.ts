@@ -37,6 +37,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const ticket = await prisma.supportTicket.findUnique({ where: { id: params.id }, select: { id: true, userId: true, status: true } });
     if (!ticket) return NextResponse.json({ error: "التذكرة غير موجودة" }, { status: 404 });
 
+    if (!ticket.userId && !isInternal) return NextResponse.json({ error: "أرسل رد الزائر بالبريد من صفحة التذكرة." }, { status: 400 });
+
     const message = await prisma.ticketMessage.create({
       data: { ticketId: params.id, userId: admin.id, content: content.trim(), isInternal },
     });
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     // Notify user (unless internal note)
-    if (!isInternal) {
+    if (!isInternal && ticket.userId) {
       const { createNotification } = await import("@/lib/notifications");
       await createNotification({
         userId: ticket.userId,
