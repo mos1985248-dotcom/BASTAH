@@ -2,10 +2,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { ShoppingCart, Heart } from "lucide-react";
+import { useGuestCart } from "@/lib/guest-cart";
 import { api } from "@/lib/api-client";
 import s from "./navctl.module.css";
 
 export function useNavCounts(userId: string | undefined) {
+  const guestLines = useGuestCart();
   const [cartCount, setCartCount] = useState(0);
   const [favCount, setFavCount] = useState(0);
 
@@ -25,7 +27,7 @@ export function useNavCounts(userId: string | undefined) {
       .catch(() => {});
   }, [userId]);
 
-  return { cartCount, favCount };
+  return { cartCount: userId ? cartCount : guestLines.length, favCount };
 }
 
 export default function NavIconLinks({ cartCount, favCount }: ReturnType<typeof useNavCounts>) {

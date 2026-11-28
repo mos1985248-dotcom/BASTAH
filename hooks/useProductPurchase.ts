@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, ApiError } from "@/lib/api-client";
 import { useCurrentUser } from "@/app/providers";
+import { addGuestCartLine, guestCartEnabled } from "@/lib/guest-cart";
 import { useAddressBook } from "@/hooks/useAddressBook";
 import { ProductDetail } from "@/components/product/types";
 
@@ -69,7 +70,8 @@ export function useProductPurchase(product: ProductDetail | null, id: string) {
   // مُحدَّثان) — سعر/مخزون الـvariant المختار بصفحة المنتج هو نفسه الذي
   // يُحتسب بالطلب والدفع الفعلي، لا فرق بينهما.
   const handleAddToCart = async () => {
-    if (!user) {
+    if (userLoading) return;
+    if (!user && !guestCartEnabled) {
       window.location.href = `/login?redirect=/products/${id}`;
       return;
     }
@@ -79,7 +81,16 @@ export function useProductPurchase(product: ProductDetail | null, id: string) {
     }
     setAddingToCart(true);
     try {
-      await api.post("/api/cart", { productId: id, quantity: qty, variantId: selectedVariant?.id });
+      if (!user) {
+        if (!product || maxQty < 1) return;
+        addGuestCartLine({
+          productId: id, variantId: selectedVariant?.id, quantity: qty, maxQuantity: maxQty,
+          storeId: product.store.id, storeName: product.store.nameAr,
+          name: selectedVariant ? `${product.nameAr} — ${selectedVariant.nameAr}` : product.nameAr,
+        });
+      } else {
+        await api.post("/api/cart", { productId: id, quantity: qty, variantId: selectedVariant?.id });
+      }
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2500);
     } catch (err) {

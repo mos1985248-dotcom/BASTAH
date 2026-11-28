@@ -13,6 +13,8 @@ import SiteShell from "@/components/layout/SiteShell";
 import CartContactConsent from "@/components/cart/CartContactConsent";
 import CartStoreGroup from "@/components/cart/CartStoreGroup";
 import CartTrustBar from "@/components/cart/CartTrustBar";
+import GuestCart from "@/components/cart/GuestCart";
+import { guestCartEnabled } from "@/lib/guest-cart";
 import CartRelatedProducts from "@/components/cart/CartRelatedProducts";
 import { CartEmpty, CartError, CartLoading, CartLoginPrompt } from "@/components/cart/CartStates";
 import { CartItemData } from "@/components/cart/types";
@@ -106,7 +108,7 @@ export default function CartPage() {
   );
 
   if (userLoading) return shell(<CartLoading />);
-  if (!user) return shell(<CartLoginPrompt />);
+  if (!user) return shell(guestCartEnabled ? <GuestCart /> : <CartLoginPrompt />);
 
   const groups = items.reduce<Record<string, { storeName: string; storeSlug: string; items: CartItemData[] }>>((acc, item) => {
     const sid = item.product.store.id;

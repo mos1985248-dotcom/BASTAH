@@ -3,6 +3,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { api, ApiError } from "@/lib/api-client";
+import { mergeGuestCart } from "@/lib/guest-cart";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 
 interface CurrentUser {
@@ -31,9 +32,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const cartMerge = useRef<{ userId: string; task: Promise<void> } | null>(null);
   const refresh = useCallback(async () => {
     try {
       const { user } = await api.get<{ user: CurrentUser }>("/api/auth/me");
+      if (user?.role === "BUYER") {
+        if (cartMerge.current?.userId !== user.id) {
+          const task = mergeGuestCart(user.id).catch(() => {}).finally(() => {
+            if (cartMerge.current?.task === task) cartMerge.current = null;
+          });
+          cartMerge.current = { userId: user.id, task };
+        }
+        await cartMerge.current.task;
+      }
       setUser(user);
     } catch (err) {
       // 401 يعني زائر غير مسجّل — ليست حالة خطأ تستدعي إيقاف التطبيق
