@@ -85,3 +85,7 @@
 @media (max-width: 767px) {
   .name { font-size: 21px; font-weight: 500; } .btn { font-size: 13px; font-weight: 500; }
 }
+
+@media (min-width: 1024px) {
+  .name { font-size: clamp(28px, 2.7vw, 34px); }
+}

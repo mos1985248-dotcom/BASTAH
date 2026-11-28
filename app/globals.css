@@ -688,3 +688,8 @@ textarea:focus-visible {
   :root { --type-section: 22px; --type-body: 14px; }
   h1 { font-size: 26px; }
 }
+
+@media (min-width: 1024px) {
+  #site-top { --type-section: 26px; }
+  :where(#site-top) h1 { font-size: 32px; }
+}

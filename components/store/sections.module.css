@@ -56,3 +56,9 @@
 @media (max-width: 767px) {
   .title, .closingTitle { font-size: 20px; font-weight: 500; } .rowTitle { font-size: 17px; font-weight: 500; } .sectionFilter, .closingCta { font-size: 13px; font-weight: 500; }
 }
+
+@media (min-width: 1024px) {
+  .title { font-size: var(--type-section); }
+  .closingTitle { font-size: clamp(24px, 2.4vw, 30px); }
+  .rowTitle { font-size: 19px; }
+}

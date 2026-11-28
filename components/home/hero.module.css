@@ -63,3 +63,7 @@
   .founderNote { margin-top: 10px; font-size: 13px; line-height: 1.7; }
   .founderNote strong { font-weight: 500; }
 }
+
+@media (min-width: 1024px) {
+  .title { font-size: clamp(32px, 2.8vw, 38px); }
+}

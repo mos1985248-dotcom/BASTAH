@@ -47,3 +47,7 @@
   .card { padding: 20px 16px; }
   .text { font-size: 14px; }
 }
+
+@media (min-width: 1024px) {
+  .title { font-size: var(--type-section); }
+}
