@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { guestQuote, guestQuoteSchema } from "@/lib/guest-checkout";
 import { CheckoutItemError, ShippingCalcError } from "@/lib/checkout-pricing";
 import { reserveStock, InsufficientStockError } from "@/lib/inventory";
+import { snapshotDaftariCosts } from "@/lib/daftari/snapshot";
 import { snapshotCodShare } from "@/lib/finance/snapshots";
 import { authRateLimit, checkRateLimit } from "@/lib/rate-limit";
 import { guestBuyerId, guestOrderId, guestSession } from "@/lib/guest-order-session";
@@ -87,6 +88,7 @@ export async function POST(req: NextRequest) {
           select: orderSelect,
         });
         await reserveStock(tx, resolved, productNames);
+        await snapshotDaftariCosts(tx, created.id, data.storeId);
         if (shippingRateLogId) {
           const rate = await tx.shippingRate.update({ where: { id: shippingRateLogId }, data: { orderId: created.id } });
           if (totals.codFee > 0) await snapshotCodShare(tx, created.id, String(rate.carrier));

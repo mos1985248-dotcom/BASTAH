@@ -869,6 +869,7 @@ model OrderItem {
   price       Float
   quantity    Int
   total       Float
+  daftariCostSnapshot DaftariOrderItemCost?
   @@index([orderId])
   @@index([productId])
 
@@ -2294,4 +2295,13 @@ model MuniraImage {
   @@index([scope, window, state])
   @@index([day, provider])
   @@map("munira_images")
+}
+
+// Private historical estimate; never included by default in public order item responses.
+model DaftariOrderItemCost {
+  orderItemId String @id
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  productCostMinor Int
+  capturedAt DateTime @default(now())
+  @@map("daftari_order_item_costs")
 }
