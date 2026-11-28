@@ -56,3 +56,8 @@
 @media (hover: hover) {
   .close:hover { border-color: var(--ui-green); }
 }
+
+@media (max-width: 767px) {
+  .compactMobile { padding: 12px; }
+  .compactMobile .controls { margin-block-end: 12px; }
+}

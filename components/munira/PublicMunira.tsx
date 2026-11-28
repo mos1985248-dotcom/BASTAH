@@ -85,7 +85,7 @@ export default function PublicMunira() {
         <MessageCircle size={21} aria-hidden="true" />
         اسأل منيرة
       </button>
-      {opened && <Modal open={open} label="اسأل منيرة" onClose={() => setOpen(false)}>
+      {opened && <Modal open={open} label="اسأل منيرة" onClose={() => setOpen(false)} compactMobile>
         <div className={s.content}>
           <header className={s.profile}>
             <Portrait size={58} />
@@ -94,7 +94,7 @@ export default function PublicMunira() {
               <p>مساعدة بسطة مارت</p>
             </div>
           </header>
-          <p className={s.greeting}>هلا، أنا منيرة. أقدر أدلّك على بسطة في مدينتك، أساعدك تبدأ متجرك، أو أوصلك بفريق الدعم. وش تحتاج اليوم؟</p>
+          <p className={s.greeting}><span>حياك الله .. معك منيرة، كيف أخدمك اليوم؟</span>{" "}<span>تقدر تختار من الخيارات تحت أو تكتب لي وش بخاطرك.</span></p>
           <div className={s.actions} role="group" aria-label="مساعدة منيرة">
             {([["ask", "دلّيني على بسطة"], ["draft", "ساعديني أفتح بسطتي"], ["support", "وصّليني للدعم"]] as const).map(([value, label]) => (
               <button type="button" key={value} aria-pressed={mode === value} disabled={busy} onClick={() => switchMode(value)}>{label}</button>

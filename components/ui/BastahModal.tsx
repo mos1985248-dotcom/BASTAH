@@ -11,9 +11,10 @@ interface BastahModalProps {
   label: string;
   onClose: () => void;
   children: ReactNode;
+  compactMobile?: boolean;
 }
 
-export default function BastahModal({ open, label, onClose, children }: BastahModalProps) {
+export default function BastahModal({ open, label, onClose, children, compactMobile = false }: BastahModalProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const reduceMotion = useReducedMotion();
 
@@ -47,7 +48,7 @@ export default function BastahModal({ open, label, onClose, children }: BastahMo
               onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
             >
               <m.div
-                className={s.panel}
+                className={compactMobile ? `${s.panel} ${s.compactMobile}` : s.panel}
                 initial={reduceMotion ? false : { y: 14, scale: 0.98 }}
                 animate={{ y: 0, scale: 1 }}
                 exit={reduceMotion ? undefined : { y: 8, scale: 0.99 }}
