@@ -3,11 +3,7 @@ import { readPlatformSales } from "@/lib/daftari/platform-sales";
 import { monthRangeUtc, riyadhMonthOf } from "@/lib/finance/riyadh";
 import { toMinor, fromMinor } from "@/lib/finance/money";
 import { assertStoreFeature } from "@/lib/feature-access";
-// app/api/daftari/entries/route.ts
-// ⚠️ Endpoint جديد بالكامل — يفعّل موديل DaftariEntry الموجود أصلاً بدون
-// أي كود يكتب فيه سابقاً. مقصود بسيط عمداً: تسجيل يدوي فقط (SALE تلقائي
-// من الطلبات لاحقاً إذا احتجناه — خارج نطاق هذي المرحلة).
-
+// Manual ledger and separate, order-derived sales summary.
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, AuthError } from "@/lib/auth";
@@ -15,7 +11,7 @@ import { z } from "zod";
 
 const createEntrySchema = z.object({
   type: z.enum(["SALE", "EXPENSE", "REFUND", "WITHDRAWAL", "ADJUSTMENT"]),
-  amount: z.coerce.number().finite().positive().max(100000000).refine(n => Math.abs(n * 100 - Math.round(n * 100)) < 0.00001, "خانتان عشريتان كحد أقصى"),
+  amount: z.number().finite().positive().max(100000000).refine(n => Math.abs(n * 100 - Math.round(n * 100)) < 0.00001, "خانتان عشريتان كحد أقصى"),
   expenseCategory: z.enum(["RAW_MATERIALS", "SHIPPING", "PACKAGING", "MARKETING", "PLATFORM_FEE", "OTHER"]).optional(),
   description: z.string().trim().max(300).optional(),
   note: z.string().trim().max(300).optional(),
@@ -72,7 +68,7 @@ export async function POST(req: NextRequest) {
     if (!user.store) return NextResponse.json({ error: "لا يوجد متجر مرتبط بحسابك" }, { status: 403 });
     await assertStoreFeature(user.store.id, "daftari");
 
-    const parsed = createEntrySchema.safeParse(await req.json());
+    const parsed = createEntrySchema.safeParse(await req.json().catch(() => null));
     if (!parsed.success) return NextResponse.json({ error: "بيانات غير صالحة" }, { status: 400 });
 
     const entry = await prisma.daftariEntry.create({
