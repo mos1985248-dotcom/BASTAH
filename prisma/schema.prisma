@@ -2295,3 +2295,17 @@ model MuniraImage {
   @@index([day, provider])
   @@map("munira_images")
 }
+
+// Public, administrator-approved knowledge only. Never store merchant or customer records here.
+model MuniraKnowledgeArticle {
+  id          String   @id @default(cuid())
+  question    String
+  questionKey String   @unique
+  answer      String
+  aliases     String[] @default([])
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([published])
+  @@map("munira_knowledge_articles")
+}

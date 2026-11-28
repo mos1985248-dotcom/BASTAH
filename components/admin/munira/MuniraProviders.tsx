@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import MuniraKnowledge from "./MuniraKnowledge";
 import MuniraImageProviders from "./MuniraImageProviders";
 import { api, ApiError } from "@/lib/api-client";
 import s from "@/components/dashboard/forms.module.css";
@@ -27,13 +28,14 @@ const errorNames: Record<string, string> = {
 };
 
 export default function MuniraProviders() {
-  const [tab, setTab] = useState<"chat" | "images">("chat");
+  const [tab, setTab] = useState<"chat" | "images" | "knowledge">("chat");
   return <>
     <nav aria-label="مزودات منيرة" className={s.itemActions}>
       <button type="button" className={s.btnSm} aria-pressed={tab === "chat"} onClick={() => setTab("chat")}>نماذج المحادثات</button>
       <button type="button" className={s.btnSm} aria-pressed={tab === "images"} onClick={() => setTab("images")}>نماذج توليد الصور</button>
+      <button type="button" className={s.btnSm} aria-pressed={tab === "knowledge"} onClick={() => setTab("knowledge")}>معرفة منيرة</button>
     </nav>
-    {tab === "images" ? <MuniraImageProviders /> : <ChatProviders />}
+    {tab === "knowledge" ? <MuniraKnowledge /> : tab === "images" ? <MuniraImageProviders /> : <ChatProviders />}
   </>;
 }
 

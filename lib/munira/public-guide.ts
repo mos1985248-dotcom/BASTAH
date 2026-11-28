@@ -51,25 +51,24 @@ const aliases: [string, string[]][] = [
 const aliasIndex = new Map(aliases.flatMap(([question, phrases]) => phrases.map(phrase => [normalizeArabic(phrase), question] as const)));
 
 // AI may select a published answer, never invent a policy or external link.
-export function selectKnowledgeAnswer(output: string) {
+export function selectKnowledgeAnswer(output: string, items = publicKnowledge) {
   const match = /^\s*(?:FAQ:)?(\d{1,3})\s*$/u.exec(output);
   if (!match) return null;
   const index = Number(match[1]);
-  return index > 0 ? publicKnowledge[index - 1] ?? null : null;
+  return index > 0 ? items[index - 1] ?? null : null;
 }
 
-export function knowledgeChoices() {
-  return publicKnowledge.map((item, i) => `${i + 1}. ${item.question}`).join("\n");
+export function knowledgeChoices(items = publicKnowledge) {
+  return items.map((item, i) => `${i + 1}. ${item.question}`).join("\n");
 }
 
 const stop = new Set("من في على عن هل كيف ما هي هو انا ابغي ابغى اريد عايز ابي بسطة بسطه مارت الله لو سمحت ايش وش".split(" "));
 const words = (text: string) => normalizeArabic(text).split(" ").filter(x => x.length > 2 && !stop.has(x))
   .map(x => x.replace(/^ال(?=.{3})/u, ""));
 
-export function helpArticle(input: string) {
+export function helpArticle(input: string, items = publicKnowledge) {
   const normalized = normalizeArabic(input);
   const tokens = words(input);
-  const items = publicKnowledge;
   const alias = aliasIndex.get(normalized);
   if (alias) return items.find(item => item.question === alias) ?? null;
   if (/^(?:(?:ايش|وش|ما|ما هي) )?(?:الباقات|باقات بسطه|اسعار الباقات)$/u.test(normalized)) {
