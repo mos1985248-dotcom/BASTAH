@@ -351,3 +351,46 @@
   .publicMobileShell .drawer { max-height: calc(100dvh - 114px - var(--home-bottom-nav-space)); }
   .bottomNav { min-height: calc(72px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* Shared mobile header: symmetric RTL columns and a true centered logo. */
+.logoImage { width: 36px; height: 36px; object-fit: contain; display: block; }
+@media (max-width: 767px) {
+  .header .main,
+  .header.marketplaceHeader .main,
+  .publicMobileShell .header .main,
+  .publicMobileShell .marketplaceHeader .main {
+    grid-template-columns: minmax(0, 1fr) 50px minmax(0, 1fr);
+    grid-template-areas: "menu logo search";
+    gap: 0 8px;
+    min-height: 70px;
+    padding: 10px 12px;
+    direction: rtl;
+  }
+  .header .menuBtn, .header.marketplaceHeader .menuBtn {
+    grid-area: menu; justify-self: start; width: 40px; height: 40px;
+    min-height: 40px; margin: 0;
+  }
+  .header .toggleBtn, .header.marketplaceHeader .toggleBtn,
+  .publicMobileShell .marketplaceHeader .toggleBtn {
+    display: inline-flex; grid-area: search; justify-self: end;
+    width: 40px; height: 40px; min-height: 40px;
+  }
+  .header .logo, .header.marketplaceHeader .logo {
+    grid-area: logo; justify-self: center; gap: 0;
+  }
+  .header .logoMark, .header.marketplaceHeader .logoMark {
+    width: 50px; height: 50px; box-sizing: border-box;
+  }
+  .header .logoImage { width: 46px; height: 46px; }
+  .header .brand { display: none; }
+  .header .actions { display: none; }
+  /* Keep the existing account controls reachable when the menu is open. */
+  .header .main.menuOpen { grid-template-areas: "menu logo search" "actions actions actions"; row-gap: 8px; }
+  .header .main.menuOpen .actions:not(.guestActions) {
+    display: flex; grid-area: actions; justify-content: center; flex-wrap: wrap;
+  }
+  .header .main.menuOpen .guestActions { display: none; }
+  .publicMobileShell .marketplaceHeader .mobileSearch { display: block; }
+  .header .drawer { max-height: calc(100dvh - 158px - var(--home-bottom-nav-space, 0px)); }
+  .header .mobileSearch + .drawer { max-height: calc(100dvh - 220px - var(--home-bottom-nav-space, 0px)); }
+}

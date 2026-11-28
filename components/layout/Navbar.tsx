@@ -50,7 +50,7 @@ export default function Navbar({ homeMobileNav = false, marketplaceHeader = fals
     <header className={`${s.header}${homeMobileNav ? ` ${s.homeHeader}` : ""}${marketplaceHeader ? ` ${s.marketplaceHeader}` : ""}`} style={headerVars}>
       <NavTopBar />
 
-      <div className={s.main}>
+      <div className={`${s.main}${menuOpen ? ` ${s.menuOpen}` : ""}`}>
         <button
           type="button"
           className={s.menuBtn}
@@ -63,15 +63,15 @@ export default function Navbar({ homeMobileNav = false, marketplaceHeader = fals
         </button>
 
         {/* الشعار */}
-        <a href="/" className={s.logo}>
+        <a href="/" className={s.logo} aria-label="بسطة مارت — الصفحة الرئيسية">
           <span className={s.logoMark}>
             <Image
               src="/images/logo-icon.png"
-              alt="بسطة مارت"
+              alt=""
               width={36}
               height={36}
               priority
-              style={{ width: 36, height: 36, objectFit: "contain", display: "block" }}
+              className={s.logoImage}
             />
           </span>
           <span className={s.brand}>
