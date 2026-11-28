@@ -47,7 +47,7 @@ export default function DaftariDashboardCard({ plan }: { plan: string }) {
           <div className={s.mini}>
             <MiniStat label="مبيعات الشهر" value={`${summary.income} ر.س`} color="var(--ui-green)" />
             <MiniStat label="مصروفات الشهر" value={`${summary.expenses} ر.س`} color="var(--ui-danger)" />
-            <MiniStat label="صافي الربح" value={`${summary.netProfit} ر.س`} color="var(--ui-green-deep)" />
+            <MiniStat label="صافي الحركات المسجلة" value={`${summary.netProfit} ر.س`} color="var(--ui-green-deep)" />
           </div>
         )}
       </div>

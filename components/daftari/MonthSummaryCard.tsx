@@ -22,8 +22,8 @@ export default function MonthSummaryCard({ summary }: { summary: MonthSummary })
       <div className={s.main}>
         <span className={s.mainIcon}><WalletCards size={24} strokeWidth={1.7} aria-hidden="true" /></span>
         <div>
-          <span className={s.mainLabel}>صافي الربح هذا الشهر</span>
-          <span className={s.mainValue}>{summary.netProfit.toFixed(0)} ر.س</span>
+          <span className={s.mainLabel}>صافي الحركات المسجلة</span>
+          <span className={s.mainValue}>{summary.netProfit.toFixed(2)} ر.س</span>
         </div>
       </div>
       {items.map(({ label, value, color, Icon }) => (
@@ -31,7 +31,7 @@ export default function MonthSummaryCard({ summary }: { summary: MonthSummary })
           <span className={s.miniIcon} style={{ color }}><Icon size={19} strokeWidth={1.8} aria-hidden="true" /></span>
           <div>
             <span className={s.miniLabel}>{label}</span>
-            <span className={s.miniValue} style={{ color }}>{value.toFixed(0)} ر.س</span>
+            <span className={s.miniValue} style={{ color }}>{value.toFixed(2)} ر.س</span>
           </div>
         </div>
       ))}

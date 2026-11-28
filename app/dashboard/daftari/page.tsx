@@ -81,7 +81,7 @@ export default function DaftariPage() {
           <Wallet size={26} strokeWidth={1.8} aria-hidden="true" />
           دفاتري
         </h1>
-        <p className={s.sub}>محاسبة بسيطة لمتجرك: مبيعاتك ومصروفاتك وأرباحك في مكان واحد</p>
+        <p className={s.sub}>دفتر مالي لمتجرك: المبيعات والمصروفات والاسترجاعات المسجلة في مكان واحد</p>
       </div>
 
       {summary && <MonthSummaryCard summary={summary} />}
@@ -95,7 +95,7 @@ export default function DaftariPage() {
             </div>
           </div>
           {entries.length === 0 ? (
-            <p className={s.empty}>لا توجد قيود بعد — سجّل أول عملية بيع أو مصروف</p>
+            <p className={s.empty}>لا توجد قيود بعد — سجّل أول عملية بيع خارج المنصة أو مصروف</p>
           ) : (
             <ul className={s.list}>
               {entries.map((e) => <li key={e.id}><EntryRow entry={e} /></li>)}

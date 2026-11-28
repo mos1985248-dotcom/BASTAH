@@ -11,7 +11,7 @@ import { z } from "zod";
 
 const createEntrySchema = z.object({
   type: z.enum(["SALE", "EXPENSE", "REFUND", "WITHDRAWAL", "ADJUSTMENT"]),
-  amount: z.coerce.number().positive(),
+  amount: z.coerce.number().finite().positive().max(100000000).refine(n => Math.abs(n * 100 - Math.round(n * 100)) < 0.00001, "خانتان عشريتان كحد أقصى"),
   expenseCategory: z.enum(["RAW_MATERIALS", "SHIPPING", "PACKAGING", "MARKETING", "PLATFORM_FEE", "OTHER"]).optional(),
   description: z.string().trim().max(300).optional(),
   note: z.string().trim().max(300).optional(),
@@ -24,8 +24,9 @@ export async function GET(req: NextRequest) {
     await assertStoreFeature(user.store.id, "daftari");
 
     const { searchParams } = new URL(req.url);
-    const page = Math.max(1, Number(searchParams.get("page") ?? 1));
-    const limit = Math.min(50, Number(searchParams.get("limit") ?? 20));
+    const paginationInput = z.object({ page: z.coerce.number().int().min(1).max(100000).default(1), limit: z.coerce.number().int().min(1).max(50).default(20) }).safeParse(Object.fromEntries(searchParams));
+    if (!paginationInput.success) return NextResponse.json({ error: "بيانات الصفحة غير صالحة" }, { status: 400 });
+    const { page, limit } = paginationInput.data;
 
     const [entries, total] = await Promise.all([
       prisma.daftariEntry.findMany({
@@ -38,8 +39,10 @@ export async function GET(req: NextRequest) {
     ]);
 
     const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEntries = await prisma.daftariEntry.findMany({ where: { storeId: user.store.id, entryDate: { gte: monthStart } } });
+    const riyadh = new Date(now.getTime() + 3 * 3600000);
+    const monthStart = new Date(Date.UTC(riyadh.getUTCFullYear(), riyadh.getUTCMonth(), 1) - 3 * 3600000);
+    const monthEnd = new Date(Date.UTC(riyadh.getUTCFullYear(), riyadh.getUTCMonth() + 1, 1) - 3 * 3600000);
+    const monthEntries = await prisma.daftariEntry.findMany({ where: { storeId: user.store.id, entryDate: { gte: monthStart, lt: monthEnd } } });
 
     const income = monthEntries.filter((e) => e.type === "SALE").reduce((s, e) => s + e.amount, 0);
     const expenses = monthEntries.filter((e) => e.type === "EXPENSE").reduce((s, e) => s + e.amount, 0);
