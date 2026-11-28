@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useState, type FormEvent } from "react";
 import { MessageCircle } from "lucide-react";
 import { api, ApiError } from "@/lib/api-client";
@@ -10,13 +11,24 @@ import s from "./public-munira.module.css";
 
 const Modal = dynamic(() => import("@/components/ui/BastahModal"), { ssr: false });
 type Mode = "ask" | "draft" | "support";
-type Answer = { text: string; links: { href: string; label: string }[] };
+type Answer = {
+  text: string;
+  links: { href: string; label: string }[];
+  searchProduct?: string;
+  stores?: { name: string; city: string | null; href: string; products: { name: string; price: number; href: string; available: boolean | null }[] }[];
+};
+const prices = new Intl.NumberFormat("ar-SA", { style: "currency", currency: "SAR" });
+
+function Portrait({ size }: { size: number }) {
+  return <Image className={s.portrait} src="/images/munira-avatar.png" alt="" width={size} height={size} />;
+}
 
 export default function PublicMunira() {
   const { user } = useCurrentUser();
   const [open, setOpen] = useState(false);
   const [opened, setOpened] = useState(false);
   const [mode, setMode] = useState<Mode>("ask");
+  const [previousProduct, setPreviousProduct] = useState<string>();
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [lastQuestion, setLastQuestion] = useState("");
@@ -31,7 +43,8 @@ export default function PublicMunira() {
     setMode(next);
     setError("");
     if (next === "support" && !issue) setIssue(lastQuestion || question);
-    if (next !== "support") {
+    if (next !== "support" && next !== mode) {
+      setPreviousProduct(undefined);
       setAnswer(null);
       setQuestion("");
     }
@@ -52,7 +65,10 @@ export default function PublicMunira() {
         setIssue("");
       } else {
         setLastQuestion(question);
-        const result = await api.post<Answer>("/api/public/munira", { message: question, mode });
+        const result = await api.post<Answer>("/api/public/munira", {
+          message: question, mode, previousProduct: mode === "ask" ? previousProduct : undefined,
+        });
+        setPreviousProduct(result.searchProduct);
         setAnswer(result);
         setQuestion("");
       }
@@ -71,12 +87,16 @@ export default function PublicMunira() {
       </button>
       {opened && <Modal open={open} label="اسأل منيرة" onClose={() => setOpen(false)}>
         <div className={s.content}>
-          <header>
-            <h2>كيف أقدر أساعدك؟</h2>
-            <p>اسألني عن بسطة مارت أو عن المنتجات والبسطات في مدينتك.</p>
+          <header className={s.profile}>
+            <Portrait size={58} />
+            <div>
+              <h2>منيرة</h2>
+              <p>مساعدة بسطة مارت</p>
+            </div>
           </header>
+          <p className={s.greeting}>هلا، أنا منيرة. أقدر أدلّك على بسطة في مدينتك، أساعدك تبدأ متجرك، أو أوصلك بفريق الدعم. وش تحتاج اليوم؟</p>
           <div className={s.actions} role="group" aria-label="مساعدة منيرة">
-            {([["ask", "اسأل عن بسطة"], ["draft", "ساعدني أبدأ متجري"], ["support", "تواصل مع الدعم"]] as const).map(([value, label]) => (
+            {([["ask", "دلّيني على بسطة"], ["draft", "ساعديني أفتح بسطتي"], ["support", "وصّليني للدعم"]] as const).map(([value, label]) => (
               <button type="button" key={value} aria-pressed={mode === value} disabled={busy} onClick={() => switchMode(value)}>{label}</button>
             ))}
           </div>
@@ -91,15 +111,30 @@ export default function PublicMunira() {
               </> : <label>
                 {mode === "draft" ? "اسم البسطة، وش تبيع، وإيش يميّز شغلك؟" : "سؤالك"}
                 <textarea required minLength={2} maxLength={800} rows={3} value={question} onChange={(event) => setQuestion(event.target.value)}
-                  placeholder={mode === "ask" ? "أبغى بسطة في حائل تبيع تمر" : "مثال: تمور القصيم، نبيع التمر السكري ونعبّئه للهدايا"} />
+                  placeholder={mode === "ask" ? (previousProduct ? "مثال: طيب في بريدة؟" : "أبغى بسطة في حائل تبيع تمر") : "مثال: تمور القصيم، نبيع التمر السكري ونعبّئه للهدايا"} />
               </label>}
-              <button type="submit" className={s.send} disabled={busy}>{busy ? "لحظة من فضلك…" : mode === "support" ? "إرسال التذكرة" : "إرسال إلى منيرة"}</button>
+              <button type="submit" className={s.send} disabled={busy}>{busy ? "جارٍ التنفيذ…" : mode === "support" ? "إرسال التذكرة" : "إرسال إلى منيرة"}</button>
             </form>
           )}
+          {busy && <p role="status" className={s.status}><Portrait size={26} />{
+            mode === "support" ? "أرسل طلبك إلى فريق الدعم…" :
+              mode === "draft" ? "أجهّز لك مسودة البايو والحكاية…" :
+                "أبحث لك عن إجابة…"
+          }</p>}
           {error && <p role="alert" className={s.error}>{error}</p>}
           {answer && mode !== "support" && <div className={s.answer} aria-live="polite">
-            <p>{answer.text}</p>
+            <div className={s.reply}><Portrait size={32} /><p>{answer.text}</p></div>
+            {!!answer.stores?.length && <ul className={s.results}>
+              {answer.stores.map(store => <li key={store.href} className={s.result}>
+                <a href={store.href}><strong>{store.name}</strong>{store.city ? ` · ${store.city}` : ""}</a>
+                <ul className={s.products}>{store.products.map(product => <li key={product.href}>
+                  <a href={product.href}>{product.name}</a>
+                  <span>{prices.format(product.price)}{product.available === false ? " · نفدت الكمية" : ""}</span>
+                </li>)}</ul>
+              </li>)}
+            </ul>}
             {answer.links.length > 0 && <ul>{answer.links.map(({ href, label }) => <li key={href}><a href={href}>{label}</a></li>)}</ul>}
+            {mode === "ask" && <button type="button" className={s.copy} disabled={busy} onClick={() => switchMode("support")}>ما انحلّت المشكلة</button>}
             {mode === "draft" && <button type="button" className={s.copy} onClick={async () => {
               try { await navigator.clipboard.writeText(answer.text); } catch { setError("تعذّر النسخ تلقائيًا. يمكنك تحديد النص ونسخه."); }
             }}>نسخ المسودة</button>}

@@ -17,3 +17,11 @@ test("keeps platform answers grounded in published FAQs and recognizes seller on
   assert.equal(helpArticle("وش الباقات؟")?.href, "/pricing");
   assert.equal(helpArticle("كم أرباح التاجر في الرياض؟"), null);
 });
+
+test("uses the previous product for a city follow-up and resets for a new product", () => {
+  assert.deepEqual(storeSearch("طيب في بريدة؟", ["بريدة"], "تمر"), {
+    product: "تمر", city: "بريدة", matchingCities: ["بريدة"],
+  });
+  assert.equal(storeSearch("طيب في بريدة؟", ["بريدة"]), null);
+  assert.equal(storeSearch("أبغى بسطة في حائل تبيع هيل", ["حائل"], "تمر")?.product, "هيل");
+});

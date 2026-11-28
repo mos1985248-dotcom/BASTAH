@@ -18,3 +18,17 @@
 .answer a { display: inline-block; padding-block: 6px; color: var(--ui-green-deep); text-decoration: underline; }
 .copy { margin-block-start: 8px; }
 .error { color: var(--ui-danger); }
+
+.profile, .reply, .status { display: flex; align-items: center; gap: 10px; }
+.profile { padding: 12px; border-radius: 16px; background: var(--ui-green-deep); color: var(--ui-white); }
+.profile h2 { color: inherit; font-size: 22px; }
+.profile p { font-size: 14px; }
+.portrait { flex: none; object-fit: cover; border: 1px solid var(--ui-gold); border-radius: 50%; }
+.greeting { line-height: 1.8; }
+.reply { align-items: flex-start; }
+.status { color: var(--ui-green-deep); font-size: 14px; }
+.answer .results, .answer .products { list-style: none; padding: 0; }
+.results { display: grid; gap: 8px; }
+.result { padding: 8px 10px; border: 1px solid var(--ui-border); border-radius: 10px; background: var(--ui-card); }
+.products li { display: flex; align-items: baseline; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; font-size: 14px; }
+.products span { color: var(--ui-ink-muted); }
