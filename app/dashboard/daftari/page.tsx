@@ -8,6 +8,8 @@ import { api, ApiError } from "@/lib/api-client";
 import { uiVars } from "@/components/ui/vars";
 import MonthSummaryCard, { MonthSummary } from "@/components/daftari/MonthSummaryCard";
 import AddEntryForm, { EntryFormState } from "@/components/daftari/AddEntryForm";
+import PlatformSummary from "@/components/daftari/PlatformSummary";
+import { type PlatformSalesSummary } from "@/lib/daftari/platform-sales";
 import EntryRow from "@/components/daftari/EntryRow";
 import { DaftariEntryItem } from "@/components/daftari/types";
 import s from "@/components/daftari/daftari.module.css";
@@ -17,6 +19,9 @@ const EMPTY_FORM: EntryFormState = { type: "SALE", amount: "", expenseCategory: 
 export default function DaftariPage() {
   const [entries, setEntries] = useState<DaftariEntryItem[]>([]);
   const [summary, setSummary] = useState<MonthSummary | null>(null);
+  const [platform, setPlatform] = useState<PlatformSalesSummary | null>(null);
+  const [reports, setReports] = useState(false);
+  const [advanced, setAdvanced] = useState(false);
   const [loading, setLoading] = useState(true);
   const [accessError, setAccessError] = useState("");
   const [form, setForm] = useState<EntryFormState>(EMPTY_FORM);
@@ -25,8 +30,8 @@ export default function DaftariPage() {
 
   const load = () => {
     api
-      .get<{ entries: DaftariEntryItem[]; monthSummary: MonthSummary }>("/api/daftari/entries?limit=30")
-      .then((d) => { setEntries(d.entries); setSummary(d.monthSummary); })
+      .get<{ entries: DaftariEntryItem[]; monthSummary: MonthSummary; platform: PlatformSalesSummary; capabilities: { reports: boolean; advanced: boolean } }>("/api/daftari/entries?limit=30")
+      .then((d) => { setEntries(d.entries); setSummary(d.monthSummary); setPlatform(d.platform); setReports(d.capabilities.reports); setAdvanced(d.capabilities.advanced); })
       .catch((err) => setAccessError(err instanceof ApiError ? err.message : "تعذّر تحميل دفاتري"))
       .finally(() => setLoading(false));
   };
@@ -81,9 +86,12 @@ export default function DaftariPage() {
           <Wallet size={26} strokeWidth={1.8} aria-hidden="true" />
           دفاتري
         </h1>
-        <p className={s.sub}>محاسبة بسيطة لمتجرك: مبيعاتك ومصروفاتك وأرباحك في مكان واحد</p>
+        <p className={s.sub}>دفتر مالي لمتجرك: المبيعات والمصروفات والاسترجاعات المسجلة في مكان واحد</p>
       </div>
 
+      {platform && <PlatformSummary summary={platform} reports={reports} advanced={advanced} />}
+      <h2 className={s.panelTitle}>الدفتر اليدوي — خارج المنصة</h2>
+      <p className={s.sub}>لا تسجل مبيعات المنصة مرة أخرى. الأرقام اليدوية مستقلة ولا تُجمع تلقائيًا مع مبيعات المنصة، تفاديًا لتكرار قيود سابقة.</p>
       {summary && <MonthSummaryCard summary={summary} />}
 
       <div className={s.layout}>
@@ -95,7 +103,7 @@ export default function DaftariPage() {
             </div>
           </div>
           {entries.length === 0 ? (
-            <p className={s.empty}>لا توجد قيود بعد — سجّل أول عملية بيع أو مصروف</p>
+            <p className={s.empty}>لا توجد قيود بعد — سجّل أول عملية بيع خارج المنصة أو مصروف</p>
           ) : (
             <ul className={s.list}>
               {entries.map((e) => <li key={e.id}><EntryRow entry={e} /></li>)}

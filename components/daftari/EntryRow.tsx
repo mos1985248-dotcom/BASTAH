@@ -34,9 +34,9 @@ export default function EntryRow({ entry }: { entry: DaftariEntryItem }) {
         <span className={s.desc}>{description}</span>
         <span className={s.meta}>{ENTRY_TYPE_LABEL[entry.type] ?? entry.type}</span>
       </div>
-      <span className={s.date}>{new Date(entry.entryDate).toLocaleDateString("ar-SA-u-ca-gregory")}</span>
+      <span className={s.date}>{new Date(entry.entryDate).toLocaleDateString("ar-SA-u-ca-gregory", {timeZone:"Asia/Riyadh"})}</span>
       <span className={s.amount} style={{ color: isNegative ? "var(--ui-danger)" : "var(--ui-green)" }}>
-        {isNegative ? "−" : "+"}{entry.amount} ر.س
+        {isNegative ? "−" : "+"}{entry.amount.toFixed(2)} ر.س
         <span className={s.amountNote}>{isNegative ? "خصم من الرصيد" : "إضافة للرصيد"}</span>
       </span>
     </article>

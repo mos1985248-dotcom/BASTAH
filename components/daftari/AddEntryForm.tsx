@@ -33,9 +33,9 @@ export default function AddEntryForm({
         <label className={s.fieldWrap}>
           <span className={s.fieldLabel}>نوع القيد</span>
           <select value={form.type} onChange={(e) => onChange({ type: e.target.value })} className={s.field}>
-            <option value="SALE">بيع (دخل)</option>
+            <option value="SALE">بيع خارج المنصة</option>
             <option value="EXPENSE">مصروف</option>
-            <option value="REFUND">استرداد</option>
+            <option value="REFUND">استرداد خارج المنصة</option>
             <option value="WITHDRAWAL">سحب أرباح</option>
             <option value="ADJUSTMENT">تعديل يدوي</option>
           </select>
@@ -43,7 +43,7 @@ export default function AddEntryForm({
 
         <label className={s.fieldWrap}>
           <span className={s.fieldLabel}>المبلغ</span>
-          <input type="number" min={0} value={form.amount} onChange={(e) => onChange({ amount: e.target.value })} placeholder="المبلغ (ر.س)" className={`${s.field} ${s.ltr}`} />
+          <input type="number" min={0.01} step={0.01} value={form.amount} onChange={(e) => onChange({ amount: e.target.value })} placeholder="المبلغ (ر.س)" className={`${s.field} ${s.ltr}`} />
         </label>
 
         {form.type === "EXPENSE" && (

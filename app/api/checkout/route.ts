@@ -20,6 +20,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { snapshotDaftariCosts } from "@/lib/daftari/snapshot";
 import { snapshotCodShare } from "@/lib/finance/snapshots";
 import { requireUser, AuthError } from "@/lib/auth";
 import { checkoutSchema, formatZodError } from "@/lib/validation";
@@ -185,6 +186,7 @@ export async function POST(req: NextRequest) {
         select: { id: true, orderNumber: true, total: true },
       });
 
+      await snapshotDaftariCosts(tx, newOrder.id, storeId);
       if (shippingRateLogId) {
         await tx.shippingRate.update({ where: { id: shippingRateLogId }, data: { orderId: newOrder.id } });
         // المركز المالي: تثبيت حصة الناقل من رسم COD وقت الطلب بحسب شروطه السارية (لا يتأثر القديم بتعديل الإعدادات)

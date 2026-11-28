@@ -14,7 +14,8 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:seed-blog": "tsx prisma/seed-blog.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test:daftari": "tsx --test tests/daftari/*.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.27.3",

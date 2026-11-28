@@ -316,6 +316,8 @@ model Store {
   aiSessions      ChatSession[]     @relation("StoreSessions")
   publicInfo      StorePublicInfo?
   daftariEntries  DaftariEntry[]
+  daftariBudgets DaftariBudget[]
+  daftariCashEntries DaftariCashEntry[]
   // ⚠️ لوحة التسويق (القسم ٣) — بنية فقط، بدون أي Provider حقيقي بعد
   marketingContent MarketingContent[]
   adCampaigns      AdCampaign[]
@@ -869,6 +871,7 @@ model OrderItem {
   price       Float
   quantity    Int
   total       Float
+  daftariCostSnapshot DaftariOrderItemCost?
   @@index([orderId])
   @@index([productId])
 
@@ -2294,4 +2297,41 @@ model MuniraImage {
   @@index([scope, window, state])
   @@index([day, provider])
   @@map("munira_images")
+}
+
+// Private historical estimate; never included by default in public order item responses.
+model DaftariOrderItemCost {
+  orderItemId String @id
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  productCostMinor Int
+  capturedAt DateTime @default(now())
+  @@map("daftari_order_item_costs")
+}
+
+model DaftariBudget {
+  storeId String
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  year Int
+  month Int
+  revenueMinor BigInt
+  expensesMinor BigInt
+  updatedAt DateTime @updatedAt
+  @@id([storeId, year, month])
+  @@map("daftari_budgets")
+}
+
+model DaftariCashEntry {
+  id String @id @default(cuid())
+  storeId String
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  requestId String
+  direction String
+  category String
+  amountMinor BigInt
+  occurredAt DateTime
+  description String?
+  createdAt DateTime @default(now())
+  @@unique([storeId, requestId])
+  @@index([storeId, occurredAt])
+  @@map("daftari_cash_entries")
 }

@@ -1,0 +1,66 @@
+name: Daftari validation
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: local_test_only
+          POSTGRES_DB: daftari_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:local_test_only@127.0.0.1:5432/daftari_test
+      DIRECT_URL: postgresql://postgres:local_test_only@127.0.0.1:5432/daftari_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        id: install
+      - run: npx prisma validate
+      - name: Create Supabase-compatible test roles
+        run: |
+          docker exec ${{ job.services.postgres.id }} psql -U postgres -d daftari_test -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS;"
+      - run: npx prisma migrate deploy
+      - run: npm run test:daftari
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+      - run: npx tsc --noEmit
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit all dependencies
+        run: |
+          npm audit --json > audit-all.json || true
+          node -e 'const a=require("./audit-all.json"); if(!a.metadata?.vulnerabilities) {console.error("Audit unavailable",a.error);process.exit(1)}; console.log(JSON.stringify(a.metadata.vulnerabilities)); for(const [name,v] of Object.entries(a.vulnerabilities||{})) console.log(JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,via:v.via,range:v.range,fixAvailable:v.fixAvailable}))'
+      - name: Audit production dependencies and enforce high severity gate
+        run: |
+          npm audit --omit=dev --json > audit-production.json || true
+          node -e 'const a=require("./audit-production.json"); if(!a.metadata?.vulnerabilities) {console.error("Audit unavailable",a.error);process.exit(1)}; console.log(JSON.stringify(a.metadata.vulnerabilities)); for(const [name,v] of Object.entries(a.vulnerabilities||{})) console.log(JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,via:v.via,range:v.range,fixAvailable:v.fixAvailable})); if(a.metadata.vulnerabilities.high || a.metadata.vulnerabilities.critical) process.exitCode=1'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-audit
+          path: audit-*.json

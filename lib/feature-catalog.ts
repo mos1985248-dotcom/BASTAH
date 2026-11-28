@@ -3,6 +3,8 @@ export const featureCatalog = {
   products: ["عدد المنتجات", 0],
   pricing: ["محرك التسعير", 0],
   daftari: ["دفاتري", 1],
+  daftari_reports: ["دفاتري — التقارير وربحية المنتجات", 2],
+  daftari_advanced: ["دفاتري — الإدارة المالية المتقدمة", 3],
   munira: ["منيرة", 1],
   munira_images: ["توليد الصور مع منيرة", 2],
   abandoned_carts: ["السلات المتروكة", 2],
