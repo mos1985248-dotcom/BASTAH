@@ -73,3 +73,7 @@
 @media (max-width: 767px) {
   .name { font-size: 23px; font-weight: 500; }
 }
+
+@media (min-width: 1024px) {
+  .name { font-size: 23px; }
+}
