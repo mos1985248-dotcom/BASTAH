@@ -33,7 +33,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+        id: install
       - run: npx prisma validate
+      - name: Create Supabase-compatible test roles
+        run: |
+          docker exec ${{ job.services.postgres.id }} psql -U postgres -d daftari_test -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN BYPASSRLS;"
       - run: npx prisma migrate deploy
       - run: npm run test:daftari
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
       - run: npx tsc --noEmit
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
