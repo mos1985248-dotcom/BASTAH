@@ -48,6 +48,8 @@ export const authRateLimit = makeLimiter(Ratelimit.slidingWindow(5, "60 s"), "ra
 export const apiRateLimit = makeLimiter(Ratelimit.slidingWindow(60, "60 s"), "ratelimit:api"); // 60 طلب/دقيقة — عام
 export const aiRateLimit = makeLimiter(Ratelimit.slidingWindow(15, "60 s"), "ratelimit:ai"); // 15 طلب/دقيقة — منيرة (مكلفة: Claude + Whisper + fal.ai)
 export const webhookRateLimit = makeLimiter(Ratelimit.slidingWindow(100, "60 s"), "ratelimit:webhook");
+export const publicMuniraLimit = makeLimiter(Ratelimit.slidingWindow(12, "1 h"), "ratelimit:munira:public");
+export const publicTicketLimit = makeLimiter(Ratelimit.slidingWindow(3, "24 h"), "ratelimit:munira:ticket");
 
 // ── Role-aware AI rate limits (daily quotas) ──────────────
 // IP-only كان كافياً للـ API العام، لكن AI calls مكلفة ولا يجب مشاركة

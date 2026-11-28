@@ -1300,8 +1300,9 @@ model AIUsage {
 model SupportTicket {
   id          String          @id @default(cuid())
   ticketNumber String         @unique // TKT-1001
-  userId      String
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guestEmail  String?
   subject     String
   category    String          // technical | billing | order | other
   status      TicketStatus    @default(OPEN)
@@ -1322,8 +1323,8 @@ model TicketMessage {
   id          String        @id @default(cuid())
   ticketId    String
   ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
   content     String        @db.Text
   attachments String[]      @default([])
   isInternal  Boolean       @default(false) // ملاحظات داخلية للدعم

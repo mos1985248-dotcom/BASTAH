@@ -1,3 +1,5 @@
+"use client";
+
 // components/home/MuniraShowcase.tsx
 import {
   BarChart3,
@@ -45,9 +47,9 @@ export default function MuniraShowcase() {
             ))}
           </ul>
 
-          <a href="/dashboard/munira" className={s.cta}>
+          <button type="button" className={s.cta} onClick={() => document.getElementById("public-munira-launch")?.click()}>
             اسأل منيرة
-          </a>
+          </button>
         </div>
 
         <MuniraChat />
