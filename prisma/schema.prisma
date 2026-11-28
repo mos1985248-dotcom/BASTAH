@@ -2309,3 +2309,14 @@ model MuniraKnowledgeArticle {
   @@index([published])
   @@map("munira_knowledge_articles")
 }
+
+model MuniraKnowledgeGap {
+  id          String   @id @default(cuid())
+  questionKey String   @unique
+  question    String
+  occurrences Int      @default(1)
+  resolved    Boolean  @default(false)
+  lastSeenAt  DateTime @default(now())
+  @@index([resolved, lastSeenAt])
+  @@map("munira_knowledge_gaps")
+}

@@ -3,9 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import { api, ApiError } from "@/lib/api-client";
 import s from "@/components/dashboard/forms.module.css";
 
+type Gap = { id: string; question: string; occurrences: number };
 type Article = { id: string; question: string; answer: string; aliases: string[]; published: boolean };
 export default function MuniraKnowledge() {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [gaps, setGaps] = useState<Gap[]>([]);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [aliases, setAliases] = useState("");
@@ -14,8 +16,8 @@ export default function MuniraKnowledge() {
   const [ready, setReady] = useState(false);
   const [status, setStatus] = useState("");
   const load = useCallback(async () => {
-    const result = await api.get<{ articles: Article[] }>("/api/admin/munira/knowledge");
-    setArticles(result.articles); setReady(true);
+    const result = await api.get<{ articles: Article[]; gaps: Gap[] }>("/api/admin/munira/knowledge");
+    setArticles(result.articles); setGaps(result.gaps); setReady(true);
   }, []);
   useEffect(() => { void load().catch(() => setStatus("مكتبة المعرفة غير متاحة. تحقق من تجهيز قاعدة البيانات.")); }, [load]);
   const edit = (item: Article) => {
@@ -40,6 +42,13 @@ export default function MuniraKnowledge() {
         <label><input type="checkbox" checked={published} onChange={e => setPublished(e.target.checked)} /> نشر للزوار</label>
         <div className={s.itemActions}><button className={s.cta} disabled={busy || !ready}>حفظ المادة</button><button type="button" className={s.btnSm} onClick={() => { setQuestion(""); setAnswer(""); setAliases(""); setPublished(false); setStatus(""); }}>مادة جديدة</button></div>
       </form>
+      <h3>الأسئلة التي تحتاج مراجعة</h3>
+      <p>الأسئلة العامة المؤهلة للتسجيل خلال آخر 30 يومًا، مرتبة حسب التكرار. لا تُنشر أي إجابة تلقائيًا.</p>
+      {ready && !gaps.length && <p>لا توجد أسئلة معلقة مسجلة.</p>}
+      {gaps.map(item => <article key={item.id} className={s.panel}><div className={s.panelBody}>
+        <strong>{item.question}</strong><p>عدد مرات الورود: {item.occurrences}</p>
+        <button type="button" className={s.btnSm} disabled={busy} onClick={() => { setQuestion(item.question); setAnswer(""); setAliases(""); setPublished(false); setStatus("أدخل الإجابة المعتمدة ثم احفظها للنشر."); }}>إعداد إجابة</button>
+      </div></article>)}
       {articles.map(item => <article key={item.id} className={s.panel}><div className={s.panelBody}>
         <strong>{item.question}</strong><p>{item.answer}</p><p>{item.published ? "منشورة" : "مسودة"}</p>
         <button type="button" className={s.btnSm} onClick={() => edit(item)}>تعديل</button>

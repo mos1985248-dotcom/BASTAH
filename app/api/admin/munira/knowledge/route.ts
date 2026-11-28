@@ -20,7 +20,8 @@ export async function GET() {
   try {
     await requireRole("ADMIN", "SUPER_ADMIN");
     const articles = await prisma.muniraKnowledgeArticle.findMany({ orderBy: { updatedAt: "desc" }, take: 100 });
-    return NextResponse.json({ articles }, { headers });
+    const gaps = await prisma.muniraKnowledgeGap.findMany({ where: { resolved: false, lastSeenAt: { gte: new Date(Date.now() - 30 * 86400000) } }, orderBy: [{ occurrences: "desc" }, { lastSeenAt: "desc" }], take: 100 });
+    return NextResponse.json({ articles, gaps }, { headers });
   } catch (error) { return errorResponse(error); }
 }
 export async function POST(request: Request) {
@@ -36,7 +37,9 @@ export async function POST(request: Request) {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(73829104)`;
       const existing = await tx.muniraKnowledgeArticle.findUnique({ where: { questionKey } });
       if (!existing && await tx.muniraKnowledgeArticle.count() >= 100) return null;
-      return tx.muniraKnowledgeArticle.upsert({ where: { questionKey }, create: data, update: data });
+      const saved = await tx.muniraKnowledgeArticle.upsert({ where: { questionKey }, create: data, update: data });
+      if (data.published) await tx.muniraKnowledgeGap.updateMany({ where: { questionKey: { in: [questionKey, ...data.aliases.map(normalizeArabic)] } }, data: { resolved: true } });
+      return saved;
     });
     if (!result) return fail("وصلت المكتبة إلى حد 100 مادة.", 409);
     return NextResponse.json({ article: result }, { headers });
