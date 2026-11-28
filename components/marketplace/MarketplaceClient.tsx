@@ -4,6 +4,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { t } from "@/theme";
+import { api } from "@/lib/api-client";
 import { uiVars } from "@/components/ui/vars";
 import SiteShell from "@/components/layout/SiteShell";
 import type { HomeStore } from "@/components/home/StoreCard";
@@ -32,13 +33,28 @@ function MarketplaceContent() {
   const [term, setTerm] = useState(search); // البحث المعتمد: بعد توقّف الكتابة أو عند الإرسال
   const [category, setCategory] = useState(searchParams.get("category") ?? "");
   const [sort, setSort] = useState("popular");
+  const [city, setCity] = useState(searchParams.get("city") ?? "");
+  const [cities, setCities] = useState<string[]>([]);
+  const [citiesError, setCitiesError] = useState(false);
+  useEffect(() => {
+    let active = true;
+    api.get<{ cities: string[] }>("/api/stores/cities").then(d => { if (active) setCities(d.cities); }).catch(() => { if (active) setCitiesError(true); });
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    setView(searchParams.get("view") === "stores" ? "stores" : "products");
+    const query = searchParams.get("search") ?? "";
+    setSearch(query); setTerm(query);
+    setCategory(searchParams.get("category") ?? "");
+    setCity(searchParams.get("city") ?? "");
+  }, [searchParams]);
 
   useEffect(() => {
     const id = setTimeout(() => setTerm(search), 350);
     return () => clearTimeout(id);
   }, [search]);
 
-  const filters = { ...(term ? { search: term } : {}), ...(category ? { category } : {}) };
+  const filters = { ...(term ? { search: term } : {}), ...(category ? { category } : {}), ...(city ? { city } : {}) };
   const products = useMarketData<MarketplaceProduct>("products", { sort, ...filters }, view === "products");
   const stores = useMarketData<HomeStore>("stores", { limit: "12", ...filters }, view === "stores");
   const active = view === "products" ? products : stores;
@@ -49,7 +65,7 @@ function MarketplaceContent() {
         <MarketplaceHero search={search} onSearchChange={setSearch} onSubmit={() => setTerm(search)} />
 
         <div className={s.page} style={{ ...uiVars, maxWidth: t.layout.containerMaxWidth }}>
-          <MarketControls view={view} onViewChange={setView} category={category} onCategoryChange={setCategory} />
+          <MarketControls view={view} onViewChange={setView} category={category} onCategoryChange={setCategory} city={city} cities={cities} citiesError={citiesError} onCityChange={setCity} />
 
           {view === "products" ? (
             <>
@@ -61,7 +77,7 @@ function MarketplaceContent() {
               <h2 id="market-stores-heading" className={s.storesTitle} style={{ fontFamily: t.typography.fontFamily.display }}>
                 ممشى البسطات
               </h2>
-              <SortBar total={stores.pagination.total} unit="متجر" />
+              <SortBar total={stores.pagination.total} unit="بسطة" />
               <StoreGrid stores={stores.items} loading={stores.loading} error={stores.error} onRetry={() => stores.load(1)} />
             </section>
           )}

@@ -123,3 +123,8 @@
   .storesTitle { font-size: var(--type-section); }
   .tab { font-size: 14px; }
 }
+
+.cityFilter { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:13px; color:var(--ui-green-deep); }
+.cityFilter label { font-weight:500; }
+.cityFilter .select { min-width:140px; max-width:100%; font-size:13px; }
+.resetFilters { border:0; background:none; color:var(--ui-green-deep); text-decoration:underline; font:inherit; cursor:pointer; min-height:44px; }

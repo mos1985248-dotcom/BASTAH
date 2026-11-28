@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser, AuthError } from "@/lib/auth";
 import { createStoreSchema, listStoresQuerySchema, formatZodError } from "@/lib/validation";
 import { calculateDistance, boundingBox } from "@/lib/geolocation";
+import { GOOD_STANDING_STATUSES } from "@/lib/subscription-limits";
 import type { Prisma } from "@prisma/client";
 
 function generateSlug(nameAr: string): string {
@@ -30,6 +31,7 @@ export async function GET(req: NextRequest) {
 
   const where: Prisma.StoreWhereInput = {
     status: "ACTIVE", // المعلّق/قيد المراجعة لا يظهر للعامة أبداً
+    subscription: { status: { in: GOOD_STANDING_STATUSES } },
   };
   if (city) where.city = { equals: city, mode: "insensitive" };
   if (search) {
@@ -39,7 +41,7 @@ export async function GET(req: NextRequest) {
     ];
   }
   if (category) {
-    where.categories = { some: { category: { slug: category } } };
+    where.products = { some: { status: "ACTIVE", category: { slug: category } } };
   }
 
   // ⚠️ Geolocation (اختياري تماماً) — يُفعَّل فقط لو أُرسلت الثلاثة معاً
