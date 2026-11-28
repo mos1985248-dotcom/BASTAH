@@ -10,7 +10,7 @@ import { assertStoreFeature } from "@/lib/feature-access";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireUser, AuthError } from "@/lib/auth";
+import { requireRole, AuthError } from "@/lib/auth";
 import { z } from "zod";
 
 const createEntrySchema = z.object({
@@ -23,7 +23,7 @@ const createEntrySchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await requireUser();
+    const user = await requireRole("SELLER");
     if (!user.store) return NextResponse.json({ error: "لا يوجد متجر مرتبط بحسابك" }, { status: 403 });
     await assertStoreFeature(user.store.id, "daftari");
 
@@ -34,12 +34,12 @@ export async function GET(req: NextRequest) {
 
     const [entries, total] = await Promise.all([
       prisma.daftariEntry.findMany({
-        where: { storeId: user.store.id },
+        where: { storeId: user.store.id, orderId: null, isManual: true },
         orderBy: { entryDate: "desc" },
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.daftariEntry.count({ where: { storeId: user.store.id } }),
+      prisma.daftariEntry.count({ where: { storeId: user.store.id, orderId: null, isManual: true } }),
     ]);
 
     const period = riyadhMonthOf(new Date());
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await requireUser();
+    const user = await requireRole("SELLER");
     if (!user.store) return NextResponse.json({ error: "لا يوجد متجر مرتبط بحسابك" }, { status: 403 });
     await assertStoreFeature(user.store.id, "daftari");
 

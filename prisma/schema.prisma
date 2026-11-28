@@ -317,6 +317,7 @@ model Store {
   publicInfo      StorePublicInfo?
   daftariEntries  DaftariEntry[]
   daftariBudgets DaftariBudget[]
+  daftariCashEntries DaftariCashEntry[]
   // ⚠️ لوحة التسويق (القسم ٣) — بنية فقط، بدون أي Provider حقيقي بعد
   marketingContent MarketingContent[]
   adCampaigns      AdCampaign[]
@@ -2317,4 +2318,20 @@ model DaftariBudget {
   updatedAt DateTime @updatedAt
   @@id([storeId, year, month])
   @@map("daftari_budgets")
+}
+
+model DaftariCashEntry {
+  id String @id @default(cuid())
+  storeId String
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  requestId String
+  direction String
+  category String
+  amountMinor BigInt
+  occurredAt DateTime
+  description String?
+  createdAt DateTime @default(now())
+  @@unique([storeId, requestId])
+  @@index([storeId, occurredAt])
+  @@map("daftari_cash_entries")
 }
