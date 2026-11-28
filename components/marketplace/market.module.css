@@ -117,3 +117,9 @@
   .count { font-size: 13px; }
   .toolbar { margin-bottom: 10px; }
 }
+
+@media (min-width: 1024px) {
+  .heroTitle { font-size: clamp(30px, 3vw, 38px); }
+  .storesTitle { font-size: var(--type-section); }
+  .tab { font-size: 14px; }
+}

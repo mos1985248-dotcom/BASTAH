@@ -39,3 +39,7 @@
 
 .compactSectionTitle { font-size: 28px; font-weight: 500; line-height: 1.5; }
 @media (max-width: 767px) { .compactSectionTitle { font-size: 22px; } }
+
+@media (min-width: 1024px) {
+  .sectionTitle, .compactSectionTitle { font-size: var(--type-section); }
+}

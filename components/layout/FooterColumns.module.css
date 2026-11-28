@@ -26,3 +26,8 @@
 }
 @media (prefers-reduced-motion: reduce) { .link { transition: none; } }
 /* basita-font-scale: applied */
+
+@media (min-width: 1024px) {
+  .title { font-size: 21px; }
+  .link { font-size: 14px; }
+}
