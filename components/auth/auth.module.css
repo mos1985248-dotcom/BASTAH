@@ -169,3 +169,30 @@
   .step { gap: 10px; }
   .input { font-size: 16px; }
 }
+
+/* Registration only: fit the standard form into the mobile viewport where space permits.
+   Keep scrolling available for small screens, validation messages and the keyboard. */
+@media (max-width: 767px) {
+  .compactRegister .aside { height: 60px; min-height: 60px; padding: 6px 12px; box-sizing: border-box; justify-content: center; }
+  .compactRegister .brandName { font-size: 19px; line-height: 1.3; }
+  .compactRegister .brandTag { font-size: 10px; line-height: 1.4; margin-top: 1px; }
+  .compactRegister .logoBox { width: 36px; height: 36px; border-radius: 10px; }
+  .compactRegister .logoBox img { width: 31px; height: 31px; }
+  .compactRegister .main { padding: 7px 12px max(8px, env(safe-area-inset-bottom)); }
+  .compactRegister .title { font-size: 20px; line-height: 1.4; }
+  .compactRegister .sub { font-size: 11px; line-height: 1.45; margin: 2px 0 7px; }
+  .compactRegister .card { padding: 9px 11px; border-radius: 15px; }
+  .compactRegister .stack { gap: 5px; }
+  .compactRegister .label { font-size: 12px; line-height: 1.3; margin-bottom: 2px; }
+  .compactRegister .input { height: 38px; border-radius: 10px; padding-inline: 11px; font-size: 16px; }
+  .compactRegister .withToggle { padding-inline-end: 44px; }
+  .compactRegister .toggle { width: 38px; height: 38px; }
+  .compactRegister .btn, .compactRegister .google, .compactRegister .role { min-height: 40px; }
+  .compactRegister .tab { min-height: 36px; }
+  .compactRegister .roles { gap: 6px; }
+  .compactRegister .role { border-radius: 10px; }
+  .compactRegister .divider { font-size: 11px; line-height: 1.3; }
+  .compactRegister .foot { font-size: 12px; line-height: 1.4; }
+  .compactRegister .foot a { min-height: 28px; }
+  .compactRegister .err { padding: 6px 8px; }
+}

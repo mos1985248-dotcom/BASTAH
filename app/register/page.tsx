@@ -94,11 +94,11 @@ export default function RegisterPage() {
 
   // نتجنّب رمشة نموذج فارغ لمستخدم سيُوجَّه فوراً لمكانه الصحيح
   if (userLoading || user) {
-    return <AuthShell title="إنشاء حساب جديد" subtitle=" " scene="souq"><div /></AuthShell>;
+    return <AuthShell title="إنشاء حساب جديد" subtitle=" " scene="souq" compact><div /></AuthShell>;
   }
 
   return (
-    <AuthShell title="إنشاء حساب جديد" subtitle="انضم إلى بسطة مارت — سوق الأسر المنتجة السعودية" scene="souq">
+    <AuthShell title="إنشاء حساب جديد" subtitle="انضم إلى بسطة مارت — سوق الأسر المنتجة السعودية" scene="souq" compact>
       <div className={s.stack}>
         <RoleSelect value={form.role} onChange={(v) => set("role", v)} />
 

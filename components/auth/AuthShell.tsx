@@ -32,16 +32,18 @@ export default function AuthShell({
   subtitle,
   scene = "heritage",
   children,
+  compact = false,
 }: {
   title?: string;
   subtitle?: string;
   scene?: keyof typeof SCENES;
   children: React.ReactNode;
+  compact?: boolean;
 }) {
   const view = SCENES[scene];
 
   return (
-    <div className={s.root} style={uiVars}>
+    <div className={`${s.root}${compact ? ` ${s.compactRegister}` : ""}`} style={uiVars}>
       <main className={s.main}>
         <div className={s.panel}>
           {title && <h1 className={s.title}>{title}</h1>}
